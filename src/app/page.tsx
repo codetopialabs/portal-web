@@ -1,65 +1,82 @@
-import Image from "next/image";
+import Link from "next/link";
+import { MoveRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black">
+      {/* Navigation */}
+      <header className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          {/* Replicating the logo from image */}
+          <div className="relative flex items-center justify-center w-10 h-10 border-2 border-white rounded-full">
+            <div className="absolute w-2 h-2 bg-white rounded-full -left-1 top-1/2 -translate-y-1/2" />
+            <div className="absolute w-2 h-2 bg-white rounded-full -right-1 top-1/2 -translate-y-1/2" />
+            <span className="text-xl font-light scale-y-150">/</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight">Codetopia | <span className="font-normal opacity-70">Community</span></span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        
+        <nav className="hidden md:flex items-center gap-8 text-sm font-bold tracking-widest uppercase">
+          <Link href="#" className="hover:opacity-70 transition-opacity">About</Link>
+          <Link href="#" className="hover:opacity-70 transition-opacity">Team</Link>
+          <Link href="#" className="hover:opacity-70 transition-opacity">Event & Activities</Link>
+          <Link href="#" className="hover:opacity-70 transition-opacity">Articles</Link>
+          <Link href="#" className="hover:opacity-70 transition-opacity">Gallery</Link>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 relative overflow-hidden">
+        {/* Background Image / Pattern Placeholder */}
+        <div className="absolute inset-0 z-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070')] bg-cover bg-center mix-blend-overlay" />
+        
+        <div className="relative z-10 text-center max-w-5xl mx-auto space-y-8">
+          <div className="space-y-2">
+            <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter opacity-20 leading-none">
+              GROW, COLLABORATE,
+            </h2>
+            <h1 className="text-7xl md:text-9xl font-black tracking-tight leading-none mt-[-10px]">
+              AND LEAD
+            </h1>
+          </div>
+
+          <p className="text-xl md:text-2xl text-zinc-300 max-w-3xl mx-auto font-medium leading-relaxed">
+            A community where developers and technologists learn together, collaborate, and grow.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-8">
+            <div className="relative group w-fit">
+              <div className="absolute inset-0 border border-white translate-x-[4px] translate-y-[4px] group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-300" />
+              <Link 
+                href="/signup" 
+                className="relative z-10 flex items-center justify-center h-16 px-10 bg-white text-black font-black uppercase tracking-widest text-sm hover:bg-zinc-200 transition-colors"
+              >
+                Join our community
+              </Link>
+            </div>
+            
+            <div className="relative group w-fit">
+              <div className="absolute inset-0 border border-zinc-800 translate-x-[4px] translate-y-[4px] group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-300" />
+              <Link 
+                href="/login" 
+                className="relative z-10 flex items-center justify-center gap-3 h-16 px-10 bg-black text-white border border-zinc-800 font-bold uppercase tracking-widest text-sm hover:bg-zinc-900 transition-colors"
+              >
+                Login <MoveRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* Footer / Branding */}
+      <footer className="py-12 flex flex-col items-center gap-4 opacity-30">
+        <div className="h-px w-24 bg-white/50 mb-4" />
+        <div className="flex gap-8 text-xs font-bold uppercase tracking-[0.3em]">
+          <span>Security</span>
+          <span>Sovereignty</span>
+          <span>Scalability</span>
+        </div>
+      </footer>
     </div>
   );
 }
