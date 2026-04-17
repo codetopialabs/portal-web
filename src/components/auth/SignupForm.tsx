@@ -23,12 +23,13 @@ export function SignupForm() {
 
   return (
     <div className="relative w-full max-w-[440px]">
+      <div className="absolute -inset-20 bg-white/[0.02] rounded-full blur-[100px] pointer-events-none" />
       <div className="space-y-8 relative z-20">
         <div className="space-y-2">
           <h2 className="text-3xl font-sans font-black tracking-tighter text-white uppercase">
             Create Account
           </h2>
-          <p className="text-[10px] text-zinc-400 font-mono tracking-[0.1em] uppercase">
+          <p className="text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase opacity-80">
             Join the Codetopia Community
           </p>
         </div>
@@ -36,7 +37,7 @@ export function SignupForm() {
         <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-3">
-              <label htmlFor="firstName" className="block text-[10px] text-zinc-400 font-mono tracking-[0.1em] uppercase">
+              <label htmlFor="firstName" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
                 First Name
               </label>
               <Input
@@ -47,13 +48,13 @@ export function SignupForm() {
                 autoComplete="given-name"
                 autoCorrect="off"
                 disabled={isLoading}
-                className="bg-[#050505] border-[1px] border-zinc-800 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-zinc-500 placeholder:text-zinc-700 transition-colors"
+                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
                 required
               />
             </div>
 
             <div className="space-y-3">
-              <label htmlFor="lastName" className="block text-[10px] text-zinc-400 font-mono tracking-[0.1em] uppercase">
+              <label htmlFor="lastName" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
                 Last Name
               </label>
               <Input
@@ -64,14 +65,14 @@ export function SignupForm() {
                 autoComplete="family-name"
                 autoCorrect="off"
                 disabled={isLoading}
-                className="bg-[#050505] border-[1px] border-zinc-800 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-zinc-500 placeholder:text-zinc-700 transition-colors"
+                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-3">
-            <label htmlFor="email" className="block text-[10px] text-zinc-400 font-mono tracking-[0.1em] uppercase">
+            <label htmlFor="email" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
               Email Address
             </label>
             <Input
@@ -82,13 +83,13 @@ export function SignupForm() {
               autoComplete="email"
               autoCorrect="off"
               disabled={isLoading}
-              className="bg-[#050505] border-[1px] border-zinc-800 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-zinc-500 placeholder:text-zinc-700 transition-colors"
+              className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
               required
             />
           </div>
 
           <div className="space-y-3">
-            <label htmlFor="password" className="block text-[10px] text-zinc-400 font-mono tracking-[0.1em] uppercase">
+            <label htmlFor="password" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
               Password
             </label>
             <div className="relative">
@@ -99,7 +100,7 @@ export function SignupForm() {
                 autoComplete="new-password"
                 autoCorrect="off"
                 disabled={isLoading}
-                className="bg-[#050505] border-[1px] border-zinc-800 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-zinc-500 placeholder:text-zinc-700 transition-colors pr-10"
+                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300 pr-10"
                 required
               />
               <button
@@ -137,9 +138,9 @@ export function SignupForm() {
 
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-zinc-800/80" />
+            <span className="w-full border-t border-zinc-700/50" />
           </div>
-          <div className="relative flex justify-center text-[9px] font-mono text-zinc-500 uppercase tracking-[0.3em]">
+          <div className="relative flex justify-center text-[9px] font-mono text-zinc-400 uppercase tracking-[0.3em]">
             <span className="bg-black px-4">Or sign up with</span>
           </div>
         </div>
@@ -147,7 +148,7 @@ export function SignupForm() {
         <div className="grid grid-cols-2 gap-4">
           <Button
             variant="outline"
-            className="bg-transparent border border-zinc-800 hover:bg-[#111] hover:text-white hover:border-zinc-600 text-zinc-400 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
+            className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
             disabled={isLoading}
           >
             <FcGoogle className="mr-2 h-4 w-4" />
@@ -155,17 +156,17 @@ export function SignupForm() {
           </Button>
           <Button
             variant="outline"
-            className="bg-transparent border border-zinc-800 hover:bg-[#111] hover:text-white hover:border-zinc-600 text-zinc-400 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
+            className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
             disabled={isLoading}
           >
-            <FaGithub className="mr-2 h-4 w-4 text-zinc-500 group-hover:text-white transition-colors" />
+            <FaGithub className="mr-2 h-4 w-4 text-zinc-400 group-hover:text-white transition-colors" />
             Github
           </Button>
         </div>
 
-        <div className="pt-8 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-zinc-500">
+        <div className="pt-8 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-zinc-400">
           <span className="mr-3">Already have an account?</span>
-          <Link href="/login" className="hover:text-white border-b border-zinc-800 hover:border-zinc-500 pb-1 transition-all">
+          <Link href="/login" className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all">
             Sign In
           </Link>
         </div>
