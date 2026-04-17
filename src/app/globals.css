@@ -3,9 +3,9 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-html {
+/* html {
   scroll-behavior: smooth;
-}
+} */
 
 /* Offset anchor scroll targets to account for sticky header */
 /* :target {

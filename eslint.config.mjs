@@ -5,6 +5,30 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    rules: {
+      // General Quality Checks
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "prefer-const": "error",
+      "no-var": "error",
+      "eqeqeq": ["error", "always"],
+
+      // TypeScript strictness
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ],
+      "@typescript-eslint/no-explicit-any": "warn",
+      
+      // React / UI Conventions
+      "react/self-closing-comp": "warn",
+      "react/no-unescaped-entities": "off",
+    }
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
