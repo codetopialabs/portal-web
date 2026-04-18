@@ -26,9 +26,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark h-full">
+    <html lang="en" className="h-full">
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-black text-white flex flex-col overflow-x-hidden`}
+        className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-white text-zinc-950 flex flex-col overflow-x-hidden`}
       >
         <TooltipProvider>
           <Toaster position="top-center" richColors theme="dark" />
