@@ -1,6 +1,6 @@
-# Codetopia Design System Extraction Guide
+<!-- # Codetopia Design System Extraction Guide
 
-This document provides a detailed breakdown of the styling, typography, colors, and interactive elements used in the Codetopia Community Website. Use these specifications to replicate the "Premium Technical" aesthetic in your new project.
+This document provides a detailed breakdown of the styling, typography, colors, and interactive elements used in the Codetopia Community Website. Use these specifications to replicate the aesthetic in your new project.
 
 ## 1. Typography & Hierarchy
 The site uses high-contrast typography, blending a bold sans-serif for impact with a technical monospaced font for details.
@@ -118,4 +118,4 @@ This is the core configuration to include in your `globals.css`.
 ## 6. Layout Principles
 - **Max Width**: Usually `max-w-screen-2xl` for content containers.
 - **Padding**: Generous vertical spacing (`py-24` to `py-32`) to create a "gallery" feel.
-- **Glassmorphism**: Limited use. Focus more on solid colors and sharp lines.
+- **Glassmorphism**: Limited use. Focus more on solid colors and sharp lines. -->

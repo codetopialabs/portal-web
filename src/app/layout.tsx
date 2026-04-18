@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -29,9 +30,11 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-black text-white flex flex-col overflow-x-hidden`}
       >
-        <Toaster position="top-center" richColors theme="dark" />
-        {children}
-        <Analytics />
+        <TooltipProvider>
+          <Toaster position="top-center" richColors theme="dark" />
+          {children}
+          <Analytics />
+        </TooltipProvider>
       </body>
     </html>
   );
