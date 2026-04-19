@@ -6,10 +6,8 @@ import {
   Home,
   User,
   Shield,
-  Key,
   Globe,
   History,
-  Settings,
   LogOut,
   AppWindow,
 } from "lucide-react";
@@ -28,6 +26,7 @@ import {
   useSidebar,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useLogoutMutation } from "@/hooks/useAuthMutations";
 
 const menuGroups = [
   {
@@ -42,7 +41,6 @@ const menuGroups = [
     items: [
       { icon: User, label: "Profile", href: "/profile" },
       { icon: Shield, label: "Security", href: "/security" },
-      { icon: Key, label: "Credentials", href: "/credentials" },
       { icon: AppWindow, label: "Authorized Apps", href: "/apps" },
     ],
   },
@@ -50,7 +48,6 @@ const menuGroups = [
     label: "Management",
     items: [
       { icon: History, label: "Activity Log", href: "/activity" },
-      { icon: Settings, label: "Preferences", href: "/settings" },
     ],
   },
 ];
@@ -59,6 +56,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const logout = useLogoutMutation();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-zinc-900 bg-black text-white">
@@ -103,7 +101,7 @@ export function DashboardSidebar() {
                           "h-9 rounded-none transition-all duration-150",
                           isActive
                             ? "!bg-white !text-black shadow-sm"
-                            : "text-zinc-500 hover:text-white hover:bg-zinc-900"
+                            : "text-white hover:text-white hover:bg-zinc-900"
                         )}
                       >
                         <Link href={item.href} className="flex items-center gap-3 px-3">
@@ -133,6 +131,8 @@ export function DashboardSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Log out"
+              onClick={() => logout.mutate()}
+              disabled={logout.isPending}
               className="h-9 rounded-none text-zinc-500 hover:text-white hover:bg-zinc-900 transition-colors justify-center gap-2"
             >
               <LogOut className="w-4 h-4 shrink-0" />

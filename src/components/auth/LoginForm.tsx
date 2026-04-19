@@ -2,38 +2,29 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useLoginMutation, type LoginFormValues } from "@/hooks/useAuthMutations";
 
 export function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<"email" | "password">("email");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const mutation = useLoginMutation();
 
-  async function handleEmailSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (!email) return;
+  const { register, handleSubmit, getValues, formState: { errors } } = useForm<LoginFormValues>();
 
-    setIsLoading(true);
-    // Simulate a check or just transition
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep("password");
-    }, 600);
+  function onEmailSubmit() {
+    setStep("password");
   }
 
-  async function handlePasswordSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Logging in with:", { email, password });
-    }, 2000);
+  function onPasswordSubmit() {
+    mutation.mutate({
+      email: getValues("email"),
+      password: getValues("password"),
+    });
   }
 
   return (
@@ -51,7 +42,7 @@ export function LoginForm() {
 
         {step === "email" ? (
           <>
-            <form onSubmit={handleEmailSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit(onEmailSubmit)} className="space-y-6">
               <div className="space-y-3">
                 <label htmlFor="email" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
                   Email Address
@@ -61,24 +52,26 @@ export function LoginForm() {
                     id="email"
                     placeholder="name@example.com"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     autoCapitalize="none"
                     autoComplete="email"
                     autoCorrect="off"
-                    disabled={isLoading}
+                    disabled={mutation.isPending}
                     className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
-                    required
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+                    })}
                   />
                   <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 group-focus-within:w-full" />
                 </div>
+                {errors.email && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.email.message}</p>}
               </div>
 
               <Button
-                disabled={isLoading || !email}
+                disabled={mutation.isPending}
                 className="w-full bg-white text-black hover:bg-zinc-200 h-14 rounded-none font-sans font-black text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-3"
               >
-                {isLoading ? (
+                {mutation.isPending ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
                 ) : (
                   <>
@@ -101,7 +94,7 @@ export function LoginForm() {
               <Button
                 variant="outline"
                 className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
-                disabled={isLoading}
+                disabled={mutation.isPending}
               >
                 <FcGoogle className="mr-2 h-4 w-4" />
                 Google
@@ -109,7 +102,7 @@ export function LoginForm() {
               <Button
                 variant="outline"
                 className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
-                disabled={isLoading}
+                disabled={mutation.isPending}
               >
                 <FaGithub className="mr-2 h-4 w-4 text-zinc-400 group-hover:text-white transition-colors" />
                 Github
@@ -118,14 +111,14 @@ export function LoginForm() {
           </>
         ) : (
           <>
-            <form onSubmit={handlePasswordSubmit} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+            <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="pb-2">
                 <div className="flex items-center gap-4 py-5 px-3 bg-[#0c0c0c] border border-zinc-800 transition-all cursor-pointer" onClick={() => setStep("email")}>
                   <div className="h-10 w-10 border border-zinc-700 bg-black flex items-center justify-center font-mono text-zinc-300">
-                    {email.charAt(0).toUpperCase()}
+                    {getValues("email").charAt(0).toUpperCase()}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-white font-mono text-xs tracking-widest truncate">{email}</span>
+                    <span className="text-white font-mono text-xs tracking-widest truncate">{getValues("email")}</span>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-1 h-1 bg-zinc-500" />
                       <span className="text-[9px] text-zinc-300 font-mono uppercase tracking-[0.2em]">Switch Account</span>
@@ -142,23 +135,29 @@ export function LoginForm() {
                   <Input
                     id="password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     autoFocus
-                    disabled={isLoading}
+                    disabled={mutation.isPending}
                     className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
-                    required
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: { value: 8, message: "Min 8 characters" },
+                    })}
                   />
                   <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 group-focus-within:w-full" />
                 </div>
+                {errors.password && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.password.message}</p>}
               </div>
 
+              {mutation.isError && (
+                <p className="text-red-400 font-mono text-xs tracking-wider">{mutation.error?.message}</p>
+              )}
+
               <Button
-                disabled={isLoading || !password}
+                disabled={mutation.isPending}
                 className="w-full bg-white text-black hover:bg-zinc-200 h-14 rounded-none font-sans font-black text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-3"
               >
-                {isLoading ? (
+                {mutation.isPending ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
                 ) : (
                   <>
@@ -182,4 +181,3 @@ export function LoginForm() {
     </div>
   );
 }
-

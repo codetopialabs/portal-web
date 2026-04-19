@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Providers } from "@/components/layout/Providers";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -30,11 +31,13 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-white text-zinc-950 flex flex-col overflow-x-hidden`}
       >
-        <TooltipProvider>
-          <Toaster position="top-center" richColors theme="dark" />
-          {children}
-          <Analytics />
-        </TooltipProvider>
+        <Providers>
+          <TooltipProvider>
+            <Toaster position="top-center" richColors theme="dark" />
+            {children}
+            <Analytics />
+          </TooltipProvider>
+        </Providers>
       </body>
     </html>
   );
