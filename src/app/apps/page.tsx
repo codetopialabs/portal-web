@@ -55,7 +55,6 @@ export default function AuthorizedAppsPage() {
   return (
     <DashboardShell>
       <div className="max-w-3xl space-y-8 pb-20">
-
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
@@ -87,13 +86,18 @@ export default function AuthorizedAppsPage() {
               {searchQuery ? "No results found" : "No Apps Connected"}
             </p>
             <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-              {searchQuery ? "Try a different search term" : "You haven't authorized any third-party apps yet"}
+              {searchQuery
+                ? "Try a different search term"
+                : "You haven't authorized any third-party apps yet"}
             </p>
           </div>
         ) : (
           <div className="border border-zinc-200 bg-white overflow-hidden divide-y divide-zinc-100">
             {filtered.map((app) => (
-              <div key={app.id} className="p-5 flex items-center gap-5 group hover:bg-zinc-50 transition-all">
+              <div
+                key={app.id}
+                className="p-5 flex items-center gap-5 group hover:bg-zinc-50 transition-all"
+              >
                 {/* Icon */}
                 <div className="w-10 h-10 border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0">
                   <AppWindow className="w-4 h-4 text-zinc-400" />
@@ -146,7 +150,6 @@ export default function AuthorizedAppsPage() {
             {filtered.length} app{filtered.length !== 1 ? "s" : ""} connected
           </p>
         )}
-
       </div>
     </DashboardShell>
   );

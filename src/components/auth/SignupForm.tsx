@@ -12,7 +12,11 @@ import { useRegisterMutation, type SignupFormValues } from "@/hooks/useAuthMutat
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormValues>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormValues>();
   const mutation = useRegisterMutation();
 
   function onSubmit(data: SignupFormValues) {
@@ -35,7 +39,10 @@ export function SignupForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-3">
-              <label htmlFor="firstName" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+              <label
+                htmlFor="firstName"
+                className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+              >
                 First Name
               </label>
               <Input
@@ -47,13 +54,23 @@ export function SignupForm() {
                 autoCorrect="off"
                 disabled={mutation.isPending}
                 className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
-                {...register("firstName", { required: "First name is required", minLength: { value: 2, message: "Min 2 characters" } })}
+                {...register("firstName", {
+                  required: "First name is required",
+                  minLength: { value: 2, message: "Min 2 characters" },
+                })}
               />
-              {errors.firstName && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.firstName.message}</p>}
+              {errors.firstName && (
+                <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                  {errors.firstName.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
-              <label htmlFor="lastName" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+              <label
+                htmlFor="lastName"
+                className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+              >
                 Last Name
               </label>
               <Input
@@ -65,14 +82,24 @@ export function SignupForm() {
                 autoCorrect="off"
                 disabled={mutation.isPending}
                 className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
-                {...register("lastName", { required: "Last name is required", minLength: { value: 2, message: "Min 2 characters" } })}
+                {...register("lastName", {
+                  required: "Last name is required",
+                  minLength: { value: 2, message: "Min 2 characters" },
+                })}
               />
-              {errors.lastName && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.lastName.message}</p>}
+              {errors.lastName && (
+                <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                  {errors.lastName.message}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="space-y-3">
-            <label htmlFor="email" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+            <label
+              htmlFor="email"
+              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+            >
               Email Address
             </label>
             <Input
@@ -89,11 +116,18 @@ export function SignupForm() {
                 pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
               })}
             />
-            {errors.email && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
-            <label htmlFor="username" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+            <label
+              htmlFor="username"
+              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+            >
               Username
             </label>
             <Input
@@ -108,14 +142,24 @@ export function SignupForm() {
               {...register("username", {
                 required: "Username is required",
                 minLength: { value: 3, message: "Min 3 characters" },
-                pattern: { value: /^[a-zA-Z0-9_]+$/, message: "Letters, numbers and underscores only" },
+                pattern: {
+                  value: /^[a-zA-Z0-9_]+$/,
+                  message: "Letters, numbers and underscores only",
+                },
               })}
             />
-            {errors.username && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.username.message}</p>}
+            {errors.username && (
+              <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                {errors.username.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
-            <label htmlFor="password" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+            <label
+              htmlFor="password"
+              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+            >
               Password
             </label>
             <div className="relative">
@@ -140,19 +184,36 @@ export function SignupForm() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {errors.password && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-4">
             <div className="text-[10px] text-zinc-500 font-mono tracking-wider leading-relaxed text-center px-4">
               By continuing, you agree to our{" "}
-              <Link href="/terms" className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all">Terms of Service</Link>
-              {" "}and{" "}
-              <Link href="/privacy" className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all">Privacy Policy</Link>.
+              <Link
+                href="/terms"
+                className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy"
+                className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all"
+              >
+                Privacy Policy
+              </Link>
+              .
             </div>
 
             {mutation.isError && (
-              <p className="text-red-400 font-mono text-xs tracking-wider">{mutation.error?.message}</p>
+              <p className="text-red-400 font-mono text-xs tracking-wider">
+                {mutation.error?.message}
+              </p>
             )}
 
             <Button
@@ -200,7 +261,10 @@ export function SignupForm() {
 
         <div className="pt-8 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-zinc-400">
           <span className="mr-3">Already have an account?</span>
-          <Link href="/login" className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all">
+          <Link
+            href="/login"
+            className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all"
+          >
             Sign In
           </Link>
         </div>

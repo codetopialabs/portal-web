@@ -19,16 +19,36 @@ import Link from "next/link";
 import React from "react";
 
 const quickActions = [
-  { icon: Lock,      label: "Change Password",  description: "Update your security credentials", href: "/security" },
-  { icon: Shield,    label: "Two-Factor Auth",   description: "Enable additional security",       href: "/security" },
-  { icon: Edit3,     label: "Update Profile",    description: "Edit your publicly visible data",  href: "/profile"  },
-  { icon: UserCheck, label: "Authorized Apps",   description: "Manage third-party access",        href: "/apps"     },
+  {
+    icon: Lock,
+    label: "Change Password",
+    description: "Update your security credentials",
+    href: "/security",
+  },
+  {
+    icon: Shield,
+    label: "Two-Factor Auth",
+    description: "Enable additional security",
+    href: "/security",
+  },
+  {
+    icon: Edit3,
+    label: "Update Profile",
+    description: "Edit your publicly visible data",
+    href: "/profile",
+  },
+  {
+    icon: UserCheck,
+    label: "Authorized Apps",
+    description: "Manage third-party access",
+    href: "/apps",
+  },
 ];
 
 const connectedApps = [
-  { name: "Codetopia Discord",    scope: "Identity, Email", lastUsed: "2 hours ago" },
-  { name: "Community Forum",      scope: "Identity, Write", lastUsed: "Yesterday"   },
-  { name: "Dev Resources Portal", scope: "Identity, Read",  lastUsed: "3 days ago"  },
+  { name: "Codetopia Discord", scope: "Identity, Email", lastUsed: "2 hours ago" },
+  { name: "Community Forum", scope: "Identity, Write", lastUsed: "Yesterday" },
+  { name: "Dev Resources Portal", scope: "Identity, Read", lastUsed: "3 days ago" },
 ];
 
 const userData = {
@@ -36,13 +56,14 @@ const userData = {
   email: "kadin.v@codetopia.com",
   location: "Toronto, Ontario, Canada",
   joinedDate: "Jan 2024",
-  avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
+  avatarUrl:
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
   bannerUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064",
   roles: [
     { label: "Community Member" },
-    { label: "Active Volunteer"  },
-    { label: "Core Delegate"     },
-    { label: "Beta Tester"       },
+    { label: "Active Volunteer" },
+    { label: "Core Delegate" },
+    { label: "Beta Tester" },
   ],
   identityId: "#CT-7724-912A",
   phone: "+1 (555) 001-4920",
@@ -55,7 +76,9 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">{title}</h2>
+      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -68,7 +91,6 @@ export default function UserDashboard() {
   return (
     <DashboardShell>
       <div className="space-y-8 max-w-6xl">
-
         {/* ── Profile Header ── */}
         <section className="relative overflow-hidden border border-zinc-200 bg-white">
           {/* Banner */}
@@ -84,7 +106,11 @@ export default function UserDashboard() {
             <div className="flex flex-col md:flex-row items-start gap-6 w-full">
               {/* Avatar */}
               <div className="w-24 h-24 -mt-12 shrink-0 rounded-full overflow-hidden border-4 border-white shadow-lg relative z-20 bg-zinc-100">
-                <img src={userData.avatarUrl} alt={userData.name} className="w-full h-full object-cover" />
+                <img
+                  src={userData.avatarUrl}
+                  alt={userData.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Info */}
@@ -96,11 +122,20 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-zinc-400 font-mono text-[9px] uppercase tracking-widest mb-4">
-                  <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{userData.email}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Mail className="w-3 h-3" />
+                    {userData.email}
+                  </span>
                   <span className="text-zinc-200">·</span>
-                  <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3" />{userData.location}</span>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3" />
+                    {userData.location}
+                  </span>
                   <span className="text-zinc-200">·</span>
-                  <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" />Joined {userData.joinedDate}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3" />
+                    Joined {userData.joinedDate}
+                  </span>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
@@ -125,7 +160,8 @@ export default function UserDashboard() {
                 <Edit3 className="w-3.5 h-3.5" /> Edit
               </Link>
               <button className="h-10 px-6 bg-black text-white font-mono text-[9px] uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center gap-2 group">
-                Share <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                Share{" "}
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
             </div>
           </div>
@@ -133,10 +169,8 @@ export default function UserDashboard() {
 
         {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-
           {/* Left — Quick Actions + Identity Record */}
           <div className="lg:col-span-2 space-y-8">
-
             {/* Quick Actions */}
             <section className="space-y-4">
               <SectionHeader icon={Key} title="Quick Actions" />
@@ -171,19 +205,17 @@ export default function UserDashboard() {
               <SectionHeader icon={UserCheck} title="Identity Record" />
               <div className="bg-white border border-zinc-200 overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                  <DataField label="Community ID"    value={userData.identityId} />
-                  <DataField label="Full Name"        value={userData.name}       />
-                  <DataField label="Phone"            value={userData.phone}      />
-                  <DataField label="Address"          value={userData.address}    />
+                  <DataField label="Community ID" value={userData.identityId} />
+                  <DataField label="Full Name" value={userData.name} />
+                  <DataField label="Phone" value={userData.phone} />
+                  <DataField label="Address" value={userData.address} />
                 </div>
               </div>
             </section>
-
           </div>
 
           {/* Right — Connected Apps + Node Status */}
           <div className="space-y-8">
-
             {/* Connected Apps */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
@@ -191,7 +223,10 @@ export default function UserDashboard() {
               </div>
               <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
                 {connectedApps.map((app) => (
-                  <div key={app.name} className="flex items-center gap-3 p-4 hover:bg-zinc-50 transition-all">
+                  <div
+                    key={app.name}
+                    className="flex items-center gap-3 p-4 hover:bg-zinc-50 transition-all"
+                  >
                     <div className="w-8 h-8 border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0">
                       <AppWindow className="w-3.5 h-3.5 text-zinc-400" />
                     </div>
@@ -228,7 +263,9 @@ export default function UserDashboard() {
               <div className="bg-white border border-zinc-200 p-5 space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-zinc-900 rounded-full animate-pulse" />
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-900 font-bold">Active</span>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-900 font-bold">
+                    Active
+                  </span>
                 </div>
                 <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 leading-relaxed">
                   Your account is secure. Password last changed 4 days ago.
@@ -241,10 +278,8 @@ export default function UserDashboard() {
                 </Link>
               </div>
             </section>
-
           </div>
         </div>
-
       </div>
     </DashboardShell>
   );
@@ -253,8 +288,12 @@ export default function UserDashboard() {
 function DataField({ label, value }: { label: string; value: string }) {
   return (
     <div className="p-5 border-zinc-100 odd:border-r border-b last:border-b-0 hover:bg-zinc-50 transition-all">
-      <span className="block font-mono text-[8px] uppercase tracking-[0.3em] text-zinc-400 font-bold mb-1.5">{label}</span>
-      <span className="block font-mono text-xs font-bold text-zinc-900 tracking-tight">{value}</span>
+      <span className="block font-mono text-[8px] uppercase tracking-[0.3em] text-zinc-400 font-bold mb-1.5">
+        {label}
+      </span>
+      <span className="block font-mono text-xs font-bold text-zinc-900 tracking-tight">
+        {value}
+      </span>
     </div>
   );
 }

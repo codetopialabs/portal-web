@@ -13,11 +13,7 @@ export function Footer() {
       <span>© {currentYear} Codetopia. All rights reserved.</span>
       <div className="flex items-center gap-8 mt-4 md:mt-0 font-bold">
         {footerLinks.map((link) => (
-          <Link
-            key={link.label}
-            href={link.href}
-            className="hover:text-white transition-colors"
-          >
+          <Link key={link.label} href={link.href} className="hover:text-white transition-colors">
             {link.label}
           </Link>
         ))}

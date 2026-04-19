@@ -6,12 +6,12 @@ import { usePathname } from "next/navigation";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const routeLabels: Record<string, string> = {
-  "":          "Dashboard",
-  "community": "Community",
-  "profile":   "Profile",
-  "security":  "Security",
-  "apps":      "Authorized Apps",
-  "activity":  "Activity Log",
+  "": "Dashboard",
+  community: "Community",
+  profile: "Profile",
+  security: "Security",
+  apps: "Authorized Apps",
+  activity: "Activity Log",
 };
 
 function Breadcrumbs() {
@@ -73,7 +73,10 @@ export function DashboardNavbar() {
 
       <div className="flex items-center gap-2 sm:gap-6">
         <div className="flex items-center gap-1">
-          <Link href="/activity" className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all relative inline-flex">
+          <Link
+            href="/activity"
+            className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all relative inline-flex"
+          >
             <Bell className="w-4 h-4" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-zinc-900 rounded-full border border-white" />
           </Link>

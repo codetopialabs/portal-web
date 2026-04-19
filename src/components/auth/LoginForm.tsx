@@ -14,7 +14,12 @@ export function LoginForm() {
   const [step, setStep] = useState<"email" | "password">("email");
   const mutation = useLoginMutation();
 
-  const { register, handleSubmit, getValues, formState: { errors } } = useForm<LoginFormValues>();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm<LoginFormValues>();
 
   function onEmailSubmit() {
     setStep("password");
@@ -44,7 +49,10 @@ export function LoginForm() {
           <>
             <form onSubmit={handleSubmit(onEmailSubmit)} className="space-y-6">
               <div className="space-y-3">
-                <label htmlFor="email" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+                <label
+                  htmlFor="email"
+                  className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+                >
                   Email Address
                 </label>
                 <div className="relative group">
@@ -59,12 +67,19 @@ export function LoginForm() {
                     className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
                     {...register("email", {
                       required: "Email is required",
-                      pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Enter a valid email",
+                      },
                     })}
                   />
                   <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 group-focus-within:w-full" />
                 </div>
-                {errors.email && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               <Button
@@ -111,24 +126,37 @@ export function LoginForm() {
           </>
         ) : (
           <>
-            <form onSubmit={handleSubmit(onPasswordSubmit)} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+            <form
+              onSubmit={handleSubmit(onPasswordSubmit)}
+              className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500"
+            >
               <div className="pb-2">
-                <div className="flex items-center gap-4 py-5 px-3 bg-[#0c0c0c] border border-zinc-800 transition-all cursor-pointer" onClick={() => setStep("email")}>
+                <div
+                  className="flex items-center gap-4 py-5 px-3 bg-[#0c0c0c] border border-zinc-800 transition-all cursor-pointer"
+                  onClick={() => setStep("email")}
+                >
                   <div className="h-10 w-10 border border-zinc-700 bg-black flex items-center justify-center font-mono text-zinc-300">
                     {getValues("email").charAt(0).toUpperCase()}
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-white font-mono text-xs tracking-widest truncate">{getValues("email")}</span>
+                    <span className="text-white font-mono text-xs tracking-widest truncate">
+                      {getValues("email")}
+                    </span>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-1 h-1 bg-zinc-500" />
-                      <span className="text-[9px] text-zinc-300 font-mono uppercase tracking-[0.2em]">Switch Account</span>
+                      <span className="text-[9px] text-zinc-300 font-mono uppercase tracking-[0.2em]">
+                        Switch Account
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label htmlFor="password" className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase">
+                <label
+                  htmlFor="password"
+                  className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
+                >
                   Password
                 </label>
                 <div className="relative group">
@@ -146,11 +174,17 @@ export function LoginForm() {
                   />
                   <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-500 group-focus-within:w-full" />
                 </div>
-                {errors.password && <p className="text-red-400 font-mono text-[10px] tracking-wider">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="text-red-400 font-mono text-[10px] tracking-wider">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               {mutation.isError && (
-                <p className="text-red-400 font-mono text-xs tracking-wider">{mutation.error?.message}</p>
+                <p className="text-red-400 font-mono text-xs tracking-wider">
+                  {mutation.error?.message}
+                </p>
               )}
 
               <Button
@@ -170,10 +204,16 @@ export function LoginForm() {
         )}
 
         <div className="pt-8 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-          <Link href="#" className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all">
+          <Link
+            href="#"
+            className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all"
+          >
             Forgot Password?
           </Link>
-          <Link href="/signup" className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all">
+          <Link
+            href="/signup"
+            className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all"
+          >
             Sign Up
           </Link>
         </div>

@@ -2,15 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  User,
-  Shield,
-  Globe,
-  History,
-  LogOut,
-  AppWindow,
-} from "lucide-react";
+import { Home, User, Shield, Globe, History, LogOut, AppWindow } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Sidebar,
@@ -46,9 +38,7 @@ const menuGroups = [
   },
   {
     label: "Management",
-    items: [
-      { icon: History, label: "Activity Log", href: "/activity" },
-    ],
+    items: [{ icon: History, label: "Activity Log", href: "/activity" }],
   },
 ];
 

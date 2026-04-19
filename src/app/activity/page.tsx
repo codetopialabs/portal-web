@@ -134,13 +134,13 @@ const activityData: ActivityLog[] = [
 ];
 
 const typeConfig: Record<ActivityType, { icon: React.ElementType; label: string }> = {
-  login:    { icon: LogIn,        label: "Sign In"   },
-  logout:   { icon: LogOut,       label: "Sign Out"  },
-  security: { icon: Shield,       label: "Security"  },
-  password: { icon: Key,          label: "Password"  },
-  app:      { icon: AppWindow,    label: "App"       },
-  profile:  { icon: User,         label: "Profile"   },
-  alert:    { icon: AlertTriangle,label: "Alert"     },
+  login: { icon: LogIn, label: "Sign In" },
+  logout: { icon: LogOut, label: "Sign Out" },
+  security: { icon: Shield, label: "Security" },
+  password: { icon: Key, label: "Password" },
+  app: { icon: AppWindow, label: "App" },
+  profile: { icon: User, label: "Profile" },
+  alert: { icon: AlertTriangle, label: "Alert" },
 };
 
 const filterOptions: { label: string; value: ActivityType | "all" }[] = [
@@ -176,12 +176,13 @@ export default function ActivityPage() {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   // Reset to page 1 when filter/search changes
-  React.useEffect(() => { setPage(1); }, [search, activeFilter]);
+  React.useEffect(() => {
+    setPage(1);
+  }, [search, activeFilter]);
 
   return (
     <DashboardShell>
       <div className="max-w-3xl space-y-8 pb-20">
-
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
@@ -239,14 +240,19 @@ export default function ActivityPage() {
               const config = typeConfig[log.type];
               const isAlert = log.type === "alert";
               return (
-                <div key={log.id} className={`flex items-start gap-4 p-5 group hover:bg-zinc-50 transition-all ${isAlert ? "bg-zinc-50" : ""}`}>
+                <div
+                  key={log.id}
+                  className={`flex items-start gap-4 p-5 group hover:bg-zinc-50 transition-all ${isAlert ? "bg-zinc-50" : ""}`}
+                >
                   {/* Icon */}
-                  <div className={`w-9 h-9 flex items-center justify-center shrink-0 border mt-0.5 ${
-                    isAlert
-                      ? "border-zinc-300 bg-white"
-                      : "border-zinc-200 bg-zinc-50"
-                  }`}>
-                    <config.icon className={`w-4 h-4 ${isAlert ? "text-zinc-900" : "text-zinc-400"}`} />
+                  <div
+                    className={`w-9 h-9 flex items-center justify-center shrink-0 border mt-0.5 ${
+                      isAlert ? "border-zinc-300 bg-white" : "border-zinc-200 bg-zinc-50"
+                    }`}
+                  >
+                    <config.icon
+                      className={`w-4 h-4 ${isAlert ? "text-zinc-900" : "text-zinc-400"}`}
+                    />
                   </div>
 
                   {/* Content */}
@@ -254,9 +260,11 @@ export default function ActivityPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-0.5 flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className={`font-mono text-[10px] font-black uppercase tracking-widest leading-none ${
-                            isAlert ? "text-zinc-900" : "text-zinc-900"
-                          }`}>
+                          <p
+                            className={`font-mono text-[10px] font-black uppercase tracking-widest leading-none ${
+                              isAlert ? "text-zinc-900" : "text-zinc-900"
+                            }`}
+                          >
                             {log.title}
                           </p>
                           {isAlert && (
@@ -296,7 +304,8 @@ export default function ActivityPage() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-              {filtered.length} event{filtered.length !== 1 ? "s" : ""} · page {page} of {totalPages}
+              {filtered.length} event{filtered.length !== 1 ? "s" : ""} · page {page} of{" "}
+              {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -318,7 +327,6 @@ export default function ActivityPage() {
             </div>
           </div>
         )}
-
       </div>
     </DashboardShell>
   );

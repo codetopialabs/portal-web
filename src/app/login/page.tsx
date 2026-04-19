@@ -5,7 +5,6 @@ import { Footer } from "@/components/layout/Footer";
 export default function LoginPage() {
   return (
     <main className="min-h-screen bg-black flex flex-col font-mono text-white relative">
-
       {/* Top Navbar */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-8 py-6 w-full bg-black/60 backdrop-blur-md border-b border-white/5">
         <div className="flex items-center">

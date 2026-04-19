@@ -11,7 +11,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
           <DashboardNavbar />
-          
+
           <div className="flex-1 overflow-y-auto relative min-h-0 w-full">
             {/* Technical Background Overlays (Subtle for light mode) */}
             <div className="absolute inset-0 pointer-events-none z-0">

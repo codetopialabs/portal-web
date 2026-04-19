@@ -19,7 +19,9 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">{title}</h2>
+      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -52,7 +54,9 @@ export default function ProfilePage() {
               const addr = item.address;
               const city = addr.city || addr.town || addr.village || addr.suburb || "";
               const country = addr.country || "";
-              return city && country ? `${city}, ${country}` : item.display_name.split(",").slice(0, 2).join(", ");
+              return city && country
+                ? `${city}, ${country}`
+                : item.display_name.split(",").slice(0, 2).join(", ");
             })
           )
         );
@@ -66,7 +70,13 @@ export default function ProfilePage() {
     return () => clearTimeout(timer);
   }, [location, showSuggestions]);
 
-  const [skills, setSkills] = React.useState(["React", "TypeScript", "Next.js", "Solidity", "Tailwind"]);
+  const [skills, setSkills] = React.useState([
+    "React",
+    "TypeScript",
+    "Next.js",
+    "Solidity",
+    "Tailwind",
+  ]);
   const [newSkill, setNewSkill] = React.useState("");
   const [isAdding, setIsAdding] = React.useState(false);
 
@@ -82,7 +92,6 @@ export default function ProfilePage() {
   return (
     <DashboardShell>
       <div className="max-w-6xl space-y-8 pb-20">
-
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
@@ -94,10 +103,8 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-
           {/* LEFT — avatar + backdrop */}
           <div className="space-y-6">
-
             {/* Avatar */}
             <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
               <div className="relative group">
@@ -113,8 +120,12 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div className="text-center">
-                <p className="font-sans font-black text-sm uppercase tracking-tight text-zinc-900">Kadin Vaccaro</p>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 mt-0.5">kadin.v@codetopia.com</p>
+                <p className="font-sans font-black text-sm uppercase tracking-tight text-zinc-900">
+                  Kadin Vaccaro
+                </p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 mt-0.5">
+                  kadin.v@codetopia.com
+                </p>
               </div>
               <button className="w-full h-9 border border-zinc-200 font-mono text-[9px] uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2">
                 <Camera className="w-3.5 h-3.5" /> Change Photo
@@ -136,7 +147,9 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="px-4 py-3 border-t border-zinc-100">
-                <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">Profile Backdrop</p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
+                  Profile Backdrop
+                </p>
               </div>
             </div>
 
@@ -146,17 +159,14 @@ export default function ProfilePage() {
                 Changes are visible across the Codetopia ecosystem once saved.
               </p>
             </div>
-
           </div>
 
           {/* RIGHT — form */}
           <div className="lg:col-span-2 space-y-8">
-
             {/* Personal Info */}
             <section className="space-y-5">
               <SectionHeader icon={User} title="Personal Info" />
               <div className="bg-white border border-zinc-200 p-6 space-y-5">
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <Label className={labelStyles}>Display Name</Label>
@@ -174,7 +184,10 @@ export default function ProfilePage() {
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
                     <Input
                       value={location}
-                      onChange={(e) => { setLocation(e.target.value); setShowSuggestions(true); }}
+                      onChange={(e) => {
+                        setLocation(e.target.value);
+                        setShowSuggestions(true);
+                      }}
                       onFocus={() => setShowSuggestions(true)}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                       className={inputStyles + " pl-9"}
@@ -190,7 +203,10 @@ export default function ProfilePage() {
                           suggestions.map((loc) => (
                             <button
                               key={loc}
-                              onClick={() => { setLocation(loc); setShowSuggestions(false); }}
+                              onClick={() => {
+                                setLocation(loc);
+                                setShowSuggestions(false);
+                              }}
                               className="w-full text-left px-4 py-2.5 font-mono text-[9px] uppercase tracking-widest text-zinc-600 hover:bg-zinc-50 transition-colors border-b border-zinc-100 last:border-0"
                             >
                               {loc}
@@ -209,7 +225,6 @@ export default function ProfilePage() {
                     className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-xs placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
                   />
                 </div>
-
               </div>
             </section>
 
@@ -265,7 +280,10 @@ export default function ProfilePage() {
                         onChange={(e) => setNewSkill(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") addSkill();
-                          if (e.key === "Escape") { setIsAdding(false); setNewSkill(""); }
+                          if (e.key === "Escape") {
+                            setIsAdding(false);
+                            setNewSkill("");
+                          }
                         }}
                         className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-[9px] uppercase tracking-widest outline-none"
                         placeholder="Skill..."
@@ -301,7 +319,6 @@ export default function ProfilePage() {
                 Save Changes
               </Button>
             </div>
-
           </div>
         </div>
       </div>

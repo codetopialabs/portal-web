@@ -94,20 +94,65 @@ const timelineData: TimelineItem[] = [
 ];
 
 const events: CommunityEvent[] = [
-  { id: "1", title: "Codetopia Summit 2026", date: "May 12", location: "Toronto, CA", attendees: 450, type: "in-person" },
-  { id: "2", title: "Security Node Workshop", date: "Jun 04", location: "Virtual / Discord", attendees: 120, type: "virtual" },
-  { id: "3", title: "Global Identity Hackathon", date: "Jul 20", location: "Prague, CZ", attendees: 800, type: "hybrid" },
+  {
+    id: "1",
+    title: "Codetopia Summit 2026",
+    date: "May 12",
+    location: "Toronto, CA",
+    attendees: 450,
+    type: "in-person",
+  },
+  {
+    id: "2",
+    title: "Security Node Workshop",
+    date: "Jun 04",
+    location: "Virtual / Discord",
+    attendees: 120,
+    type: "virtual",
+  },
+  {
+    id: "3",
+    title: "Global Identity Hackathon",
+    date: "Jul 20",
+    location: "Prague, CZ",
+    attendees: 800,
+    type: "hybrid",
+  },
 ];
 
 const opportunities: Opportunity[] = [
-  { id: "1", role: "UI/UX Identity Designer", type: "Full-Time", compensation: "$90k – $120k", location: "Global / Remote" },
-  { id: "2", role: "Runtime Security Engineer", type: "Bounty", compensation: "15,000 Credits", location: "Node Network" },
-  { id: "3", role: "Community Moderator", type: "Volunteer", compensation: "Legendary Badge", location: "Digital Hub" },
+  {
+    id: "1",
+    role: "UI/UX Identity Designer",
+    type: "Full-Time",
+    compensation: "$90k – $120k",
+    location: "Global / Remote",
+  },
+  {
+    id: "2",
+    role: "Runtime Security Engineer",
+    type: "Bounty",
+    compensation: "15,000 Credits",
+    location: "Node Network",
+  },
+  {
+    id: "3",
+    role: "Community Moderator",
+    type: "Volunteer",
+    compensation: "Legendary Badge",
+    location: "Digital Hub",
+  },
 ];
 
 const reputationBadges: ReputationBadge[] = [
   { id: "1", label: "Core Contributor", description: "Merged 10+ PRs", icon: Star, earned: true },
-  { id: "2", label: "Security Auditor", description: "Completed 3 audits", icon: CheckCircle2, earned: true },
+  {
+    id: "2",
+    label: "Security Auditor",
+    description: "Completed 3 audits",
+    icon: CheckCircle2,
+    earned: true,
+  },
   { id: "3", label: "Protocol Pioneer", description: "Early adopter", icon: Zap, earned: true },
   { id: "4", label: "Global Node", description: "Attend 5 events", icon: Globe, earned: false },
 ];
@@ -118,7 +163,9 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">{title}</h2>
+      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -130,7 +177,6 @@ export default function CommunityPage() {
   return (
     <DashboardShell>
       <div className="max-w-6xl space-y-8 pb-20">
-
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
@@ -143,10 +189,8 @@ export default function CommunityPage() {
 
         {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-
           {/* LEFT — main content */}
           <div className="lg:col-span-2 space-y-8">
-
             {/* Identity Journey */}
             <section className="space-y-4">
               <SectionHeader icon={TrendingUp} title="Identity Journey" />
@@ -204,7 +248,9 @@ export default function CommunityPage() {
                       className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1.5"
                     >
                       {showAllTimeline ? "Show less" : `Show ${timelineData.length - 3} more`}
-                      <ArrowRight className={`w-3 h-3 transition-transform duration-200 ${showAllTimeline ? "-rotate-90" : ""}`} />
+                      <ArrowRight
+                        className={`w-3 h-3 transition-transform duration-200 ${showAllTimeline ? "-rotate-90" : ""}`}
+                      />
                     </button>
                   </div>
                 )}
@@ -215,13 +261,19 @@ export default function CommunityPage() {
             <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <SectionHeader icon={Briefcase} title="Open Opportunities" />
-                <Button variant="ghost" className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-8 px-3">
+                <Button
+                  variant="ghost"
+                  className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-8 px-3"
+                >
                   View All <ArrowRight className="ml-1.5 w-3 h-3" />
                 </Button>
               </div>
               <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
                 {opportunities.map((op) => (
-                  <div key={op.id} className="p-5 flex items-center gap-4 group hover:bg-zinc-50 transition-all">
+                  <div
+                    key={op.id}
+                    className="p-5 flex items-center gap-4 group hover:bg-zinc-50 transition-all"
+                  >
                     <div className="w-9 h-9 bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0 group-hover:border-zinc-300 transition-colors">
                       <Briefcase className="w-4 h-4 text-zinc-400" />
                     </div>
@@ -254,12 +306,10 @@ export default function CommunityPage() {
                 ))}
               </div>
             </section>
-
           </div>
 
           {/* RIGHT — sidebar */}
           <div className="space-y-8">
-
             {/* Reputation */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
@@ -276,7 +326,9 @@ export default function CommunityPage() {
                     <div className="w-10 h-10 border border-zinc-200 bg-zinc-50 flex items-center justify-center mb-3">
                       <Award className="w-4 h-4 text-zinc-300" />
                     </div>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-900 mb-1">No Badges Yet</p>
+                    <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-900 mb-1">
+                      No Badges Yet
+                    </p>
                     <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 leading-relaxed">
                       Complete activities to earn badges
                     </p>
@@ -289,7 +341,9 @@ export default function CommunityPage() {
                         className={`flex items-center gap-3 p-4 transition-all ${badge.earned ? "hover:bg-zinc-50" : "opacity-40"}`}
                       >
                         <div className="w-8 h-8 flex items-center justify-center shrink-0 border border-zinc-200 bg-zinc-50">
-                          <badge.icon className={`w-3.5 h-3.5 ${badge.earned ? "text-zinc-900" : "text-zinc-300"}`} />
+                          <badge.icon
+                            className={`w-3.5 h-3.5 ${badge.earned ? "text-zinc-900" : "text-zinc-300"}`}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-mono text-[9px] font-black uppercase tracking-widest text-zinc-900 truncate leading-none">
@@ -299,10 +353,11 @@ export default function CommunityPage() {
                             {badge.description}
                           </p>
                         </div>
-                        {badge.earned
-                          ? <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                          : <Plus className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
-                        }
+                        {badge.earned ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
+                        ) : (
+                          <Plus className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -315,7 +370,10 @@ export default function CommunityPage() {
               <SectionHeader icon={Calendar} title="Events" />
               <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
                 {events.map((event) => (
-                  <div key={event.id} className="p-4 group hover:bg-zinc-50 transition-all cursor-pointer">
+                  <div
+                    key={event.id}
+                    className="p-4 group hover:bg-zinc-50 transition-all cursor-pointer"
+                  >
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -334,9 +392,15 @@ export default function CommunityPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 font-mono text-[8px] text-zinc-400 uppercase tracking-widest">
-                        <span className="flex items-center gap-1"><MapPin className="w-2 h-2" />{event.location}</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-2 h-2" />
+                          {event.location}
+                        </span>
                         <span className="text-zinc-200">·</span>
-                        <span className="flex items-center gap-1"><Users className="w-2 h-2" />{event.attendees.toLocaleString()}</span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-2 h-2" />
+                          {event.attendees.toLocaleString()}
+                        </span>
                       </div>
                       <button className="font-mono text-[8px] uppercase tracking-widest text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-400 hover:border-zinc-400 transition-all font-bold">
                         Register
@@ -345,13 +409,15 @@ export default function CommunityPage() {
                   </div>
                 ))}
                 <div className="p-3 bg-zinc-50">
-                  <Button variant="ghost" className="w-full text-[9px] font-mono uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-7">
+                  <Button
+                    variant="ghost"
+                    className="w-full text-[9px] font-mono uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-7"
+                  >
                     View Calendar <ArrowRight className="ml-1.5 w-3 h-3" />
                   </Button>
                 </div>
               </div>
             </section>
-
           </div>
         </div>
       </div>
