@@ -19,15 +19,22 @@ export interface TokenResponse {
   expiresIn: number
 }
 
+// API envelope: { data: T, errors: null | object, meta: object }
+interface ApiResponse<T> {
+  data: T
+  errors: unknown
+  meta: unknown
+}
+
 export const AuthService = {
   async register(data: RegisterRequest): Promise<TokenResponse> {
-    const response = await axiosInstance.post<TokenResponse>('/auth/register/', data)
-    return response.data
+    const response = await axiosInstance.post<ApiResponse<TokenResponse>>('/auth/register/', data)
+    return response.data.data
   },
 
   async login(data: LoginRequest): Promise<TokenResponse> {
-    const response = await axiosInstance.post<TokenResponse>('/auth/login/', data)
-    return response.data
+    const response = await axiosInstance.post<ApiResponse<TokenResponse>>('/auth/login/', data)
+    return response.data.data
   },
 
   async logout(accessToken: string): Promise<void> {
