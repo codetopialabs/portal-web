@@ -43,3 +43,6 @@ next-env.d.ts
 # AI Assistant files
 AGENTS.md
 CLAUDE.md
+
+.kiro
+.vscode
