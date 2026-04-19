@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-screen bg-white text-zinc-900 selection:bg-black selection:text-white relative font-sans overflow-hidden">
+      <div className="flex min-h-screen w-full bg-white text-zinc-900 selection:bg-black selection:text-white relative font-sans overflow-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
           <DashboardNavbar />
