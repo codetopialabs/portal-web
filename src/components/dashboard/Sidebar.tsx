@@ -1,44 +1,44 @@
 "use client";
 
+import { BookOpen, Globe, Home, Library, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, User, Shield, Globe, History, LogOut, AppWindow } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  useSidebar,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { useLogoutMutation } from "@/hooks/useAuthMutations";
+import { cn } from "@/lib/utils";
 
 const menuGroups = [
   {
-    label: "General",
+    label: "Discover",
     items: [
-      { icon: Home, label: "Dashboard", href: "/" },
-      { icon: Globe, label: "Community", href: "/community" },
+      { icon: Home, label: "Dashboard", href: "/", activePrefix: "/" },
+      { icon: Globe, label: "Community", href: "/community", activePrefix: "/community" },
     ],
   },
   {
-    label: "My Identity",
+    label: "My Space",
     items: [
-      { icon: User, label: "Profile", href: "/profile" },
-      { icon: Shield, label: "Security", href: "/security" },
-      { icon: AppWindow, label: "Authorized Apps", href: "/apps" },
+      { icon: BookOpen, label: "Programs", href: "/programs", activePrefix: "/programs" },
+      { icon: Users, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
+      { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
     ],
   },
   {
-    label: "Management",
-    items: [{ icon: History, label: "Activity Log", href: "/activity" }],
+    label: "Account",
+    items: [
+      { icon: Settings, label: "Settings", href: "/settings", activePrefix: "/settings" },
+    ],
   },
 ];
 
@@ -46,7 +46,23 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const logout = useLogoutMutation();
+
+  function isActive(activePrefix: string) {
+    return activePrefix === "/" ? pathname === "/" : pathname.startsWith(activePrefix);
+  }
+
+  function itemClass(active: boolean) {
+    return cn(
+      "h-9 rounded-none transition-all duration-150",
+      active
+        ? "!bg-white !text-black shadow-sm"
+        : "text-white hover:text-white hover:bg-zinc-900"
+    );
+  }
+
+  function iconClass(active: boolean) {
+    return cn("w-4 h-4 shrink-0", active ? "text-black" : "text-zinc-500");
+  }
 
   return (
     <Sidebar collapsible="icon" className="border-r border-zinc-900 bg-black text-white">
@@ -71,7 +87,7 @@ export function DashboardSidebar() {
       {/* Nav */}
       <SidebarContent className="px-3 py-6 no-scrollbar bg-black">
         {menuGroups.map((group) => (
-          <SidebarGroup key={group.label} className="mb-10 p-0">
+          <SidebarGroup key={group.label} className="mb-8 p-0">
             {!isCollapsed && (
               <SidebarGroupLabel className="px-2 mb-1 h-auto font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 font-bold">
                 {group.label}
@@ -80,27 +96,17 @@ export function DashboardSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className="gap-0">
                 {group.items.map((item) => {
-                  const isActive = pathname === item.href;
+                  const active = isActive(item.activePrefix);
                   return (
                     <SidebarMenuItem key={item.label}>
                       <SidebarMenuButton
                         asChild
                         tooltip={item.label}
-                        isActive={isActive}
-                        className={cn(
-                          "h-9 rounded-none transition-all duration-150",
-                          isActive
-                            ? "!bg-white !text-black shadow-sm"
-                            : "text-white hover:text-white hover:bg-zinc-900"
-                        )}
+                        isActive={active}
+                        className={itemClass(active)}
                       >
                         <Link href={item.href} className="flex items-center gap-3 px-3">
-                          <item.icon
-                            className={cn(
-                              "w-4 h-4 shrink-0",
-                              isActive ? "text-black" : "text-zinc-500"
-                            )}
-                          />
+                          <item.icon className={iconClass(active)} />
                           <span className="font-mono text-[11px] uppercase tracking-wider">
                             {item.label}
                           </span>
@@ -114,27 +120,6 @@ export function DashboardSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-
-      {/* Footer */}
-      <SidebarFooter className="p-3 bg-black">
-        <SidebarMenu className="gap-0.5">
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Log out"
-              onClick={() => logout.mutate()}
-              disabled={logout.isPending}
-              className="h-9 rounded-none text-zinc-500 hover:text-white hover:bg-zinc-900 transition-colors justify-center gap-2"
-            >
-              <LogOut className="w-4 h-4 shrink-0" />
-              {!isCollapsed && (
-                <span className="font-mono text-[10px] uppercase tracking-widest font-bold">
-                  Disconnect
-                </span>
-              )}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>

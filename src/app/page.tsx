@@ -1,299 +1,390 @@
 "use client";
 
-import { DashboardShell } from "@/components/dashboard/Shell";
 import {
-  Shield,
-  Key,
-  Mail,
-  MapPin,
+  ArrowRight,
+  BookOpen,
   Calendar,
-  ExternalLink,
-  Edit3,
-  Lock,
-  ChevronRight,
-  UserCheck,
-  AppWindow,
+  CheckCircle2,
   Clock,
+  ExternalLink,
+  MapPin,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Users,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import { DashboardShell } from "@/components/dashboard/Shell";
 
-const quickActions = [
+const member = {
+  name: "Kadin Vaccaro",
+  email: "kadin.v@codetopia.com",
+  role: "Core Contributor",
+  memberSince: "Jan 2024",
+  communityId: "#CT-7724-912A",
+  avatarUrl:
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
+  twoFactorEnabled: true,
+  lastLogin: "Today, 9:14 AM",
+  loginLocation: "Toronto, CA",
+};
+
+const mentorship = {
+  mentor: {
+    name: "Abena Mensah",
+    role: "Senior Engineer · OSSAfrica",
+    avatarUrl:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=200&auto=format&fit=crop",
+  },
+  focus: "Systems Design & Open Source Contribution",
+  nextSession: "Thu, Apr 24 · 3:00 PM GMT",
+  sessionsCompleted: 4,
+  totalSessions: 12,
+};
+
+const training = {
+  title: "Full-Stack Web Engineering",
+  cohort: "Cohort 3 · 2026",
+  progress: 62,
+  currentModule: "Module 6 — API Design & Integration",
+  nextDeadline: "Apr 28 · Assignment due",
+};
+
+const events = [
   {
-    icon: Lock,
-    label: "Change Password",
-    description: "Update your security credentials",
-    href: "/security",
+    id: "1",
+    title: "Codetopia Community Meetup",
+    date: "Sat, May 3",
+    location: "Accra, Ghana",
+    type: "in-person",
+    attendees: 120,
   },
   {
-    icon: Shield,
-    label: "Two-Factor Auth",
-    description: "Enable additional security",
-    href: "/security",
+    id: "2",
+    title: "Open Source Contribution Workshop",
+    date: "Wed, May 7",
+    location: "Virtual · Discord",
+    type: "virtual",
+    attendees: 80,
   },
   {
-    icon: Edit3,
-    label: "Update Profile",
-    description: "Edit your publicly visible data",
-    href: "/profile",
+    id: "3",
+    title: "Hackathon — Build for Africa",
+    date: "Sat, May 17",
+    location: "Hybrid · Accra + Online",
+    type: "hybrid",
+    attendees: 300,
   },
-  {
-    icon: UserCheck,
-    label: "Authorized Apps",
-    description: "Manage third-party access",
-    href: "/apps",
-  },
+];
+
+const stats = [
+  { label: "Events Attended", value: "8" },
+  { label: "Programs Completed", value: "2" },
+  { label: "Sessions Done", value: "4" },
+  { label: "Community Rank", value: "#42" },
+];
+
+const securityAlerts = [
+  { ok: true, label: "Two-factor authentication enabled" },
+  { ok: true, label: "Password updated 4 days ago" },
+  { ok: false, label: "Unrecognized login attempt on Apr 16" },
 ];
 
 const connectedApps = [
-  { name: "Codetopia Discord", scope: "Identity, Email", lastUsed: "2 hours ago" },
-  { name: "Community Forum", scope: "Identity, Write", lastUsed: "Yesterday" },
-  { name: "Dev Resources Portal", scope: "Identity, Read", lastUsed: "3 days ago" },
+  { name: "Codetopia Dev Portal", scopes: "Profile, Code" },
+  { name: "CommuniTrack", scopes: "Identity, Stats" },
 ];
 
-const userData = {
-  name: "Kadin Vaccaro",
-  email: "kadin.v@codetopia.com",
-  location: "Toronto, Ontario, Canada",
-  joinedDate: "Jan 2024",
-  avatarUrl:
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
-  bannerUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064",
-  roles: [
-    { label: "Community Member" },
-    { label: "Active Volunteer" },
-    { label: "Core Delegate" },
-    { label: "Beta Tester" },
-  ],
-  identityId: "#CT-7724-912A",
-  phone: "+1 (555) 001-4920",
-  address: "390 Market St, Toronto, CA",
+const typeColors: Record<string, string> = {
+  "in-person": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  virtual: "bg-blue-50 text-blue-700 border-blue-200",
+  hybrid: "bg-violet-50 text-violet-700 border-violet-200",
 };
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
-        <Icon className="w-3.5 h-3.5" />
-      </div>
-      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
-        {title}
-      </h2>
-    </div>
-  );
-}
+export default function Dashboard() {
+  const mentorshipPct = Math.round((mentorship.sessionsCompleted / mentorship.totalSessions) * 100);
 
-function Divider() {
-  return <div className="border-t border-zinc-100" />;
-}
-
-export default function UserDashboard() {
   return (
     <DashboardShell>
-      <div className="space-y-8 max-w-6xl">
-        {/* ── Profile Header ── */}
-        <section className="relative overflow-hidden border border-zinc-200 bg-white">
-          {/* Banner */}
-          <div
-            className="h-36 w-full bg-cover bg-center"
-            style={{ backgroundImage: `url(${userData.bannerUrl})` }}
+      <div className="max-w-7xl mx-auto pb-20 space-y-8">
+
+        {/* Identity Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-zinc-100">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-zinc-200 shrink-0">
+              {/* biome-ignore lint/performance/noImgElement: member avatar */}
+              <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-mono font-bold text-xl text-zinc-900">{member.name}</h1>
+                <span className="font-mono text-xs uppercase tracking-widest border border-zinc-200 bg-zinc-50 text-zinc-600 px-2 py-0.5">
+                  {member.role}
+                </span>
+              </div>
+              <p className="font-mono text-sm text-zinc-400 mt-0.5">
+                {member.communityId} · Member since {member.memberSince}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/community"
+            className="inline-flex items-center gap-2 font-mono text-sm text-zinc-500 hover:text-zinc-900 transition-colors border-b border-zinc-200 hover:border-zinc-900 pb-px self-start sm:self-auto"
           >
-            <div className="h-full w-full bg-white/60 backdrop-blur-sm" />
-          </div>
+            View community profile <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
 
-          {/* Content */}
-          <div className="px-8 pb-8 relative z-10 flex flex-col md:flex-row items-start justify-between gap-8">
-            <div className="flex flex-col md:flex-row items-start gap-6 w-full">
-              {/* Avatar */}
-              <div className="w-24 h-24 -mt-12 shrink-0 rounded-full overflow-hidden border-4 border-white shadow-lg relative z-20 bg-zinc-100">
-                <img
-                  src={userData.avatarUrl}
-                  alt={userData.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 pt-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-3 mb-1">
-                  <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900 leading-none">
-                    {userData.name}
-                  </h1>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-zinc-400 font-mono text-[9px] uppercase tracking-widest mb-4">
-                  <span className="flex items-center gap-1.5">
-                    <Mail className="w-3 h-3" />
-                    {userData.email}
-                  </span>
-                  <span className="text-zinc-200">·</span>
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3" />
-                    {userData.location}
-                  </span>
-                  <span className="text-zinc-200">·</span>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3" />
-                    Joined {userData.joinedDate}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {userData.roles.map((role) => (
-                    <span
-                      key={role.label}
-                      className="font-mono text-[7px] font-bold uppercase tracking-[0.15em] leading-none px-2.5 py-1.5 rounded-full border border-zinc-200 text-zinc-500 bg-white"
-                    >
-                      {role.label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2 pt-1 shrink-0">
-              <Link
-                href="/profile"
-                className="h-10 px-5 border border-zinc-200 text-zinc-600 font-mono text-[9px] uppercase tracking-widest hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center gap-2"
-              >
-                <Edit3 className="w-3.5 h-3.5" /> Edit
-              </Link>
-              <button className="h-10 px-6 bg-black text-white font-mono text-[9px] uppercase tracking-widest hover:bg-zinc-800 transition-all flex items-center gap-2 group">
-                Share{" "}
-                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* Left — Quick Actions + Identity Record */}
+
+          {/* LEFT — main */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Quick Actions */}
-            <section className="space-y-4">
-              <SectionHeader icon={Key} title="Quick Actions" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {quickActions.map((action) => (
-                  <Link
-                    key={action.label}
-                    href={action.href}
-                    className="flex items-start text-left p-5 bg-white border border-zinc-200 hover:border-zinc-400 hover:shadow-sm transition-all group relative overflow-hidden"
-                  >
-                    <div className="relative z-10 w-full">
-                      <div className="p-2 w-fit mb-3 bg-zinc-50 border border-zinc-100 group-hover:border-zinc-300 transition-colors">
-                        <action.icon className="w-4 h-4 text-zinc-900" />
-                      </div>
-                      <h3 className="text-zinc-900 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">
-                        {action.label}
-                      </h3>
-                      <p className="text-zinc-400 font-mono text-[9px] uppercase tracking-wider leading-relaxed">
-                        {action.description}
-                      </p>
-                    </div>
-                    <ChevronRight className="absolute bottom-5 right-5 w-4 h-4 text-zinc-200 group-hover:text-zinc-900 group-hover:translate-x-0.5 transition-all" />
-                  </Link>
-                ))}
-              </div>
-            </section>
 
-            <Divider />
-
-            {/* Identity Record */}
-            <section className="space-y-4">
-              <SectionHeader icon={UserCheck} title="Identity Record" />
-              <div className="bg-white border border-zinc-200 overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                  <DataField label="Community ID" value={userData.identityId} />
-                  <DataField label="Full Name" value={userData.name} />
-                  <DataField label="Phone" value={userData.phone} />
-                  <DataField label="Address" value={userData.address} />
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Right — Connected Apps + Node Status */}
-          <div className="space-y-8">
-            {/* Connected Apps */}
+            {/* Mentorship */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <SectionHeader icon={AppWindow} title="Connected Apps" />
+                <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                  Active Mentorship
+                </h2>
+                <span className="font-mono text-xs text-zinc-400">
+                  {mentorship.sessionsCompleted}/{mentorship.totalSessions} sessions
+                </span>
+              </div>
+              <div className="bg-white border border-zinc-200 p-6 space-y-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-zinc-200 shrink-0">
+                    {/* biome-ignore lint/performance/noImgElement: mentor avatar */}
+                    <img
+                      src={mentorship.mentor.avatarUrl}
+                      alt={mentorship.mentor.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-mono font-semibold text-base text-zinc-900">
+                      {mentorship.mentor.name}
+                    </p>
+                    <p className="font-mono text-sm text-zinc-500">{mentorship.mentor.role}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">Focus</p>
+                  <p className="font-mono text-sm text-zinc-700">{mentorship.focus}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between font-mono text-xs text-zinc-400">
+                    <span>Progress</span>
+                    <span>{mentorshipPct}%</span>
+                  </div>
+                  <div className="h-1.5 bg-zinc-100 w-full">
+                    <div
+                      className="h-full bg-zinc-900 transition-all"
+                      style={{ width: `${mentorshipPct}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 font-mono text-sm text-zinc-500 pt-1">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  Next session — {mentorship.nextSession}
+                </div>
+              </div>
+            </section>
+
+            {/* Training */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                  Active Training
+                </h2>
+                <span className="font-mono text-xs text-zinc-400">{training.progress}% complete</span>
+              </div>
+              <div className="bg-white border border-zinc-200 p-6 space-y-5">
+                <div>
+                  <p className="font-mono font-semibold text-base text-zinc-900">{training.title}</p>
+                  <p className="font-mono text-sm text-zinc-500 mt-0.5">{training.cohort}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between font-mono text-xs text-zinc-400">
+                    <span>{training.currentModule}</span>
+                    <span>{training.progress}%</span>
+                  </div>
+                  <div className="h-1.5 bg-zinc-100 w-full">
+                    <div
+                      className="h-full bg-zinc-900 transition-all"
+                      style={{ width: `${training.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 font-mono text-sm text-zinc-500">
+                  <BookOpen className="w-3.5 h-3.5 shrink-0" />
+                  {training.nextDeadline}
+                </div>
+              </div>
+            </section>
+
+            {/* Upcoming Events */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                  Upcoming Events
+                </h2>
+                <Link
+                  href="/community"
+                  className="font-mono text-xs text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1"
+                >
+                  View all <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
               <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
-                {connectedApps.map((app) => (
+                {events.map((event) => (
                   <div
-                    key={app.name}
-                    className="flex items-center gap-3 p-4 hover:bg-zinc-50 transition-all"
+                    key={event.id}
+                    className="p-5 flex items-center gap-4 group hover:bg-zinc-50 transition-all"
                   >
-                    <div className="w-8 h-8 border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0">
-                      <AppWindow className="w-3.5 h-3.5 text-zinc-400" />
+                    <div className="w-10 h-10 bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0">
+                      <Calendar className="w-4 h-4 text-zinc-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-900 truncate leading-none">
-                        {app.name}
+                      <p className="font-mono font-semibold text-base text-zinc-900 truncate">
+                        {event.title}
                       </p>
-                      <p className="font-mono text-[8px] uppercase tracking-widest text-zinc-400 mt-0.5">
-                        {app.scope}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-3 mt-1 font-mono text-sm text-zinc-400">
+                        <span>{event.date}</span>
+                        <span className="text-zinc-200">·</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" /> {event.location}
+                        </span>
+                        <span className="text-zinc-200">·</span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" /> {event.attendees}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <Clock className="w-2.5 h-2.5 text-zinc-300" />
-                      <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-400 whitespace-nowrap">
-                        {app.lastUsed}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span
+                        className={`font-mono text-xs uppercase tracking-widest border px-2 py-0.5 hidden sm:inline ${typeColors[event.type]}`}
+                      >
+                        {event.type}
                       </span>
+                      <button
+                        type="button"
+                        className="font-mono text-sm font-semibold text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-500 hover:border-zinc-400 transition-all"
+                      >
+                        Register
+                      </button>
                     </div>
                   </div>
                 ))}
-                <div className="p-3 bg-zinc-50">
-                  <Link
-                    href="/apps"
-                    className="w-full flex items-center justify-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors h-7"
+              </div>
+            </section>
+          </div>
+
+          {/* RIGHT — sidebar */}
+          <div className="space-y-6">
+
+            {/* Stats */}
+            <section className="space-y-3">
+              <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                Your Stats
+              </h2>
+              <div className="grid grid-cols-2 gap-3">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white border border-zinc-200 p-4 space-y-1"
                   >
-                    Manage Apps <ChevronRight className="w-3 h-3" />
+                    <p className="font-mono font-black text-2xl text-zinc-900">{stat.value}</p>
+                    <p className="font-mono text-xs text-zinc-400 leading-tight">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Security */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                  Security
+                </h2>
+                <Link
+                  href="/settings/security"
+                  className="font-mono text-xs text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1"
+                >
+                  Manage <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
+                {securityAlerts.map((alert) => (
+                  <div key={alert.label} className="flex items-center gap-3 px-4 py-3">
+                    {alert.ok ? (
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    ) : (
+                      <ShieldAlert className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                    )}
+                    <p
+                      className={`font-mono text-sm ${alert.ok ? "text-zinc-600" : "text-red-600 font-semibold"}`}
+                    >
+                      {alert.label}
+                    </p>
+                  </div>
+                ))}
+                <div className="px-4 py-3 bg-zinc-50 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-zinc-400" />
+                    <span className="font-mono text-xs text-zinc-500">
+                      Last login — {member.lastLogin} · {member.loginLocation}
+                    </span>
+                  </div>
+                  <Link
+                    href="/activity"
+                    className="font-mono text-xs text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1 shrink-0"
+                  >
+                    Activity <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
             </section>
 
-            {/* Node Status */}
-            <section className="space-y-4">
-              <SectionHeader icon={Shield} title="Account Status" />
-              <div className="bg-white border border-zinc-200 p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-zinc-900 rounded-full animate-pulse" />
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-900 font-bold">
-                    Active
-                  </span>
-                </div>
-                <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 leading-relaxed">
-                  Your account is secure. Password last changed 4 days ago.
-                </p>
+            {/* Connected Apps */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
+                  Connected Apps
+                </h2>
                 <Link
-                  href="/activity"
-                  className="font-mono text-[9px] uppercase tracking-widest text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-400 hover:border-zinc-400 transition-all font-bold inline-block"
+                  href="/settings/apps"
+                  className="font-mono text-xs text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1"
                 >
-                  View Activity Log
+                  Manage <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
+              <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
+                {connectedApps.map((app) => (
+                  <div key={app.name} className="flex items-center gap-3 px-4 py-3">
+                    <Zap className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-mono text-sm font-semibold text-zinc-900 truncate">
+                        {app.name}
+                      </p>
+                      <p className="font-mono text-xs text-zinc-400">{app.scopes}</p>
+                    </div>
+                  </div>
+                ))}
+                {connectedApps.length === 0 && (
+                  <p className="font-mono text-sm text-zinc-400 px-4 py-3">No apps connected</p>
+                )}
+              </div>
             </section>
+
           </div>
         </div>
       </div>
     </DashboardShell>
-  );
-}
-
-function DataField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="p-5 border-zinc-100 odd:border-r border-b last:border-b-0 hover:bg-zinc-50 transition-all">
-      <span className="block font-mono text-[8px] uppercase tracking-[0.3em] text-zinc-400 font-bold mb-1.5">
-        {label}
-      </span>
-      <span className="block font-mono text-xs font-bold text-zinc-900 tracking-tight">
-        {value}
-      </span>
-    </div>
   );
 }

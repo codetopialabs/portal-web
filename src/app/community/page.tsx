@@ -1,32 +1,37 @@
 "use client";
 
-import React from "react";
-import { DashboardShell } from "@/components/dashboard/Shell";
-import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
+  BookOpen,
   Briefcase,
   Calendar,
-  Award,
-  TrendingUp,
-  MapPin,
-  Users,
-  ArrowRight,
-  Plus,
-  Star,
-  Zap,
-  Globe,
-  Clock,
-  CheckCircle2,
   ExternalLink,
+  FolderGit2,
+  MapPin,
+  Search,
+  Sparkles,
+  Star,
+  Users,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import React from "react";
+import { DashboardShell } from "@/components/dashboard/Shell";
+import { Input } from "@/components/ui/input";
 
-interface TimelineItem {
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Tab = "members" | "events" | "programs" | "projects" | "resources";
+type MemberRole = "Member" | "Mentor" | "Volunteer" | "Core Team";
+
+interface Member {
   id: string;
+  name: string;
   role: string;
-  status: string;
-  period: string;
-  description: string;
-  isCurrent?: boolean;
+  communityRole: MemberRole;
+  location: string;
+  skills: string[];
+  avatarUrl: string;
 }
 
 interface CommunityEvent {
@@ -34,393 +39,727 @@ interface CommunityEvent {
   title: string;
   date: string;
   location: string;
-  attendees: number;
   type: "in-person" | "virtual" | "hybrid";
+  attendees: number;
+  spotsLeft?: number;
 }
 
 interface Opportunity {
   id: string;
-  role: string;
-  type: "Full-Time" | "Bounty" | "Volunteer" | "Contract";
-  compensation: string;
-  location: string;
-}
-
-interface ReputationBadge {
-  id: string;
-  label: string;
+  title: string;
+  type: "Mentorship" | "Volunteer" | "Bounty" | "Full-Time" | "Contract";
   description: string;
-  icon: React.ElementType;
-  earned: boolean;
+  postedBy: string;
 }
 
-const timelineData: TimelineItem[] = [
+interface Spotlight {
+  id: string;
+  member: string;
+  avatarUrl: string;
+  achievement: string;
+  detail: string;
+}
+
+interface Program {
+  id: string;
+  title: string;
+  type: "Training" | "Mentorship" | "Bootcamp" | "Workshop";
+  description: string;
+  duration: string;
+  enrolledCount: number;
+  spotsLeft?: number;
+  status: "open" | "ongoing" | "closed";
+}
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  stack: string[];
+  contributors: number;
+  stars: number;
+  status: "active" | "seeking-contributors" | "completed";
+  repoUrl?: string;
+}
+
+interface Resource {
+  id: string;
+  title: string;
+  type: "Article" | "Guide" | "Video" | "Template";
+  author: string;
+  date: string;
+  readTime?: string;
+}
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const members: Member[] = [
   {
     id: "1",
-    role: "Senior Identity Architect",
-    status: "Active Rank",
-    period: "Jan 2026 – Present",
-    description: "Leading the core identity protocol migration for Codetopia nodes.",
-    isCurrent: true,
+    name: "Abena Mensah",
+    role: "Senior Engineer",
+    communityRole: "Mentor",
+    location: "Accra, GH",
+    skills: ["Systems Design", "Go", "Kubernetes"],
+    avatarUrl: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "2",
-    role: "Security Researcher",
-    status: "Verified",
-    period: "Jun 2025 – Dec 2025",
-    description: "Conducted zero-day audits on community auth-gateways.",
+    name: "Kwame Asante",
+    role: "Frontend Developer",
+    communityRole: "Member",
+    location: "Kumasi, GH",
+    skills: ["React", "TypeScript", "Figma"],
+    avatarUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "3",
-    role: "Core Contributor",
-    status: "Contributor Level 4",
-    period: "Jan 2024 – May 2025",
-    description: "Architected the initial open-source repository for community identity.",
+    name: "Ama Owusu",
+    role: "DevOps Engineer",
+    communityRole: "Mentor",
+    location: "Takoradi, GH",
+    skills: ["Docker", "CI/CD", "AWS"],
+    avatarUrl: "https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "4",
-    role: "Frontend Developer",
-    status: "Intern Rank",
-    period: "Jun 2023 – Dec 2023",
-    description: "Assisted in building the initial UI components for the Identity Hub prototype.",
+    name: "Kofi Boateng",
+    role: "Backend Engineer",
+    communityRole: "Member",
+    location: "Accra, GH",
+    skills: ["Django", "PostgreSQL", "Redis"],
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
   },
   {
     id: "5",
-    role: "Community Evangelist",
-    status: "Social Rank",
-    period: "Jan 2023 – May 2023",
-    description: "Promoted Codetopia identity protocols across dev forums and social nodes.",
+    name: "Efua Darko",
+    role: "Mobile Developer",
+    communityRole: "Member",
+    location: "Cape Coast, GH",
+    skills: ["Flutter", "Dart", "Firebase"],
+    avatarUrl: "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    id: "6",
+    name: "Yaw Frimpong",
+    role: "Security Researcher",
+    communityRole: "Volunteer",
+    location: "Accra, GH",
+    skills: ["Pentesting", "Rust", "Cryptography"],
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
   },
 ];
 
 const events: CommunityEvent[] = [
   {
     id: "1",
-    title: "Codetopia Summit 2026",
-    date: "May 12",
-    location: "Toronto, CA",
-    attendees: 450,
+    title: "Codetopia Community Meetup",
+    date: "Sat, May 3",
+    location: "Accra, Ghana",
     type: "in-person",
+    attendees: 120,
+    spotsLeft: 18,
   },
   {
     id: "2",
-    title: "Security Node Workshop",
-    date: "Jun 04",
-    location: "Virtual / Discord",
-    attendees: 120,
+    title: "Open Source Contribution Workshop",
+    date: "Wed, May 7",
+    location: "Virtual · Discord",
     type: "virtual",
+    attendees: 80,
+    spotsLeft: 40,
   },
   {
     id: "3",
-    title: "Global Identity Hackathon",
-    date: "Jul 20",
-    location: "Prague, CZ",
-    attendees: 800,
+    title: "Hackathon — Build for Africa",
+    date: "Sat, May 17",
+    location: "Hybrid · Accra + Online",
     type: "hybrid",
+    attendees: 300,
+  },
+  {
+    id: "4",
+    title: "Web Infrastructure Bootcamp",
+    date: "Mon, Jun 2",
+    location: "Kumasi, Ghana",
+    type: "in-person",
+    attendees: 60,
+    spotsLeft: 12,
   },
 ];
 
 const opportunities: Opportunity[] = [
   {
     id: "1",
-    role: "UI/UX Identity Designer",
-    type: "Full-Time",
-    compensation: "$90k – $120k",
-    location: "Global / Remote",
+    title: "Mentor — Frontend Engineering",
+    type: "Mentorship",
+    description: "Guide 1–2 junior members through React and modern web development practices.",
+    postedBy: "Core Team",
   },
   {
     id: "2",
-    role: "Runtime Security Engineer",
-    type: "Bounty",
-    compensation: "15,000 Credits",
-    location: "Node Network",
+    title: "Community Moderator",
+    type: "Volunteer",
+    description: "Help moderate Discord, support new members, and keep discussions productive.",
+    postedBy: "Core Team",
   },
   {
     id: "3",
-    role: "Community Moderator",
-    type: "Volunteer",
-    compensation: "Legendary Badge",
-    location: "Digital Hub",
+    title: "Auth System Security Audit",
+    type: "Bounty",
+    description: "Review and harden the identity platform's auth layer.",
+    postedBy: "Identify Project",
+  },
+  {
+    id: "4",
+    title: "Technical Writer",
+    type: "Contract",
+    description: "Document community projects and publish engineering articles on the Codetopia blog.",
+    postedBy: "Content Team",
   },
 ];
 
-const reputationBadges: ReputationBadge[] = [
-  { id: "1", label: "Core Contributor", description: "Merged 10+ PRs", icon: Star, earned: true },
+const spotlights: Spotlight[] = [
+  {
+    id: "1",
+    member: "Kwame Asante",
+    avatarUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=200&auto=format&fit=crop",
+    achievement: "First open-source PR merged",
+    detail: "Contributed a critical accessibility fix to OSSAfrica's main platform.",
+  },
   {
     id: "2",
-    label: "Security Auditor",
-    description: "Completed 3 audits",
-    icon: CheckCircle2,
-    earned: true,
+    member: "Efua Darko",
+    avatarUrl: "https://images.unsplash.com/photo-1614644147798-f8c0fc9da7f6?q=80&w=200&auto=format&fit=crop",
+    achievement: "Completed Full-Stack Cohort 2",
+    detail: "Graduated with distinction and shipped a live community project.",
   },
-  { id: "3", label: "Protocol Pioneer", description: "Early adopter", icon: Zap, earned: true },
-  { id: "4", label: "Global Node", description: "Attend 5 events", icon: Globe, earned: false },
+  {
+    id: "3",
+    member: "Yaw Frimpong",
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+    achievement: "Security bounty awarded",
+    detail: "Identified and reported a critical vulnerability in the community auth gateway.",
+  },
 ];
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
-        <Icon className="w-3.5 h-3.5" />
-      </div>
-      <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900">
-        {title}
-      </h2>
-    </div>
-  );
-}
+const programs: Program[] = [
+  {
+    id: "1",
+    title: "Full-Stack Web Engineering",
+    type: "Training",
+    description: "A structured 6-month program covering frontend, backend, and deployment. From fundamentals to production-grade systems.",
+    duration: "6 months",
+    enrolledCount: 42,
+    spotsLeft: 8,
+    status: "open",
+  },
+  {
+    id: "2",
+    title: "1-on-1 Mentorship Program",
+    type: "Mentorship",
+    description: "Get paired with a senior engineer for personalised guidance on your tech journey. Sessions twice a month.",
+    duration: "3 months",
+    enrolledCount: 18,
+    spotsLeft: 4,
+    status: "open",
+  },
+  {
+    id: "3",
+    title: "DevOps & Cloud Bootcamp",
+    type: "Bootcamp",
+    description: "Intensive 8-week bootcamp covering Docker, CI/CD pipelines, AWS, and infrastructure as code.",
+    duration: "8 weeks",
+    enrolledCount: 30,
+    status: "ongoing",
+  },
+  {
+    id: "4",
+    title: "Open Source Contribution Workshop",
+    type: "Workshop",
+    description: "A 2-day hands-on workshop teaching Git workflows, code review, and how to contribute to real open-source projects.",
+    duration: "2 days",
+    enrolledCount: 65,
+    status: "closed",
+  },
+];
 
-export default function CommunityPage() {
-  const [showAllTimeline, setShowAllTimeline] = React.useState(false);
-  const visibleTimeline = showAllTimeline ? timelineData : timelineData.slice(0, 3);
+const projects: Project[] = [
+  {
+    id: "1",
+    title: "Codetopia Identity (Identify)",
+    description: "The community identity and auth platform. Members manage their profile, security, and connected apps here.",
+    stack: ["Next.js", "Django", "PostgreSQL"],
+    contributors: 6,
+    stars: 24,
+    status: "active",
+  },
+  {
+    id: "2",
+    title: "CommuniTrack",
+    description: "An open-source attendance and participation tracker for community events and programs.",
+    stack: ["React", "FastAPI", "SQLite"],
+    contributors: 3,
+    stars: 11,
+    status: "seeking-contributors",
+  },
+  {
+    id: "3",
+    title: "Codetopia Blog Engine",
+    description: "A lightweight CMS built by the community for publishing technical articles and tutorials.",
+    stack: ["Astro", "MDX", "Tailwind"],
+    contributors: 8,
+    stars: 37,
+    status: "active",
+  },
+  {
+    id: "4",
+    title: "DevPath CLI",
+    description: "A command-line tool that helps new developers navigate learning paths and track their progress.",
+    stack: ["Rust", "TOML"],
+    contributors: 2,
+    stars: 9,
+    status: "seeking-contributors",
+  },
+];
+
+const resources: Resource[] = [
+  {
+    id: "1",
+    title: "Getting Started with Open Source Contributions",
+    type: "Guide",
+    author: "Abena Mensah",
+    date: "Apr 10, 2026",
+    readTime: "8 min",
+  },
+  {
+    id: "2",
+    title: "Understanding Web Infrastructure Basics",
+    type: "Article",
+    author: "Kofi Boateng",
+    date: "Apr 3, 2026",
+    readTime: "12 min",
+  },
+  {
+    id: "3",
+    title: "Docker for Beginners — Full Workshop Recording",
+    type: "Video",
+    author: "Ama Owusu",
+    date: "Mar 28, 2026",
+  },
+  {
+    id: "4",
+    title: "Project README Template",
+    type: "Template",
+    author: "Core Team",
+    date: "Mar 15, 2026",
+  },
+  {
+    id: "5",
+    title: "How to Make the Most of Your Mentorship",
+    type: "Guide",
+    author: "Yaw Frimpong",
+    date: "Mar 8, 2026",
+    readTime: "6 min",
+  },
+];
+
+// ─── Style maps ──────────────────────────────────────────────────────────────
+
+const eventTypeColors: Record<string, string> = {
+  "in-person": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  virtual: "bg-blue-50 text-blue-700 border-blue-200",
+  hybrid: "bg-violet-50 text-violet-700 border-violet-200",
+};
+
+const opportunityColors: Record<string, string> = {
+  Mentorship: "bg-amber-50 text-amber-700 border-amber-200",
+  Volunteer: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Bounty: "bg-violet-50 text-violet-700 border-violet-200",
+  "Full-Time": "bg-blue-50 text-blue-700 border-blue-200",
+  Contract: "bg-zinc-100 text-zinc-600 border-zinc-200",
+};
+
+const programTypeColors: Record<string, string> = {
+  Training: "bg-blue-50 text-blue-700 border-blue-200",
+  Mentorship: "bg-amber-50 text-amber-700 border-amber-200",
+  Bootcamp: "bg-violet-50 text-violet-700 border-violet-200",
+  Workshop: "bg-emerald-50 text-emerald-700 border-emerald-200",
+};
+
+const programStatusColors: Record<string, string> = {
+  open: "text-emerald-600",
+  ongoing: "text-amber-600",
+  closed: "text-zinc-400",
+};
+
+const projectStatusColors: Record<string, string> = {
+  active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "seeking-contributors": "bg-amber-50 text-amber-700 border-amber-200",
+  completed: "bg-zinc-100 text-zinc-500 border-zinc-200",
+};
+
+const projectStatusLabels: Record<string, string> = {
+  active: "Active",
+  "seeking-contributors": "Seeking Contributors",
+  completed: "Completed",
+};
+
+const resourceTypeColors: Record<string, string> = {
+  Article: "bg-blue-50 text-blue-700 border-blue-200",
+  Guide: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  Video: "bg-violet-50 text-violet-700 border-violet-200",
+  Template: "bg-zinc-100 text-zinc-600 border-zinc-200",
+};
+
+const memberRoleColors: Record<MemberRole, string> = {
+  Mentor: "bg-amber-50 text-amber-700 border-amber-200",
+  Member: "bg-zinc-100 text-zinc-500 border-zinc-200",
+  Volunteer: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "Core Team": "bg-blue-50 text-blue-700 border-blue-200",
+};
+
+const memberRoleFilters: { label: string; value: MemberRole | "all" }[] = [
+  { label: "All", value: "all" },
+  { label: "Mentor", value: "Mentor" },
+  { label: "Member", value: "Member" },
+  { label: "Volunteer", value: "Volunteer" },
+  { label: "Core Team", value: "Core Team" },
+];
+
+// ─── Tab config ───────────────────────────────────────────────────────────────
+
+const tabs: { id: Tab; label: string }[] = [
+  { id: "members", label: "Members" },
+  { id: "events", label: "Events" },
+  { id: "programs", label: "Programs" },
+  { id: "projects", label: "Projects" },
+  { id: "resources", label: "Resources" },
+];
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+function CommunityContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = React.useState<Tab>(() => {
+    const t = searchParams.get("tab");
+    return (tabs.map((x) => x.id) as string[]).includes(t ?? "") ? (t as Tab) : "members";
+  });
+  const [memberSearch, setMemberSearch] = React.useState("");
+  const [roleFilter, setRoleFilter] = React.useState<MemberRole | "all">(() => {
+    const r = searchParams.get("role");
+    return (["all", "Mentor", "Member", "Volunteer", "Core Team"] as string[]).includes(r ?? "") ? (r as MemberRole | "all") : "all";
+  });
+
+  function handleTabChange(tab: Tab) {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    if (tab !== "members") params.delete("role");
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }
+
+  function handleRoleFilter(role: MemberRole | "all") {
+    setRoleFilter(role);
+    const params = new URLSearchParams(searchParams.toString());
+    if (role === "all") params.delete("role");
+    else params.set("role", role);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }
+
+  const filteredMembers = members.filter((m) => {
+    const matchesRole = roleFilter === "all" || m.communityRole === roleFilter;
+    const matchesSearch =
+      memberSearch === "" ||
+      m.name.toLowerCase().includes(memberSearch.toLowerCase()) ||
+      m.role.toLowerCase().includes(memberSearch.toLowerCase()) ||
+      m.skills.some((s) => s.toLowerCase().includes(memberSearch.toLowerCase()));
+    return matchesRole && matchesSearch;
+  });
 
   return (
     <DashboardShell>
-      <div className="max-w-6xl space-y-8 pb-20">
+      <div className="max-w-7xl mx-auto pb-20 space-y-8">
+
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
             Community
           </h1>
-          <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
-            Your progression, events, and open opportunities
+          <p className="font-mono text-sm text-zinc-500">
+            500+ members building Ghana's tech ecosystem
           </p>
         </div>
 
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* LEFT — main content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Identity Journey */}
-            <section className="space-y-4">
-              <SectionHeader icon={TrendingUp} title="Identity Journey" />
-              <div className="bg-white border border-zinc-200 overflow-hidden">
-                <div className="p-6">
-                  <div className="relative">
-                    <div className="absolute left-[5px] top-2 bottom-2 w-px bg-zinc-100" />
-                    <div className="space-y-0">
-                      {visibleTimeline.map((item, idx) => (
-                        <div
-                          key={item.id}
-                          className={`relative pl-7 group ${idx < visibleTimeline.length - 1 ? "pb-6" : ""}`}
-                        >
-                          <div
-                            className={`absolute left-0 top-[7px] w-[11px] h-[11px] rounded-full border-2 transition-all ${
-                              item.isCurrent
-                                ? "bg-black border-black"
-                                : "bg-white border-zinc-300 group-hover:border-zinc-600"
-                            }`}
-                          />
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="space-y-1 flex-1 min-w-0">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-sans font-black text-sm uppercase tracking-tight text-zinc-900 leading-none">
-                                  {item.role}
-                                </h3>
-                                {item.isCurrent && (
-                                  <span className="inline-flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-widest bg-black text-white px-2 py-0.5 leading-none">
-                                    <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
-                                    Current
-                                  </span>
-                                )}
-                              </div>
-                              <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 flex items-center gap-1">
-                                <Clock className="w-2.5 h-2.5 shrink-0" />
-                                {item.period}
-                              </p>
-                              <p className="text-[11px] text-zinc-500 leading-relaxed">
-                                {item.description}
-                              </p>
-                            </div>
-                            <span className="font-mono text-[8px] uppercase tracking-widest border border-zinc-200 text-zinc-400 px-2 py-0.5 shrink-0 whitespace-nowrap">
-                              {item.status}
-                            </span>
-                          </div>
-                        </div>
+        {/* Tab nav */}
+        <div className="flex border-b border-zinc-200 overflow-x-auto no-scrollbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleTabChange(tab.id)}
+              className={`font-mono text-sm px-5 py-3 border-b-2 -mb-px transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "border-zinc-900 text-zinc-900"
+                  : "border-transparent text-zinc-400 hover:text-zinc-700 hover:border-zinc-300"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Members ── */}
+        {activeTab === "members" && (
+          <div className="space-y-5">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+                <Input
+                  placeholder="Search by name, role, or skill..."
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  className="h-11 rounded-none border-zinc-200 bg-white pl-9 font-mono text-sm focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {memberRoleFilters.map((f) => (
+                  <button
+                    key={f.value}
+                    type="button"
+                    onClick={() => handleRoleFilter(f.value)}
+                    className={`font-mono text-sm px-3 h-11 border transition-all whitespace-nowrap ${
+                      roleFilter === f.value
+                        ? "bg-black text-white border-black"
+                        : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {filteredMembers.map((member) => (
+                <Link
+                  key={member.id}
+                  href={`/community/${member.id}`}
+                  className="bg-white border border-zinc-200 p-4 flex items-start gap-3 hover:border-zinc-400 transition-all group cursor-pointer"
+                >
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-zinc-200 shrink-0">
+                    {/* biome-ignore lint/performance/noImgElement: member avatar */}
+                    <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-mono font-semibold text-sm text-zinc-900 truncate group-hover:underline underline-offset-4">{member.name}</p>
+                      <ExternalLink className="w-3 h-3 text-zinc-300 group-hover:text-zinc-500 transition-colors shrink-0" />
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <p className="font-mono text-xs text-zinc-500">{member.role}</p>
+                      <span className={`font-mono text-[10px] uppercase tracking-widest border px-1.5 py-0.5 ${memberRoleColors[member.communityRole]}`}>
+                        {member.communityRole}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-2.5 h-2.5 text-zinc-300 shrink-0" />
+                      <p className="font-mono text-xs text-zinc-400">{member.location}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {member.skills.map((skill) => (
+                        <span key={skill} className="font-mono text-[10px] uppercase tracking-widest bg-zinc-50 border border-zinc-100 text-zinc-500 px-1.5 py-0.5">
+                          {skill}
+                        </span>
                       ))}
                     </div>
                   </div>
+                </Link>
+              ))}
+              {filteredMembers.length === 0 && (
+                <div className="col-span-3 py-16 text-center border border-zinc-200 bg-white">
+                  <p className="font-mono text-sm text-zinc-500">No members match your search</p>
                 </div>
-                {timelineData.length > 3 && (
-                  <div className="px-6 py-3 bg-zinc-50 border-t border-zinc-100">
-                    <button
-                      onClick={() => setShowAllTimeline((v) => !v)}
-                      className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1.5"
-                    >
-                      {showAllTimeline ? "Show less" : `Show ${timelineData.length - 3} more`}
-                      <ArrowRight
-                        className={`w-3 h-3 transition-transform duration-200 ${showAllTimeline ? "-rotate-90" : ""}`}
-                      />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </section>
+              )}
+            </div>
+          </div>
+        )}
 
-            {/* Open Opportunities */}
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <SectionHeader icon={Briefcase} title="Open Opportunities" />
-                <Button
-                  variant="ghost"
-                  className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-8 px-3"
-                >
-                  View All <ArrowRight className="ml-1.5 w-3 h-3" />
-                </Button>
-              </div>
-              <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
-                {opportunities.map((op) => (
-                  <div
-                    key={op.id}
-                    className="p-5 flex items-center gap-4 group hover:bg-zinc-50 transition-all"
-                  >
-                    <div className="w-9 h-9 bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0 group-hover:border-zinc-300 transition-colors">
-                      <Briefcase className="w-4 h-4 text-zinc-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-sans font-black uppercase text-xs tracking-wider text-zinc-900 leading-none">
-                        {op.role}
-                      </h4>
-                      <div className="flex flex-wrap items-center gap-2 mt-2">
-                        <span className="font-mono text-[8px] uppercase tracking-widest border border-zinc-200 bg-zinc-50 text-zinc-500 px-2 py-0.5">
-                          {op.type}
-                        </span>
-                        <span className="font-mono text-[9px] text-zinc-400 uppercase tracking-widest flex items-center gap-1">
-                          <MapPin className="w-2.5 h-2.5" />
-                          {op.location}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <span className="font-mono text-[10px] font-black tracking-widest text-zinc-900 whitespace-nowrap hidden sm:block">
-                        {op.compensation}
+        {/* ── Events ── */}
+        {activeTab === "events" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="lg:col-span-2 space-y-3">
+              {events.map((event) => (
+                <div key={event.id} className="bg-white border border-zinc-200 p-5 flex items-center gap-4 hover:bg-zinc-50 transition-all group">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className={`font-mono text-xs uppercase tracking-widest border px-2 py-0.5 ${eventTypeColors[event.type]}`}>
+                        {event.type}
                       </span>
-                      <Button
-                        variant="outline"
-                        className="h-8 rounded-none border-black bg-black text-white hover:bg-zinc-800 font-mono text-[9px] uppercase tracking-widest px-4"
-                      >
-                        Apply
-                      </Button>
+                      <span className="font-mono text-sm text-zinc-400">{event.date}</span>
                     </div>
+                    <p className="font-mono font-semibold text-base text-zinc-900">{event.title}</p>
+                    <div className="flex flex-wrap items-center gap-3 mt-1 font-mono text-sm text-zinc-400">
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{event.location}</span>
+                      <span className="text-zinc-200">·</span>
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{event.attendees} attending</span>
+                      {event.spotsLeft && (
+                        <>
+                          <span className="text-zinc-200">·</span>
+                          <span className="text-amber-600 font-semibold">{event.spotsLeft} spots left</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <button type="button" className="font-mono text-sm font-semibold text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-500 hover:border-zinc-400 transition-all shrink-0">
+                    Register
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Spotlight sidebar */}
+            <div className="space-y-4">
+              <h2 className="font-sans font-black uppercase text-sm tracking-widest text-zinc-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Spotlight
+              </h2>
+              <div className="space-y-3">
+                {spotlights.map((s) => (
+                  <div key={s.id} className="bg-white border border-zinc-200 p-4 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-zinc-200 shrink-0">
+                        {/* biome-ignore lint/performance/noImgElement: spotlight avatar */}
+                        <img src={s.avatarUrl} alt={s.member} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="font-mono font-semibold text-sm text-zinc-900">{s.member}</p>
+                        <p className="font-mono text-xs text-zinc-500">{s.achievement}</p>
+                      </div>
+                    </div>
+                    <p className="font-mono text-xs text-zinc-400 leading-relaxed">{s.detail}</p>
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
           </div>
+        )}
 
-          {/* RIGHT — sidebar */}
-          <div className="space-y-8">
-            {/* Reputation */}
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <SectionHeader icon={Award} title="Reputation" />
-                {reputationBadges.length > 0 && (
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-                    {reputationBadges.filter((b) => b.earned).length}/{reputationBadges.length}
-                  </span>
-                )}
-              </div>
-              <div className="bg-white border border-zinc-200 overflow-hidden">
-                {reputationBadges.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
-                    <div className="w-10 h-10 border border-zinc-200 bg-zinc-50 flex items-center justify-center mb-3">
-                      <Award className="w-4 h-4 text-zinc-300" />
-                    </div>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-900 mb-1">
-                      No Badges Yet
-                    </p>
-                    <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 leading-relaxed">
-                      Complete activities to earn badges
-                    </p>
+        {/* ── Programs ── */}
+        {activeTab === "programs" && (
+          <div className="space-y-3">
+            {programs.map((program) => (
+              <div key={program.id} className="bg-white border border-zinc-200 p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-zinc-50 transition-all group">
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`font-mono text-xs uppercase tracking-widest border px-2 py-0.5 ${programTypeColors[program.type]}`}>
+                      {program.type}
+                    </span>
+                    <span className={`font-mono text-xs font-semibold ${programStatusColors[program.status]}`}>
+                      {program.status === "open" ? "Open for enrollment" : program.status === "ongoing" ? "In progress" : "Closed"}
+                    </span>
                   </div>
-                ) : (
-                  <div className="divide-y divide-zinc-100">
-                    {reputationBadges.map((badge) => (
-                      <div
-                        key={badge.id}
-                        className={`flex items-center gap-3 p-4 transition-all ${badge.earned ? "hover:bg-zinc-50" : "opacity-40"}`}
-                      >
-                        <div className="w-8 h-8 flex items-center justify-center shrink-0 border border-zinc-200 bg-zinc-50">
-                          <badge.icon
-                            className={`w-3.5 h-3.5 ${badge.earned ? "text-zinc-900" : "text-zinc-300"}`}
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-mono text-[9px] font-black uppercase tracking-widest text-zinc-900 truncate leading-none">
-                            {badge.label}
-                          </p>
-                          <p className="font-mono text-[8px] uppercase tracking-widest text-zinc-400 mt-0.5">
-                            {badge.description}
-                          </p>
-                        </div>
-                        {badge.earned ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                        ) : (
-                          <Plus className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Upcoming Events */}
-            <section className="space-y-4">
-              <SectionHeader icon={Calendar} title="Events" />
-              <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
-                {events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="p-4 group hover:bg-zinc-50 transition-all cursor-pointer"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="space-y-1 flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-[9px] font-black text-zinc-900 uppercase tracking-widest">
-                            {event.date}
-                          </span>
-                          <span className="font-mono text-[7px] uppercase tracking-widest border border-zinc-200 bg-zinc-50 text-zinc-400 px-1.5 py-0.5">
-                            {event.type}
-                          </span>
-                        </div>
-                        <h4 className="font-sans font-black text-xs uppercase tracking-wider text-zinc-900 group-hover:underline underline-offset-4 leading-tight">
-                          {event.title}
-                        </h4>
-                      </div>
-                      <ExternalLink className="w-3 h-3 text-zinc-300 group-hover:text-zinc-500 transition-colors shrink-0 mt-1" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 font-mono text-[8px] text-zinc-400 uppercase tracking-widest">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-2 h-2" />
-                          {event.location}
-                        </span>
+                  <p className="font-mono font-semibold text-base text-zinc-900">{program.title}</p>
+                  <p className="font-mono text-sm text-zinc-500 leading-relaxed">{program.description}</p>
+                  <div className="flex flex-wrap items-center gap-3 font-mono text-sm text-zinc-400">
+                    <span>{program.duration}</span>
+                    <span className="text-zinc-200">·</span>
+                    <span>{program.enrolledCount} enrolled</span>
+                    {program.spotsLeft && (
+                      <>
                         <span className="text-zinc-200">·</span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-2 h-2" />
-                          {event.attendees.toLocaleString()}
-                        </span>
-                      </div>
-                      <button className="font-mono text-[8px] uppercase tracking-widest text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-400 hover:border-zinc-400 transition-all font-bold">
-                        Register
-                      </button>
-                    </div>
+                        <span className="text-amber-600 font-semibold">{program.spotsLeft} spots left</span>
+                      </>
+                    )}
                   </div>
-                ))}
-                <div className="p-3 bg-zinc-50">
-                  <Button
-                    variant="ghost"
-                    className="w-full text-[9px] font-mono uppercase tracking-widest text-zinc-400 hover:text-zinc-900 h-7"
-                  >
-                    View Calendar <ArrowRight className="ml-1.5 w-3 h-3" />
-                  </Button>
+                </div>
+                {program.status === "open" && (
+                  <button type="button" className="font-mono text-sm font-semibold text-zinc-900 border-b border-zinc-900 pb-px hover:text-zinc-500 hover:border-zinc-400 transition-all shrink-0 self-start sm:self-auto">
+                    Enroll
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── Projects ── */}
+        {activeTab === "projects" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {projects.map((project) => (
+              <div key={project.id} className="bg-white border border-zinc-200 p-5 space-y-3 hover:border-zinc-400 transition-all group">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <FolderGit2 className="w-4 h-4 text-zinc-400 shrink-0" />
+                    <p className="font-mono font-semibold text-base text-zinc-900">{project.title}</p>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-500 transition-colors shrink-0 mt-0.5" />
+                </div>
+                <p className="font-mono text-sm text-zinc-500 leading-relaxed">{project.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {project.stack.map((tech) => (
+                    <span key={tech} className="font-mono text-[10px] uppercase tracking-widest bg-zinc-50 border border-zinc-100 text-zinc-500 px-1.5 py-0.5">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-4 font-mono text-sm text-zinc-400">
+                    <span className="flex items-center gap-1"><Users className="w-3 h-3" />{project.contributors}</span>
+                    <span className="flex items-center gap-1"><Star className="w-3 h-3" />{project.stars}</span>
+                  </div>
+                  <span className={`font-mono text-[10px] uppercase tracking-widest border px-2 py-0.5 ${projectStatusColors[project.status]}`}>
+                    {projectStatusLabels[project.status]}
+                  </span>
                 </div>
               </div>
-            </section>
+            ))}
           </div>
-        </div>
+        )}
+
+        {/* ── Resources ── */}
+        {activeTab === "resources" && (
+          <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
+            {resources.map((resource) => (
+              <div key={resource.id} className="p-5 flex items-center gap-4 hover:bg-zinc-50 transition-all group cursor-pointer">
+                <BookOpen className="w-4 h-4 text-zinc-400 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono font-semibold text-base text-zinc-900 group-hover:underline underline-offset-4">
+                    {resource.title}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 font-mono text-sm text-zinc-400">
+                    <span>{resource.author}</span>
+                    <span className="text-zinc-200">·</span>
+                    <span>{resource.date}</span>
+                    {resource.readTime && (
+                      <>
+                        <span className="text-zinc-200">·</span>
+                        <span>{resource.readTime} read</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className={`font-mono text-xs uppercase tracking-widest border px-2 py-0.5 hidden sm:inline ${resourceTypeColors[resource.type]}`}>
+                    {resource.type}
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
     </DashboardShell>
+  );
+}
+
+export default function CommunityPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <CommunityContent />
+    </React.Suspense>
   );
 }

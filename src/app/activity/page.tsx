@@ -1,21 +1,20 @@
 "use client";
 
+import {
+  AlertTriangle,
+  AppWindow,
+  Filter,
+  Key,
+  LogIn,
+  LogOut,
+  Search,
+  Shield,
+  User,
+} from "lucide-react";
 import React from "react";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  LogIn,
-  LogOut,
-  Shield,
-  Key,
-  AppWindow,
-  User,
-  AlertTriangle,
-  Search,
-  Filter,
-  ChevronDown,
-} from "lucide-react";
 
 type ActivityType = "login" | "logout" | "security" | "password" | "app" | "profile" | "alert";
 
@@ -175,20 +174,19 @@ export default function ActivityPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // Reset to page 1 when filter/search changes
   React.useEffect(() => {
     setPage(1);
-  }, [search, activeFilter]);
+  }, []);
 
   return (
     <DashboardShell>
-      <div className="max-w-3xl space-y-8 pb-20">
+      <div className="max-w-6xl mx-auto space-y-8 pb-20">
         {/* Header */}
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
             Activity Log
           </h1>
-          <p className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+          <p className="font-mono text-sm text-zinc-500">
             A full record of actions and events on your account
           </p>
         </div>
@@ -198,7 +196,7 @@ export default function ActivityPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
           <Input
             placeholder="Search activity..."
-            className="h-11 rounded-none border-zinc-200 bg-white pl-9 font-mono text-xs focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
+            className="h-11 rounded-none border-zinc-200 bg-white pl-9 font-mono text-sm focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -209,8 +207,9 @@ export default function ActivityPage() {
           {filterOptions.map((f) => (
             <button
               key={f.value}
+              type="button"
               onClick={() => setActiveFilter(f.value)}
-              className={`font-mono text-[9px] uppercase tracking-widest px-3 py-1.5 border transition-all ${
+              className={`font-mono text-sm px-3 py-1.5 border transition-all ${
                 activeFilter === f.value
                   ? "bg-black text-white border-black"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
@@ -227,12 +226,8 @@ export default function ActivityPage() {
             <div className="w-12 h-12 border border-zinc-200 bg-zinc-50 flex items-center justify-center mb-4">
               <Filter className="w-5 h-5 text-zinc-300" />
             </div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-900 mb-1">
-              No results
-            </p>
-            <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-              Try adjusting your search or filter
-            </p>
+            <p className="font-mono font-semibold text-sm text-zinc-900 mb-1">No results</p>
+            <p className="font-mono text-xs text-zinc-500">Try adjusting your search or filter</p>
           </div>
         ) : (
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
@@ -242,16 +237,16 @@ export default function ActivityPage() {
               return (
                 <div
                   key={log.id}
-                  className={`flex items-start gap-4 p-5 group hover:bg-zinc-50 transition-all ${isAlert ? "bg-zinc-50" : ""}`}
+                  className={`flex items-start gap-4 p-5 group transition-all ${isAlert ? "bg-red-50 border-l-2 border-l-red-400 hover:bg-red-50/80" : "hover:bg-zinc-50"}`}
                 >
                   {/* Icon */}
                   <div
                     className={`w-9 h-9 flex items-center justify-center shrink-0 border mt-0.5 ${
-                      isAlert ? "border-zinc-300 bg-white" : "border-zinc-200 bg-zinc-50"
+                      isAlert ? "border-red-200 bg-white" : "border-zinc-200 bg-zinc-50"
                     }`}
                   >
                     <config.icon
-                      className={`w-4 h-4 ${isAlert ? "text-zinc-900" : "text-zinc-400"}`}
+                      className={`w-4 h-4 ${isAlert ? "text-red-500" : "text-zinc-400"}`}
                     />
                   </div>
 
@@ -261,29 +256,29 @@ export default function ActivityPage() {
                       <div className="space-y-0.5 flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p
-                            className={`font-mono text-[10px] font-black uppercase tracking-widest leading-none ${
-                              isAlert ? "text-zinc-900" : "text-zinc-900"
-                            }`}
+                            className={`font-mono font-semibold text-base leading-none ${isAlert ? "text-red-700" : "text-zinc-900"}`}
                           >
                             {log.title}
                           </p>
                           {isAlert && (
-                            <span className="font-mono text-[7px] uppercase tracking-widest border border-zinc-300 text-zinc-600 px-1.5 py-0.5 font-bold">
+                            <span className="font-mono text-xs uppercase tracking-widest border border-red-300 bg-red-100 text-red-600 px-1.5 py-0.5 font-bold">
                               Review
                             </span>
                           )}
                         </div>
-                        <p className="font-mono text-[9px] uppercase tracking-widest text-zinc-400 pt-0.5">
+                        <p
+                          className={`font-mono text-sm pt-0.5 ${isAlert ? "text-red-500/80" : "text-zinc-500"}`}
+                        >
                           {log.detail}
                         </p>
                       </div>
-                      <span className="font-mono text-[8px] uppercase tracking-widest text-zinc-400 whitespace-nowrap shrink-0">
+                      <span className="font-mono text-sm text-zinc-400 whitespace-nowrap shrink-0">
                         {log.timestamp}
                       </span>
                     </div>
 
                     {/* Meta row */}
-                    <div className="flex flex-wrap items-center gap-3 mt-2.5 font-mono text-[8px] uppercase tracking-widest text-zinc-400">
+                    <div className="flex flex-wrap items-center gap-3 mt-2.5 font-mono text-sm text-zinc-400">
                       <span className="border border-zinc-100 bg-zinc-50 px-2 py-0.5 text-zinc-500">
                         {config.label}
                       </span>
@@ -303,14 +298,14 @@ export default function ActivityPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
+            <span className="font-mono text-sm text-zinc-500">
               {filtered.length} event{filtered.length !== 1 ? "s" : ""} · page {page} of{" "}
               {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="h-8 rounded-none border-zinc-200 font-mono text-[9px] uppercase tracking-widest px-4 hover:border-zinc-900 disabled:opacity-30"
+                className="h-8 rounded-none border-zinc-200 font-mono text-xs px-4 hover:border-zinc-900 disabled:opacity-30"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
               >
@@ -318,7 +313,7 @@ export default function ActivityPage() {
               </Button>
               <Button
                 variant="outline"
-                className="h-8 rounded-none border-zinc-200 font-mono text-[9px] uppercase tracking-widest px-4 hover:border-zinc-900 disabled:opacity-30"
+                className="h-8 rounded-none border-zinc-200 font-mono text-xs px-4 hover:border-zinc-900 disabled:opacity-30"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page === totalPages}
               >

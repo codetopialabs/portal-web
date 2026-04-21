@@ -1,7 +1,9 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-const PROTECTED_ROUTES = ["/", "/community", "/profile", "/security", "/apps", "/activity"];
+// TODO: re-enable after auth is wired up
+// const PROTECTED_ROUTES = ["/", "/community", "/profile", "/security", "/apps", "/activity"];
+const PROTECTED_ROUTES: string[] = [];
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export function proxy(request: NextRequest) {

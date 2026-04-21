@@ -1,13 +1,22 @@
 "use client";
 
-import { DashboardSidebar } from "./Sidebar";
+import React from "react";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardNavbar } from "./Navbar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "./Sidebar";
+
+function getSidebarDefaultOpen() {
+  if (typeof document === "undefined") return true;
+  const match = document.cookie.match(/sidebar_state=([^;]+)/);
+  return match ? match[1] === "true" : true;
+}
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const [defaultOpen] = React.useState(getSidebarDefaultOpen);
+
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-white text-zinc-900 selection:bg-black selection:text-white relative font-sans overflow-hidden">
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <div className="flex min-h-screen w-full bg-white text-zinc-900 selection:bg-black selection:text-white relative font-mono overflow-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
           <DashboardNavbar />

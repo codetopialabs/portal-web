@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { useRegisterMutation, type SignupFormValues } from "@/hooks/useAuthMutations";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { type SignupFormValues, useRegisterMutation } from "@/hooks/useAuthMutations";
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,26 +23,21 @@ export function SignupForm() {
     mutation.mutate(data);
   }
 
+  const inputClass =
+    "bg-zinc-900 border border-zinc-700 text-white h-11 rounded-none px-4 text-sm focus-visible:ring-0 focus-visible:border-zinc-400 placeholder:text-zinc-500 transition-all duration-200";
+
   return (
-    <div className="relative w-full max-w-[440px]">
-      <div className="absolute -inset-20 bg-white/[0.02] rounded-full blur-[100px] pointer-events-none" />
-      <div className="space-y-8 relative z-20">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-sans font-black tracking-tighter text-white uppercase">
-            Create Account
-          </h2>
-          <p className="text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase opacity-80">
-            Join the Codetopia Community
-          </p>
+    <div className="w-full max-w-[420px]">
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-sans font-bold text-white">Create Account</h2>
+          <p className="font-mono text-sm text-zinc-400">Join Codetopia Community</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <label
-                htmlFor="firstName"
-                className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
-              >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label htmlFor="firstName" className="block text-sm text-zinc-300">
                 First Name
               </label>
               <Input
@@ -53,24 +48,19 @@ export function SignupForm() {
                 autoComplete="given-name"
                 autoCorrect="off"
                 disabled={mutation.isPending}
-                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
+                className={inputClass}
                 {...register("firstName", {
-                  required: "First name is required",
+                  required: "Required",
                   minLength: { value: 2, message: "Min 2 characters" },
                 })}
               />
               {errors.firstName && (
-                <p className="text-red-400 font-mono text-[10px] tracking-wider">
-                  {errors.firstName.message}
-                </p>
+                <p className="text-red-400 text-xs">{errors.firstName.message}</p>
               )}
             </div>
 
-            <div className="space-y-3">
-              <label
-                htmlFor="lastName"
-                className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
-              >
+            <div className="space-y-2">
+              <label htmlFor="lastName" className="block text-sm text-zinc-300">
                 Last Name
               </label>
               <Input
@@ -81,25 +71,18 @@ export function SignupForm() {
                 autoComplete="family-name"
                 autoCorrect="off"
                 disabled={mutation.isPending}
-                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
+                className={inputClass}
                 {...register("lastName", {
-                  required: "Last name is required",
+                  required: "Required",
                   minLength: { value: 2, message: "Min 2 characters" },
                 })}
               />
-              {errors.lastName && (
-                <p className="text-red-400 font-mono text-[10px] tracking-wider">
-                  {errors.lastName.message}
-                </p>
-              )}
+              {errors.lastName && <p className="text-red-400 text-xs">{errors.lastName.message}</p>}
             </div>
           </div>
 
-          <div className="space-y-3">
-            <label
-              htmlFor="email"
-              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
-            >
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm text-zinc-300">
               Email Address
             </label>
             <Input
@@ -110,24 +93,17 @@ export function SignupForm() {
               autoComplete="email"
               autoCorrect="off"
               disabled={mutation.isPending}
-              className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
+              className={inputClass}
               {...register("email", {
                 required: "Email is required",
                 pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
               })}
             />
-            {errors.email && (
-              <p className="text-red-400 font-mono text-[10px] tracking-wider">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="text-red-400 text-xs">{errors.email.message}</p>}
           </div>
 
-          <div className="space-y-3">
-            <label
-              htmlFor="username"
-              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
-            >
+          <div className="space-y-2">
+            <label htmlFor="username" className="block text-sm text-zinc-300">
               Username
             </label>
             <Input
@@ -138,7 +114,7 @@ export function SignupForm() {
               autoComplete="username"
               autoCorrect="off"
               disabled={mutation.isPending}
-              className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300"
+              className={inputClass}
               {...register("username", {
                 required: "Username is required",
                 minLength: { value: 3, message: "Min 3 characters" },
@@ -148,18 +124,11 @@ export function SignupForm() {
                 },
               })}
             />
-            {errors.username && (
-              <p className="text-red-400 font-mono text-[10px] tracking-wider">
-                {errors.username.message}
-              </p>
-            )}
+            {errors.username && <p className="text-red-400 text-xs">{errors.username.message}</p>}
           </div>
 
-          <div className="space-y-3">
-            <label
-              htmlFor="password"
-              className="block text-[10px] text-zinc-300 font-mono tracking-[0.1em] uppercase"
-            >
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm text-zinc-300">
               Password
             </label>
             <div className="relative">
@@ -170,7 +139,7 @@ export function SignupForm() {
                 autoComplete="new-password"
                 autoCorrect="off"
                 disabled={mutation.isPending}
-                className="bg-[#080808] border-[1px] border-zinc-700 text-white h-12 rounded-none px-4 font-mono text-xs tracking-widest focus-visible:ring-0 focus-visible:border-white focus-visible:bg-[#0c0c0c] placeholder:text-zinc-600 transition-all duration-300 pr-10"
+                className={`${inputClass} pr-10`}
                 {...register("password", {
                   required: "Password is required",
                   minLength: { value: 8, message: "Min 8 characters" },
@@ -184,66 +153,58 @@ export function SignupForm() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-400 font-mono text-[10px] tracking-wider">
-                {errors.password.message}
-              </p>
-            )}
+            {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
           </div>
 
-          <div className="space-y-4">
-            <div className="text-[10px] text-zinc-500 font-mono tracking-wider leading-relaxed text-center px-4">
+          <div className="space-y-3 pt-1">
+            <p className="text-xs text-zinc-500 text-center leading-relaxed">
               By continuing, you agree to our{" "}
               <Link
                 href="/terms"
-                className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all"
+                className="text-zinc-300 hover:text-white transition-colors underline underline-offset-2"
               >
                 Terms of Service
               </Link>{" "}
               and{" "}
               <Link
                 href="/privacy"
-                className="text-zinc-400 hover:text-white border-b border-zinc-800 hover:border-zinc-500 transition-all"
+                className="text-zinc-300 hover:text-white transition-colors underline underline-offset-2"
               >
                 Privacy Policy
               </Link>
               .
-            </div>
+            </p>
 
-            {mutation.isError && (
-              <p className="text-red-400 font-mono text-xs tracking-wider">
-                {mutation.error?.message}
-              </p>
-            )}
+            {mutation.isError && <p className="text-red-400 text-xs">{mutation.error?.message}</p>}
 
             <Button
               disabled={mutation.isPending}
-              className="w-full bg-white text-black hover:bg-zinc-200 h-14 rounded-none font-sans font-black text-sm tracking-widest uppercase transition-colors flex items-center justify-center gap-3"
+              className="w-full bg-white text-black hover:bg-zinc-200 h-11 rounded-none font-semibold text-sm transition-colors flex items-center justify-center gap-2"
             >
               {mutation.isPending ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
               ) : (
                 <>
-                  Create Account <ArrowRight className="w-4 h-4 ml-1" />
+                  Create Account <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </Button>
           </div>
         </form>
 
-        <div className="relative py-2">
+        <div className="relative py-1">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-zinc-700/50" />
+            <span className="w-full border-t border-zinc-700/60" />
           </div>
-          <div className="relative flex justify-center text-[9px] font-mono text-zinc-400 uppercase tracking-[0.3em]">
-            <span className="bg-black px-4">Or sign up with</span>
+          <div className="relative flex justify-center text-xs text-zinc-500">
+            <span className="bg-black px-3">Or sign up with</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Button
             variant="outline"
-            className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
+            className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
             disabled={mutation.isPending}
           >
             <FcGoogle className="mr-2 h-4 w-4" />
@@ -251,23 +212,23 @@ export function SignupForm() {
           </Button>
           <Button
             variant="outline"
-            className="bg-transparent border border-zinc-700 hover:bg-[#111] hover:text-white hover:border-zinc-500 text-zinc-300 h-12 rounded-none font-sans font-bold text-xs uppercase tracking-widest transition-all group"
+            className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
             disabled={mutation.isPending}
           >
-            <FaGithub className="mr-2 h-4 w-4 text-zinc-400 group-hover:text-white transition-colors" />
-            Github
+            <FaGithub className="mr-2 h-4 w-4" />
+            GitHub
           </Button>
         </div>
 
-        <div className="pt-8 flex items-center justify-center font-mono text-[9px] uppercase tracking-widest text-zinc-400">
-          <span className="mr-3">Already have an account?</span>
+        <p className="font-mono text-center text-sm text-zinc-400">
+          Already have an account?{" "}
           <Link
             href="/login"
-            className="hover:text-white border-b border-zinc-700 hover:border-zinc-500 pb-1 transition-all"
+            className="text-white font-medium hover:text-zinc-300 transition-colors"
           >
-            Sign In
+            Sign in
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

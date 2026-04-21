@@ -1,9 +1,9 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { Toaster } from "sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/Providers";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({

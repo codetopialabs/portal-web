@@ -47,8 +47,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       return acc;
     }, {});
 
-    const accessToken = cookies["accessToken"];
-    const refreshToken = cookies["refreshToken"];
+    const accessToken = cookies.accessToken;
+    const refreshToken = cookies.refreshToken;
 
     if (accessToken && refreshToken) {
       set({
