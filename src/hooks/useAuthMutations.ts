@@ -28,7 +28,7 @@ export function useLoginMutation() {
     mutationFn: (data: LoginFormValues) => AuthService.login(data),
     onSuccess: (tokens) => {
       setSession(tokens);
-      router.push("/");
+      router.push(tokens.isOnboarded ? "/" : "/onboarding");
     },
   });
 }

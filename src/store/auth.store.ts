@@ -31,12 +31,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   setSession: (tokens: TokenResponse) => {
     setCookie("accessToken", tokens.accessToken, tokens.expiresIn);
     setCookie("refreshToken", tokens.refreshToken, 2592000);
+    setCookie("isOnboarded", String(tokens.isOnboarded), 2592000);
     set({ session: tokens });
   },
 
   clearSession: () => {
     deleteCookie("accessToken");
     deleteCookie("refreshToken");
+    deleteCookie("isOnboarded");
     set({ session: null });
   },
 

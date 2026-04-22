@@ -1,17 +1,25 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// TODO: re-enable after auth is wired up
-// const PROTECTED_ROUTES = ["/", "/community", "/profile", "/security", "/apps", "/activity"];
-const PROTECTED_ROUTES: string[] = [];
+const PROTECTED_ROUTES = ["/", "/community", "/activity", "/mentorship", "/programs", "/resources", "/settings", "/settings/profile", "/settings/security", "/settings/apps"];
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("accessToken")?.value;
+  const isOnboarded = request.cookies.get("isOnboarded")?.value;
+
+  const isProtected = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // Redirect unauthenticated users away from /onboarding
+  if (pathname === "/onboarding" && !accessToken) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   // Redirect unauthenticated users away from protected routes
-  if (PROTECTED_ROUTES.includes(pathname) && !accessToken) {
+  if (isProtected && !accessToken) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -20,9 +28,35 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  // Redirect already-onboarded users away from /onboarding
+  if (pathname === "/onboarding" && accessToken && isOnboarded === "true") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Allow non-onboarded authenticated users to access /onboarding
+  if (pathname === "/onboarding" && accessToken && isOnboarded !== "true") {
+    return NextResponse.next();
+  }
+
+  // Redirect non-onboarded authenticated users away from protected routes
+  if (isProtected && accessToken && isOnboarded !== "true") {
+    return NextResponse.redirect(new URL("/onboarding", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/community", "/profile", "/security", "/apps", "/activity", "/login", "/signup"],
+  matcher: [
+    "/",
+    "/community/:path*",
+    "/activity/:path*",
+    "/mentorship/:path*",
+    "/programs/:path*",
+    "/resources/:path*",
+    "/settings/:path*",
+    "/login",
+    "/signup",
+    "/onboarding",
+  ],
 };

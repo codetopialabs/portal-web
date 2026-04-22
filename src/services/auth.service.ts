@@ -17,6 +17,7 @@ export interface TokenResponse {
   refreshToken: string;
   tokenType: string;
   expiresIn: number;
+  isOnboarded: boolean;
 }
 
 // API envelope: { data: T, errors: null | object, meta: object }
