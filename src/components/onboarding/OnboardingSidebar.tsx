@@ -32,7 +32,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
           />
         </div>
 
-        <nav className="flex flex-col gap-0 flex-1">
+        <nav className="flex flex-col gap-0 flex-1 justify-center">
           {STEPS.map((step, i) => {
             const isCompleted = i < currentStep;
             const isActive = i === currentStep;

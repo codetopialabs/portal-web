@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaDiscord, FaWhatsapp } from "react-icons/fa6";
+import { FaDiscord, FaWhatsapp, FaLinkedinIn, FaXTwitter, FaBluesky, FaTiktok, FaYoutube } from "react-icons/fa6";
 import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
 
 interface StepProps {
@@ -36,14 +36,63 @@ const COMMUNITIES = [
   },
 ];
 
+const SOCIALS = [
+  {
+    id: "linkedin",
+    icon: FaLinkedinIn,
+    iconColor: "text-blue-600",
+    name: "LinkedIn",
+    href: "https://linkedin.com/company/codetopia",
+    followedBtn: "bg-blue-600",
+  },
+  {
+    id: "x",
+    icon: FaXTwitter,
+    iconColor: "text-zinc-900",
+    name: "X (Twitter)",
+    href: "https://x.com/codetopia",
+    followedBtn: "bg-zinc-900",
+  },
+  {
+    id: "bluesky",
+    icon: FaBluesky,
+    iconColor: "text-sky-500",
+    name: "Bluesky",
+    href: "https://bsky.app/profile/codetopia.bsky.social",
+    followedBtn: "bg-sky-500",
+  },
+  {
+    id: "tiktok",
+    icon: FaTiktok,
+    iconColor: "text-zinc-900",
+    name: "TikTok",
+    href: "https://tiktok.com/@codetopia",
+    followedBtn: "bg-zinc-900",
+  },
+  {
+    id: "youtube",
+    icon: FaYoutube,
+    iconColor: "text-red-500",
+    name: "YouTube",
+    href: "https://youtube.com/@codetopia",
+    followedBtn: "bg-red-500",
+  },
+];
+
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
   const [joined, setJoined] = useState<Record<string, boolean>>({});
+  const [followed, setFollowed] = useState<Record<string, boolean>>({});
 
   const allJoined = COMMUNITIES.every(({ id }) => joined[id]);
 
   function handleJoin(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
     setJoined((prev) => ({ ...prev, [id]: true }));
+  }
+
+  function handleFollow(id: string, href: string) {
+    window.open(href, "_blank", "noopener,noreferrer");
+    setFollowed((prev) => ({ ...prev, [id]: true }));
   }
 
   return (
@@ -92,6 +141,33 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
             </div>
           );
         })}
+      </div>
+
+      {/* Socials */}
+      <div className="mb-10">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-4">
+          Also follow us on
+        </p>
+        <div className="flex flex-wrap gap-3">
+          {SOCIALS.map(({ id, icon: Icon, iconColor, name, href, followedBtn }) => {
+            const isFollowed = followed[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => handleFollow(id, href)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all border ${
+                  isFollowed
+                    ? `${followedBtn} text-white border-transparent`
+                    : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-900 hover:text-zinc-900"
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isFollowed ? "text-white" : iconColor}`} />
+                {isFollowed ? <><Check className="w-3 h-3" /> {name}</> : name}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
