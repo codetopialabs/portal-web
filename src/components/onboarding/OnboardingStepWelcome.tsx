@@ -1,18 +1,33 @@
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
 interface StepProps {
   onNext: () => void;
 }
 
 export function OnboardingStepWelcome({ onNext }: StepProps) {
   return (
-    <div className="flex flex-col max-w-xl">
-      <p className="text-xs uppercase tracking-widest text-zinc-400 font-mono mb-3">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
+      <div className="mb-8">
+        <Image
+          src="/logos/codetopia-community.png"
+          alt="Codetopia Community"
+          width={180}
+          height={45}
+          className="h-12 w-auto object-contain object-left brightness-0"
+          priority
+        />
+      </div>
+
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
         Welcome
-      </p>
-      <h1 className="text-3xl font-bold font-mono uppercase tracking-widest text-zinc-900 mb-6">
-        A Utopia for Tech Enthusiasts
+      </span>
+
+      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-8 leading-[1.1]">
+        A Utopia for<br />Tech Enthusiasts
       </h1>
 
-      <div className="space-y-5 font-mono text-zinc-600 leading-relaxed text-sm">
+      <div className="space-y-4 font-mono text-zinc-600 text-sm leading-relaxed pl-5 border-l-2 border-zinc-200 mb-8">
         <p>
           Codetopia Community is an inclusive and collaborative initiative of the mother company
           Codetopia. It was created to empower aspiring and practicing technologists. We believe
@@ -23,24 +38,26 @@ export function OnboardingStepWelcome({ onNext }: StepProps) {
           Whether you are writing your first line of code or exploring the edges of tech, the
           Codetopia Community is your home.
         </p>
-
-        <div className="border-l-2 border-zinc-900 pl-4 py-1 space-y-2">
-          <p className="text-xs uppercase tracking-widest text-zinc-400">Our Pledge</p>
-          <p className="text-zinc-600">
-            We pledge to make our community welcoming, safe, and equitable for all — regardless of
-            race, ethnicity, age, disability, gender identity, sexual orientation, language,
-            religion, national origin, socio-economic position, or any other status.
-          </p>
-        </div>
       </div>
 
-      <div className="flex mt-8">
+      <div className="bg-white border border-zinc-200 p-6 mb-10">
+        <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-400 mb-3">
+          Our Pledge
+        </p>
+        <p className="font-mono text-zinc-600 text-sm leading-relaxed">
+          We pledge to make our community welcoming, safe, and equitable for all — regardless of
+          race, ethnicity, age, disability, gender identity, sexual orientation, language,
+          religion, national origin, socio-economic position, or any other status.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-6">
         <button
           type="button"
           onClick={onNext}
-          className="bg-zinc-900 text-white px-6 py-3 text-sm uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono"
+          className="bg-zinc-900 text-white px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2"
         >
-          Get Started
+          Get Started <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>

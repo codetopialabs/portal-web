@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Cpu, Globe, Plus, User, X } from "lucide-react";
+import { Camera, Cpu, Globe, Plus, User, X, ArrowLeft, ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
@@ -21,17 +21,17 @@ interface ProfileFormValues {
 }
 
 const inputStyles =
-  "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all";
+  "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all";
 
-const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
+const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold";
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
-        <Icon className="w-3.5 h-3.5" />
+      <div className="w-6 h-6 bg-zinc-900 text-white flex items-center justify-center shrink-0">
+        <Icon className="w-3 h-3" />
       </div>
-      <h2 className="font-sans font-black uppercase text-base tracking-widest text-zinc-900">
+      <h2 className="font-mono font-bold text-sm uppercase tracking-[0.2em] text-zinc-900">
         {title}
       </h2>
     </div>
@@ -89,20 +89,23 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-zinc-400 font-mono mb-1">Final Step</p>
-        <h1 className="text-3xl font-bold font-mono uppercase tracking-widest text-zinc-900">
-          Set Up Your Profile
-        </h1>
-        <p className="font-mono text-zinc-500 text-sm mt-2">
-          Tell the community a bit about yourself.
-        </p>
-      </div>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl"
+    >
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+        Final Step
+      </span>
+      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+        Your Profile
+      </h1>
+      <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
+        Tell the community a bit about yourself.
+      </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* LEFT — avatar */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
             <div className="relative group">
               <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
@@ -115,18 +118,18 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <Camera className="w-4 h-4 text-white" />
               </button>
             </div>
-            <p className="font-mono text-xs text-zinc-400 text-center">
+            <p className="font-mono text-xs text-zinc-400 text-center leading-relaxed">
               You can update your photo after joining.
             </p>
             <button
               type="button"
-              className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2"
+              className="w-full h-9 border border-zinc-200 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2"
             >
               <Camera className="w-3.5 h-3.5" /> Upload Photo
             </button>
           </div>
 
-          <div className="p-4 bg-zinc-50 border border-zinc-200">
+          <div className="p-4 bg-white border border-zinc-200">
             <p className="font-mono text-xs text-zinc-500 leading-relaxed">
               Your profile is visible across the Codetopia ecosystem once you complete setup.
             </p>
@@ -135,7 +138,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
         {/* RIGHT — form */}
         <div className="lg:col-span-2 space-y-8">
-          <section className="space-y-5">
+          <section className="space-y-4">
             <SectionHeader icon={User} title="Personal Info" />
             <div className="bg-white border border-zinc-200 p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -173,7 +176,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <label className={labelStyles}>Bio</label>
                 <textarea
                   placeholder="Tell the community who you are..."
-                  className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                  className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
                   {...register("bio")}
                 />
               </div>
@@ -182,7 +185,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <Divider />
 
-          <section className="space-y-5">
+          <section className="space-y-4">
             <SectionHeader icon={Globe} title="Social Links" />
             <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
               <div className="flex items-center gap-3 px-4">
@@ -214,7 +217,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <Divider />
 
-          <section className="space-y-5">
+          <section className="space-y-4">
             <SectionHeader icon={Cpu} title="Skills" />
             <div className="bg-white border border-zinc-200 p-5">
               <div className="flex flex-wrap gap-2">
@@ -250,7 +253,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                     <button
                       type="button"
                       onClick={addSkill}
-                      className="h-8 w-8 bg-black text-white flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                      className="h-8 w-8 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-700 transition-colors"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -272,20 +275,20 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             <p className="text-red-500 text-sm font-mono">{submitError}</p>
           )}
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-3 pt-2">
             <button
               type="button"
               onClick={onBack}
-              className="h-10 border border-zinc-200 font-mono text-xs uppercase tracking-widest px-6 hover:border-zinc-400 transition-colors"
+              className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
             >
-              Back
+              <ArrowLeft className="w-3.5 h-3.5" /> Back
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-10 bg-black text-white font-mono text-xs uppercase tracking-widest px-6 hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {isSubmitting && (
+              {isSubmitting ? (
                 <div className="flex items-center gap-1">
                   {[0, 1, 2].map((i) => (
                     <span
@@ -295,8 +298,9 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                     />
                   ))}
                 </div>
+              ) : (
+                <>Complete Setup <ArrowRight className="w-3.5 h-3.5" /></>
               )}
-              Complete Setup
             </button>
           </div>
         </div>
