@@ -88,11 +88,9 @@ export function DashboardSidebar() {
       <SidebarContent className="px-3 py-6 no-scrollbar bg-black">
         {menuGroups.map((group) => (
           <SidebarGroup key={group.label} className="mb-8 p-0">
-            {!isCollapsed && (
-              <SidebarGroupLabel className="px-2 mb-1 h-auto font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 font-bold">
-                {group.label}
-              </SidebarGroupLabel>
-            )}
+            <SidebarGroupLabel className="px-2 mb-1 h-auto font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 font-bold">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="gap-0">
                 {group.items.map((item) => {

@@ -6,16 +6,21 @@ import { DashboardNavbar } from "./Navbar";
 import { DashboardSidebar } from "./Sidebar";
 
 function getSidebarDefaultOpen() {
-  if (typeof document === "undefined") return true;
-  const match = document.cookie.match(/sidebar_state=([^;]+)/);
-  return match ? match[1] === "true" : true;
+  return true; // Always return true for SSR and initial hydration
 }
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [defaultOpen] = React.useState(getSidebarDefaultOpen);
+  const [open, setOpen] = React.useState(true);
+
+  React.useEffect(() => {
+    // Read the actual cookie value after mounting
+    const match = document.cookie.match(/sidebar_state=([^;]+)/);
+    const cookieValue = match ? match[1] === "true" : true;
+    setOpen(cookieValue);
+  }, []);
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider open={open} onOpenChange={setOpen}>
       <div className="flex min-h-screen w-full bg-white text-zinc-900 selection:bg-black selection:text-white relative font-mono overflow-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
