@@ -5,6 +5,8 @@ const PROTECTED_ROUTES = ["/", "/community", "/activity", "/mentorship", "/progr
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export function proxy(request: NextRequest) {
+  if (process.env.DEV_BYPASS_AUTH === "true") return NextResponse.next();
+
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("accessToken")?.value;
   const isOnboarded = request.cookies.get("isOnboarded")?.value;
