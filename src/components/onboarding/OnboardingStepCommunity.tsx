@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaDiscord, FaWhatsapp, FaLinkedinIn, FaXTwitter, FaBluesky, FaTiktok, FaYoutube } from "react-icons/fa6";
-import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 
 interface StepProps {
   onNext: () => void;
@@ -37,6 +37,14 @@ const COMMUNITIES = [
 ];
 
 const SOCIALS = [
+  {
+    id: "whatsapp",
+    icon: FaWhatsapp,
+    iconColor: "text-emerald-500",
+    name: "WhatsApp",
+    href: "https://chat.whatsapp.com/codetopia",
+    followedBtn: "bg-emerald-500",
+  },
   {
     id: "linkedin",
     icon: FaLinkedinIn,
@@ -80,14 +88,10 @@ const SOCIALS = [
 ];
 
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
-  const [joined, setJoined] = useState<Record<string, boolean>>({});
   const [followed, setFollowed] = useState<Record<string, boolean>>({});
-
-  const allJoined = COMMUNITIES.every(({ id }) => joined[id]);
 
   function handleJoin(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
-    setJoined((prev) => ({ ...prev, [id]: true }));
   }
 
   function handleFollow(id: string, href: string) {
@@ -105,16 +109,15 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         Connect With Us
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
-        Join our spaces to stay connected, get support, and be part of the conversation.
+        We recommend you connect with us on our socials to stay updated and connected with the community.
       </p>
 
       <div className="space-y-4 mb-10">
-        {COMMUNITIES.map(({ id, icon: Icon, iconColor, name, description, cta, href, joinedBg, joinedBtn }) => {
-          const isJoined = joined[id];
+        {COMMUNITIES.map(({ id, icon: Icon, iconColor, name, description, cta, href }) => {
           return (
             <div
               key={id}
-              className={`border p-6 transition-all duration-300 ${isJoined ? joinedBg : "border-zinc-200 bg-white"}`}
+              className="border border-zinc-200 bg-white p-6"
             >
               <div className="flex items-start gap-5">
                 <Icon className={`w-9 h-9 shrink-0 mt-0.5 ${iconColor}`} />
@@ -124,17 +127,9 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
                   <button
                     type="button"
                     onClick={() => handleJoin(id, href)}
-                    className={`inline-flex items-center gap-2 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all ${
-                      isJoined
-                        ? `${joinedBtn} text-white`
-                        : "border border-zinc-200 text-zinc-600 hover:border-zinc-900 hover:text-zinc-900"
-                    }`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] border border-zinc-200 text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 transition-all"
                   >
-                    {isJoined ? (
-                      <><Check className="w-3.5 h-3.5" /> Joined</>
-                    ) : (
-                      <><ExternalLink className="w-3.5 h-3.5" /> {cta}</>
-                    )}
+                    <ExternalLink className="w-3.5 h-3.5" /> {cta}
                   </button>
                 </div>
               </div>
@@ -181,7 +176,7 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={onNext}
-          disabled={!allJoined}
+          disabled={false}
           className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
         >
           Continue <ArrowRight className="w-3.5 h-3.5" />

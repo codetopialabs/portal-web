@@ -43,6 +43,7 @@ function Divider() {
 }
 
 export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileProps) {
+  const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
   const setOnboarded = useUserStore((s) => s.setOnboarded);
 
@@ -50,6 +51,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const [newSkill, setNewSkill] = useState("");
   const [isAddingSkill, setIsAddingSkill] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const {
     register,
@@ -80,6 +82,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         is_onboarded: true,
       });
       setOnboarded();
+      localStorage.removeItem("onboarding_step");
       onNext();
     } catch (err) {
       setSubmitError(
@@ -147,6 +150,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <input
                     className={inputStyles}
                     placeholder="Your display name"
+                    defaultValue={profile?.fullName ?? ""}
                     {...register("full_name", {
                       required: "Display name is required",
                       validate: (v) => v.trim() !== "" || "Display name is required",
@@ -161,6 +165,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <input
                     className={inputStyles}
                     placeholder="your_username"
+                    defaultValue={profile?.username ?? ""}
                     {...register("username", {
                       required: "Username is required",
                       validate: (v) => v.trim() !== "" || "Username is required",
@@ -187,6 +192,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <section className="space-y-4">
             <SectionHeader icon={Globe} title="Social Links" />
+            <p className="font-mono text-xs text-zinc-400">All optional — adding at least one helps the community connect with you.</p>
             <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
               <div className="flex items-center gap-3 px-4">
                 <FaGithub className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -284,7 +290,8 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               <ArrowLeft className="w-3.5 h-3.5" /> Back
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={() => setShowConfirm(true)}
               disabled={isSubmitting}
               className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
@@ -305,6 +312,51 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
           </div>
         </div>
       </div>
+
+      {/* Confirmation modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white w-full max-w-sm p-8 space-y-5 shadow-2xl">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-mono font-bold mb-2">
+                One last thing
+              </p>
+              <h2 className="font-bold text-xl text-zinc-900 leading-snug">
+                Ready to join Codetopia Community?
+              </h2>
+            </div>
+            <p className="font-mono text-sm text-zinc-500 leading-relaxed">
+              You've reviewed our values, code of conduct, and community guidelines. By continuing, you agree to uphold them.
+            </p>
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="border border-zinc-200 px-5 py-3 text-[11px] uppercase tracking-widest text-zinc-600 hover:bg-zinc-50 transition-colors font-mono"
+              >
+                Go Back
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 bg-zinc-900 text-white px-5 py-3 text-[11px] uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  [0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
+                      style={{ animationDelay: `${i * 0.15}s` }}
+                    />
+                  ))
+                ) : (
+                  <>Join the Community <ArrowRight className="w-3.5 h-3.5" /></>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

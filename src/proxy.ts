@@ -60,5 +60,8 @@ export const config = {
     "/login",
     "/signup",
     "/onboarding",
+    "/verify-email",
+    "/forgot-password",
+    "/reset-password",
   ],
 };

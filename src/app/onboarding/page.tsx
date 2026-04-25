@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OnboardingSidebar } from "@/components/onboarding/OnboardingSidebar";
+import { OnboardingStepTerms } from "@/components/onboarding/OnboardingStepTerms";
 import { OnboardingStepWelcome } from "@/components/onboarding/OnboardingStepWelcome";
 import { OnboardingStepValues } from "@/components/onboarding/OnboardingStepValues";
 import { OnboardingStepConduct } from "@/components/onboarding/OnboardingStepConduct";
@@ -12,14 +13,35 @@ import { OnboardingStepProfile } from "@/components/onboarding/OnboardingStepPro
 import { OnboardingStepCongrats } from "@/components/onboarding/OnboardingStepCongrats";
 import { useUserStore } from "@/store/user.store";
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 export default function OnboardingPage() {
-  const [currentStep, setCurrentStep] = useState(0);
   const isLoading = useUserStore((s) => s.isLoading);
 
-  const nextStep = () => setCurrentStep((s) => Math.min(s + 1, TOTAL_STEPS - 1));
-  const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
+  const [currentStep, setCurrentStep] = useState(0);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const saved = Number(localStorage.getItem("onboarding_step") ?? 0);
+    setCurrentStep(saved);
+    setHydrated(true);
+  }, []);
+
+  function nextStep() {
+    setCurrentStep((s) => {
+      const next = Math.min(s + 1, TOTAL_STEPS - 1);
+      localStorage.setItem("onboarding_step", String(next));
+      return next;
+    });
+  }
+
+  function prevStep() {
+    setCurrentStep((s) => {
+      const prev = Math.max(s - 1, 0);
+      localStorage.setItem("onboarding_step", String(prev));
+      return prev;
+    });
+  }
 
   return (
     <main className="h-screen overflow-hidden bg-white flex flex-col md:flex-row font-mono text-zinc-900">
@@ -31,7 +53,7 @@ export default function OnboardingPage() {
         </div>
 
         <div className="relative z-10 flex items-center justify-center min-h-full px-8 py-12 md:px-16">
-          {isLoading ? (
+          {isLoading || !hydrated ? (
             <div className="flex flex-col items-center gap-6">
               <div className="flex items-center gap-2">
                 {[0, 1, 2].map((i) => (
@@ -46,14 +68,15 @@ export default function OnboardingPage() {
             </div>
           ) : (
             <>
-              {currentStep === 0 && <OnboardingStepWelcome onNext={nextStep} />}
-              {currentStep === 1 && <OnboardingStepValues onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 2 && <OnboardingStepConduct onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 3 && <OnboardingStepVideo onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 4 && <OnboardingStepEnforcement onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 5 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 6 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
-              {currentStep === 7 && <OnboardingStepCongrats />}
+              {currentStep === 0 && <OnboardingStepTerms onNext={nextStep} />}
+              {currentStep === 1 && <OnboardingStepWelcome onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 2 && <OnboardingStepValues onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 3 && <OnboardingStepConduct onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 4 && <OnboardingStepVideo onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 5 && <OnboardingStepEnforcement onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 6 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 7 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
+              {currentStep === 8 && <OnboardingStepCongrats />}
             </>
           )}
         </div>

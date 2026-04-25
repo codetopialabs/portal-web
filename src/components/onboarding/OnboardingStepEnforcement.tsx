@@ -58,10 +58,10 @@ export function OnboardingStepEnforcement({ onNext, onBack }: StepProps) {
             If you witness or experience a Code of Conduct violation, reach out to our Community Moderators privately:
           </p>
           <a
-            href="mailto:codetopiacommunity@gmail.com"
+            href="mailto:codetopiancommunity@gmail.com"
             className="text-sm font-mono font-semibold text-zinc-900 underline underline-offset-4 hover:text-zinc-500 transition-colors"
           >
-            codetopiacommunity@gmail.com
+            codetopiancommunity@gmail.com
           </a>
           <p className="text-xs font-mono text-zinc-400 mt-3">
             All reports are taken seriously and handled with confidentiality.

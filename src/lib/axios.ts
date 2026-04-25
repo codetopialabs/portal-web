@@ -5,27 +5,30 @@ const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof document !== "undefined") {
+    const match = document.cookie.split("; ").find((r) => r.startsWith("accessToken="));
+    const token = match?.split("=")[1];
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const data = error.response?.data;
-    // API format: { data, errors: { fieldName: ["msg"] }, meta }
     const errors = data?.errors;
     if (errors && typeof errors === "object") {
-      const firstKey = Object.keys(errors)[0];
-      const firstMsg = errors[firstKey];
-      const msg = Array.isArray(firstMsg) ? firstMsg[0] : firstMsg;
-      if (msg) return Promise.reject(new Error(String(msg)));
+      const err = new Error(errors.detail ? String(errors.detail) : (() => {
+        const firstKey = Object.keys(errors)[0];
+        const firstMsg = errors[firstKey];
+        return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
+      })()) as Error & { code?: string };
+      if (errors.code) err.code = errors.code;
+      return Promise.reject(err);
     }
-    const message =
-      data?.message ||
-      data?.detail ||
-      data?.error ||
-      (Array.isArray(data?.non_field_errors) ? data.non_field_errors[0] : undefined) ||
-      (typeof data === "string" ? data : undefined) ||
-      error.message ||
-      "An unexpected error occurred";
-    return Promise.reject(new Error(message));
+    return Promise.reject(new Error(error.message || "An unexpected error occurred"));
   }
 );
 

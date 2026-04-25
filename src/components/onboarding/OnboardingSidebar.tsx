@@ -3,10 +3,11 @@
 import Image from "next/image";
 
 const STEPS = [
+  { label: "Terms", description: "Platform & privacy" },
   { label: "Welcome", description: "Who we are" },
   { label: "Core Values", description: "What we stand for" },
   { label: "Code of Conduct", description: "How we behave" },
-  { label: "Intro Video", description: "Meet Codetopia" },
+  { label: "Intro Video", description: "Meet Codetopia Community" },
   { label: "Reporting", description: "Keeping us safe" },
   { label: "Join Us", description: "Discord & WhatsApp" },
   { label: "Your Profile", description: "Set up your account" },

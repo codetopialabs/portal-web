@@ -1,18 +1,24 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AuthService } from "@/services/auth.service";
 import { type LoginFormValues, useLoginMutation } from "@/hooks/useAuthMutations";
 
 export function LoginForm() {
   const [step, setStep] = useState<"email" | "password">("email");
+  const [showPassword, setShowPassword] = useState(false);
   const mutation = useLoginMutation();
+  const resendMutation = useMutation({
+    mutationFn: (email: string) => AuthService.resendVerification(email),
+  });
 
   const {
     register,
@@ -134,22 +140,51 @@ export function LoginForm() {
               <label htmlFor="password" className="block text-sm text-zinc-300">
                 Password
               </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoFocus
-                disabled={mutation.isPending}
-                className={inputClass}
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: { value: 8, message: "Min 8 characters" },
-                })}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoFocus
+                  disabled={mutation.isPending}
+                  className={`${inputClass} pr-10`}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 8, message: "Min 8 characters" },
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
             </div>
 
-            {mutation.isError && <p className="text-red-400 text-xs">{mutation.error?.message}</p>}
+            {mutation.isError && (
+              (mutation.error as Error & { code?: string })?.code === "email_not_verified" ? (
+                <div className="space-y-2 p-3 bg-zinc-900 border border-zinc-700">
+                  <p className="text-yellow-400 text-xs">Your email isn't verified yet.</p>
+                  {resendMutation.isSuccess ? (
+                    <p className="text-emerald-400 text-xs">Verification email sent.</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => resendMutation.mutate(getValues("email"))}
+                      disabled={resendMutation.isPending}
+                      className="text-xs text-white underline underline-offset-2 hover:text-zinc-300 transition-colors disabled:opacity-50"
+                    >
+                      {resendMutation.isPending ? "Sending…" : "Resend verification email"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <p className="text-red-400 text-xs">{mutation.error?.message}</p>
+              )
+            )}
 
             <Button
               disabled={mutation.isPending}
@@ -167,7 +202,7 @@ export function LoginForm() {
         )}
 
         <div className="flex items-center justify-between font-mono text-sm text-zinc-400">
-          <Link href="#" className="hover:text-white transition-colors">
+          <Link href="/forgot-password" className="hover:text-white transition-colors">
             Forgot password?
           </Link>
           <Link href="/signup" className="hover:text-white transition-colors">

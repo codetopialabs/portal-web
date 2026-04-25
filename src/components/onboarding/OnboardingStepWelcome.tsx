@@ -1,11 +1,12 @@
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface StepProps {
   onNext: () => void;
+  onBack: () => void;
 }
 
-export function OnboardingStepWelcome({ onNext }: StepProps) {
+export function OnboardingStepWelcome({ onNext, onBack }: StepProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
       <div className="mb-8">
@@ -29,8 +30,8 @@ export function OnboardingStepWelcome({ onNext }: StepProps) {
 
       <div className="space-y-4 font-mono text-zinc-600 text-sm leading-relaxed pl-5 border-l-2 border-zinc-200 mb-8">
         <p>
-          Codetopia Community is an inclusive and collaborative initiative of the mother company
-          Codetopia. It was created to empower aspiring and practicing technologists. We believe
+          Codetopia Community is an inclusive and collaborative initiative of the mother company{" "}
+          <a href="https://codetopia.org" target="_blank" rel="noopener noreferrer" className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 transition-colors">Codetopia</a>. It was created to empower aspiring and practicing technologists. We believe
           technology is more than a tool — it is the foundation of innovation, creativity, and
           problem-solving.
         </p>
@@ -52,6 +53,13 @@ export function OnboardingStepWelcome({ onNext }: StepProps) {
       </div>
 
       <div className="flex items-center gap-6">
+        <button
+          type="button"
+          onClick={onBack}
+          className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Back
+        </button>
         <button
           type="button"
           onClick={onNext}

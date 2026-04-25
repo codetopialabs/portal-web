@@ -5,16 +5,16 @@ export interface UserProfile {
   email: string;
   username: string;
   role: string;
-  is_onboarded: boolean;
-  is_email_verified: boolean;
-  full_name: string;
-  profile_picture_url: string | null;
+  isOnboarded: boolean;
+  isEmailVerified: boolean;
+  fullName: string;
+  profilePictureUrl: string | null;
   bio: string | null;
   skills: string[];
-  github_handle: string | null;
-  twitter_handle: string | null;
-  linkedin_url: string | null;
-  website_url: string | null;
+  githubHandle: string | null;
+  twitterHandle: string | null;
+  linkedinUrl: string | null;
+  websiteUrl: string | null;
 }
 
 export interface UpdateMeRequest {
@@ -29,28 +29,15 @@ export interface UpdateMeRequest {
   is_onboarded?: boolean;
 }
 
-function getAccessToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("accessToken="));
-  return match ? match.split("=")[1] : null;
-}
 
 export const UserService = {
   async getMe(): Promise<UserProfile> {
-    const token = getAccessToken();
-    const response = await axiosInstance.get<UserProfile>("/auth/me/", {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    return response.data;
+    const response = await axiosInstance.get<{ data: UserProfile }>("/auth/me/");
+    return response.data.data;
   },
 
   async updateMe(data: UpdateMeRequest): Promise<UserProfile> {
-    const token = getAccessToken();
-    const response = await axiosInstance.patch<UserProfile>("/auth/me/", data, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    return response.data;
+    const response = await axiosInstance.patch<{ data: UserProfile }>("/auth/me/", data);
+    return response.data.data;
   },
 };

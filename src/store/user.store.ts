@@ -26,7 +26,7 @@ export const useUserStore = create<UserState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const profile = await UserService.getMe();
-      set({ profile, isOnboarded: profile.is_onboarded, isLoading: false });
+      set({ profile, isOnboarded: profile.isOnboarded, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch user";
       set({ error: message, isOnboarded: false, isLoading: false });

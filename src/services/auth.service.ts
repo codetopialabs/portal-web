@@ -28,8 +28,8 @@ interface ApiResponse<T> {
 }
 
 export const AuthService = {
-  async register(data: RegisterRequest): Promise<TokenResponse> {
-    const response = await axiosInstance.post<ApiResponse<TokenResponse>>("/auth/register/", data);
+  async register(data: RegisterRequest): Promise<{ detail: string }> {
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/register/", data);
     return response.data.data;
   },
 
@@ -42,5 +42,35 @@ export const AuthService = {
     await axiosInstance.post("/auth/logout/", undefined, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+  },
+
+  async resendVerification(email: string): Promise<{ detail: string }> {
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/resend-verification/", { email });
+    return response.data.data;
+  },
+
+  async verifyEmail(token: string): Promise<{ detail: string }> {
+    const response = await axiosInstance.get<ApiResponse<{ detail: string }>>("/auth/verify-email/", { params: { token } });
+    return response.data.data;
+  },
+
+  async passwordReset(email: string): Promise<{ detail: string }> {
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/password-reset/", { email });
+    return response.data.data;
+  },
+
+  async confirmPasswordReset(token: string, password: string): Promise<{ detail: string }> {
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/password-reset/confirm/", { token, password });
+    return response.data.data;
+  },
+
+  async checkEmail(email: string): Promise<boolean> {
+    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>("/auth/check-email/", { params: { email } });
+    return response.data.data.available;
+  },
+
+  async checkUsername(username: string): Promise<boolean> {
+    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>("/auth/check-username/", { params: { username } });
+    return response.data.data.available;
   },
 };

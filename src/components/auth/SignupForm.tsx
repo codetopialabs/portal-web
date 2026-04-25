@@ -8,15 +8,19 @@ import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AuthService } from "@/services/auth.service";
 import { type SignupFormValues, useRegisterMutation } from "@/hooks/useAuthMutations";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm<SignupFormValues>();
+  } = useForm<SignupFormValues>({ mode: "onBlur" });
+  const password = watch("password", "");
   const mutation = useRegisterMutation();
 
   function onSubmit(data: SignupFormValues) {
@@ -25,6 +29,20 @@ export function SignupForm() {
 
   const inputClass =
     "bg-zinc-900 border border-zinc-700 text-white h-11 rounded-none px-4 text-sm focus-visible:ring-0 focus-visible:border-zinc-400 placeholder:text-zinc-500 transition-all duration-200";
+
+  if (mutation.isSuccess) {
+    return (
+      <div className="w-full max-w-[420px]">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-sans font-bold text-white">Check your email</h2>
+          <p className="font-mono text-sm text-zinc-400">{mutation.data.detail}</p>
+          <Link href="/login" className="flex items-center gap-1 font-mono text-sm text-white hover:text-zinc-300 transition-colors">
+            Back to sign in <ArrowRight className="w-3.5 h-3.5 mt-px" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[420px]">
@@ -97,6 +115,10 @@ export function SignupForm() {
               {...register("email", {
                 required: "Email is required",
                 pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
+                validate: async (value) => {
+                  const available = await AuthService.checkEmail(value).catch(() => true);
+                  return available || "Email is already taken";
+                },
               })}
             />
             {errors.email && <p className="text-red-400 text-xs">{errors.email.message}</p>}
@@ -121,6 +143,11 @@ export function SignupForm() {
                 pattern: {
                   value: /^[a-zA-Z0-9_]+$/,
                   message: "Letters, numbers and underscores only",
+                },
+                validate: async (value) => {
+                  if (value.length < 3) return true; // let minLength handle it
+                  const available = await AuthService.checkUsername(value).catch(() => true);
+                  return available || "Username is already taken";
                 },
               })}
             />
@@ -154,6 +181,7 @@ export function SignupForm() {
               </button>
             </div>
             {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
+            <PasswordStrengthMeter password={password} />
           </div>
 
           <div className="space-y-3 pt-1">

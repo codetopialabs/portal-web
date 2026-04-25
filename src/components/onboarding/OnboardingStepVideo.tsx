@@ -13,7 +13,7 @@ export function OnboardingStepVideo({ onNext, onBack }: StepProps) {
       </span>
 
       <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
-        Meet Codetopia
+        Meet Codetopia Community
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-8">
         Watch this short intro to get a feel for our community.

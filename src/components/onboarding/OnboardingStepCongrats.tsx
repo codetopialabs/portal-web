@@ -1,39 +1,30 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/user.store";
 
 export function OnboardingStepCongrats() {
   const router = useRouter();
+  const username = useUserStore((s) => s.profile?.username ?? "member");
 
   return (
-    <div className="flex flex-col items-center max-w-2xl mx-auto text-center">
-      <p className="text-xs uppercase tracking-widest text-zinc-400 font-mono mb-3">
-        You're in
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 flex flex-col items-center max-w-xl mx-auto text-center px-4">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-mono font-bold mb-4">
+        Welcome In
       </p>
-      <h1 className="text-2xl md:text-4xl font-bold font-mono uppercase tracking-widest text-zinc-900 mb-3">
-        Congratulations
+      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 leading-[1.1] mb-4">
+        You're in, <span className="text-zinc-400">@{username}</span>
       </h1>
       <p className="font-mono text-zinc-500 text-sm mb-10">
-        Welcome to Codetopia. You're officially part of the community — now go build something great.
+        You're officially a Codetopia Community member. Go build something great.
       </p>
-
-      <div className="w-full aspect-video border border-zinc-200 mb-10">
-        <iframe
-          src="https://www.youtube.com/embed/SC4xMk98Pdc?si=4bIY5w5z3QcugdzT"
-          title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-          className="w-full h-full"
-        />
-      </div>
-
       <button
         type="button"
         onClick={() => router.push("/")}
-        className="bg-zinc-900 text-white px-10 py-4 text-sm uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono"
+        className="inline-flex items-center gap-2 bg-zinc-900 text-white px-10 py-4 text-[11px] uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono"
       >
-        Explore the Community →
+        Go to Dashboard <ArrowRight className="w-3.5 h-3.5" />
       </button>
     </div>
   );
