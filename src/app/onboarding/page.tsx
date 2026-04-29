@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { OnboardingSidebar } from "@/components/onboarding/OnboardingSidebar";
-import { OnboardingStepTerms } from "@/components/onboarding/OnboardingStepTerms";
-import { OnboardingStepWelcome } from "@/components/onboarding/OnboardingStepWelcome";
-import { OnboardingStepValues } from "@/components/onboarding/OnboardingStepValues";
-import { OnboardingStepConduct } from "@/components/onboarding/OnboardingStepConduct";
-import { OnboardingStepVideo } from "@/components/onboarding/OnboardingStepVideo";
-import { OnboardingStepEnforcement } from "@/components/onboarding/OnboardingStepEnforcement";
+import { OnboardingStepBackground } from "@/components/onboarding/OnboardingStepBackground";
 import { OnboardingStepCommunity } from "@/components/onboarding/OnboardingStepCommunity";
-import { OnboardingStepProfile } from "@/components/onboarding/OnboardingStepProfile";
+import { OnboardingStepConduct } from "@/components/onboarding/OnboardingStepConduct";
 import { OnboardingStepCongrats } from "@/components/onboarding/OnboardingStepCongrats";
+import { OnboardingStepGoals } from "@/components/onboarding/OnboardingStepGoals";
+import { OnboardingStepProfile } from "@/components/onboarding/OnboardingStepProfile";
+import { OnboardingStepTerms } from "@/components/onboarding/OnboardingStepTerms";
+import { OnboardingStepValues } from "@/components/onboarding/OnboardingStepValues";
+import { OnboardingStepVideo } from "@/components/onboarding/OnboardingStepVideo";
+import { OnboardingStepWelcome } from "@/components/onboarding/OnboardingStepWelcome";
 import { useUserStore } from "@/store/user.store";
 
-const TOTAL_STEPS = 9;
+const TOTAL_STEPS = 10;
 
 export default function OnboardingPage() {
   const isLoading = useUserStore((s) => s.isLoading);
@@ -22,7 +23,7 @@ export default function OnboardingPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const saved = Number(localStorage.getItem("onboarding_step") ?? 0);
+    const saved = Math.min(Number(localStorage.getItem("onboarding_step") ?? 0), TOTAL_STEPS - 1);
     setCurrentStep(saved);
     setHydrated(true);
   }, []);
@@ -73,10 +74,13 @@ export default function OnboardingPage() {
               {currentStep === 2 && <OnboardingStepValues onNext={nextStep} onBack={prevStep} />}
               {currentStep === 3 && <OnboardingStepConduct onNext={nextStep} onBack={prevStep} />}
               {currentStep === 4 && <OnboardingStepVideo onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 5 && <OnboardingStepEnforcement onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 6 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 7 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
-              {currentStep === 8 && <OnboardingStepCongrats />}
+              {currentStep === 5 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 6 && (
+                <OnboardingStepBackground onNext={nextStep} onBack={prevStep} />
+              )}
+              {currentStep === 7 && <OnboardingStepGoals onNext={nextStep} onBack={prevStep} />}
+              {currentStep === 8 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
+              {currentStep === 9 && <OnboardingStepCongrats />}
             </>
           )}
         </div>

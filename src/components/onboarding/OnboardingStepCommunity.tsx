@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaDiscord, FaWhatsapp, FaLinkedinIn, FaXTwitter, FaBluesky, FaTiktok, FaYoutube } from "react-icons/fa6";
-import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
 
 interface StepProps {
   onNext: () => void;

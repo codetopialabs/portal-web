@@ -1,16 +1,33 @@
 "use client";
 
 import { Camera, Cpu, Globe, MapPin, Plus, User, X } from "lucide-react";
-import React from "react";
-import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import type React from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useUserStore } from "@/store/user.store";
 
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 
 const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
+
+interface ProfileFormValues {
+  full_name: string;
+  username: string;
+  location: string;
+  date_of_birth: string;
+  bio: string;
+  discord_username: string;
+  github_handle: string;
+  linkedin_url: string;
+  twitter_handle: string;
+  website_url: string;
+}
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
@@ -30,55 +47,32 @@ function Divider() {
 }
 
 export default function SettingsProfilePage() {
-  const [location, setLocation] = React.useState("Toronto, Ontario, Canada");
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
-  const [suggestions, setSuggestions] = React.useState<string[]>([]);
-  const [isLoadingLoc, setIsLoadingLoc] = React.useState(false);
+  const profile = useUserStore((s) => s.profile);
+  const updateMe = useUserStore((s) => s.updateMe);
 
-  React.useEffect(() => {
-    if (location.length < 3 || !showSuggestions) {
-      setSuggestions([]);
-      return;
-    }
-    setIsLoadingLoc(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&addressdetails=1&limit=5`
-        );
-        const data = await res.json();
-        const results: string[] = Array.from(
-          new Set(
-            // biome-ignore lint/suspicious/noExplicitAny: nominatim API response
-            data.map((item: any) => {
-              const addr = item.address;
-              const city = addr.city || addr.town || addr.village || addr.suburb || "";
-              const country = addr.country || "";
-              return city && country
-                ? `${city}, ${country}`
-                : item.display_name.split(",").slice(0, 2).join(", ");
-            })
-          )
-        );
-        setSuggestions(results);
-      } catch {
-        setSuggestions([]);
-      } finally {
-        setIsLoadingLoc(false);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [location, showSuggestions]);
+  const [skills, setSkills] = useState<string[]>(profile?.skills ?? []);
+  const [newSkill, setNewSkill] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
-  const [skills, setSkills] = React.useState([
-    "React",
-    "TypeScript",
-    "Next.js",
-    "Solidity",
-    "Tailwind",
-  ]);
-  const [newSkill, setNewSkill] = React.useState("");
-  const [isAdding, setIsAdding] = React.useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+    reset,
+  } = useForm<ProfileFormValues>({
+    defaultValues: {
+      full_name: profile?.fullName ?? "",
+      username: profile?.username ?? "",
+      location: profile?.location ?? "",
+      date_of_birth: profile?.dateOfBirth ?? "",
+      bio: profile?.bio ?? "",
+      discord_username: profile?.discordUsername ?? "",
+      github_handle: profile?.githubHandle ?? "",
+      linkedin_url: profile?.linkedinUrl ?? "",
+      twitter_handle: profile?.twitterHandle ?? "",
+      website_url: profile?.websiteUrl ?? "",
+    },
+  });
 
   function addSkill() {
     const trimmed = newSkill.trim();
@@ -89,20 +83,48 @@ export default function SettingsProfilePage() {
     setIsAdding(false);
   }
 
+  async function onSubmit(data: ProfileFormValues) {
+    try {
+      await updateMe({
+        full_name: data.full_name.trim(),
+        username: data.username.trim(),
+        location: data.location.trim() || undefined,
+        date_of_birth: data.date_of_birth || undefined,
+        bio: data.bio.trim() || undefined,
+        discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
+        github_handle: data.github_handle.trim() || undefined,
+        linkedin_url: data.linkedin_url.trim() || undefined,
+        twitter_handle: data.twitter_handle.trim() || undefined,
+        website_url: data.website_url.trim() || undefined,
+        skills,
+      });
+      toast.success("Profile updated.");
+      reset(data);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-      {/* LEFT — avatar + backdrop */}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
+    >
+      {/* LEFT — avatar */}
       <div className="space-y-6">
-        {/* Avatar */}
         <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200">
-              {/* biome-ignore lint/performance/noImgElement: placeholder image */}
-              <img
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop"
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
+              {profile?.profilePictureUrl ? (
+                // biome-ignore lint/performance/noImgElement: user avatar
+                <img
+                  src={profile.profilePictureUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-10 h-10 text-zinc-300" />
+              )}
             </div>
             <button
               type="button"
@@ -113,9 +135,9 @@ export default function SettingsProfilePage() {
           </div>
           <div className="text-center">
             <p className="font-mono font-black text-base uppercase tracking-tight text-zinc-900">
-              Kadin Vaccaro
+              {profile?.fullName ?? "—"}
             </p>
-            <p className="font-mono text-xs text-zinc-500 mt-0.5">kadin.v@codetopia.com</p>
+            <p className="font-mono text-xs text-zinc-500 mt-0.5">{profile?.email ?? ""}</p>
           </div>
           <button
             type="button"
@@ -125,30 +147,6 @@ export default function SettingsProfilePage() {
           </button>
         </div>
 
-        {/* Backdrop */}
-        <div className="bg-white border border-zinc-200 overflow-hidden">
-          <div className="aspect-video relative group">
-            {/* biome-ignore lint/performance/noImgElement: placeholder image */}
-            <img
-              src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop"
-              alt="Backdrop"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <button
-                type="button"
-                className="font-mono text-xs uppercase tracking-widest text-white border border-white px-4 py-2 hover:bg-white hover:text-black transition-all flex items-center gap-2"
-              >
-                <Camera className="w-3 h-3" /> Update
-              </button>
-            </div>
-          </div>
-          <div className="px-4 py-3 border-t border-zinc-100">
-            <p className="font-mono text-xs text-zinc-400">Profile Backdrop</p>
-          </div>
-        </div>
-
-        {/* Public profile note */}
         <div className="p-4 bg-zinc-50 border border-zinc-200">
           <p className="font-mono text-xs text-zinc-500 leading-relaxed">
             Changes are visible across the Codetopia ecosystem once saved.
@@ -164,61 +162,59 @@ export default function SettingsProfilePage() {
           <div className="bg-white border border-zinc-200 p-6 space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <Label className={labelStyles}>Display Name</Label>
-                <Input defaultValue="Kadin Vaccaro" className={inputStyles} />
+                <Label htmlFor="full-name" className={labelStyles}>
+                  Display Name
+                </Label>
+                <Input id="full-name" className={inputStyles} {...register("full_name")} />
               </div>
               <div className="space-y-2">
-                <Label className={labelStyles}>Username</Label>
-                <Input defaultValue="kadin.v" className={inputStyles} />
+                <Label htmlFor="username" className={labelStyles}>
+                  Username
+                </Label>
+                <Input id="username" className={inputStyles} {...register("username")} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className={labelStyles}>Location</Label>
+              <Label htmlFor="location" className={labelStyles}>
+                Location
+              </Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
                 <Input
-                  value={location}
-                  onChange={(e) => {
-                    setLocation(e.target.value);
-                    setShowSuggestions(true);
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  className={`${inputStyles} pl-9`}
+                  id="location"
                   placeholder="City, Country"
+                  className={`${inputStyles} pl-9`}
+                  {...register("location")}
                 />
-                {showSuggestions && (suggestions.length > 0 || isLoadingLoc) && (
-                  <div className="absolute top-full left-0 w-full bg-white border border-zinc-200 border-t-0 z-50 shadow-lg">
-                    {isLoadingLoc ? (
-                      <div className="px-4 py-3 font-mono text-xs uppercase tracking-widest text-zinc-400">
-                        Searching...
-                      </div>
-                    ) : (
-                      suggestions.map((loc) => (
-                        <button
-                          type="button"
-                          key={loc}
-                          onClick={() => {
-                            setLocation(loc);
-                            setShowSuggestions(false);
-                          }}
-                          className="w-full text-left px-4 py-2.5 font-mono text-xs uppercase tracking-widest text-zinc-600 hover:bg-zinc-50 transition-colors border-b border-zinc-100 last:border-0"
-                        >
-                          {loc}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className={labelStyles}>Bio</Label>
+              <Label htmlFor="date-of-birth" className={labelStyles}>
+                Birthday
+              </Label>
+              <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
+                Used to celebrate your birthday with the community. Your birth year is never shared
+                publicly.
+              </p>
+              <Input
+                id="date-of-birth"
+                type="date"
+                className={inputStyles}
+                {...register("date_of_birth")}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio" className={labelStyles}>
+                Bio
+              </Label>
               <textarea
+                id="bio"
                 placeholder="Tell the community who you are..."
                 className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                {...register("bio")}
               />
             </div>
           </div>
@@ -230,19 +226,46 @@ export default function SettingsProfilePage() {
         <section className="space-y-5">
           <SectionHeader icon={Globe} title="Social Links" />
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
-            {[
-              { icon: FaGithub, placeholder: "github.com/username" },
-              { icon: FaLinkedin, placeholder: "linkedin.com/in/username" },
-              { icon: FaXTwitter, placeholder: "x.com/username" },
-            ].map(({ icon: Icon, placeholder }) => (
-              <div key={placeholder} className="flex items-center gap-3 px-4">
-                <Icon className="w-4 h-4 text-zinc-400 shrink-0" />
-                <input
-                  placeholder={placeholder}
-                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
-                />
-              </div>
-            ))}
+            <div className="flex items-center gap-3 px-4">
+              <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
+              <input
+                placeholder="Discord username"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                {...register("discord_username")}
+              />
+            </div>
+            <div className="flex items-center gap-3 px-4">
+              <FaGithub className="w-4 h-4 text-zinc-400 shrink-0" />
+              <input
+                placeholder="github.com/username"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                {...register("github_handle")}
+              />
+            </div>
+            <div className="flex items-center gap-3 px-4">
+              <FaLinkedin className="w-4 h-4 text-zinc-400 shrink-0" />
+              <input
+                placeholder="linkedin.com/in/username"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                {...register("linkedin_url")}
+              />
+            </div>
+            <div className="flex items-center gap-3 px-4">
+              <FaXTwitter className="w-4 h-4 text-zinc-400 shrink-0" />
+              <input
+                placeholder="x.com/username"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                {...register("twitter_handle")}
+              />
+            </div>
+            <div className="flex items-center gap-3 px-4">
+              <Globe className="w-4 h-4 text-zinc-400 shrink-0" />
+              <input
+                placeholder="yoursite.com"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                {...register("website_url")}
+              />
+            </div>
           </div>
         </section>
 
@@ -275,7 +298,10 @@ export default function SettingsProfilePage() {
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") addSkill();
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addSkill();
+                      }
                       if (e.key === "Escape") {
                         setIsAdding(false);
                         setNewSkill("");
@@ -308,16 +334,23 @@ export default function SettingsProfilePage() {
         {/* Save */}
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
+            type="button"
             variant="outline"
+            onClick={() => reset()}
+            disabled={!isDirty && skills.join() === (profile?.skills ?? []).join()}
             className="h-10 rounded-none border-zinc-200 font-mono text-xs uppercase tracking-widest px-6 hover:border-zinc-400"
           >
             Discard
           </Button>
-          <Button className="h-10 rounded-none bg-black text-white font-mono text-xs uppercase tracking-widest px-6 hover:bg-zinc-800 transition-colors">
-            Save Changes
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-10 rounded-none bg-black text-white font-mono text-xs uppercase tracking-widest px-6 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
-import { Camera, Cpu, Globe, Plus, User, X, ArrowLeft, ArrowRight } from "lucide-react";
-import React, { useState } from "react";
+import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Plus, User, X } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { useUserStore } from "@/store/user.store";
 
 interface OnboardingStepProfileProps {
@@ -14,10 +15,13 @@ interface OnboardingStepProfileProps {
 interface ProfileFormValues {
   full_name: string;
   username: string;
+  date_of_birth: string;
+  discord_username: string;
   bio: string;
   github_handle: string;
-  twitter_handle: string;
   linkedin_url: string;
+  twitter_handle: string;
+  website_url: string;
 }
 
 const inputStyles =
@@ -74,11 +78,14 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       await updateMe({
         full_name: data.full_name.trim(),
         username: data.username.trim(),
+        discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         bio: data.bio || undefined,
         skills,
         github_handle: data.github_handle || undefined,
-        twitter_handle: data.twitter_handle || undefined,
         linkedin_url: data.linkedin_url || undefined,
+        twitter_handle: data.twitter_handle || undefined,
+        website_url: data.website_url || undefined,
+        date_of_birth: data.date_of_birth || undefined,
         is_onboarded: true,
       });
       setOnboarded();
@@ -178,6 +185,51 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               </div>
 
               <div className="space-y-2">
+                <label htmlFor="date-of-birth" className={labelStyles}>
+                  Birthday
+                </label>
+                <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
+                  Used to celebrate your birthday with the community. Your birth year is never
+                  shared publicly.
+                </p>
+                <input
+                  id="date-of-birth"
+                  type="date"
+                  className={inputStyles}
+                  {...register("date_of_birth")}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="discord-username" className={labelStyles}>
+                  Discord Username
+                </label>
+                <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
+                  Helps us identify and connect your account on Discord.
+                </p>
+                <div className="flex items-center gap-3 border border-zinc-200 bg-white px-3 focus-within:border-zinc-900 transition-all">
+                  <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
+                  <input
+                    id="discord-username"
+                    className="flex-1 h-11 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
+                    placeholder="your_username"
+                    defaultValue={profile?.discordUsername ?? ""}
+                    {...register("discord_username", {
+                      validate: (v) =>
+                        !v.trim() ||
+                        v.trim().replace(/^@/, "").length >= 2 ||
+                        "Enter a valid Discord username",
+                    })}
+                  />
+                </div>
+                {errors.discord_username && (
+                  <p className="text-red-500 text-xs font-mono">
+                    {errors.discord_username.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <label className={labelStyles}>Bio</label>
                 <textarea
                   placeholder="Tell the community who you are..."
@@ -192,7 +244,9 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <section className="space-y-4">
             <SectionHeader icon={Globe} title="Social Links" />
-            <p className="font-mono text-xs text-zinc-400">All optional — adding at least one helps the community connect with you.</p>
+            <p className="font-mono text-xs text-zinc-400">
+              All optional. Adding at least one helps the community connect with you.
+            </p>
             <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
               <div className="flex items-center gap-3 px-4">
                 <FaGithub className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -216,6 +270,15 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   placeholder="x.com/username"
                   className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
                   {...register("twitter_handle")}
+                />
+              </div>
+              <div className="flex items-center gap-3 px-4">
+                <Globe className="w-4 h-4 text-zinc-400 shrink-0" />
+                <input
+                  placeholder="yoursite.com"
+                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                  defaultValue={profile?.websiteUrl ?? ""}
+                  {...register("website_url")}
                 />
               </div>
             </div>
@@ -249,8 +312,14 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       value={newSkill}
                       onChange={(e) => setNewSkill(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") { e.preventDefault(); addSkill(); }
-                        if (e.key === "Escape") { setIsAddingSkill(false); setNewSkill(""); }
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addSkill();
+                        }
+                        if (e.key === "Escape") {
+                          setIsAddingSkill(false);
+                          setNewSkill("");
+                        }
                       }}
                       autoFocus
                       className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-xs uppercase tracking-widest outline-none"
@@ -277,9 +346,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             </div>
           </section>
 
-          {submitError && (
-            <p className="text-red-500 text-sm font-mono">{submitError}</p>
-          )}
+          {submitError && <p className="text-red-500 text-sm font-mono">{submitError}</p>}
 
           <div className="flex items-center gap-3 pt-2">
             <button
@@ -306,7 +373,9 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   ))}
                 </div>
               ) : (
-                <>Complete Setup <ArrowRight className="w-3.5 h-3.5" /></>
+                <>
+                  Complete Setup <ArrowRight className="w-3.5 h-3.5" />
+                </>
               )}
             </button>
           </div>
@@ -326,7 +395,8 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               </h2>
             </div>
             <p className="font-mono text-sm text-zinc-500 leading-relaxed">
-              You've reviewed our values, code of conduct, and community guidelines. By continuing, you agree to uphold them.
+              You've reviewed our values, code of conduct, and community guidelines. By continuing,
+              you agree to uphold them.
             </p>
             <div className="flex items-center gap-3 pt-1">
               <button
@@ -350,7 +420,9 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                     />
                   ))
                 ) : (
-                  <>Join the Community <ArrowRight className="w-3.5 h-3.5" /></>
+                  <>
+                    Join the Community <ArrowRight className="w-3.5 h-3.5" />
+                  </>
                 )}
               </button>
             </div>

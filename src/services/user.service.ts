@@ -15,6 +15,16 @@ export interface UserProfile {
   twitterHandle: string | null;
   linkedinUrl: string | null;
   websiteUrl: string | null;
+  discipline: string | null;
+  experienceLevel: string | null;
+  memberStatus: string | null;
+  currentRole: string | null;
+  discordUsername: string | null;
+  primaryGoal: string | null;
+  communityGoals: string[];
+  referralSource: string | null;
+  location: string | null;
+  dateOfBirth: string | null;
 }
 
 export interface UpdateMeRequest {
@@ -26,9 +36,18 @@ export interface UpdateMeRequest {
   twitter_handle?: string;
   linkedin_url?: string;
   website_url?: string;
+  discipline?: string;
+  experience_level?: string;
+  member_status?: string;
+  current_role?: string;
+  discord_username?: string;
+  primary_goal?: string;
+  community_goals?: string[];
+  referral_source?: string;
+  location?: string;
+  date_of_birth?: string;
   is_onboarded?: boolean;
 }
-
 
 export const UserService = {
   async getMe(): Promise<UserProfile> {
