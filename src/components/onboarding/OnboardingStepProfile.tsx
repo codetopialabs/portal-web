@@ -4,7 +4,23 @@ import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Plus, User, X } from "lucide
 import type React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import {
+  FaBehance,
+  FaCodepen,
+  FaDiscord,
+  FaDribbble,
+  FaFacebook,
+  FaGithub,
+  FaGitlab,
+  FaInstagram,
+  FaLinkedin,
+  FaMedium,
+  FaStackOverflow,
+  FaTelegram,
+  FaTiktok,
+  FaWhatsapp,
+  FaXTwitter,
+} from "react-icons/fa6";
 import { useUserStore } from "@/store/user.store";
 
 interface OnboardingStepProfileProps {
@@ -23,6 +39,87 @@ interface ProfileFormValues {
   twitter_handle: string;
   website_url: string;
 }
+
+const LINK_PLATFORMS = [
+  {
+    value: "gitlab",
+    label: "GitLab",
+    icon: FaGitlab,
+    color: "#FC6D26",
+    placeholder: "gitlab.com/username",
+  },
+  {
+    value: "stackoverflow",
+    label: "Stack Overflow",
+    icon: FaStackOverflow,
+    color: "#F58025",
+    placeholder: "stackoverflow.com/users/...",
+  },
+  {
+    value: "codepen",
+    label: "CodePen",
+    icon: FaCodepen,
+    color: "#000000",
+    placeholder: "codepen.io/username",
+  },
+  {
+    value: "dribbble",
+    label: "Dribbble",
+    icon: FaDribbble,
+    color: "#EA4C89",
+    placeholder: "dribbble.com/username",
+  },
+  {
+    value: "behance",
+    label: "Behance",
+    icon: FaBehance,
+    color: "#1769FF",
+    placeholder: "behance.net/username",
+  },
+  {
+    value: "instagram",
+    label: "Instagram",
+    icon: FaInstagram,
+    color: "#E1306C",
+    placeholder: "instagram.com/username",
+  },
+  {
+    value: "facebook",
+    label: "Facebook",
+    icon: FaFacebook,
+    color: "#1877F2",
+    placeholder: "facebook.com/username",
+  },
+  {
+    value: "tiktok",
+    label: "TikTok",
+    icon: FaTiktok,
+    color: "#000000",
+    placeholder: "tiktok.com/@username",
+  },
+  {
+    value: "telegram",
+    label: "Telegram",
+    icon: FaTelegram,
+    color: "#26A5E4",
+    placeholder: "t.me/username",
+  },
+  {
+    value: "whatsapp",
+    label: "WhatsApp",
+    icon: FaWhatsapp,
+    color: "#25D366",
+    placeholder: "wa.me/number",
+  },
+  {
+    value: "medium",
+    label: "Medium",
+    icon: FaMedium,
+    color: "#000000",
+    placeholder: "medium.com/@username",
+  },
+  { value: "custom", label: "Custom", icon: Globe, color: "#71717A", placeholder: "https://..." },
+];
 
 const inputStyles =
   "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all";
@@ -54,8 +151,28 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
   const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [customLinks, setCustomLinks] = useState<
+    { platform: string; label: string; url: string }[]
+  >([]);
+  const [showPicker, setShowPicker] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  function addCustomLink(platform: string) {
+    const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
+    setCustomLinks((prev) => [...prev, { platform, label: p?.label ?? "", url: "" }]);
+    setShowPicker(false);
+  }
+
+  function updateCustomLink(index: number, field: "label" | "url", value: string) {
+    setCustomLinks((prev) =>
+      prev.map((link, i) => (i === index ? { ...link, [field]: value } : link))
+    );
+  }
+
+  function removeCustomLink(index: number) {
+    setCustomLinks((prev) => prev.filter((_, i) => i !== index));
+  }
 
   const {
     register,
@@ -249,7 +366,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             </p>
             <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
               <div className="flex items-center gap-3 px-4">
-                <FaGithub className="w-4 h-4 text-zinc-400 shrink-0" />
+                <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
                 <input
                   placeholder="github.com/username"
                   className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
@@ -257,7 +374,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 />
               </div>
               <div className="flex items-center gap-3 px-4">
-                <FaLinkedin className="w-4 h-4 text-zinc-400 shrink-0" />
+                <FaLinkedin className="w-4 h-4 shrink-0" style={{ color: "#0A66C2" }} />
                 <input
                   placeholder="linkedin.com/in/username"
                   className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
@@ -265,7 +382,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 />
               </div>
               <div className="flex items-center gap-3 px-4">
-                <FaXTwitter className="w-4 h-4 text-zinc-400 shrink-0" />
+                <FaXTwitter className="w-4 h-4 shrink-0" style={{ color: "#000000" }} />
                 <input
                   placeholder="x.com/username"
                   className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
@@ -281,7 +398,72 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   {...register("website_url")}
                 />
               </div>
+              {customLinks.map((link, i) => {
+                const p = LINK_PLATFORMS.find((pl) => pl.value === link.platform);
+                const Icon = p?.icon ?? Globe;
+                return (
+                  <div key={i} className="flex items-center gap-3 px-4">
+                    <Icon className="w-4 h-4 shrink-0" style={{ color: p?.color }} />
+                    {link.platform === "custom" && (
+                      <input
+                        value={link.label}
+                        onChange={(e) => updateCustomLink(i, "label", e.target.value)}
+                        placeholder="Label"
+                        className="w-20 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900 border-r border-zinc-100 pr-3 shrink-0"
+                      />
+                    )}
+                    <input
+                      value={link.url}
+                      onChange={(e) => updateCustomLink(i, "url", e.target.value)}
+                      placeholder={p?.placeholder ?? "https://..."}
+                      className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCustomLink(i)}
+                      className="text-zinc-400 hover:text-zinc-900 transition-colors shrink-0"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+              <div className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPicker((v) => !v)}
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+                >
+                  <Plus className="w-3 h-3" /> Add link
+                </button>
+              </div>
             </div>
+
+            {showPicker && (
+              <div className="border border-zinc-200 bg-zinc-50 p-4">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-3">
+                  Choose platform
+                </p>
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-1">
+                  {LINK_PLATFORMS.map((p) => {
+                    const Icon = p.icon;
+                    return (
+                      <button
+                        key={p.value}
+                        type="button"
+                        onClick={() => addCustomLink(p.value)}
+                        className="flex flex-col items-center gap-1.5 p-2.5 border border-transparent hover:bg-white hover:border-zinc-200 transition-all"
+                      >
+                        <Icon className="w-5 h-5" style={{ color: p.color }} />
+                        <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 text-center leading-tight">
+                          {p.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </section>
 
           <Divider />
