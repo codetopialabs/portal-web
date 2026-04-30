@@ -48,12 +48,9 @@ export default function OnboardingPage() {
     <main className="h-screen overflow-hidden bg-white flex flex-col md:flex-row font-mono text-zinc-900">
       <OnboardingSidebar currentStep={currentStep} />
 
-      <div className="flex-1 overflow-y-auto pt-[88px] md:pt-0 bg-[#f9fafb] relative">
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:40px_40px]" />
-        </div>
+      <div className="flex-1 overflow-y-auto pt-[88px] md:pt-0 bg-[#f9fafb] bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:40px_40px]">
 
-        <div className="relative z-10 flex items-center justify-center min-h-full px-8 py-12 md:px-16">
+        <div className="flex items-center justify-center min-h-full px-8 py-12 md:px-16">
           {isLoading || !hydrated ? (
             <div className="flex flex-col items-center gap-6">
               <div className="flex items-center gap-2">
