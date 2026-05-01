@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { OnboardingSidebar } from "@/components/onboarding/OnboardingSidebar";
 import { OnboardingStepBackground } from "@/components/onboarding/OnboardingStepBackground";
 import { OnboardingStepCommunity } from "@/components/onboarding/OnboardingStepCommunity";
@@ -12,44 +13,34 @@ import { OnboardingStepTerms } from "@/components/onboarding/OnboardingStepTerms
 import { OnboardingStepValues } from "@/components/onboarding/OnboardingStepValues";
 import { OnboardingStepVideo } from "@/components/onboarding/OnboardingStepVideo";
 import { OnboardingStepWelcome } from "@/components/onboarding/OnboardingStepWelcome";
+import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
 const TOTAL_STEPS = 10;
 
 export default function OnboardingPage() {
   const isLoading = useUserStore((s) => s.isLoading);
+  const isOnboarded = useUserStore((s) => s.isOnboarded);
+  const router = useRouter();
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const step = useOnboardingStore((s) => s.step);
+  const setStep = useOnboardingStore((s) => s.setStep);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const saved = Math.min(Number(localStorage.getItem("onboarding_step") ?? 0), TOTAL_STEPS - 1);
-    setCurrentStep(saved);
-    setHydrated(true);
-  }, []);
+    if (!isLoading && isOnboarded) router.replace("/");
+  }, [isLoading, isOnboarded, router]);
 
-  function nextStep() {
-    setCurrentStep((s) => {
-      const next = Math.min(s + 1, TOTAL_STEPS - 1);
-      localStorage.setItem("onboarding_step", String(next));
-      return next;
-    });
-  }
+  useEffect(() => { setHydrated(true); }, []);
 
-  function prevStep() {
-    setCurrentStep((s) => {
-      const prev = Math.max(s - 1, 0);
-      localStorage.setItem("onboarding_step", String(prev));
-      return prev;
-    });
-  }
+  function nextStep() { setStep(Math.min(step + 1, TOTAL_STEPS - 1)); }
+  function prevStep() { setStep(Math.max(step - 1, 0)); }
 
   return (
     <main className="h-screen overflow-hidden bg-white flex flex-col md:flex-row font-mono text-zinc-900">
-      <OnboardingSidebar currentStep={currentStep} />
+      <OnboardingSidebar currentStep={step} />
 
       <div className="flex-1 overflow-y-auto pt-[88px] md:pt-0 bg-[#f9fafb] bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:40px_40px]">
-
         <div className="flex items-center justify-center min-h-full px-8 py-12 md:px-16">
           {isLoading || !hydrated ? (
             <div className="flex flex-col items-center gap-6">
@@ -66,18 +57,16 @@ export default function OnboardingPage() {
             </div>
           ) : (
             <>
-              {currentStep === 0 && <OnboardingStepTerms onNext={nextStep} />}
-              {currentStep === 1 && <OnboardingStepWelcome onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 2 && <OnboardingStepValues onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 3 && <OnboardingStepConduct onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 4 && <OnboardingStepVideo onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 5 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 6 && (
-                <OnboardingStepBackground onNext={nextStep} onBack={prevStep} />
-              )}
-              {currentStep === 7 && <OnboardingStepGoals onNext={nextStep} onBack={prevStep} />}
-              {currentStep === 8 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
-              {currentStep === 9 && <OnboardingStepCongrats />}
+              {step === 0 && <OnboardingStepTerms onNext={nextStep} />}
+              {step === 1 && <OnboardingStepWelcome onNext={nextStep} onBack={prevStep} />}
+              {step === 2 && <OnboardingStepValues onNext={nextStep} onBack={prevStep} />}
+              {step === 3 && <OnboardingStepConduct onNext={nextStep} onBack={prevStep} />}
+              {step === 4 && <OnboardingStepVideo onNext={nextStep} onBack={prevStep} />}
+              {step === 5 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
+              {step === 6 && <OnboardingStepBackground onNext={nextStep} onBack={prevStep} />}
+              {step === 7 && <OnboardingStepGoals onNext={nextStep} onBack={prevStep} />}
+              {step === 8 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
+              {step === 9 && <OnboardingStepCongrats />}
             </>
           )}
         </div>

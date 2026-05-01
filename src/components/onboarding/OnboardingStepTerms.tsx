@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useOnboardingStore } from "@/store/onboarding.store";
 
 interface StepProps {
   onNext: () => void;
 }
 
 export function OnboardingStepTerms({ onNext }: StepProps) {
-  const [accepted, setAccepted] = useState(false);
+  const termsAccepted = useOnboardingStore((s) => s.termsAccepted);
+  const merge = useOnboardingStore((s) => s.merge);
+  const [accepted, setAccepted] = useState(termsAccepted);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
@@ -77,7 +80,10 @@ export function OnboardingStepTerms({ onNext }: StepProps) {
         <input
           type="checkbox"
           checked={accepted}
-          onChange={(e) => setAccepted(e.target.checked)}
+          onChange={(e) => {
+            setAccepted(e.target.checked);
+            merge({ termsAccepted: e.target.checked });
+          }}
           className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
         />
         <span className="text-sm font-mono text-zinc-600 leading-relaxed">

@@ -47,6 +47,15 @@ export interface UpdateMeRequest {
   location?: string;
   date_of_birth?: string;
   is_onboarded?: boolean;
+  profile_picture_url?: string;
+}
+
+interface UploadSignature {
+  signature: string;
+  timestamp: number;
+  cloud_name: string;
+  api_key: string;
+  folder: string;
 }
 
 export const UserService = {
@@ -58,5 +67,23 @@ export const UserService = {
   async updateMe(data: UpdateMeRequest): Promise<UserProfile> {
     const response = await axiosInstance.patch<{ data: UserProfile }>("/auth/me/", data);
     return response.data.data;
+  },
+
+  async uploadAvatar(file: File): Promise<string> {
+    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>("/auth/cloudinary-signature/");
+    const sig = sigResponse.data.data;
+    const form = new FormData();
+    form.append("file", file);
+    form.append("api_key", sig.api_key);
+    form.append("timestamp", String(sig.timestamp));
+    form.append("signature", sig.signature);
+    form.append("folder", sig.folder);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
+      method: "POST",
+      body: form,
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error?.message ?? "Upload failed.");
+    return json.secure_url as string;
   },
 };

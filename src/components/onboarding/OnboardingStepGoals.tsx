@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Heart, Megaphone, Target } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
 interface OnboardingStepGoalsProps {
@@ -149,11 +150,12 @@ function SelectItem({
 
 export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps) {
   const updateMe = useUserStore((s) => s.updateMe);
+  const onboarding = useOnboardingStore((s) => s);
 
-  const [primaryGoal, setPrimaryGoal] = useState("");
-  const [communityGoals, setCommunityGoals] = useState<string[]>([]);
-  const [referralSource, setReferralSource] = useState<string | null>(null);
-  const [otherReferral, setOtherReferral] = useState("");
+  const [primaryGoal, setPrimaryGoal] = useState(onboarding.primaryGoal);
+  const [communityGoals, setCommunityGoals] = useState<string[]>(onboarding.communityGoals);
+  const [referralSource, setReferralSource] = useState<string | null>(onboarding.referralSource);
+  const [otherReferral, setOtherReferral] = useState(onboarding.otherReferral);
 
   const [errors, setErrors] = useState<{
     primaryGoal?: string;
@@ -169,6 +171,15 @@ export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps
       prev.includes(value) ? prev.filter((g) => g !== value) : [...prev, value]
     );
     setErrors((e) => ({ ...e, communityGoals: undefined }));
+  }
+
+  function saveToStore() {
+    onboarding.merge({ primaryGoal, communityGoals, referralSource, otherReferral });
+  }
+
+  function handleBack() {
+    saveToStore();
+    onBack();
   }
 
   async function handleContinue() {
@@ -192,6 +203,7 @@ export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps
       referralSource === "other" ? otherReferral.trim() : (referralSource as string);
 
     try {
+      saveToStore();
       await updateMe({
         primary_goal: primaryGoal.trim(),
         community_goals: communityGoals,
@@ -332,7 +344,7 @@ export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps
         <div className="flex items-center gap-3 pt-2">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBack}
             className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back

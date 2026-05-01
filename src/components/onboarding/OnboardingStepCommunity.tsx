@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaDiscord, FaWhatsapp, FaLinkedinIn, FaXTwitter, FaBluesky, FaTiktok, FaYoutube } from "react-icons/fa6";
 import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
+import { useOnboardingStore } from "@/store/onboarding.store";
 
 interface StepProps {
   onNext: () => void;
@@ -88,7 +89,9 @@ const SOCIALS = [
 ];
 
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
-  const [followed, setFollowed] = useState<Record<string, boolean>>({});
+  const communityFollowed = useOnboardingStore((s) => s.communityFollowed);
+  const merge = useOnboardingStore((s) => s.merge);
+  const [followed, setFollowed] = useState<Record<string, boolean>>(communityFollowed);
 
   function handleJoin(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
@@ -96,7 +99,11 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
 
   function handleFollow(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
-    setFollowed((prev) => ({ ...prev, [id]: true }));
+    setFollowed((prev) => {
+      const next = { ...prev, [id]: true };
+      merge({ communityFollowed: next });
+      return next;
+    });
   }
 
   return (

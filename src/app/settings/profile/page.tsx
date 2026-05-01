@@ -1,8 +1,8 @@
 "use client";
 
-import { Camera, Cpu, Globe, MapPin, Plus, User, X } from "lucide-react";
+import { Camera, Cpu, Globe, Loader2, MapPin, Plus, User, X } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaBehance,
@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 
 const LINK_PLATFORMS = [
@@ -154,6 +155,31 @@ export default function SettingsProfilePage() {
     { platform: string; label: string; url: string }[]
   >([]);
   const [showPicker, setShowPicker] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be smaller than 5 MB.");
+      return;
+    }
+    setAvatarUploading(true);
+    try {
+      const url = await UserService.uploadAvatar(file);
+      await updateMe({ profile_picture_url: url });
+      toast.success("Profile photo updated.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
 
   function addCustomLink(platform: string) {
     const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
@@ -230,7 +256,17 @@ export default function SettingsProfilePage() {
       {/* LEFT — avatar */}
       <div className="space-y-6">
         <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
-          <div className="relative group">
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+          >
             <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
               {profile?.profilePictureUrl ? (
                 // biome-ignore lint/performance/noImgElement: user avatar
@@ -243,12 +279,11 @@ export default function SettingsProfilePage() {
                 <User className="w-10 h-10 text-zinc-300" />
               )}
             </div>
-            <button
-              type="button"
-              className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-            >
-              <Camera className="w-4 h-4 text-white" />
-            </button>
+            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              {avatarUploading
+                ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                : <Camera className="w-4 h-4 text-white" />}
+            </div>
           </div>
           <div className="text-center">
             <p className="font-mono font-black text-base uppercase tracking-tight text-zinc-900">
@@ -258,9 +293,13 @@ export default function SettingsProfilePage() {
           </div>
           <button
             type="button"
-            className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2"
+            disabled={avatarUploading}
+            onClick={() => avatarInputRef.current?.click()}
+            className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Camera className="w-3.5 h-3.5" /> Change Photo
+            {avatarUploading
+              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
+              : <><Camera className="w-3.5 h-3.5" /> Change Photo</>}
           </button>
         </div>
 

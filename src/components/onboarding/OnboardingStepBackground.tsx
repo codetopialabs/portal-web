@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Briefcase, Code2, TrendingUp } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
 interface OnboardingStepBackgroundProps {
@@ -162,13 +163,14 @@ function RadioItem({
 
 export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackgroundProps) {
   const updateMe = useUserStore((s) => s.updateMe);
+  const onboarding = useOnboardingStore((s) => s);
 
-  const [discipline, setDiscipline] = useState<string | null>(null);
-  const [otherDiscipline, setOtherDiscipline] = useState("");
-  const [experienceLevel, setExperienceLevel] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [otherStatus, setOtherStatus] = useState("");
-  const [currentRole, setCurrentRole] = useState("");
+  const [discipline, setDiscipline] = useState<string | null>(onboarding.discipline);
+  const [otherDiscipline, setOtherDiscipline] = useState(onboarding.otherDiscipline);
+  const [experienceLevel, setExperienceLevel] = useState<string | null>(onboarding.experienceLevel);
+  const [status, setStatus] = useState<string | null>(onboarding.memberStatus);
+  const [otherStatus, setOtherStatus] = useState(onboarding.otherStatus);
+  const [currentRole, setCurrentRole] = useState(onboarding.currentRole);
 
   const [errors, setErrors] = useState<{
     discipline?: string;
@@ -179,6 +181,15 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
   }>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function saveToStore() {
+    onboarding.merge({ discipline, otherDiscipline, experienceLevel, memberStatus: status, otherStatus, currentRole });
+  }
+
+  function handleBack() {
+    saveToStore();
+    onBack();
+  }
 
   async function handleContinue() {
     const newErrors: typeof errors = {};
@@ -204,6 +215,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
     const resolvedStatus = status === "other" ? otherStatus.trim() : (status as string);
 
     try {
+      saveToStore();
       await updateMe({
         discipline: resolvedDiscipline,
         experience_level: experienceLevel as string,
@@ -383,7 +395,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
         <div className="flex items-center gap-3 pt-2">
           <button
             type="button"
-            onClick={onBack}
+            onClick={handleBack}
             className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back

@@ -17,6 +17,14 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (!error.response) {
+      return Promise.reject(new Error(
+        error.code === "ECONNABORTED"
+          ? "Request timed out. Please try again."
+          : "Unable to reach the server. Please check your connection."
+      ));
+    }
+
     const data = error.response?.data;
     const errors = data?.errors;
     if (errors && typeof errors === "object") {

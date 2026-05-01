@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Check, Mail, ShieldAlert, X } from "lucide-react";
 import { useState } from "react";
+import { useOnboardingStore } from "@/store/onboarding.store";
 
 type Tab = "encouraged" | "restricted" | "enforcement";
 
@@ -120,7 +121,9 @@ const RESTRICTED = [
 ];
 
 export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
-  const [agreed, setAgreed] = useState(false);
+  const conductAgreed = useOnboardingStore((s) => s.conductAgreed);
+  const merge = useOnboardingStore((s) => s.merge);
+  const [agreed, setAgreed] = useState(conductAgreed);
   const [activeTab, setActiveTab] = useState<Tab>("encouraged");
 
   return (
@@ -278,7 +281,10 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <input
           type="checkbox"
           checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
+          onChange={(e) => {
+            setAgreed(e.target.checked);
+            merge({ conductAgreed: e.target.checked });
+          }}
           className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
         />
         <span className="text-sm font-mono text-zinc-600 leading-relaxed">

@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Plus, User, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Loader2, Plus, User, X } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaBehance,
@@ -21,6 +21,8 @@ import {
   FaWhatsapp,
   FaXTwitter,
 } from "react-icons/fa6";
+import { UserService } from "@/services/user.service";
+import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
 interface OnboardingStepProfileProps {
@@ -147,16 +149,44 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
   const setOnboarded = useUserStore((s) => s.setOnboarded);
+  const onboarding = useOnboardingStore((s) => s);
 
-  const [skills, setSkills] = useState<string[]>([]);
+  const [skills, setSkills] = useState<string[]>(onboarding.skills.length ? onboarding.skills : (profile?.skills ?? []));
   const [newSkill, setNewSkill] = useState("");
   const [isAddingSkill, setIsAddingSkill] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(onboarding.avatarUrl ?? profile?.profilePictureUrl ?? null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [customLinks, setCustomLinks] = useState<
     { platform: string; label: string; url: string }[]
   >([]);
   const [showPicker, setShowPicker] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarError(null);
+    if (!file.type.startsWith("image/")) {
+      setAvatarError("Only image files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Image must be smaller than 5 MB.");
+      return;
+    }
+    setAvatarUploading(true);
+    try {
+      const url = await UserService.uploadAvatar(file);
+      setAvatarUrl(url);
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
 
   function addCustomLink(platform: string) {
     const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
@@ -177,8 +207,36 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
-  } = useForm<ProfileFormValues>();
+  } = useForm<ProfileFormValues>({
+    defaultValues: {
+      full_name: onboarding.fullName || profile?.fullName || "",
+      username: onboarding.username || profile?.username || "",
+      date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
+      discord_username: onboarding.discordUsername || profile?.discordUsername || "",
+      bio: onboarding.bio || profile?.bio || "",
+      github_handle: onboarding.githubHandle || profile?.githubHandle || "",
+      linkedin_url: onboarding.linkedinUrl || profile?.linkedinUrl || "",
+      twitter_handle: onboarding.twitterHandle || profile?.twitterHandle || "",
+      website_url: onboarding.websiteUrl || profile?.websiteUrl || "",
+    },
+  });
+
+  function saveToStore() {
+    const v = getValues();
+    onboarding.merge({
+      fullName: v.full_name, username: v.username, dateOfBirth: v.date_of_birth,
+      discordUsername: v.discord_username, bio: v.bio, githubHandle: v.github_handle,
+      linkedinUrl: v.linkedin_url, twitterHandle: v.twitter_handle, websiteUrl: v.website_url,
+      skills, avatarUrl,
+    });
+  }
+
+  function handleBack() {
+    saveToStore();
+    onBack();
+  }
 
   function addSkill() {
     const trimmed = newSkill.trim();
@@ -203,10 +261,11 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         twitter_handle: data.twitter_handle || undefined,
         website_url: data.website_url || undefined,
         date_of_birth: data.date_of_birth || undefined,
+        profile_picture_url: avatarUrl || undefined,
         is_onboarded: true,
       });
       setOnboarded();
-      localStorage.removeItem("onboarding_step");
+      onboarding.reset();
       onNext();
     } catch (err) {
       setSubmitError(
@@ -226,33 +285,64 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Your Profile
       </h1>
-      <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
+      <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-6">
         Tell the community a bit about yourself.
       </p>
+
+      <div className="border-l-2 border-zinc-900 bg-white px-5 py-4 mb-10">
+        <p className="font-mono text-xs font-bold uppercase tracking-[0.15em] text-zinc-900 mb-2">
+          Honesty matters here
+        </p>
+        <p className="font-mono text-xs text-zinc-500 leading-relaxed">
+          Codetopia Community is built on trust. Every member is expected to represent themselves
+          honestly and accurately. We do not tolerate impersonation, false identities, or any form
+          of misrepresentation. Accounts found to contain deliberately false or misleading
+          information will be permanently banned without warning or appeal. By continuing, you
+          confirm that everything you submit is true and genuinely yours.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* LEFT — avatar */}
         <div className="space-y-4">
           <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
-            <div className="relative group">
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+            <div
+              className="relative group cursor-pointer"
+              onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+            >
               <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
-                <User className="w-10 h-10 text-zinc-300" />
+                {avatarUrl ? (
+                  // biome-ignore lint/performance/noImgElement: user avatar
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-zinc-300" />
+                )}
               </div>
-              <button
-                type="button"
-                className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-              >
-                <Camera className="w-4 h-4 text-white" />
-              </button>
+              <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                {avatarUploading
+                  ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                  : <Camera className="w-4 h-4 text-white" />}
+              </div>
             </div>
-            <p className="font-mono text-xs text-zinc-400 text-center leading-relaxed">
-              You can update your photo after joining.
-            </p>
+            {avatarError && (
+              <p className="text-red-500 text-xs font-mono text-center">{avatarError}</p>
+            )}
             <button
               type="button"
-              className="w-full h-9 border border-zinc-200 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2"
+              disabled={avatarUploading}
+              onClick={() => avatarInputRef.current?.click()}
+              className="w-full h-9 border border-zinc-200 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Camera className="w-3.5 h-3.5" /> Upload Photo
+              {avatarUploading
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
+                : <><Camera className="w-3.5 h-3.5" /> {avatarUrl ? "Change Photo" : "Upload Photo"}</>}
             </button>
           </div>
 
@@ -274,7 +364,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <input
                     className={inputStyles}
                     placeholder="Your display name"
-                    defaultValue={profile?.fullName ?? ""}
                     {...register("full_name", {
                       required: "Display name is required",
                       validate: (v) => v.trim() !== "" || "Display name is required",
@@ -289,7 +378,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <input
                     className={inputStyles}
                     placeholder="your_username"
-                    defaultValue={profile?.username ?? ""}
                     {...register("username", {
                       required: "Username is required",
                       validate: (v) => v.trim() !== "" || "Username is required",
@@ -306,15 +394,30 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   Birthday
                 </label>
                 <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
-                  Used to celebrate your birthday with the community. Your birth year is never
-                  shared publicly.
+                  Only your day and month are visible to others. You must be at least 13 to join.
                 </p>
                 <input
                   id="date-of-birth"
                   type="date"
                   className={inputStyles}
-                  {...register("date_of_birth")}
+                  {...register("date_of_birth", {
+                    validate: (v) => {
+                      if (!v) return true;
+                      const dob = new Date(v);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      if (dob >= today) return "Birthday can't be today or in the future.";
+                      const age = today.getFullYear() - dob.getFullYear()
+                        - (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate()) ? 1 : 0);
+                      if (age < 13) return "You must be at least 13 years old.";
+                      if (age > 120) return "Please enter a valid date of birth.";
+                      return true;
+                    },
+                  })}
                 />
+                {errors.date_of_birth && (
+                  <p className="text-red-500 text-xs font-mono">{errors.date_of_birth.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -330,7 +433,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                     id="discord-username"
                     className="flex-1 h-11 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
                     placeholder="your_username"
-                    defaultValue={profile?.discordUsername ?? ""}
                     {...register("discord_username", {
                       validate: (v) =>
                         !v.trim() ||
@@ -394,7 +496,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <input
                   placeholder="yoursite.com"
                   className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
-                  defaultValue={profile?.websiteUrl ?? ""}
                   {...register("website_url")}
                 />
               </div>
@@ -533,7 +634,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
           <div className="flex items-center gap-3 pt-2">
             <button
               type="button"
-              onClick={onBack}
+              onClick={handleBack}
               className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back

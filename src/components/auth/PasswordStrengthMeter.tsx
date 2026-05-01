@@ -27,16 +27,11 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
 
   return (
     <div className="space-y-3 mt-2">
-      {/* Segmented bar */}
-      <div className="flex gap-1">
-        {strengthConfig.map((s, i) => (
-          <div
-            key={s.label}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              strengthIndex >= i ? s.color : "bg-zinc-700"
-            }`}
-          />
-        ))}
+      <div className="h-1 w-full bg-zinc-700 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-300 ${strength?.color ?? ""}`}
+          style={{ width: strengthIndex >= 0 ? `${(strengthIndex + 1) * 25}%` : "0%" }}
+        />
       </div>
 
       {strength && (
