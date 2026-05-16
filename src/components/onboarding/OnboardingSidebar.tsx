@@ -37,7 +37,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
           />
         </div>
 
-        <nav className="flex flex-col flex-1 overflow-y-auto pl-2 py-4">
+        <nav className="flex flex-col flex-1 overflow-y-auto no-scrollbar pl-2 py-4">
           {STEPS.map((step, i) => {
             const isCompleted = i < currentStep;
             const isActive = i === currentStep;

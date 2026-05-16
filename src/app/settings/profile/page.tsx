@@ -118,6 +118,7 @@ interface ProfileFormValues {
   full_name: string;
   username: string;
   location: string;
+  current_role: string;
   date_of_birth: string;
   bio: string;
   discord_username: string;
@@ -157,6 +158,8 @@ export default function SettingsProfilePage() {
   const [showPicker, setShowPicker] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -178,6 +181,29 @@ export default function SettingsProfilePage() {
       toast.error(err instanceof Error ? err.message : "Upload failed.");
     } finally {
       setAvatarUploading(false);
+    }
+  }
+
+  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Cover image must be smaller than 10 MB.");
+      return;
+    }
+    setCoverUploading(true);
+    try {
+      const url = await UserService.uploadCoverImage(file);
+      await updateMe({ cover_image_url: url });
+      toast.success("Cover image updated.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setCoverUploading(false);
     }
   }
 
@@ -207,6 +233,7 @@ export default function SettingsProfilePage() {
       full_name: profile?.fullName ?? "",
       username: profile?.username ?? "",
       location: profile?.location ?? "",
+      current_role: profile?.currentRole ?? "",
       date_of_birth: profile?.dateOfBirth ?? "",
       bio: profile?.bio ?? "",
       discord_username: profile?.discordUsername ?? "",
@@ -232,6 +259,7 @@ export default function SettingsProfilePage() {
         full_name: data.full_name.trim(),
         username: data.username.trim(),
         location: data.location.trim() || undefined,
+        current_role: data.current_role.trim() || undefined,
         date_of_birth: data.date_of_birth || undefined,
         bio: data.bio.trim() || undefined,
         discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
@@ -255,6 +283,48 @@ export default function SettingsProfilePage() {
     >
       {/* LEFT — avatar */}
       <div className="space-y-6">
+        {/* Cover image */}
+        <div className="bg-white border border-zinc-200 overflow-hidden">
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
+          <div
+            className="relative group cursor-pointer h-24 bg-zinc-100 flex items-center justify-center"
+            onClick={() => !coverUploading && coverInputRef.current?.click()}
+          >
+            {profile?.coverImageUrl ? (
+              // biome-ignore lint/performance/noImgElement: cover image
+              <img
+                src={profile.coverImageUrl}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+                No cover image
+              </span>
+            )}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              {coverUploading
+                ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                : <Camera className="w-4 h-4 text-white" />}
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={coverUploading}
+            onClick={() => coverInputRef.current?.click()}
+            className="w-full h-9 border-t border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {coverUploading
+              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
+              : <><Camera className="w-3.5 h-3.5" /> {profile?.coverImageUrl ? "Change Cover" : "Upload Cover"}</>}
+          </button>
+        </div>
         <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
           <input
             ref={avatarInputRef}
@@ -344,6 +414,18 @@ export default function SettingsProfilePage() {
                   {...register("location")}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="current-role" className={labelStyles}>
+                Job Title / Occupation
+              </Label>
+              <Input
+                id="current-role"
+                placeholder="e.g. Frontend Developer, CS student, Freelance designer"
+                className={inputStyles}
+                {...register("current_role")}
+              />
             </div>
 
             <div className="space-y-2">

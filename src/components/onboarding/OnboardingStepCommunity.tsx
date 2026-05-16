@@ -91,7 +91,6 @@ const SOCIALS = [
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
   const communityFollowed = useOnboardingStore((s) => s.communityFollowed);
   const merge = useOnboardingStore((s) => s.merge);
-  const [followed, setFollowed] = useState<Record<string, boolean>>(communityFollowed);
 
   function handleJoin(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
@@ -99,11 +98,8 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
 
   function handleFollow(id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
-    setFollowed((prev) => {
-      const next = { ...prev, [id]: true };
-      merge({ communityFollowed: next });
-      return next;
-    });
+    const next = { ...communityFollowed, [id]: true };
+    merge({ communityFollowed: next });
   }
 
   return (
@@ -152,7 +148,7 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         </p>
         <div className="flex flex-wrap gap-3">
           {SOCIALS.map(({ id, icon: Icon, iconColor, name, href, followedBtn }) => {
-            const isFollowed = followed[id];
+            const isFollowed = communityFollowed[id];
             return (
               <button
                 key={id}

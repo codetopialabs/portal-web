@@ -86,10 +86,10 @@ const typeIcons: Record<ResourceType, React.ElementType> = {
 };
 
 const typeColors: Record<ResourceType, string> = {
-  Article: "bg-blue-50 text-blue-700 border-blue-200",
-  Guide: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Video: "bg-violet-50 text-violet-700 border-violet-200",
-  Template: "bg-zinc-100 text-zinc-600 border-zinc-200",
+  Article: "bg-zinc-50 text-zinc-600 border-zinc-200",
+  Guide: "bg-zinc-50 text-zinc-600 border-zinc-200",
+  Video: "bg-zinc-50 text-zinc-600 border-zinc-200",
+  Template: "bg-zinc-50 text-zinc-600 border-zinc-200",
 };
 
 const statusConfig: Record<ResourceStatus, { label: string; color: string }> = {
@@ -138,6 +138,18 @@ function ResourcesSkeleton() {
   );
 }
 
+function ComingSoon({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="bg-white border border-zinc-200 py-24 flex flex-col items-center justify-center text-center">
+      <div className="w-12 h-12 border border-zinc-200 bg-zinc-50 flex items-center justify-center mb-4">
+        <Clock className="w-5 h-5 text-zinc-300" />
+      </div>
+      <p className="font-mono font-semibold text-sm text-zinc-900 mb-1">{title}</p>
+      <p className="font-mono text-sm text-zinc-500 max-w-xs mx-auto">{description}</p>
+    </div>
+  );
+}
+
 export default function ResourcesPage() {
   const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
@@ -175,7 +187,14 @@ export default function ResourcesPage() {
           </p>
         </div>
 
-        {loading ? <ResourcesSkeleton /> : <>
+        {loading ? <ResourcesSkeleton /> : (
+          <>
+            <ComingSoon
+              title="Resources Coming Soon"
+              description="A curated library of guides, articles, and templates for engineers. We're gathering the best content."
+            />
+            {false && (
+              <>
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
@@ -205,8 +224,8 @@ export default function ResourcesPage() {
                     key={resource.id}
                     className="p-5 flex items-center gap-4 group hover:bg-zinc-50 transition-all cursor-pointer"
                   >
-                    <div className="w-9 h-9 border border-amber-200 bg-amber-50 flex items-center justify-center shrink-0">
-                      <Icon className="w-4 h-4 text-amber-500" />
+                    <div className="w-9 h-9 border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4 text-zinc-900" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-mono font-semibold text-sm text-zinc-900 group-hover:underline underline-offset-4 truncate">
@@ -356,7 +375,10 @@ export default function ResourcesPage() {
           </Link>
         </div>
 
-        </>}
+              </>
+            )}
+          </>
+        )}
 
       </div>
     </DashboardShell>

@@ -268,6 +268,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       onboarding.reset();
       onNext();
     } catch (err) {
+      setShowConfirm(false);
       setSubmitError(
         err instanceof Error ? err.message : "Something went wrong. Please try again."
       );
@@ -690,8 +691,9 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 Go Back
               </button>
               <button
-                type="submit"
+                type="button"
                 disabled={isSubmitting}
+                onClick={handleSubmit(onSubmit, () => setShowConfirm(false))}
                 className="flex-1 bg-zinc-900 text-white px-5 py-3 text-[11px] uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
