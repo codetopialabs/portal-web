@@ -2,13 +2,16 @@ import axiosInstance from "@/lib/axios";
 
 export interface UserProfile {
   id: string;
+  communityId: string;
   email: string;
   username: string;
-  role: string;
+  roles: string[];
+  permissions: string[];
   isOnboarded: boolean;
   isEmailVerified: boolean;
   fullName: string;
   profilePictureUrl: string | null;
+  coverImageUrl: string | null;
   bio: string | null;
   skills: string[];
   githubHandle: string | null;
@@ -25,6 +28,30 @@ export interface UserProfile {
   referralSource: string | null;
   location: string | null;
   dateOfBirth: string | null;
+}
+
+export interface CommunityMember {
+  id: string;
+  communityId: string;
+  email: string;
+  username: string;
+  communityRoles: string[];
+  fullName: string;
+  profilePictureUrl: string;
+  coverImageUrl: string;
+  bio: string;
+  skills: string[];
+  location: string;
+  experienceLevel: string;
+  currentRole: string;
+  discordUsername: string;
+  githubHandle: string;
+  twitterHandle: string;
+  linkedinUrl: string;
+  websiteUrl: string;
+  isEmailVerified: boolean;
+  isOnboarded: boolean;
+  joinedAt: string;
 }
 
 export interface UpdateMeRequest {
@@ -48,6 +75,7 @@ export interface UpdateMeRequest {
   date_of_birth?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;
+  cover_image_url?: string;
 }
 
 interface UploadSignature {
@@ -61,6 +89,16 @@ interface UploadSignature {
 export const UserService = {
   async getMe(): Promise<UserProfile> {
     const response = await axiosInstance.get<{ data: UserProfile }>("/auth/me/");
+    return response.data.data;
+  },
+
+  async getCommunityMembers(): Promise<CommunityMember[]> {
+    const response = await axiosInstance.get<{ data: CommunityMember[] }>("/users/members/");
+    return response.data.data;
+  },
+
+  async getMemberByUsername(username: string): Promise<CommunityMember> {
+    const response = await axiosInstance.get<{ data: CommunityMember }>(`/users/members/${username}/`);
     return response.data.data;
   },
 
@@ -78,6 +116,26 @@ export const UserService = {
     form.append("timestamp", String(sig.timestamp));
     form.append("signature", sig.signature);
     form.append("folder", sig.folder);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
+      method: "POST",
+      body: form,
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error?.message ?? "Upload failed.");
+    return json.secure_url as string;
+  },
+
+  async uploadCoverImage(file: File): Promise<string> {
+    // Reuse the same signature endpoint — Cloudinary folder is per-user,
+    // we just append /cover to distinguish from the avatar
+    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>("/auth/cloudinary-signature/");
+    const sig = sigResponse.data.data;
+    const form = new FormData();
+    form.append("file", file);
+    form.append("api_key", sig.api_key);
+    form.append("timestamp", String(sig.timestamp));
+    form.append("signature", sig.signature);
+    form.append("folder", `${sig.folder}/cover`);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
       method: "POST",
       body: form,
