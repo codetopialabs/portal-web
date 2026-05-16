@@ -17,11 +17,16 @@ interface AuthState {
 }
 
 function setCookie(name: string, value: string, maxAge: number) {
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
 function deleteCookie(name: string) {
   document.cookie = `${name}=; path=/; max-age=0`;
+}
+
+function getCookie(name: string): string | null {
+  const match = document.cookie.split("; ").find((r) => r.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.split("=")[1]) : null;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -30,8 +35,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setSession: (tokens: TokenResponse) => {
     setCookie("accessToken", tokens.accessToken, tokens.expiresIn);
-    setCookie("refreshToken", tokens.refreshToken, 2592000);
-    setCookie("isOnboarded", String(tokens.isOnboarded), 2592000);
+    setCookie("refreshToken", tokens.refreshToken, 60 * 60 * 24 * 7);
+    setCookie("isOnboarded", String(tokens.isOnboarded), 60 * 60 * 24 * 30);
     set({ session: tokens });
   },
 
@@ -43,19 +48,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   initializeFromCookies: () => {
-    const cookies = document.cookie.split(";").reduce<Record<string, string>>((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=");
-      if (key && value) acc[key] = value;
-      return acc;
-    }, {});
-
-    const accessToken = cookies.accessToken;
-    const refreshToken = cookies.refreshToken;
+    const accessToken = getCookie("accessToken");
+    const refreshToken = getCookie("refreshToken");
 
     if (accessToken && refreshToken) {
       set({
         session: {
           accessToken,
+          refreshToken,
+          tokenType: "Bearer",
+          expiresIn: 0,
+        },
+        isLoading: false,
+      });
+    } else if (!accessToken && refreshToken) {
+
+      set({
+        session: {
+          accessToken: "",
           refreshToken,
           tokenType: "Bearer",
           expiresIn: 0,

@@ -73,4 +73,55 @@ export const AuthService = {
     const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>("/auth/check-username/", { params: { username } });
     return response.data.data.available;
   },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await axiosInstance.post("/auth/change-password/", {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+  },
+};
+
+// ─── Sessions ─────────────────────────────────────────────────────────────────
+
+export interface UserSession {
+  id: number;
+  deviceName: string;
+  ipAddress: string | null;
+  userAgent: string;
+  createdAt: string;
+  isCurrent: boolean;
+}
+
+export interface ActivityLogEntry {
+  id: number;
+  eventType: string;
+  eventLabel: string;
+  detail: string;
+  ipAddress: string | null;
+  deviceName: string;
+  createdAt: string;
+}
+
+export const SessionService = {
+  async getSessions(): Promise<UserSession[]> {
+    const response = await axiosInstance.get<ApiResponse<UserSession[]>>("/auth/sessions/");
+    return response.data.data;
+  },
+
+  async revokeSession(id: number): Promise<void> {
+    await axiosInstance.delete(`/auth/sessions/${id}/`);
+  },
+
+  async revokeAllOtherSessions(): Promise<void> {
+    await axiosInstance.delete("/auth/sessions/");
+  },
+
+  async getActivity(limit = 20, offset = 0): Promise<{ results: ActivityLogEntry[]; total: number }> {
+    const response = await axiosInstance.get<{ data: { results: ActivityLogEntry[]; total: number } }>(
+      "/auth/activity/",
+      { params: { limit, offset } }
+    );
+    return response.data.data;
+  },
 };

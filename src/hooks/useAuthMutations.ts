@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { AuthService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
+import { useOnboardingStore } from "@/store/onboarding.store";
 // Login form values (used by LoginForm)
 export interface LoginFormValues {
   email: string;
@@ -27,6 +28,9 @@ export function useLoginMutation() {
     mutationFn: (data: LoginFormValues) => AuthService.login(data),
     onSuccess: (tokens) => {
       setSession(tokens);
+      if (!tokens.isOnboarded) {
+        useOnboardingStore.getState().reset();
+      }
       router.push(tokens.isOnboarded ? "/" : "/onboarding");
     },
   });
@@ -41,6 +45,9 @@ export function useRegisterMutation() {
         full_name: `${data.firstName} ${data.lastName}`,
         password: data.password,
       }),
+    onSuccess: () => {
+      useOnboardingStore.getState().reset();
+    },
   });
 }
 
@@ -53,6 +60,7 @@ export function useLogoutMutation() {
     mutationFn: () => AuthService.logout(session?.accessToken ?? ""),
     onSettled: () => {
       clearSession();
+      useOnboardingStore.getState().reset();
       router.push("/login");
     },
   });
