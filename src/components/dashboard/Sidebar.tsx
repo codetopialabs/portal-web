@@ -1,6 +1,14 @@
 "use client";
 
-import { BookOpen, Globe, Home, Library, Settings, Users } from "lucide-react";
+import {
+  BookOpen,
+  Globe,
+  Home,
+  Library,
+  Settings,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,35 +25,64 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { usePermission } from "@/hooks/usePermission";
 
-const menuGroups = [
-  {
-    label: "Discover",
-    items: [
-      { icon: Home, label: "Dashboard", href: "/", activePrefix: "/" },
-      { icon: Globe, label: "Community", href: "/community", activePrefix: "/community" },
-    ],
-  },
-  {
-    label: "My Space",
-    items: [
-      { icon: BookOpen, label: "Programs", href: "/programs", activePrefix: "/programs" },
-      { icon: Users, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
-      { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
-      { icon: Settings, label: "Settings", href: "/settings", activePrefix: "/settings" },
-    ],
-  },
-];
+interface NavItem {
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  activePrefix: string;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const canAccessAdmin = usePermission("admin.panel.access");
+
+  const menuGroups: NavGroup[] = [
+    {
+      label: "Discover",
+      items: [
+        { icon: Home, label: "Dashboard", href: "/", activePrefix: "/" },
+        { icon: Globe, label: "Community", href: "/community", activePrefix: "/community" },
+      ],
+    },
+    {
+      label: "My Space",
+      items: [
+        { icon: BookOpen, label: "Programs", href: "/programs", activePrefix: "/programs" },
+        { icon: Users, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
+        { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
+      ],
+    },
+    {
+      label: "Account",
+      items: [
+        { icon: Settings, label: "Settings", href: "/settings", activePrefix: "/settings" },
+      ],
+    },
+  ];
+
+  // Inject Admin Panel group when the user has admin.access
+  if (canAccessAdmin) {
+    menuGroups.push({
+      label: "Admin",
+      items: [
+        {
+          icon: ShieldCheck,
+          label: "Admin Panel",
+          href: "/admin",
+          activePrefix: "/admin",
+        },
+      ],
+    });
+  }
 
   function isActive(activePrefix: string) {
     return activePrefix === "/" ? pathname === "/" : pathname.startsWith(activePrefix);
@@ -67,18 +104,18 @@ export function DashboardSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-zinc-900 bg-black text-white">
       {/* Logo */}
-      <SidebarHeader className="px-5 pt-6 pb-4 bg-black">
+      <SidebarHeader className="px-5 pt-8 pb-6 bg-black">
         <Link href="/" className="flex items-center overflow-hidden">
           <div
             className={cn(
-              "relative transition-all duration-300 shrink-0",
-              isCollapsed ? "w-7 h-7" : "w-40 h-7"
+              "relative transition-all duration-500 shrink-0",
+              isCollapsed ? "w-8 h-8" : "w-44 h-12"
             )}
           >
             <img
               src="/logos/codetopia-community.png"
               alt="Codetopia Community"
-              className="h-full w-auto object-contain object-left grayscale invert brightness-0 hover:grayscale-0 transition-all duration-300"
+              className="h-full w-auto object-contain transition-all duration-500 brightness-0 invert"
             />
           </div>
         </Link>

@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, ChevronRight, HelpCircle, Home, LogOut } from "lucide-react";
+import { ChevronRight, HelpCircle, Home, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLogoutMutation } from "@/hooks/useAuthMutations";
+import { useUserStore } from "@/store/user.store";
 
 const routeLabels: Record<string, string> = {
   "": "Dashboard",
@@ -23,14 +24,6 @@ const routeLabels: Record<string, string> = {
 function resolveLabel(seg: string): string {
   return routeLabels[seg] ?? seg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
-
-const userData = {
-  name: "Kadin Vaccaro",
-  email: "kadin.v@codetopia.com",
-  avatarUrl:
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop",
-};
-
 
 function Breadcrumbs() {
   const pathname = usePathname();
@@ -84,6 +77,7 @@ function ProfileDropdown() {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
   const logout = useLogoutMutation();
+  const profile = useUserStore((s) => s.profile);
 
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -95,6 +89,11 @@ function ProfileDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  const name = profile?.fullName ?? "—";
+  const email = profile?.email ?? "—";
+  const avatarUrl = profile?.profilePictureUrl;
+  const initials = name.charAt(0).toUpperCase();
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -103,26 +102,23 @@ function ProfileDropdown() {
         className="flex items-center group"
       >
         <div
-          className={`w-8 h-8 rounded-full overflow-hidden transition-all ring-2 ${open ? "ring-zinc-900" : "ring-transparent group-hover:ring-zinc-200"}`}
+          className={`w-8 h-8 rounded-full overflow-hidden transition-all ring-2 bg-zinc-100 flex items-center justify-center ${open ? "ring-zinc-900" : "ring-transparent group-hover:ring-zinc-200"}`}
         >
-          {/* biome-ignore lint/performance/noImgElement: placeholder image */}
-          <img
-            src={userData.avatarUrl}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
+          {avatarUrl ? (
+            // biome-ignore lint/performance/noImgElement: user avatar
+            <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="font-mono font-bold text-xs text-zinc-500">{initials}</span>
+          )}
         </div>
       </button>
 
       {open && (
         <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-zinc-200 shadow-lg z-50">
-          {/* User info */}
           <div className="px-4 py-3 border-b border-zinc-100">
-            <p className="font-mono font-bold text-sm text-zinc-900 truncate">{userData.name}</p>
-            <p className="font-mono text-xs text-zinc-400 truncate mt-0.5">{userData.email}</p>
+            <p className="font-mono font-bold text-sm text-zinc-900 truncate">{name}</p>
+            <p className="font-mono text-xs text-zinc-400 truncate mt-0.5">{email}</p>
           </div>
-
-          {/* Sign out */}
           <div className="py-1">
             <button
               type="button"
@@ -134,7 +130,7 @@ function ProfileDropdown() {
               className="w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
             >
               <LogOut className="w-3.5 h-3.5 shrink-0" />
-              Sign out
+              {logout.isPending ? "Signing out…" : "Sign out"}
             </button>
           </div>
         </div>
@@ -152,21 +148,13 @@ export function DashboardNavbar() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-6">
-        <div className="flex items-center gap-1">
-          <Link
-            href="/activity"
-            className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all relative inline-flex"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white" />
-          </Link>
-          <button
-            type="button"
-            className="hidden sm:flex p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all"
-          >
-            <HelpCircle className="w-4 h-4" />
-          </button>
-        </div>
+        <Link
+          href="/docs"
+          className="hidden sm:flex p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all"
+          title="Documentation"
+        >
+          <HelpCircle className="w-4 h-4" />
+        </Link>
 
         <div className="h-6 w-px bg-zinc-200 hidden sm:block" />
 
