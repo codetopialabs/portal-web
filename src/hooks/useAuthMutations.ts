@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AuthService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useOnboardingStore } from "@/store/onboarding.store";
+import { useUserStore } from "@/store/user.store";
 // Login form values (used by LoginForm)
 export interface LoginFormValues {
   email: string;
@@ -18,6 +19,7 @@ export interface SignupFormValues {
   email: string;
   username: string;
   password: string;
+  confirmPassword?: string;
 }
 
 export function useLoginMutation() {
@@ -60,7 +62,17 @@ export function useLogoutMutation() {
     mutationFn: () => AuthService.logout(session?.accessToken ?? ""),
     onSettled: () => {
       clearSession();
+      useUserStore.getState().reset();
       useOnboardingStore.getState().reset();
+
+      // Clear walkthrough local storage cache so a different logged-in user on the same device starts fresh
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("codetopia_walkthrough_")) {
+          localStorage.removeItem(key);
+        }
+      }
+
       router.push("/login");
     },
   });

@@ -6,14 +6,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthService } from "@/services/auth.service";
 import { type SignupFormValues, useRegisterMutation } from "@/hooks/useAuthMutations";
-import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
+import { AuthService } from "@/services/auth.service";
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -24,7 +25,13 @@ export function SignupForm() {
   const mutation = useRegisterMutation();
 
   function onSubmit(data: SignupFormValues) {
-    mutation.mutate(data);
+    mutation.mutate({
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      email: data.email.trim().toLowerCase(),
+      username: data.username.trim(),
+      password: data.password,
+    });
   }
 
   const inputClass =
@@ -36,7 +43,10 @@ export function SignupForm() {
         <div className="space-y-4">
           <h2 className="text-2xl font-sans font-bold text-white">Check your email</h2>
           <p className="font-mono text-sm text-zinc-400">{mutation.data.detail}</p>
-          <Link href="/login" className="flex items-center gap-1 font-mono text-sm text-white hover:text-zinc-300 transition-colors">
+          <Link
+            href="/login"
+            className="flex items-center gap-1 font-mono text-sm text-white hover:text-zinc-300 transition-colors"
+          >
             Back to sign in <ArrowRight className="w-3.5 h-3.5 mt-px" />
           </Link>
         </div>
@@ -70,6 +80,10 @@ export function SignupForm() {
                 {...register("firstName", {
                   required: "Required",
                   minLength: { value: 2, message: "Min 2 characters" },
+                  pattern: {
+                    value: /^[a-zA-ZÀ-ÿ\s'-]+$/,
+                    message: "Letters, spaces, hyphens and apostrophes only",
+                  },
                 })}
               />
               {errors.firstName && (
@@ -93,6 +107,10 @@ export function SignupForm() {
                 {...register("lastName", {
                   required: "Required",
                   minLength: { value: 2, message: "Min 2 characters" },
+                  pattern: {
+                    value: /^[a-zA-ZÀ-ÿ\s'-]+$/,
+                    message: "Letters, spaces, hyphens and apostrophes only",
+                  },
                 })}
               />
               {errors.lastName && <p className="text-red-400 text-xs">{errors.lastName.message}</p>}
@@ -116,7 +134,8 @@ export function SignupForm() {
                 required: "Email is required",
                 pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email" },
                 validate: async (value) => {
-                  const available = await AuthService.checkEmail(value).catch(() => true);
+                  const normalized = value.trim().toLowerCase();
+                  const available = await AuthService.checkEmail(normalized).catch(() => true);
                   return available || "Email is already taken";
                 },
               })}
@@ -146,7 +165,8 @@ export function SignupForm() {
                 },
                 validate: async (value) => {
                   if (value.length < 3) return true; // let minLength handle it
-                  const available = await AuthService.checkUsername(value).catch(() => true);
+                  const normalized = value.trim();
+                  const available = await AuthService.checkUsername(normalized).catch(() => true);
                   return available || "Username is already taken";
                 },
               })}
@@ -182,6 +202,37 @@ export function SignupForm() {
             </div>
             {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
             <PasswordStrengthMeter password={password} />
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="confirmPassword" className="block text-sm text-zinc-300">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                placeholder="••••••••"
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
+                autoCorrect="off"
+                disabled={mutation.isPending}
+                className={`${inputClass} pr-10`}
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) => value === password || "Passwords do not match",
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-red-400 text-xs">{errors.confirmPassword.message}</p>
+            )}
           </div>
 
           <div className="space-y-3 pt-1">
