@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { ArrowLeft, Check, Mail, ShieldAlert } from "lucide-react";
+import { useState } from "react";
 
 interface StepProps {
   onNext: () => void;
@@ -16,18 +16,22 @@ const ENFORCEMENT_LADDER = [
   },
   {
     level: "Temporarily Limited Activities",
-    event: "A repeated violation that previously resulted in a warning, or the first incidence of a more serious violation.",
+    event:
+      "A repeated violation that previously resulted in a warning, or the first incidence of a more serious violation.",
     consequence: "A private, written warning with a time-limited cooldown period.",
   },
   {
     level: "Temporary Suspension",
-    event: "A pattern of repeated violations which the Community Moderators have tried to address with warnings, or a single serious violation.",
+    event:
+      "A pattern of repeated violations which the Community Moderators have tried to address with warnings, or a single serious violation.",
     consequence: "A private written warning with conditions for return from suspension.",
   },
   {
     level: "Permanent Ban",
-    event: "A pattern of repeated violations that other steps have failed to resolve, or a violation so serious that there is no way to keep the community safe with this person as a member.",
-    consequence: "Access to all Codetopia spaces, tools, and communication channels is permanently removed.",
+    event:
+      "A pattern of repeated violations that other steps have failed to resolve, or a violation so serious that there is no way to keep the community safe with this person as a member.",
+    consequence:
+      "Access to all Codetopia spaces, tools, and communication channels is permanently removed.",
   },
 ];
 
@@ -55,7 +59,8 @@ export function OnboardingStepEnforcement({ onNext, onBack }: StepProps) {
             Report an Issue
           </p>
           <p className="text-sm font-mono text-zinc-600 leading-relaxed mb-3">
-            If you witness or experience a Code of Conduct violation, reach out to our Community Moderators privately:
+            If you witness or experience a Code of Conduct violation, reach out to our Community
+            Moderators privately:
           </p>
           <a
             href="mailto:codetopiancommunity@gmail.com"
@@ -80,7 +85,7 @@ export function OnboardingStepEnforcement({ onNext, onBack }: StepProps) {
 
         <div className="space-y-4">
           {ENFORCEMENT_LADDER.map((step, i) => (
-            <div key={i} className="flex gap-4">
+            <div key={step.level} className="flex gap-4">
               <div className="flex flex-col items-center">
                 <div className="w-6 h-6 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0">
                   {i + 1}
@@ -92,12 +97,18 @@ export function OnboardingStepEnforcement({ onNext, onBack }: StepProps) {
               <div className="pb-4 flex flex-col gap-3">
                 <p className="text-sm font-mono font-semibold text-zinc-900">{step.level}</p>
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">Event</span>
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">
+                    Event
+                  </span>
                   <p className="text-sm font-mono text-zinc-600 leading-relaxed">{step.event}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">Consequence</span>
-                  <p className="text-sm font-mono text-zinc-600 leading-relaxed">{step.consequence}</p>
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">
+                    Consequence
+                  </span>
+                  <p className="text-sm font-mono text-zinc-600 leading-relaxed">
+                    {step.consequence}
+                  </p>
                 </div>
               </div>
             </div>
@@ -114,7 +125,9 @@ export function OnboardingStepEnforcement({ onNext, onBack }: StepProps) {
           className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
         />
         <span className="text-sm font-mono text-zinc-600 leading-relaxed">
-          I acknowledge that I have read and understood the reporting process and enforcement ladder. I understand that violations may result in consequences ranging from warnings to permanent removal.
+          I acknowledge that I have read and understood the reporting process and enforcement
+          ladder. I understand that violations may result in consequences ranging from warnings to
+          permanent removal.
         </span>
       </label>
 

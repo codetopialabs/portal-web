@@ -183,7 +183,14 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function saveToStore() {
-    onboarding.merge({ discipline, otherDiscipline, experienceLevel, memberStatus: status, otherStatus, currentRole });
+    onboarding.merge({
+      discipline,
+      otherDiscipline,
+      experienceLevel,
+      memberStatus: status,
+      otherStatus,
+      currentRole,
+    });
   }
 
   function handleBack() {

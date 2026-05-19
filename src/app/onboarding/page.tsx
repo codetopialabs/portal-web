@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { OnboardingSidebar } from "@/components/onboarding/OnboardingSidebar";
 import { OnboardingStepBackground } from "@/components/onboarding/OnboardingStepBackground";
 import { OnboardingStepCommunity } from "@/components/onboarding/OnboardingStepCommunity";
@@ -22,25 +22,45 @@ export default function OnboardingPage() {
   const isLoading = useUserStore((s) => s.isLoading);
   const isOnboarded = useUserStore((s) => s.isOnboarded);
   const router = useRouter();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const step = useOnboardingStore((s) => s.step);
   const setStep = useOnboardingStore((s) => s.setStep);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && isOnboarded) router.replace("/");
-  }, [isLoading, isOnboarded, router]);
+    // Only redirect if they are onboarded AND NOT on the final congrats step
+    if (!isLoading && isOnboarded && step !== TOTAL_STEPS - 1) {
+      router.replace("/");
+    }
+  }, [isLoading, isOnboarded, router, step]);
 
-  useEffect(() => { setHydrated(true); }, []);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
-  function nextStep() { setStep(Math.min(step + 1, TOTAL_STEPS - 1)); }
-  function prevStep() { setStep(Math.max(step - 1, 0)); }
+  useEffect(() => {
+    const scrollKey = step;
+    if (scrollKey >= 0 && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [step]);
+
+  function nextStep() {
+    setStep(Math.min(step + 1, TOTAL_STEPS - 1));
+  }
+  function prevStep() {
+    setStep(Math.max(step - 1, 0));
+  }
 
   return (
     <main className="h-screen overflow-hidden bg-white flex flex-col md:flex-row font-mono text-zinc-900">
       <OnboardingSidebar currentStep={step} />
 
-      <div className="flex-1 overflow-y-auto pt-[88px] md:pt-0 bg-[#f9fafb] bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:40px_40px]">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto pt-[88px] md:pt-0 bg-white bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:40px_40px]"
+      >
         <div className="flex items-center justify-center min-h-full px-8 py-12 md:px-16">
           {isLoading || !hydrated ? (
             <div className="flex flex-col items-center gap-6">

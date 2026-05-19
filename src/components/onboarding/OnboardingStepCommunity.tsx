@@ -1,8 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { FaDiscord, FaWhatsapp, FaLinkedinIn, FaXTwitter, FaBluesky, FaTiktok, FaYoutube } from "react-icons/fa6";
 import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
+import {
+  FaBluesky,
+  FaDiscord,
+  FaLinkedinIn,
+  FaTiktok,
+  FaWhatsapp,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
 import { useOnboardingStore } from "@/store/onboarding.store";
 
 interface StepProps {
@@ -92,7 +99,7 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
   const communityFollowed = useOnboardingStore((s) => s.communityFollowed);
   const merge = useOnboardingStore((s) => s.merge);
 
-  function handleJoin(id: string, href: string) {
+  function handleJoin(_id: string, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
   }
 
@@ -112,21 +119,21 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         Connect With Us
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
-        We recommend you connect with us on our socials to stay updated and connected with the community.
+        We recommend you connect with us on our socials to stay updated and connected with the
+        community.
       </p>
 
       <div className="space-y-4 mb-10">
         {COMMUNITIES.map(({ id, icon: Icon, iconColor, name, description, cta, href }) => {
           return (
-            <div
-              key={id}
-              className="border border-zinc-200 bg-white p-6"
-            >
+            <div key={id} className="border border-zinc-200 bg-white p-6">
               <div className="flex items-start gap-5">
                 <Icon className={`w-9 h-9 shrink-0 mt-0.5 ${iconColor}`} />
                 <div className="flex-1 min-w-0">
                   <p className="font-mono font-semibold text-base text-zinc-900 mb-1">{name}</p>
-                  <p className="font-mono text-sm text-zinc-500 leading-relaxed mb-5">{description}</p>
+                  <p className="font-mono text-sm text-zinc-500 leading-relaxed mb-5">
+                    {description}
+                  </p>
                   <button
                     type="button"
                     onClick={() => handleJoin(id, href)}
@@ -161,7 +168,13 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isFollowed ? "text-white" : iconColor}`} />
-                {isFollowed ? <><Check className="w-3 h-3" /> {name}</> : name}
+                {isFollowed ? (
+                  <>
+                    <Check className="w-3 h-3" /> {name}
+                  </>
+                ) : (
+                  name
+                )}
               </button>
             );
           })}

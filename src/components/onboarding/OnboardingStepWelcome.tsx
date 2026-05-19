@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 interface StepProps {
   onNext: () => void;
@@ -25,15 +25,24 @@ export function OnboardingStepWelcome({ onNext, onBack }: StepProps) {
       </span>
 
       <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-8 leading-[1.1]">
-        A Utopia for<br />Tech Enthusiasts
+        A Utopia for
+        <br />
+        Tech Enthusiasts
       </h1>
 
       <div className="space-y-4 font-mono text-zinc-600 text-sm leading-relaxed pl-5 border-l-2 border-zinc-200 mb-8">
         <p>
           Codetopia Community is an inclusive and collaborative initiative of the mother company{" "}
-          <a href="https://codetopia.org" target="_blank" rel="noopener noreferrer" className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 transition-colors">Codetopia</a>. It was created to empower aspiring and practicing technologists. We believe
-          technology is more than a tool — it is the foundation of innovation, creativity, and
-          problem-solving.
+          <a
+            href="https://codetopia.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 transition-colors"
+          >
+            Codetopia
+          </a>
+          . It was created to empower aspiring and practicing technologists. We believe technology
+          is more than a tool — it is the foundation of innovation, creativity, and problem-solving.
         </p>
         <p>
           Whether you are writing your first line of code or exploring the edges of tech, the
@@ -47,8 +56,8 @@ export function OnboardingStepWelcome({ onNext, onBack }: StepProps) {
         </p>
         <p className="font-mono text-zinc-600 text-sm leading-relaxed">
           We pledge to make our community welcoming, safe, and equitable for all — regardless of
-          race, ethnicity, age, disability, gender identity, sexual orientation, language,
-          religion, national origin, socio-economic position, or any other status.
+          race, ethnicity, age, disability, gender identity, sexual orientation, language, religion,
+          national origin, socio-economic position, or any other status.
         </p>
       </div>
 

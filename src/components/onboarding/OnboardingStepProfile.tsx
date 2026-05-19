@@ -21,6 +21,7 @@ import {
   FaWhatsapp,
   FaXTwitter,
 } from "react-icons/fa6";
+import { getAvatarUrl } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
@@ -151,15 +152,19 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const setOnboarded = useUserStore((s) => s.setOnboarded);
   const onboarding = useOnboardingStore((s) => s);
 
-  const [skills, setSkills] = useState<string[]>(onboarding.skills.length ? onboarding.skills : (profile?.skills ?? []));
+  const [skills, setSkills] = useState<string[]>(
+    onboarding.skills.length ? onboarding.skills : (profile?.skills ?? [])
+  );
   const [newSkill, setNewSkill] = useState("");
   const [isAddingSkill, setIsAddingSkill] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(onboarding.avatarUrl ?? profile?.profilePictureUrl ?? null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    onboarding.avatarUrl ?? profile?.profilePictureUrl ?? null
+  );
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [customLinks, setCustomLinks] = useState<
-    { platform: string; label: string; url: string }[]
+    { id: string; platform: string; label: string; url: string }[]
   >([]);
   const [showPicker, setShowPicker] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -190,7 +195,15 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
   function addCustomLink(platform: string) {
     const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
-    setCustomLinks((prev) => [...prev, { platform, label: p?.label ?? "", url: "" }]);
+    setCustomLinks((prev) => [
+      ...prev,
+      {
+        id: `${platform}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        platform,
+        label: p?.label ?? "",
+        url: "",
+      },
+    ]);
     setShowPicker(false);
   }
 
@@ -226,10 +239,17 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   function saveToStore() {
     const v = getValues();
     onboarding.merge({
-      fullName: v.full_name, username: v.username, dateOfBirth: v.date_of_birth,
-      discordUsername: v.discord_username, bio: v.bio, githubHandle: v.github_handle,
-      linkedinUrl: v.linkedin_url, twitterHandle: v.twitter_handle, websiteUrl: v.website_url,
-      skills, avatarUrl,
+      fullName: v.full_name,
+      username: v.username,
+      dateOfBirth: v.date_of_birth,
+      discordUsername: v.discord_username,
+      bio: v.bio,
+      githubHandle: v.github_handle,
+      linkedinUrl: v.linkedin_url,
+      twitterHandle: v.twitter_handle,
+      websiteUrl: v.website_url,
+      skills,
+      avatarUrl,
     });
   }
 
@@ -314,24 +334,28 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               className="hidden"
               onChange={handleAvatarChange}
             />
-            <div
+            <button
+              type="button"
               className="relative group cursor-pointer"
               onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+              disabled={avatarUploading}
             >
-              <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
-                {avatarUrl ? (
-                  // biome-ignore lint/performance/noImgElement: user avatar
-                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-10 h-10 text-zinc-300" />
-                )}
+              <div className="w-24 h-24 rounded-none overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center p-1">
+                {/* biome-ignore lint/performance/noImgElement: user avatar */}
+                <img
+                  src={getAvatarUrl(avatarUrl, profile?.fullName ?? "User")}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                {avatarUploading
-                  ? <Loader2 className="w-4 h-4 text-white animate-spin" />
-                  : <Camera className="w-4 h-4 text-white" />}
+                {avatarUploading ? (
+                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4 text-white" />
+                )}
               </div>
-            </div>
+            </button>
             {avatarError && (
               <p className="text-red-500 text-xs font-mono text-center">{avatarError}</p>
             )}
@@ -341,9 +365,15 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               onClick={() => avatarInputRef.current?.click()}
               className="w-full h-9 border border-zinc-200 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {avatarUploading
-                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
-                : <><Camera className="w-3.5 h-3.5" /> {avatarUrl ? "Change Photo" : "Upload Photo"}</>}
+              {avatarUploading ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
+                </>
+              ) : (
+                <>
+                  <Camera className="w-3.5 h-3.5" /> {avatarUrl ? "Change Photo" : "Upload Photo"}
+                </>
+              )}
             </button>
           </div>
 
@@ -361,13 +391,24 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             <div className="bg-white border border-zinc-200 p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className={labelStyles}>Display Name *</label>
+                  <label htmlFor="full_name" className={labelStyles}>
+                    Display Name *
+                  </label>
                   <input
+                    id="full_name"
                     className={inputStyles}
                     placeholder="Your display name"
                     {...register("full_name", {
                       required: "Display name is required",
-                      validate: (v) => v.trim() !== "" || "Display name is required",
+                      validate: (v) => {
+                        const trimmed = v.trim();
+                        if (trimmed === "") return "Display name is required";
+                        if (trimmed.length < 2) return "Min 2 characters";
+                        if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmed)) {
+                          return "Letters, spaces, hyphens and apostrophes only";
+                        }
+                        return true;
+                      },
                     })}
                   />
                   {errors.full_name && (
@@ -375,13 +416,24 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className={labelStyles}>Username *</label>
+                  <label htmlFor="username" className={labelStyles}>
+                    Username *
+                  </label>
                   <input
+                    id="username"
                     className={inputStyles}
                     placeholder="your_username"
                     {...register("username", {
                       required: "Username is required",
-                      validate: (v) => v.trim() !== "" || "Username is required",
+                      validate: (v) => {
+                        const trimmed = v.trim();
+                        if (trimmed === "") return "Username is required";
+                        if (trimmed.length < 3) return "Min 3 characters";
+                        if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
+                          return "Letters, numbers and underscores only";
+                        }
+                        return true;
+                      },
                     })}
                   />
                   {errors.username && (
@@ -408,8 +460,12 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       const today = new Date();
                       today.setHours(0, 0, 0, 0);
                       if (dob >= today) return "Birthday can't be today or in the future.";
-                      const age = today.getFullYear() - dob.getFullYear()
-                        - (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate()) ? 1 : 0);
+                      const age =
+                        today.getFullYear() -
+                        dob.getFullYear() -
+                        (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate())
+                          ? 1
+                          : 0);
                       if (age < 13) return "You must be at least 13 years old.";
                       if (age > 120) return "Please enter a valid date of birth.";
                       return true;
@@ -450,8 +506,11 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               </div>
 
               <div className="space-y-2">
-                <label className={labelStyles}>Bio</label>
+                <label htmlFor="bio" className={labelStyles}>
+                  Bio
+                </label>
                 <textarea
+                  id="bio"
                   placeholder="Tell the community who you are..."
                   className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
                   {...register("bio")}
@@ -504,7 +563,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 const p = LINK_PLATFORMS.find((pl) => pl.value === link.platform);
                 const Icon = p?.icon ?? Globe;
                 return (
-                  <div key={i} className="flex items-center gap-3 px-4">
+                  <div key={link.id} className="flex items-center gap-3 px-4">
                     <Icon className="w-4 h-4 shrink-0" style={{ color: p?.color }} />
                     {link.platform === "custom" && (
                       <input
@@ -605,7 +664,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                           setNewSkill("");
                         }
                       }}
-                      autoFocus
                       className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-xs uppercase tracking-widest outline-none"
                       placeholder="Skill..."
                     />

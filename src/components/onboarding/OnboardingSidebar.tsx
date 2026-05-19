@@ -43,7 +43,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
             const isActive = i === currentStep;
 
             return (
-              <div key={i} className="flex gap-3">
+              <div key={step.label} className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <div
                     className={`
@@ -55,6 +55,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
                   >
                     {isCompleted ? (
                       <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                        <title>Completed</title>
                         <path
                           d="M2.5 7L5.5 10L11.5 4"
                           stroke="currentColor"

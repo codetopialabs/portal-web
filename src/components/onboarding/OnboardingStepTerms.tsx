@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { useOnboardingStore } from "@/store/onboarding.store";
 
 interface StepProps {
@@ -50,15 +50,13 @@ export function OnboardingStepTerms({ onNext }: StepProps) {
             Third-Party Integrations
           </h3>
           <p className="text-sm font-mono text-zinc-500 leading-relaxed">
-            Your data may be shared with services we use to operate the community, including
-            Discord and WhatsApp. We only share what's necessary for these integrations to function.
+            Your data may be shared with services we use to operate the community, including Discord
+            and WhatsApp. We only share what's necessary for these integrations to function.
           </p>
         </div>
 
         <div>
-          <h3 className="text-sm font-mono font-semibold text-zinc-900 mb-1">
-            Account Management
-          </h3>
+          <h3 className="text-sm font-mono font-semibold text-zinc-900 mb-1">Account Management</h3>
           <p className="text-sm font-mono text-zinc-500 leading-relaxed">
             Codetopia reserves the right to suspend or terminate accounts that violate our terms or
             engage in harmful behavior. You will be notified before any account action is taken.
@@ -66,9 +64,7 @@ export function OnboardingStepTerms({ onNext }: StepProps) {
         </div>
 
         <div>
-          <h3 className="text-sm font-mono font-semibold text-zinc-900 mb-1">
-            Content Ownership
-          </h3>
+          <h3 className="text-sm font-mono font-semibold text-zinc-900 mb-1">Content Ownership</h3>
           <p className="text-sm font-mono text-zinc-500 leading-relaxed">
             You retain ownership of content you create. By posting on our platform, you grant
             Codetopia a license to use and display that content for community purposes.

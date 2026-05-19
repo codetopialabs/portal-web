@@ -18,18 +18,15 @@ const VALUES = [
   },
   {
     name: "Continuous Learning",
-    description:
-      "In technology there is always more to learn. Stay curious, stay humble.",
+    description: "In technology there is always more to learn. Stay curious, stay humble.",
   },
   {
     name: "Practical Application",
-    description:
-      "We value hands-on experience and real-world problem solving over theory alone.",
+    description: "We value hands-on experience and real-world problem solving over theory alone.",
   },
   {
     name: "Innovation",
-    description:
-      "We encourage creative thinking and bold ideas that push boundaries.",
+    description: "We encourage creative thinking and bold ideas that push boundaries.",
   },
   {
     name: "Integrity",
@@ -55,18 +52,14 @@ export function OnboardingStepValues({ onNext, onBack }: StepProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
         {VALUES.map((value, i) => (
           <div
-            key={i}
+            key={value.name}
             className="flex flex-col gap-2 border border-zinc-200 bg-white p-4 hover:border-zinc-400 transition-colors"
           >
             <span className="text-sm font-mono text-zinc-400">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <p className="text-sm font-mono font-semibold text-zinc-900">
-              {value.name}
-            </p>
-            <p className="text-sm font-mono text-zinc-500 leading-relaxed">
-              {value.description}
-            </p>
+            <p className="text-sm font-mono font-semibold text-zinc-900">{value.name}</p>
+            <p className="text-sm font-mono text-zinc-500 leading-relaxed">{value.description}</p>
           </div>
         ))}
       </div>

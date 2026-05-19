@@ -182,8 +182,8 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
       {/* Tab content */}
       <div className="space-y-5 mb-8">
         {activeTab === "encouraged" &&
-          ENCOURAGED.map((item, i) => (
-            <div key={i} className="flex gap-3 animate-in fade-in duration-300">
+          ENCOURAGED.map((item) => (
+            <div key={item.label} className="flex gap-3 animate-in fade-in duration-300">
               <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-1" />
               <div>
                 <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
@@ -195,8 +195,8 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
           ))}
 
         {activeTab === "restricted" &&
-          RESTRICTED.map((item, i) => (
-            <div key={i} className="flex gap-3 animate-in fade-in duration-300">
+          RESTRICTED.map((item) => (
+            <div key={item.label} className="flex gap-3 animate-in fade-in duration-300">
               <X className="w-3.5 h-3.5 text-red-400 shrink-0 mt-1" />
               <div>
                 <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
@@ -240,7 +240,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
               </div>
               <div className="space-y-4">
                 {ENFORCEMENT_LADDER.map((step, i) => (
-                  <div key={i} className="flex gap-4">
+                  <div key={step.level} className="flex gap-4">
                     <div className="flex flex-col items-center">
                       <div className="w-6 h-6 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-mono font-bold shrink-0">
                         {i + 1}
