@@ -49,6 +49,24 @@ X-API-Key: <api_key>
 
 API keys have their own Permission Set assigned at creation time. They go through the same permission check layer as user tokens.
 
+## Rate limiting
+
+The API enforces rate limits using both user and IP throttles. Limits vary by endpoint:
+
+- Default authenticated: 300 requests/minute + 60 requests/10s burst
+- Default anonymous: 60 requests/minute + 20 requests/10s burst
+- `/auth/me/`: 600 requests/minute + 120 requests/10s burst
+- Login: 10 requests/minute + 3 requests/10s burst (per IP and per email)
+- Signup: 5 requests/minute + 2 requests/10s burst (per IP and per email)
+- Password reset request: 5 requests/minute + 2 requests/10s burst (per IP and per email)
+- Email verification: 10 requests/minute + 3 requests/10s burst (per IP and per token)
+
+When limits are exceeded, the API returns HTTP 429.
+
+## Caching
+
+Selected read-heavy endpoints are cached in Redis with short TTLs. Writes immediately invalidate related cache entries so profiles and member lists update quickly after changes.
+
 ## Permission enforcement
 
 Every endpoint declares a required permission. Requests without the required permission receive HTTP 403.

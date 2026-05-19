@@ -41,7 +41,7 @@ Activity logs are accessible to admins via the Admin Panel (Coming Soon in v1). 
 | `session_revoked` | Single session signed out |
 | `all_sessions_revoked` | All other sessions signed out |
 
-### Role and permission events (implemented when admin panel ships)
+### Role and permission events
 
 | Event type | When it fires |
 |---|---|

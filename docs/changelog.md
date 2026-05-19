@@ -10,6 +10,20 @@ All notable changes to the Codetopia Community Portal are documented here.
 
 ---
 
+## [2026-05-19] Performance and reliability upgrades
+
+**What changed:** Added Redis-backed caching for high-traffic profile and member endpoints and introduced global plus auth-specific rate limits.
+**Affected areas:** Authentication API, Community Member API, API Throttling.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-19] Primary role selection and rendering
+
+**What changed:** Implemented primary role selection for community members, enabling them to choose one of their assigned roles to highlight as their primary identifier. Supported this by extending the Django `Profile` model and serialization, updating the Next.js form and types, and rendering the chosen role across public profiles and the member directory.  
+**Affected areas:** User Profile Model, Settings Profile Page, Public Profiles, Member Cards, Community Member Directory, API Serializers.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
 ## [2026-05-19] Walkthrough state synchronization with backend
 
 **What changed:** Implemented backend database storage for completed user onboarding walkthroughs, migrating from purely local storage to persistent DB sync. Corrected and modernized Django serializers and API endpoints to completely resolve stale imports and legacy single-role definitions.  

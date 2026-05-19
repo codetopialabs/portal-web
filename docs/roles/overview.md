@@ -34,6 +34,16 @@ members.*   → all members permissions (except destructive)
 
 Destructive permissions (`members.deactivate`, `roles.delete`) must always be listed explicitly.
 
+## Primary Community Role
+
+Members holding multiple community roles can select a single **Primary Community Role** that best identifies them to the community:
+1. Go to Settings → Profile
+2. Under "Personal Info", find the **Primary Community Role** dropdown
+3. Select from your assigned roles to set it as your primary identifier
+4. Save Changes
+
+This primary role will be displayed as the main badge on your Public Profile and in the Community Member Directory. Other assigned roles continue to be displayed inside the "Community roles" list on your profile card.
+
 ## System roles
 
 Some roles are marked as system roles and cannot be deleted. See [System Roles](./system-roles.md).
