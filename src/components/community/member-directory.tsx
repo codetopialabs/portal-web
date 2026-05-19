@@ -175,9 +175,11 @@ export function MemberDirectory({
 /* ------------------------------------------------------------------ */
 
 function FeaturedMemberCard({ member }: { member: CommunityMember }) {
-  const primaryRole = member.communityRoles?.[0]
-    ? formatRoleLabel(member.communityRoles[0])
-    : "Member";
+  const primaryRole = member.primaryRole
+    ? formatRoleLabel(member.primaryRole)
+    : member.communityRoles?.[0]
+      ? formatRoleLabel(member.communityRoles[0])
+      : "Member";
   const visibleSkills = member.skills.slice(0, 5);
 
   return (

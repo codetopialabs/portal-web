@@ -62,9 +62,11 @@ export function PublicProfileContent() {
     notFound();
   }
 
-  const primaryRole = profile.communityRoles?.[0]
-    ? formatRoleLabel(profile.communityRoles[0])
-    : "Member";
+  const primaryRole = profile.primaryRole
+    ? formatRoleLabel(profile.primaryRole)
+    : profile.communityRoles?.[0]
+      ? formatRoleLabel(profile.communityRoles[0])
+      : "Member";
   const roleList =
     profile.communityRoles && profile.communityRoles.length > 0
       ? profile.communityRoles.map(formatRoleLabel)

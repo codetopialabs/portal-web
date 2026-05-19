@@ -27,9 +27,11 @@ interface MemberCardProps {
 export function MemberCard({ member, compact = false }: MemberCardProps) {
   const router = useRouter();
   const canEditMembers = usePermission("members.edit");
-  const primaryRole = member.communityRoles?.[0]
-    ? formatRoleLabel(member.communityRoles[0])
-    : "Member";
+  const primaryRole = member.primaryRole
+    ? formatRoleLabel(member.primaryRole)
+    : member.communityRoles?.[0]
+      ? formatRoleLabel(member.communityRoles[0])
+      : "Member";
 
   const hasSocials = member.githubHandle || member.linkedinUrl || member.websiteUrl;
 

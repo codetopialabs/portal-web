@@ -37,9 +37,14 @@ export function getInitials(name: string) {
 export function getMemberFilterOptions(members: CommunityMember[]) {
   return {
     roles: getUniqueValues(
-      members.map((member) =>
-        member.communityRoles?.[0] ? formatRoleLabel(member.communityRoles[0]) : "Member"
-      )
+      members.map((member) => {
+        const primaryRole = member.primaryRole
+          ? formatRoleLabel(member.primaryRole)
+          : member.communityRoles?.[0]
+            ? formatRoleLabel(member.communityRoles[0])
+            : "Member";
+        return primaryRole;
+      })
     ),
     skills: getUniqueValues(members.flatMap((member) => member.skills)),
     experienceLevels: getUniqueValues(members.map((member) => member.experienceLevel)),
@@ -50,9 +55,11 @@ export function filterMembers(members: CommunityMember[], search: string, filter
   const normalizedSearch = search.trim().toLowerCase();
 
   return members.filter((member) => {
-    const primaryRole = member.communityRoles?.[0]
-      ? formatRoleLabel(member.communityRoles[0])
-      : "Member";
+    const primaryRole = member.primaryRole
+      ? formatRoleLabel(member.primaryRole)
+      : member.communityRoles?.[0]
+        ? formatRoleLabel(member.communityRoles[0])
+        : "Member";
     const matchesRole = filters.role === "all" || primaryRole === filters.role;
     const matchesSkill = filters.skill === "all" || member.skills.includes(filters.skill);
     const matchesExperience =

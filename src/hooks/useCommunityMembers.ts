@@ -7,5 +7,7 @@ export function useCommunityMembers() {
   return useQuery({
     queryKey: ["community-members"],
     queryFn: () => UserService.getCommunityMembers(),
+    staleTime: 60_000,
+    gcTime: 300_000,
   });
 }
