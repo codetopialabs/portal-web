@@ -5,10 +5,6 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardNavbar } from "./Navbar";
 import { DashboardSidebar } from "./Sidebar";
 
-function getSidebarDefaultOpen() {
-  return true; // Always return true for SSR and initial hydration
-}
-
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
 
@@ -21,7 +17,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
-      <div className="flex min-h-screen w-full bg-white text-zinc-900 selection:bg-black selection:text-white relative font-mono overflow-hidden">
+      <div className="flex min-h-screen w-full bg-[#f9fafb] text-zinc-900 selection:bg-black selection:text-white relative font-mono overflow-hidden">
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
           <DashboardNavbar />
@@ -33,7 +29,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <main className="relative z-10 flex flex-col min-h-full w-full">
-              <div className="p-6 lg:p-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 w-full max-w-none">
+              <div className="p-3 sm:p-6 lg:p-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 w-full max-w-none">
                 {children}
               </div>
             </main>

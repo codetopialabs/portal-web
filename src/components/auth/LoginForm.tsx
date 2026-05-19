@@ -1,16 +1,16 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthService } from "@/services/auth.service";
 import { type LoginFormValues, useLoginMutation } from "@/hooks/useAuthMutations";
+import { AuthService } from "@/services/auth.service";
 
 export function LoginForm() {
   const [step, setStep] = useState<"email" | "password">("email");
@@ -123,8 +123,9 @@ export function LoginForm() {
             onSubmit={handleSubmit(onPasswordSubmit)}
             className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <div
-              className="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-700 cursor-pointer hover:border-zinc-500 transition-all"
+            <button
+              type="button"
+              className="flex w-full items-center gap-3 p-3 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 transition-all"
               onClick={() => setStep("email")}
             >
               <div className="h-9 w-9 rounded-full bg-zinc-700 flex items-center justify-center text-white font-semibold text-sm shrink-0">
@@ -134,7 +135,7 @@ export function LoginForm() {
                 <span className="font-mono text-white text-sm truncate">{getValues("email")}</span>
                 <span className="font-mono text-xs text-zinc-400 mt-0.5">Switch account</span>
               </div>
-            </div>
+            </button>
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm text-zinc-300">
@@ -164,8 +165,8 @@ export function LoginForm() {
               {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
             </div>
 
-            {mutation.isError && (
-              (mutation.error as Error & { code?: string })?.code === "email_not_verified" ? (
+            {mutation.isError &&
+              ((mutation.error as Error & { code?: string })?.code === "email_not_verified" ? (
                 <div className="space-y-2 p-3 bg-zinc-900 border border-zinc-700">
                   <p className="text-yellow-400 text-xs">Your email isn't verified yet.</p>
                   {resendMutation.isSuccess ? (
@@ -183,8 +184,7 @@ export function LoginForm() {
                 </div>
               ) : (
                 <p className="text-red-400 text-xs">{mutation.error?.message}</p>
-              )
-            )}
+              ))}
 
             <Button
               disabled={mutation.isPending}

@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { AuthService } from "@/services/auth.service";
 
 type State = "loading" | "success" | "error";
@@ -62,7 +62,10 @@ function VerifyEmailContent() {
               <h2 className="text-2xl font-sans font-bold text-white">Email verified</h2>
               <p className="text-sm text-zinc-400">{message}</p>
               <p className="text-xs text-zinc-500">Redirecting to sign in…</p>
-              <Link href="/login" className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors">
+              <Link
+                href="/login"
+                className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors"
+              >
                 Sign in now <ArrowRight className="w-3.5 h-3.5 mt-px" />
               </Link>
             </>
@@ -72,7 +75,10 @@ function VerifyEmailContent() {
             <>
               <h2 className="text-2xl font-sans font-bold text-white">Verification failed</h2>
               <p className="text-sm text-zinc-400">{message}</p>
-              <Link href="/login" className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors">
+              <Link
+                href="/login"
+                className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors"
+              >
                 Back to sign in <ArrowRight className="w-3.5 h-3.5 mt-px" />
               </Link>
             </>

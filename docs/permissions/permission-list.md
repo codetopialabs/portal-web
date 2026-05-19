@@ -29,6 +29,9 @@ Permissions are served to the frontend via `GET /api/v1/permissions/` — the ad
 | `profile.view` | View public profiles | No |
 | `profile.edit` | Edit own profile | No |
 | `permissions.view` | View the master permission list | No |
+| `activity.view` | View own activity log | No |
+| `security.view` | View own active sessions | No |
+| `security.revoke` | Revoke own sessions | No |
 | `docs.view` | View the community documentation portal | No |
 
 ## Planned permissions (Coming Soon features)

@@ -1,100 +1,137 @@
-import React from "react";
+import { ArrowRight, Copy } from "lucide-react";
 import Link from "next/link";
-import { ArrowRight, Copy, Check } from "lucide-react";
+import type { ReactNode } from "react";
 
-const H1 = ({ children }: any) => (
-  <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900 mt-10 mb-6">
+type WithChildren = {
+  children?: ReactNode;
+};
+
+type HeadingProps = WithChildren & {
+  id?: string;
+};
+
+type CodeProps = WithChildren & {
+  className?: string;
+};
+
+type LinkProps = WithChildren & {
+  href: string;
+};
+
+const H1 = ({ children }: WithChildren) => (
+  <h1 className="mt-12 mb-5 font-[var(--font-space-grotesk)] text-3xl font-bold tracking-[-0.03em] text-neutral-950">
     {children}
   </h1>
 );
 
-const H2 = ({ children, id }: any) => (
-  <h2 id={id} className="text-xl font-sans font-black uppercase tracking-tight text-zinc-800 mt-12 mb-4 group flex items-center gap-2">
+const H2 = ({ children, id }: HeadingProps) => (
+  <h2
+    id={id}
+    className="group mt-14 mb-4 flex items-center gap-2 border-t border-neutral-200 pt-8 font-[var(--font-space-grotesk)] text-2xl font-bold tracking-[-0.025em] text-neutral-950"
+  >
     {children}
-    <a href={`#${id}`} className="opacity-0 group-hover:opacity-100 text-zinc-300 hover:text-zinc-500 transition-opacity">#</a>
+    {id && (
+      <a
+        href={`#${id}`}
+        className="text-neutral-300 opacity-0 transition-opacity hover:text-neutral-950 group-hover:opacity-100"
+        aria-label="Link to section"
+      >
+        #
+      </a>
+    )}
   </h2>
 );
 
-const H3 = ({ children, id }: any) => (
-  <h3 id={id} className="text-base font-mono font-bold text-zinc-900 mt-8 mb-3 uppercase tracking-widest">
+const H3 = ({ children, id }: HeadingProps) => (
+  <h3
+    id={id}
+    className="mt-8 mb-3 font-[var(--font-space-grotesk)] text-lg font-bold tracking-[-0.015em] text-neutral-900"
+  >
     {children}
   </h3>
 );
 
-const P = ({ children }: any) => (
-  <p className="font-mono text-sm text-zinc-600 leading-relaxed mb-4">
-    {children}
-  </p>
+const P = ({ children }: WithChildren) => (
+  <p className="mb-5 text-[15px] leading-7 text-neutral-650 [color:#4b5563]">{children}</p>
 );
 
-const UL = ({ children }: any) => (
-  <ul className="space-y-2 mb-6 ml-4">
-    {children}
-  </ul>
-);
+const UL = ({ children }: WithChildren) => <ul className="mb-7 space-y-2.5">{children}</ul>;
 
-const LI = ({ children }: any) => (
-  <li className="font-mono text-sm text-zinc-600 flex items-start gap-3">
-    <span className="w-1.5 h-1.5 bg-zinc-900 mt-1.5 shrink-0" />
-    <span>{children}</span>
+const LI = ({ children }: WithChildren) => (
+  <li className="flex items-start gap-3 text-[15px] leading-7 text-neutral-700">
+    <span className="mt-3 h-1.5 w-1.5 shrink-0 bg-neutral-950" />
+    <span className="min-w-0">{children}</span>
   </li>
 );
 
-const Code = ({ children, className }: any) => {
+const OL = ({ children }: WithChildren) => (
+  <ol className="mb-7 list-decimal space-y-2.5 pl-5 text-[15px] leading-7 text-neutral-700">
+    {children}
+  </ol>
+);
+
+const Code = ({ children, className }: CodeProps) => {
   const isInline = !className;
   if (isInline) {
     return (
-      <code className="bg-zinc-100 text-zinc-900 px-1 py-0.5 font-mono text-[13px] border border-zinc-200">
+      <code className="border border-neutral-200 bg-white px-1.5 py-0.5 font-mono text-[13px] font-semibold text-neutral-950 shadow-sm">
         {children}
       </code>
     );
   }
   return (
-    <div className="relative group mb-6">
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button className="p-1.5 bg-white border border-zinc-200 hover:border-zinc-900 transition-colors">
-          <Copy className="w-3.5 h-3.5 text-zinc-400" />
+    <div className="group relative mb-8 overflow-hidden border border-neutral-800 bg-neutral-950 shadow-[0_24px_70px_rgba(15,15,15,0.18)]">
+      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 bg-[#ff6b6b]" />
+          <span className="h-2.5 w-2.5 bg-[#ffd166]" />
+          <span className="h-2.5 w-2.5 bg-[#06d6a0]" />
+        </div>
+        <button
+          type="button"
+          className="flex h-8 w-8 items-center justify-center border border-white/10 bg-white/[0.04] text-white/45 transition-colors hover:border-white/30 hover:text-white"
+        >
+          <Copy className="h-3.5 w-3.5" />
+          <span className="sr-only">Copy code</span>
         </button>
       </div>
-      <pre className="bg-zinc-950 text-zinc-50 p-6 overflow-x-auto border-l-4 border-zinc-500 font-mono text-[13px] leading-relaxed">
+      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7 text-neutral-100">
         <code className={className}>{children}</code>
       </pre>
     </div>
   );
 };
 
-const Table = ({ children }: any) => (
-  <div className="overflow-x-auto mb-8 border border-zinc-200 bg-white">
-    <table className="w-full text-left border-collapse">
-      {children}
-    </table>
+const Table = ({ children }: WithChildren) => (
+  <div className="mb-9 overflow-hidden border border-neutral-200 bg-white shadow-sm">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[640px] border-collapse text-left">{children}</table>
+    </div>
   </div>
 );
 
-const THead = ({ children }: any) => (
-  <thead className="bg-zinc-50 border-b border-zinc-200">
-    {children}
-  </thead>
+const THead = ({ children }: WithChildren) => (
+  <thead className="border-b border-neutral-200 bg-neutral-950 text-white">{children}</thead>
 );
 
-const TH = ({ children }: any) => (
-  <th className="px-4 py-3 font-mono text-xs font-bold uppercase tracking-widest text-zinc-500">
+const TH = ({ children }: WithChildren) => (
+  <th className="px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white/65">
     {children}
   </th>
 );
 
-const TD = ({ children }: any) => (
-  <td className="px-4 py-3 font-mono text-sm text-zinc-600 border-b border-zinc-50">
+const TD = ({ children }: WithChildren) => (
+  <td className="border-b border-neutral-100 px-4 py-3.5 text-sm leading-6 text-neutral-700">
     {children}
   </td>
 );
 
-const A = ({ href, children }: any) => {
+const A = ({ href, children }: LinkProps) => {
   const isExternal = href?.startsWith("http");
   return (
     <Link
       href={href}
-      className="text-zinc-900 font-bold underline decoration-zinc-200 underline-offset-4 hover:decoration-zinc-900 transition-all inline-flex items-center gap-1"
+      className="inline-flex items-center gap-1 font-semibold text-neutral-950 underline decoration-[#d4f23d] decoration-2 underline-offset-4 transition-all hover:bg-[#e8ff5f]"
       target={isExternal ? "_blank" : undefined}
     >
       {children}
@@ -103,12 +140,14 @@ const A = ({ href, children }: any) => {
   );
 };
 
-const Blockquote = ({ children }: any) => (
-  <div className="border-l-4 border-zinc-900 bg-zinc-50 p-5 mb-6">
-    <div className="font-mono text-sm text-zinc-600 italic">
-      {children}
-    </div>
+const Blockquote = ({ children }: WithChildren) => (
+  <div className="mb-8 border-l-4 border-neutral-950 bg-white p-5 shadow-sm">
+    <div className="text-[15px] leading-7 text-neutral-700">{children}</div>
   </div>
+);
+
+const Strong = ({ children }: WithChildren) => (
+  <strong className="font-bold text-neutral-950">{children}</strong>
 );
 
 export const MDXComponents = {
@@ -117,6 +156,7 @@ export const MDXComponents = {
   h3: H3,
   p: P,
   ul: UL,
+  ol: OL,
   li: LI,
   code: Code,
   table: Table,
@@ -125,4 +165,5 @@ export const MDXComponents = {
   td: TD,
   a: A,
   blockquote: Blockquote,
+  strong: Strong,
 };

@@ -14,10 +14,12 @@ function getCookie(name: string): string | null {
 }
 
 function setCookie(name: string, value: string, maxAge: number) {
+  // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for auth tokens
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
 function deleteCookie(name: string) {
+  // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for auth tokens
   document.cookie = `${name}=; path=/; max-age=0`;
 }
 
@@ -42,12 +44,16 @@ let isRefreshing = false;
 let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
 function drainQueue(token: string) {
-  refreshQueue.forEach((p) => p.resolve(token));
+  refreshQueue.forEach((p) => {
+    p.resolve(token);
+  });
   refreshQueue = [];
 }
 
 function rejectQueue(err: unknown) {
-  refreshQueue.forEach((p) => p.reject(err));
+  refreshQueue.forEach((p) => {
+    p.reject(err);
+  });
   refreshQueue = [];
 }
 
@@ -149,18 +155,18 @@ axiosInstance.interceptors.response.use(
 
     const data = error.response?.data;
     const errors = data?.errors;
-    
+
     // ─── Extract error message ────────────────────────────────────────────────
     let errorMessage = error.message || "An unexpected error occurred";
-    
+
     if (errors && typeof errors === "object") {
       errorMessage = errors.detail
         ? String(errors.detail)
         : (() => {
-          const firstKey = Object.keys(errors)[0];
-          const firstMsg = errors[firstKey];
-          return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
-        })();
+            const firstKey = Object.keys(errors)[0];
+            const firstMsg = errors[firstKey];
+            return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
+          })();
     }
 
     // ─── Toast notification ──────────────────────────────────────────────────
@@ -168,7 +174,7 @@ axiosInstance.interceptors.response.use(
     if (typeof window !== "undefined") {
       const is403 = error.response?.status === 403;
       const is401 = error.response?.status === 401;
-      
+
       // We don't toast 401s because they are handled by refresh/redirect logic
       if (!is401) {
         const { toast } = require("sonner");
@@ -181,7 +187,7 @@ axiosInstance.interceptors.response.use(
     const err = new Error(errorMessage) as Error & { code?: string; status?: number };
     err.status = error.response?.status;
     if (errors?.code) err.code = errors.code;
-    
+
     return Promise.reject(err);
   }
 );

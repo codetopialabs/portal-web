@@ -7,10 +7,10 @@ import {
   History,
   Laptop,
   Lock,
+  Monitor,
   ShieldAlert,
   Smartphone,
   Tablet,
-  Monitor,
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -19,22 +19,31 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLogoutMutation } from "@/hooks/useAuthMutations";
 import { AuthService, SessionService, type UserSession } from "@/services/auth.service";
-import { useAuthStore } from "@/store/auth.store";
-import { useUserStore } from "@/store/user.store";
 
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-base placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 const labelStyles = "font-mono text-sm text-zinc-500 font-medium";
 
-function SectionHeader({ icon: Icon, title, danger }: { icon: React.ElementType; title: string; danger?: boolean }) {
+function SectionHeader({
+  icon: Icon,
+  title,
+  danger,
+}: {
+  icon: React.ElementType;
+  title: string;
+  danger?: boolean;
+}) {
   return (
     <div className="flex items-center gap-3">
-      <div className={`w-7 h-7 text-white flex items-center justify-center shrink-0 ${danger ? "bg-red-600" : "bg-black"}`}>
+      <div
+        className={`w-7 h-7 text-white flex items-center justify-center shrink-0 ${danger ? "bg-red-600" : "bg-black"}`}
+      >
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className={`font-sans font-bold text-base ${danger ? "text-red-700" : "text-zinc-900"}`}>{title}</h2>
+      <h2 className={`font-sans font-bold text-base ${danger ? "text-red-700" : "text-zinc-900"}`}>
+        {title}
+      </h2>
     </div>
   );
 }
@@ -74,10 +83,14 @@ function ChangePasswordSection() {
   const [showCurrent, setShowCurrent] = React.useState(false);
   const [showNew, setShowNew] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
-  const session = useAuthStore((s) => s.session);
 
-  const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } =
-    useForm<PasswordFormValues>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<PasswordFormValues>();
 
   const newPassword = watch("new_password");
 
@@ -104,12 +117,17 @@ function ChangePasswordSection() {
               className={`${inputStyles} pr-10`}
               {...register("current_password", { required: "Required" })}
             />
-            <button type="button" onClick={() => setShowCurrent((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors">
+            <button
+              type="button"
+              onClick={() => setShowCurrent((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+            >
               {showCurrent ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
           </div>
-          {errors.current_password && <p className="text-red-500 text-xs font-mono">{errors.current_password.message}</p>}
+          {errors.current_password && (
+            <p className="text-red-500 text-xs font-mono">{errors.current_password.message}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -126,12 +144,17 @@ function ChangePasswordSection() {
                   validate: (v) => /\d/.test(v) || "Must contain at least one number",
                 })}
               />
-              <button type="button" onClick={() => setShowNew((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors">
+              <button
+                type="button"
+                onClick={() => setShowNew((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+              >
                 {showNew ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </div>
-            {errors.new_password && <p className="text-red-500 text-xs font-mono">{errors.new_password.message}</p>}
+            {errors.new_password && (
+              <p className="text-red-500 text-xs font-mono">{errors.new_password.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label className={labelStyles}>Confirm New Password</Label>
@@ -145,12 +168,17 @@ function ChangePasswordSection() {
                   validate: (v) => v === newPassword || "Passwords do not match",
                 })}
               />
-              <button type="button" onClick={() => setShowConfirm((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors">
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+              >
                 {showConfirm ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </div>
-            {errors.confirm_password && <p className="text-red-500 text-xs font-mono">{errors.confirm_password.message}</p>}
+            {errors.confirm_password && (
+              <p className="text-red-500 text-xs font-mono">{errors.confirm_password.message}</p>
+            )}
           </div>
         </div>
 
@@ -161,12 +189,15 @@ function ChangePasswordSection() {
             disabled={isSubmitting}
             className="h-10 px-6 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isSubmitting ? (
-              [0,1,2].map((i) => (
-                <span key={i} className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }} />
-              ))
-            ) : "Update Password"}
+            {isSubmitting
+              ? [0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
+                  />
+                ))
+              : "Update Password"}
           </button>
         </div>
       </div>
@@ -182,7 +213,6 @@ function ActiveSessionsSection() {
   const [errorStatus, setErrorStatus] = React.useState<number | null>(null);
   const [revoking, setRevoking] = React.useState<number | null>(null);
   const [revokingAll, setRevokingAll] = React.useState(false);
-  const logout = useLogoutMutation();
 
   React.useEffect(() => {
     setLoading(true);
@@ -239,8 +269,11 @@ function ActiveSessionsSection() {
           <div className="flex items-center justify-center py-12">
             <div className="flex items-center gap-2">
               {[0, 1, 2].map((i) => (
-                <span key={i} className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }} />
+                <span
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
               ))}
             </div>
           </div>
@@ -250,7 +283,9 @@ function ActiveSessionsSection() {
               <Lock className="w-5 h-5 text-red-600" />
             </div>
             <div className="space-y-1">
-              <p className="font-mono font-bold text-sm text-zinc-900 uppercase tracking-tight">Access Restricted</p>
+              <p className="font-mono font-bold text-sm text-zinc-900 uppercase tracking-tight">
+                Access Restricted
+              </p>
               <p className="font-mono text-xs text-zinc-500 max-w-[240px] mx-auto">
                 Your account does not have clearance to view active session telemetry.
               </p>

@@ -29,7 +29,10 @@ interface ApiResponse<T> {
 
 export const AuthService = {
   async register(data: RegisterRequest): Promise<{ detail: string }> {
-    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/register/", data);
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>(
+      "/auth/register/",
+      data
+    );
     return response.data.data;
   },
 
@@ -45,32 +48,50 @@ export const AuthService = {
   },
 
   async resendVerification(email: string): Promise<{ detail: string }> {
-    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/resend-verification/", { email });
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>(
+      "/auth/resend-verification/",
+      { email }
+    );
     return response.data.data;
   },
 
   async verifyEmail(token: string): Promise<{ detail: string }> {
-    const response = await axiosInstance.get<ApiResponse<{ detail: string }>>("/auth/verify-email/", { params: { token } });
+    const response = await axiosInstance.get<ApiResponse<{ detail: string }>>(
+      "/auth/verify-email/",
+      { params: { token } }
+    );
     return response.data.data;
   },
 
   async passwordReset(email: string): Promise<{ detail: string }> {
-    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/password-reset/", { email });
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>(
+      "/auth/password-reset/",
+      { email }
+    );
     return response.data.data;
   },
 
   async confirmPasswordReset(token: string, password: string): Promise<{ detail: string }> {
-    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>("/auth/password-reset/confirm/", { token, password });
+    const response = await axiosInstance.post<ApiResponse<{ detail: string }>>(
+      "/auth/password-reset/confirm/",
+      { token, password }
+    );
     return response.data.data;
   },
 
   async checkEmail(email: string): Promise<boolean> {
-    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>("/auth/check-email/", { params: { email } });
+    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>(
+      "/auth/check-email/",
+      { params: { email: email.trim().toLowerCase() } }
+    );
     return response.data.data.available;
   },
 
   async checkUsername(username: string): Promise<boolean> {
-    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>("/auth/check-username/", { params: { username } });
+    const response = await axiosInstance.get<ApiResponse<{ available: boolean }>>(
+      "/auth/check-username/",
+      { params: { username: username.trim() } }
+    );
     return response.data.data.available;
   },
 
@@ -117,11 +138,13 @@ export const SessionService = {
     await axiosInstance.delete("/auth/sessions/");
   },
 
-  async getActivity(limit = 20, offset = 0): Promise<{ results: ActivityLogEntry[]; total: number }> {
-    const response = await axiosInstance.get<{ data: { results: ActivityLogEntry[]; total: number } }>(
-      "/auth/activity/",
-      { params: { limit, offset } }
-    );
+  async getActivity(
+    limit = 20,
+    offset = 0
+  ): Promise<{ results: ActivityLogEntry[]; total: number }> {
+    const response = await axiosInstance.get<{
+      data: { results: ActivityLogEntry[]; total: number };
+    }>("/auth/activity/", { params: { limit, offset } });
     return response.data.data;
   },
 };

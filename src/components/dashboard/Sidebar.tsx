@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  BookOpen,
-  Globe,
-  Home,
-  Library,
-  Settings,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -24,20 +16,9 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
+import { getDashboardMenuGroups } from "@/data/navigation";
 import { usePermission } from "@/hooks/usePermission";
-
-interface NavItem {
-  icon: React.ElementType;
-  label: string;
-  href: string;
-  activePrefix: string;
-}
-
-interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
+import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -45,44 +26,7 @@ export function DashboardSidebar() {
   const isCollapsed = state === "collapsed";
   const canAccessAdmin = usePermission("admin.panel.access");
 
-  const menuGroups: NavGroup[] = [
-    {
-      label: "Discover",
-      items: [
-        { icon: Home, label: "Dashboard", href: "/", activePrefix: "/" },
-        { icon: Globe, label: "Community", href: "/community", activePrefix: "/community" },
-      ],
-    },
-    {
-      label: "My Space",
-      items: [
-        { icon: BookOpen, label: "Programs", href: "/programs", activePrefix: "/programs" },
-        { icon: Users, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
-        { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
-      ],
-    },
-    {
-      label: "Account",
-      items: [
-        { icon: Settings, label: "Settings", href: "/settings", activePrefix: "/settings" },
-      ],
-    },
-  ];
-
-  // Inject Admin Panel group when the user has admin.access
-  if (canAccessAdmin) {
-    menuGroups.push({
-      label: "Admin",
-      items: [
-        {
-          icon: ShieldCheck,
-          label: "Admin Panel",
-          href: "/admin",
-          activePrefix: "/admin",
-        },
-      ],
-    });
-  }
+  const menuGroups = getDashboardMenuGroups(canAccessAdmin);
 
   function isActive(activePrefix: string) {
     return activePrefix === "/" ? pathname === "/" : pathname.startsWith(activePrefix);
@@ -91,9 +35,7 @@ export function DashboardSidebar() {
   function itemClass(active: boolean) {
     return cn(
       "h-9 rounded-none transition-all duration-150",
-      active
-        ? "!bg-white !text-black shadow-sm"
-        : "text-white hover:text-white hover:bg-zinc-900"
+      active ? "!bg-white !text-black shadow-sm" : "text-white hover:text-white hover:bg-zinc-900"
     );
   }
 
@@ -112,10 +54,12 @@ export function DashboardSidebar() {
               isCollapsed ? "w-8 h-8" : "w-44 h-12"
             )}
           >
-            <img
+            <Image
               src="/logos/codetopia-community.png"
               alt="Codetopia Community"
-              className="h-full w-auto object-contain transition-all duration-500 brightness-0 invert"
+              fill
+              sizes="(max-width: 768px) 32px, 176px"
+              className="object-contain transition-all duration-500 brightness-0 invert"
             />
           </div>
         </Link>

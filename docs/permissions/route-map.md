@@ -1,17 +1,23 @@
-# Route → Permission Map
+---
+title: Route Permission Map
+category: Permissions
+order: 3
+---
 
-Every protected page in the portal and the permission required to access it.
+# Route Permission Map
 
-If a member navigates to a route they don't have permission for, they are redirected to the dashboard home (`/`).
-
-> **When adding a new route:** add it here, in `AGENTS.md`, and in `src/lib/permissions.ts`.
+Every protected page in the portal declares the permission required to access it. If a member is signed in but does not have the required permission, the portal shows an access restricted screen instead of the page.
 
 ## Current routes
 
 | Route | Required Permission | Notes |
 |---|---|---|
 | `/` (dashboard) | authenticated | Any verified, onboarded member |
-| `/admin` | `admin.panel.access` | Any member with this permission, regardless of role name |
+| `/community` | authenticated | Member directory and community tabs |
+| `/programs` | authenticated | Member program workspace |
+| `/mentorship` | authenticated | Member mentorship workspace |
+| `/resources` | authenticated | Member resource library |
+| `/admin` | `admin.panel.access` | Any member with this permission |
 | `/admin/roles` | `roles.view` | |
 | `/admin/roles/new` | `roles.create` | |
 | `/admin/roles/[id]` | `roles.view` | |
@@ -19,11 +25,14 @@ If a member navigates to a route they don't have permission for, they are redire
 | `/admin/members` | `members.view` | |
 | `/admin/members/[id]` | `members.view` | |
 | `/admin/members/[id]/edit` | `members.edit` | |
-| `/members/[username]/public-profile` | `profile.view` | Any authenticated member |
-| `/settings/profile` | authenticated | Own profile only |
-| `/settings/security` | authenticated | Own sessions only |
+| `/@username` | `profile.view` | Any authenticated member |
+| `/settings/profile` | `profile.edit` | Own profile |
+| `/settings/security` | `security.view` | Own sessions and password settings |
+| `/settings/apps` | authenticated | Connected apps placeholder |
+| `/activity` | `activity.view` | Own activity log |
+| `/docs` | `docs.view` | Live documentation portal |
 
-## Auth routes (no permission required)
+## Auth routes
 
 These routes are accessible without being logged in:
 

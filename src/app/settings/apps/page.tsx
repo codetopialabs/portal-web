@@ -13,8 +13,8 @@ export default function SettingsAppsPage() {
       </p>
       <p className="font-mono font-bold text-sm text-zinc-900 mb-1">Connected Apps</p>
       <p className="font-mono text-xs text-zinc-400 max-w-xs leading-relaxed">
-        Third-party app management is on the roadmap. You'll be able to view and revoke OAuth
-        access here once it's ready.
+        Third-party app management is on the roadmap. You'll be able to view and revoke OAuth access
+        here once it's ready.
       </p>
     </div>
   );

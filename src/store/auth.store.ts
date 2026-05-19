@@ -17,10 +17,12 @@ interface AuthState {
 }
 
 function setCookie(name: string, value: string, maxAge: number) {
+  // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for auth tokens
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
 function deleteCookie(name: string) {
+  // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for auth tokens
   document.cookie = `${name}=; path=/; max-age=0`;
 }
 
@@ -62,7 +64,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
       });
     } else if (!accessToken && refreshToken) {
-
       set({
         session: {
           accessToken: "",

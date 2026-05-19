@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLogoutMutation } from "@/hooks/useAuthMutations";
+import { getAvatarUrl } from "@/lib/utils";
 import { useUserStore } from "@/store/user.store";
 
 const routeLabels: Record<string, string> = {
@@ -92,24 +93,18 @@ function ProfileDropdown() {
   const name = profile?.fullName ?? "—";
   const email = profile?.email ?? "—";
   const avatarUrl = profile?.profilePictureUrl;
-  const initials = name.charAt(0).toUpperCase();
-
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center group"
-      >
+      <button type="button" onClick={() => setOpen((v) => !v)} className="flex items-center group">
         <div
-          className={`w-8 h-8 rounded-full overflow-hidden transition-all ring-2 bg-zinc-100 flex items-center justify-center ${open ? "ring-zinc-900" : "ring-transparent group-hover:ring-zinc-200"}`}
+          className={`w-8 h-8 rounded-none overflow-hidden transition-all border bg-white flex items-center justify-center p-0.5 ${open ? "border-zinc-900" : "border-zinc-200 group-hover:border-zinc-400"}`}
         >
-          {avatarUrl ? (
-            // biome-ignore lint/performance/noImgElement: user avatar
-            <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
-          ) : (
-            <span className="font-mono font-bold text-xs text-zinc-500">{initials}</span>
-          )}
+          {/* biome-ignore lint/performance/noImgElement: user avatar */}
+          <img
+            src={getAvatarUrl(avatarUrl, name)}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
         </div>
       </button>
 

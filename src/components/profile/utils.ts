@@ -19,5 +19,5 @@ export function formatJoinedAt(dateStr?: string | null) {
 }
 
 export function formatRoleLabel(roleStr: string) {
-    return roleStr.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+  return roleStr.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 }

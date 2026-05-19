@@ -1,5 +1,6 @@
 "use client";
 
+import type { DriveStep } from "driver.js";
 import { Camera, Cpu, Globe, Loader2, MapPin, Plus, User, X } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
@@ -25,6 +26,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useWalkthrough } from "@/hooks/useWalkthrough";
+import { getAvatarUrl } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 
@@ -153,13 +156,89 @@ export default function SettingsProfilePage() {
   const [newSkill, setNewSkill] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [customLinks, setCustomLinks] = useState<
-    { platform: string; label: string; url: string }[]
+    { id: string; platform: string; label: string; url: string }[]
   >([]);
   const [showPicker, setShowPicker] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [coverUploading, setCoverUploading] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
+
+  const walkthroughSteps: DriveStep[] = [
+    {
+      popover: {
+        title: "Welcome to Settings",
+        description:
+          "This is your account control center. Let's do a quick tour of your configuration options!",
+      },
+    },
+    {
+      element: "#settings-tabs",
+      popover: {
+        title: "Navigation Tabs",
+        description:
+          "Switch seamlessly between your Profile details, Security credentials (sessions and passwords), and Connected third-party apps.",
+        side: "bottom",
+        align: "start",
+      },
+    },
+    {
+      element: "#settings-profile-media",
+      popover: {
+        title: "Avatar & Cover Photo",
+        description:
+          "Upload a display avatar and cover image to customize your community presence and footprint.",
+        side: "right",
+        align: "start",
+      },
+    },
+    {
+      element: "#settings-personal-info",
+      popover: {
+        title: "Personal Information",
+        description:
+          "Update your full display name, username, location, job title, and bio so others in the community know what you're working on.",
+        side: "left",
+        align: "start",
+      },
+    },
+    {
+      element: "#settings-social-links",
+      popover: {
+        title: "Social connections",
+        description:
+          "Connect your digital footprint: Discord, GitHub, LinkedIn, Twitter/X, and add custom portfolio links.",
+        side: "left",
+        align: "start",
+      },
+    },
+    {
+      element: "#settings-skills",
+      popover: {
+        title: "Profile Skills",
+        description:
+          "Specify your core development skills. These will render as tags on your public profile card.",
+        side: "left",
+        align: "start",
+      },
+    },
+    {
+      element: "#settings-save-actions",
+      popover: {
+        title: "Apply Changes",
+        description:
+          "Once your settings are dialed in, hit Save Changes to sync across the community ecosystem, or Discard to revert.",
+        side: "top",
+        align: "end",
+      },
+    },
+  ];
+
+  useWalkthrough({
+    tourId: "settings_profile_tour_v1",
+    steps: walkthroughSteps,
+    enabled: Boolean(profile),
+  });
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -209,7 +288,11 @@ export default function SettingsProfilePage() {
 
   function addCustomLink(platform: string) {
     const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
-    setCustomLinks((prev) => [...prev, { platform, label: p?.label ?? "", url: "" }]);
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    setCustomLinks((prev) => [...prev, { id, platform, label: p?.label ?? "", url: "" }]);
     setShowPicker(false);
   }
 
@@ -282,7 +365,7 @@ export default function SettingsProfilePage() {
       className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
     >
       {/* LEFT — avatar */}
-      <div className="space-y-6">
+      <div id="settings-profile-media" className="space-y-6">
         {/* Cover image */}
         <div className="bg-white border border-zinc-200 overflow-hidden">
           <input
@@ -292,37 +375,44 @@ export default function SettingsProfilePage() {
             className="hidden"
             onChange={handleCoverChange}
           />
-          <div
-            className="relative group cursor-pointer h-24 bg-zinc-100 flex items-center justify-center"
+          <button
+            type="button"
+            className="w-full relative group cursor-pointer h-24 bg-zinc-100 flex items-center justify-center"
             onClick={() => !coverUploading && coverInputRef.current?.click()}
+            disabled={coverUploading}
           >
             {profile?.coverImageUrl ? (
               // biome-ignore lint/performance/noImgElement: cover image
-              <img
-                src={profile.coverImageUrl}
-                alt="Cover"
-                className="w-full h-full object-cover"
-              />
+              <img src={profile.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
             ) : (
               <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                 No cover image
               </span>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {coverUploading
-                ? <Loader2 className="w-4 h-4 text-white animate-spin" />
-                : <Camera className="w-4 h-4 text-white" />}
+              {coverUploading ? (
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4 text-white" />
+              )}
             </div>
-          </div>
+          </button>
           <button
             type="button"
             disabled={coverUploading}
             onClick={() => coverInputRef.current?.click()}
             className="w-full h-9 border-t border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {coverUploading
-              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
-              : <><Camera className="w-3.5 h-3.5" /> {profile?.coverImageUrl ? "Change Cover" : "Upload Cover"}</>}
+            {coverUploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
+              </>
+            ) : (
+              <>
+                <Camera className="w-3.5 h-3.5" />{" "}
+                {profile?.coverImageUrl ? "Change Cover" : "Upload Cover"}
+              </>
+            )}
           </button>
         </div>
         <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
@@ -333,28 +423,28 @@ export default function SettingsProfilePage() {
             className="hidden"
             onChange={handleAvatarChange}
           />
-          <div
+          <button
+            type="button"
             className="relative group cursor-pointer"
             onClick={() => !avatarUploading && avatarInputRef.current?.click()}
+            disabled={avatarUploading}
           >
-            <div className="w-24 h-24 rounded-full overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center">
-              {profile?.profilePictureUrl ? (
-                // biome-ignore lint/performance/noImgElement: user avatar
-                <img
-                  src={profile.profilePictureUrl}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="w-10 h-10 text-zinc-300" />
-              )}
+            <div className="w-24 h-24 rounded-none overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center p-1">
+              {/* biome-ignore lint/performance/noImgElement: user avatar */}
+              <img
+                src={getAvatarUrl(profile?.profilePictureUrl, profile?.fullName ?? "User")}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {avatarUploading
-                ? <Loader2 className="w-4 h-4 text-white animate-spin" />
-                : <Camera className="w-4 h-4 text-white" />}
+              {avatarUploading ? (
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4 text-white" />
+              )}
             </div>
-          </div>
+          </button>
           <div className="text-center">
             <p className="font-mono font-black text-base uppercase tracking-tight text-zinc-900">
               {profile?.fullName ?? "—"}
@@ -367,9 +457,15 @@ export default function SettingsProfilePage() {
             onClick={() => avatarInputRef.current?.click()}
             className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {avatarUploading
-              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
-              : <><Camera className="w-3.5 h-3.5" /> Change Photo</>}
+            {avatarUploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
+              </>
+            ) : (
+              <>
+                <Camera className="w-3.5 h-3.5" /> Change Photo
+              </>
+            )}
           </button>
         </div>
 
@@ -383,7 +479,7 @@ export default function SettingsProfilePage() {
       {/* RIGHT — form */}
       <div className="lg:col-span-2 space-y-8">
         {/* Personal Info */}
-        <section className="space-y-5">
+        <section id="settings-personal-info" className="space-y-5">
           <SectionHeader icon={User} title="Personal Info" />
           <div className="bg-white border border-zinc-200 p-6 space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -461,7 +557,7 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Social Links */}
-        <section className="space-y-5">
+        <section id="settings-social-links" className="space-y-5">
           <SectionHeader icon={Globe} title="Social Links" />
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
             <div className="flex items-center gap-3 px-4">
@@ -508,7 +604,7 @@ export default function SettingsProfilePage() {
               const p = LINK_PLATFORMS.find((pl) => pl.value === link.platform);
               const Icon = p?.icon ?? Globe;
               return (
-                <div key={i} className="flex items-center gap-3 px-4">
+                <div key={link.id} className="flex items-center gap-3 px-4">
                   <Icon className="w-4 h-4 shrink-0" style={{ color: p?.color }} />
                   {link.platform === "custom" && (
                     <input
@@ -575,7 +671,7 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Skills */}
-        <section className="space-y-5">
+        <section id="settings-skills" className="space-y-5">
           <SectionHeader icon={Cpu} title="Skills" />
           <div className="bg-white border border-zinc-200 p-5">
             <div className="flex flex-wrap gap-2">
@@ -635,7 +731,7 @@ export default function SettingsProfilePage() {
         </section>
 
         {/* Save */}
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div id="settings-save-actions" className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"
             variant="outline"

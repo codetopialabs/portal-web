@@ -1,217 +1,153 @@
 "use client";
 
 import {
-  AlertTriangle,
   AppWindow,
   Filter,
   Key,
+  Laptop,
   LogIn,
   LogOut,
-  Search,
+  RefreshCw,
   Shield,
+  ShieldAlert,
   User,
+  UserPlus,
 } from "lucide-react";
 import React from "react";
+import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { type ActivityLogEntry, SessionService } from "@/services/auth.service";
 
-type ActivityType = "login" | "logout" | "security" | "password" | "app" | "profile" | "alert";
+// ─── event type config ────────────────────────────────────────────────────────
 
-interface ActivityLog {
-  id: string;
-  type: ActivityType;
-  title: string;
-  detail: string;
-  device: string;
-  location: string;
-  timestamp: string;
-  ip: string;
-}
+type EventCategory = "auth" | "account" | "profile" | "session";
 
-const activityData: ActivityLog[] = [
+const EVENT_CONFIG: Record<
+  string,
   {
-    id: "1",
-    type: "login",
-    title: "Successful Sign In",
-    detail: "Authenticated via password + TOTP",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Today, 9:14 AM",
-    ip: "142.112.XX.XX",
-  },
-  {
-    id: "2",
-    type: "app",
-    title: "App Access Granted",
-    detail: "CommuniTrack accessed your public identity",
-    device: "—",
-    location: "API",
-    timestamp: "Today, 8:02 AM",
-    ip: "54.239.XX.XX",
-  },
-  {
-    id: "3",
-    type: "security",
-    title: "Two-Factor Auth Enabled",
-    detail: "TOTP authenticator app configured",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Yesterday, 4:30 PM",
-    ip: "142.112.XX.XX",
-  },
-  {
-    id: "4",
-    type: "password",
-    title: "Password Changed",
-    detail: "Account password was updated successfully",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Yesterday, 4:28 PM",
-    ip: "142.112.XX.XX",
-  },
-  {
-    id: "5",
-    type: "login",
-    title: "Successful Sign In",
-    detail: "Authenticated via password",
-    device: "iPhone 15 Pro",
-    location: "London, UK",
-    timestamp: "Apr 17, 11:55 AM",
-    ip: "82.44.XX.XX",
-  },
-  {
-    id: "6",
-    type: "alert",
-    title: "Unrecognized Device",
-    detail: "Sign-in attempt from a new device was flagged",
-    device: "Unknown Device",
-    location: "Amsterdam, NL",
-    timestamp: "Apr 16, 3:22 PM",
-    ip: "185.220.XX.XX",
-  },
-  {
-    id: "7",
-    type: "app",
-    title: "App Access Revoked",
-    detail: "Forge Engine authorization was removed",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Apr 15, 10:10 AM",
-    ip: "142.112.XX.XX",
-  },
-  {
-    id: "8",
-    type: "profile",
-    title: "Profile Updated",
-    detail: "Display name and location were changed",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Apr 14, 2:45 PM",
-    ip: "142.112.XX.XX",
-  },
-  {
-    id: "9",
-    type: "logout",
-    title: "Signed Out",
-    detail: "Session ended on iPhone 15 Pro",
-    device: "iPhone 15 Pro",
-    location: "London, UK",
-    timestamp: "Apr 13, 9:00 PM",
-    ip: "82.44.XX.XX",
-  },
-  {
-    id: "10",
-    type: "login",
-    title: "Successful Sign In",
-    detail: "Authenticated via password + TOTP",
-    device: "MacBook Pro M2",
-    location: "Toronto, CA",
-    timestamp: "Apr 13, 8:30 AM",
-    ip: "142.112.XX.XX",
-  },
-];
-
-const typeConfig: Record<ActivityType, { icon: React.ElementType; label: string }> = {
-  login: { icon: LogIn, label: "Sign In" },
-  logout: { icon: LogOut, label: "Sign Out" },
-  security: { icon: Shield, label: "Security" },
-  password: { icon: Key, label: "Password" },
-  app: { icon: AppWindow, label: "App" },
-  profile: { icon: User, label: "Profile" },
-  alert: { icon: AlertTriangle, label: "Alert" },
+    icon: React.ElementType;
+    category: EventCategory;
+    color: string;
+  }
+> = {
+  login: { icon: LogIn, category: "auth", color: "text-emerald-600" },
+  logout: { icon: LogOut, category: "auth", color: "text-zinc-500" },
+  token_refresh: { icon: RefreshCw, category: "auth", color: "text-zinc-400" },
+  register: { icon: UserPlus, category: "account", color: "text-blue-600" },
+  email_verified: { icon: Shield, category: "account", color: "text-blue-500" },
+  password_changed: { icon: Key, category: "account", color: "text-amber-600" },
+  password_reset_requested: { icon: Key, category: "account", color: "text-amber-400" },
+  password_reset_completed: { icon: Key, category: "account", color: "text-amber-600" },
+  profile_updated: { icon: User, category: "profile", color: "text-zinc-600" },
+  avatar_updated: { icon: User, category: "profile", color: "text-zinc-600" },
+  session_revoked: { icon: Laptop, category: "session", color: "text-red-500" },
+  all_sessions_revoked: { icon: Laptop, category: "session", color: "text-red-600" },
 };
 
-const filterOptions: { label: string; value: ActivityType | "all" }[] = [
+const CATEGORY_FILTERS: { label: string; value: EventCategory | "all" }[] = [
   { label: "All", value: "all" },
-  { label: "Sign In", value: "login" },
-  { label: "Sign Out", value: "logout" },
-  { label: "Security", value: "security" },
-  { label: "Password", value: "password" },
-  { label: "Apps", value: "app" },
+  { label: "Auth", value: "auth" },
+  { label: "Account", value: "account" },
   { label: "Profile", value: "profile" },
-  { label: "Alerts", value: "alert" },
+  { label: "Session", value: "session" },
 ];
 
-const PAGE_SIZE = 6;
+// ─── helpers ──────────────────────────────────────────────────────────────────
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+const PAGE_SIZE = 15;
+
+// ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function ActivityPage() {
-  const [search, setSearch] = React.useState("");
-  const [activeFilter, setActiveFilter] = React.useState<ActivityType | "all">("all");
+  return (
+    <RouteGuard permission="activity.view">
+      <ActivityPageContent />
+    </RouteGuard>
+  );
+}
+
+function ActivityPageContent() {
+  const [entries, setEntries] = React.useState<ActivityLogEntry[]>([]);
+  const [total, setTotal] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
+  const [errorStatus, setErrorStatus] = React.useState<number | null>(null);
   const [page, setPage] = React.useState(1);
-
-  const filtered = activityData.filter((log) => {
-    const matchesFilter = activeFilter === "all" || log.type === activeFilter;
-    const matchesSearch =
-      search === "" ||
-      log.title.toLowerCase().includes(search.toLowerCase()) ||
-      log.detail.toLowerCase().includes(search.toLowerCase()) ||
-      log.location.toLowerCase().includes(search.toLowerCase()) ||
-      log.device.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const [filter, setFilter] = React.useState<EventCategory | "all">("all");
 
   React.useEffect(() => {
-    setPage(1);
-  }, []);
+    setLoading(true);
+    setErrorStatus(null);
+    SessionService.getActivity(PAGE_SIZE, (page - 1) * PAGE_SIZE)
+      .then(({ results, total }) => {
+        setEntries(results);
+        setTotal(total);
+      })
+      .catch((err) => {
+        setErrorStatus(err.status || 500);
+      })
+      .finally(() => setLoading(false));
+  }, [page]);
+
+  const filtered =
+    filter === "all"
+      ? entries
+      : entries.filter((e) => EVENT_CONFIG[e.eventType]?.category === filter);
+
+  const totalPages =
+    filter === "all"
+      ? Math.max(1, Math.ceil(total / PAGE_SIZE))
+      : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
   return (
     <DashboardShell>
-      <div className="max-w-6xl mx-auto space-y-8 pb-20">
-        {/* Header */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-sans font-black uppercase tracking-tighter text-zinc-900">
-            Activity Log
-          </h1>
-          <p className="font-mono text-sm text-zinc-500">
-            A full record of actions and events on your account
-          </p>
+      <div className="w-full max-w-none space-y-6 pb-20">
+        <div className="flex flex-col gap-4 border-b border-zinc-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
+              Audit trail
+            </p>
+            <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+              Activity Log
+            </h1>
+            <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
+              Review sign-ins, account changes, profile updates, and session events tied to your
+              account.
+            </p>
+          </div>
+          <span className="w-fit border border-zinc-200 bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500">
+            {total || entries.length} events
+          </span>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
-          <Input
-            placeholder="Search activity..."
-            className="h-11 rounded-none border-zinc-200 bg-white pl-9 font-mono text-sm focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* Filter Pills */}
+        {/* filter pills */}
         <div className="flex flex-wrap gap-2">
-          {filterOptions.map((f) => (
+          {CATEGORY_FILTERS.map((f) => (
             <button
               key={f.value}
               type="button"
-              onClick={() => setActiveFilter(f.value)}
-              className={`font-mono text-sm px-3 py-1.5 border transition-all ${
-                activeFilter === f.value
-                  ? "bg-black text-white border-black"
+              onClick={() => {
+                setFilter(f.value);
+                setPage(1);
+              }}
+              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                filter === f.value
+                  ? "bg-zinc-900 text-white border-zinc-900"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
               }`}
             >
@@ -220,73 +156,77 @@ export default function ActivityPage() {
           ))}
         </div>
 
-        {/* Log List */}
-        {paginated.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center border border-zinc-200 bg-white">
+        {/* log */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex items-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-zinc-300 animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : errorStatus === 403 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center border border-zinc-200 bg-white space-y-4">
+            <div className="w-14 h-14 border border-red-100 bg-red-50 flex items-center justify-center rounded-full">
+              <ShieldAlert className="w-6 h-6 text-red-600" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-sans font-black uppercase tracking-tight text-zinc-900 text-lg">
+                Access Denied
+              </h3>
+              <p className="font-mono text-sm text-zinc-500 max-w-sm mx-auto">
+                Security protocol CT-RBAC-01 prevents your account from auditing activity logs at
+                this privilege level.
+              </p>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center border border-zinc-200 bg-white">
             <div className="w-12 h-12 border border-zinc-200 bg-zinc-50 flex items-center justify-center mb-4">
               <Filter className="w-5 h-5 text-zinc-300" />
             </div>
-            <p className="font-mono font-semibold text-sm text-zinc-900 mb-1">No results</p>
-            <p className="font-mono text-xs text-zinc-500">Try adjusting your search or filter</p>
+            <p className="font-mono text-sm text-zinc-500">No activity yet.</p>
           </div>
         ) : (
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
-            {paginated.map((log) => {
-              const config = typeConfig[log.type];
-              const isAlert = log.type === "alert";
+            {filtered.map((entry) => {
+              const cfg = EVENT_CONFIG[entry.eventType] ?? {
+                icon: AppWindow,
+                color: "text-zinc-400",
+              };
+              const Icon = cfg.icon;
               return (
                 <div
-                  key={log.id}
-                  className={`flex items-start gap-4 p-5 group transition-all ${isAlert ? "bg-red-50 border-l-2 border-l-red-400 hover:bg-red-50/80" : "hover:bg-zinc-50"}`}
+                  key={entry.id}
+                  className="flex items-start gap-4 px-5 py-4 hover:bg-zinc-50 transition-colors"
                 >
-                  {/* Icon */}
-                  <div
-                    className={`w-9 h-9 flex items-center justify-center shrink-0 border mt-0.5 ${
-                      isAlert ? "border-red-200 bg-white" : "border-zinc-200 bg-zinc-50"
-                    }`}
-                  >
-                    <config.icon
-                      className={`w-4 h-4 ${isAlert ? "text-red-500" : "text-zinc-400"}`}
-                    />
+                  <div className="w-8 h-8 border border-zinc-100 bg-zinc-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className={`w-3.5 h-3.5 ${cfg.color}`} />
                   </div>
-
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-0.5 flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p
-                            className={`font-mono font-semibold text-base leading-none ${isAlert ? "text-red-700" : "text-zinc-900"}`}
-                          >
-                            {log.title}
-                          </p>
-                          {isAlert && (
-                            <span className="font-mono text-xs uppercase tracking-widest border border-red-300 bg-red-100 text-red-600 px-1.5 py-0.5 font-bold">
-                              Review
-                            </span>
-                          )}
-                        </div>
-                        <p
-                          className={`font-mono text-sm pt-0.5 ${isAlert ? "text-red-500/80" : "text-zinc-500"}`}
-                        >
-                          {log.detail}
+                      <div>
+                        <p className="font-mono font-semibold text-sm text-zinc-900 leading-tight">
+                          {entry.eventLabel}
                         </p>
+                        {entry.detail && (
+                          <p className="font-mono text-xs text-zinc-400 mt-0.5">{entry.detail}</p>
+                        )}
                       </div>
-                      <span className="font-mono text-sm text-zinc-400 whitespace-nowrap shrink-0">
-                        {log.timestamp}
+                      <span className="font-mono text-xs text-zinc-400 whitespace-nowrap shrink-0">
+                        {timeAgo(entry.createdAt)}
                       </span>
                     </div>
-
-                    {/* Meta row */}
-                    <div className="flex flex-wrap items-center gap-3 mt-2.5 font-mono text-sm text-zinc-400">
-                      <span className="border border-zinc-100 bg-zinc-50 px-2 py-0.5 text-zinc-500">
-                        {config.label}
-                      </span>
-                      <span>{log.device}</span>
-                      <span className="text-zinc-200">·</span>
-                      <span>{log.location}</span>
-                      <span className="text-zinc-200">·</span>
-                      <span>{log.ip}</span>
+                    <div className="flex flex-wrap items-center gap-2 mt-1.5 font-mono text-xs text-zinc-400">
+                      {entry.deviceName && <span>{entry.deviceName}</span>}
+                      {entry.deviceName && entry.ipAddress && (
+                        <span className="text-zinc-200">·</span>
+                      )}
+                      {entry.ipAddress && <span>{entry.ipAddress}</span>}
                     </div>
                   </div>
                 </div>
@@ -295,30 +235,31 @@ export default function ActivityPage() {
           </div>
         )}
 
-        {/* Pagination */}
+        {/* pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
-            <span className="font-mono text-sm text-zinc-500">
-              {filtered.length} event{filtered.length !== 1 ? "s" : ""} · page {page} of{" "}
+            <span className="font-mono text-xs text-zinc-400">
+              {filter === "all" ? total : filtered.length} event
+              {(filter === "all" ? total : filtered.length) !== 1 ? "s" : ""} · page {page} of{" "}
               {totalPages}
             </span>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="h-8 rounded-none border-zinc-200 font-mono text-xs px-4 hover:border-zinc-900 disabled:opacity-30"
+              <button
+                type="button"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
+                className="h-8 px-4 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Prev
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 rounded-none border-zinc-200 font-mono text-xs px-4 hover:border-zinc-900 disabled:opacity-30"
+              </button>
+              <button
+                type="button"
                 onClick={() => setPage((p) => p + 1)}
-                disabled={page === totalPages}
+                disabled={page === totalPages || (filter !== "all" && filtered.length < PAGE_SIZE)}
+                className="h-8 px-4 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Next
-              </Button>
+              </button>
             </div>
           </div>
         )}

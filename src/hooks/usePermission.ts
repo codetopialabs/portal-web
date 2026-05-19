@@ -1,7 +1,7 @@
 "use client";
 
-import { useUserStore } from "@/store/user.store";
 import { resolvePermission } from "@/lib/permissions";
+import { useUserStore } from "@/store/user.store";
 
 /**
  * Check if the current user has a specific permission.

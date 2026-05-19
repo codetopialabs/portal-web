@@ -11,9 +11,9 @@ const criteria = [
 ];
 
 const strengthConfig = [
-  { label: "Weak",   color: "bg-red-500" },
-  { label: "Fair",   color: "bg-orange-400" },
-  { label: "Good",   color: "bg-yellow-400" },
+  { label: "Weak", color: "bg-red-500" },
+  { label: "Fair", color: "bg-orange-400" },
+  { label: "Good", color: "bg-yellow-400" },
   { label: "Strong", color: "bg-emerald-500" },
 ];
 
@@ -22,7 +22,8 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
 
   const passed = criteria.filter((c) => c.test(password)).length;
   // 0 passed → index -1 (no bar), 1-2 → Weak, 3 → Fair, 4 → Good, 5 → Strong
-  const strengthIndex = passed === 0 ? -1 : passed <= 2 ? 0 : passed === 3 ? 1 : passed === 4 ? 2 : 3;
+  const strengthIndex =
+    passed === 0 ? -1 : passed <= 2 ? 0 : passed === 3 ? 1 : passed === 4 ? 2 : 3;
   const strength = strengthIndex >= 0 ? strengthConfig[strengthIndex] : null;
 
   return (
@@ -35,7 +36,9 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
       </div>
 
       {strength && (
-        <p className={`text-xs font-mono ${strengthConfig[strengthIndex].color.replace("bg-", "text-")}`}>
+        <p
+          className={`text-xs font-mono ${strengthConfig[strengthIndex].color.replace("bg-", "text-")}`}
+        >
           {strength.label}
         </p>
       )}
@@ -46,9 +49,11 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
           const ok = c.test(password);
           return (
             <li key={c.label} className="flex items-center gap-2 text-xs font-mono">
-              {ok
-                ? <Check className="w-3 h-3 text-emerald-500 shrink-0" />
-                : <X className="w-3 h-3 text-zinc-600 shrink-0" />}
+              {ok ? (
+                <Check className="w-3 h-3 text-emerald-500 shrink-0" />
+              ) : (
+                <X className="w-3 h-3 text-zinc-600 shrink-0" />
+              )}
               <span className={ok ? "text-zinc-300" : "text-zinc-500"}>{c.label}</span>
             </li>
           );

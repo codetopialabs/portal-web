@@ -28,6 +28,7 @@ export interface UserProfile {
   referralSource: string | null;
   location: string | null;
   dateOfBirth: string | null;
+  completedWalkthroughs: string[];
 }
 
 export interface CommunityMember {
@@ -76,6 +77,7 @@ export interface UpdateMeRequest {
   is_onboarded?: boolean;
   profile_picture_url?: string;
   cover_image_url?: string;
+  completed_walkthroughs?: string[];
 }
 
 interface UploadSignature {
@@ -98,7 +100,9 @@ export const UserService = {
   },
 
   async getMemberByUsername(username: string): Promise<CommunityMember> {
-    const response = await axiosInstance.get<{ data: CommunityMember }>(`/users/members/${username}/`);
+    const response = await axiosInstance.get<{ data: CommunityMember }>(
+      `/users/members/${username}/`
+    );
     return response.data.data;
   },
 
@@ -108,7 +112,9 @@ export const UserService = {
   },
 
   async uploadAvatar(file: File): Promise<string> {
-    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>("/auth/cloudinary-signature/");
+    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>(
+      "/auth/cloudinary-signature/"
+    );
     const sig = sigResponse.data.data;
     const form = new FormData();
     form.append("file", file);
@@ -128,7 +134,9 @@ export const UserService = {
   async uploadCoverImage(file: File): Promise<string> {
     // Reuse the same signature endpoint — Cloudinary folder is per-user,
     // we just append /cover to distinguish from the avatar
-    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>("/auth/cloudinary-signature/");
+    const sigResponse = await axiosInstance.get<{ data: UploadSignature }>(
+      "/auth/cloudinary-signature/"
+    );
     const sig = sigResponse.data.data;
     const form = new FormData();
     form.append("file", file);

@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import matter from "gray-matter";
 
 const DOCS_PATH = path.join(process.cwd(), "docs");
@@ -32,7 +32,7 @@ export interface NavCategory {
 
 export async function getDocBySlug(slug: string[]): Promise<DocContent | null> {
   try {
-    const fullPath = path.join(DOCS_PATH, ...slug) + ".md";
+    const fullPath = `${path.join(DOCS_PATH, ...slug)}.md`;
     if (!fs.existsSync(fullPath)) {
       // Try directory index
       const indexPath = path.join(DOCS_PATH, ...slug, "index.md");
@@ -42,7 +42,7 @@ export async function getDocBySlug(slug: string[]): Promise<DocContent | null> {
       return null;
     }
     return readDocFile(fullPath, slug);
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }
@@ -80,15 +80,15 @@ export async function getNavTree(): Promise<NavCategory[]> {
         const slug = [...currentSlug, file.replace(/\.md$/, "")];
         // Skip index files if they are handled by the directory slug
         if (file === "index.md" && currentSlug.length > 0) continue;
-        
+
         const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data } = matter(fileContents);
-        
+
         const category = data.category || currentSlug[0] || "General";
         const title = data.title || slug[slug.length - 1];
-        
+
         if (!categories[category]) categories[category] = [];
-        
+
         categories[category].push({
           title,
           href: `/docs/${slug.join("/")}`,

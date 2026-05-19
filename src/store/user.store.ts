@@ -1,9 +1,5 @@
 import { create } from "zustand";
-import {
-  type UserProfile,
-  type UpdateMeRequest,
-  UserService,
-} from "@/services/user.service";
+import { type UpdateMeRequest, type UserProfile, UserService } from "@/services/user.service";
 
 interface UserState {
   profile: UserProfile | null;
@@ -34,21 +30,19 @@ export const useUserStore = create<UserState>((set) => ({
   },
 
   updateMe: async (data: UpdateMeRequest) => {
-    try {
-      const profile = await UserService.updateMe(data);
-      set({ profile });
-    } catch (err) {
-      throw err;
-    }
+    const profile = await UserService.updateMe(data);
+    set({ profile });
   },
 
   setOnboarded: () => {
     set({ isOnboarded: true });
+    // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for onboarding flag
     document.cookie = "isOnboarded=true; path=/; max-age=2592000; SameSite=Lax";
   },
 
   reset: () => {
     set({ profile: null, isOnboarded: false, isLoading: false, error: null });
+    // biome-ignore lint/suspicious/noDocumentCookie: legacy cookie storage for onboarding flag
     document.cookie = "isOnboarded=; path=/; max-age=0";
   },
 }));

@@ -2,14 +2,12 @@
 
 import { cn } from "@/lib/utils";
 
-export type CommunityTab = "members" | "events" | "programs" | "projects" | "resources";
+export type CommunityTab = "members" | "events" | "projects";
 
 export const COMMUNITY_TABS: { id: CommunityTab; label: string }[] = [
   { id: "members", label: "Members" },
   { id: "events", label: "Events" },
-  { id: "programs", label: "Programs" },
   { id: "projects", label: "Projects" },
-  { id: "resources", label: "Resources" },
 ];
 
 export function getCommunityTab(value: string | null): CommunityTab {
@@ -23,7 +21,7 @@ interface CommunityTabsProps {
 
 export function CommunityTabs({ activeTab, onTabChange }: CommunityTabsProps) {
   return (
-    <div className="flex overflow-x-auto border-b border-zinc-200">
+    <div className="flex overflow-x-auto overflow-y-hidden border-b border-zinc-200">
       {COMMUNITY_TABS.map((tab) => (
         <button
           key={tab.id}

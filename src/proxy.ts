@@ -1,7 +1,17 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const PROTECTED_ROUTES = ["/", "/community", "/activity", "/mentorship", "/programs", "/resources", "/settings", "/settings/profile", "/settings/security", "/settings/apps"];
+const PROTECTED_ROUTES = [
+  "/",
+  "/community",
+  "/activity",
+  "/mentorship",
+  "/resources",
+  "/settings",
+  "/settings/profile",
+  "/settings/security",
+  "/settings/apps",
+];
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export function proxy(request: NextRequest) {
@@ -58,7 +68,6 @@ export const config = {
     "/community/:path*",
     "/activity/:path*",
     "/mentorship/:path*",
-    "/programs/:path*",
     "/resources/:path*",
     "/settings/:path*",
     "/login",

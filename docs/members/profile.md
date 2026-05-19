@@ -9,7 +9,6 @@ These fields are visible to anyone on the platform:
 | Field | Description |
 |---|---|
 | Full name | Member's display name |
-| Community ID | Unique identifier in format `CT{8hex}{2yr}` e.g. `CT935C448C26` |
 | Avatar | Profile photo |
 | Cover image | Banner image behind the avatar |
 | Bio | Short description |
@@ -32,6 +31,7 @@ These fields are stored but never displayed on the public profile:
 
 - Date of birth
 - Email address
+- Community ID
 - Referral source
 - Primary goal
 - Community goals
@@ -42,6 +42,6 @@ Members edit their own profile at Settings → Profile. Changes are saved immedi
 
 ## Profile URL
 
-Public profiles are accessible at `/members/[username]/public-profile`.
+Public profiles are accessible at `/@username`.
 
 Any authenticated member can view any other member's public profile.
