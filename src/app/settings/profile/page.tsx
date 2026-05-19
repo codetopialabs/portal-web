@@ -4,7 +4,7 @@ import type { DriveStep } from "driver.js";
 import { Camera, Cpu, Globe, Loader2, MapPin, Plus, User, X } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   FaBehance,
   FaCodepen,
@@ -23,9 +23,17 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 import { toast } from "sonner";
+import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { getAvatarUrl } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
@@ -122,6 +130,7 @@ interface ProfileFormValues {
   username: string;
   location: string;
   current_role: string;
+  primary_role: string;
   date_of_birth: string;
   bio: string;
   discord_username: string;
@@ -309,6 +318,7 @@ export default function SettingsProfilePage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isSubmitting, isDirty },
     reset,
   } = useForm<ProfileFormValues>({
@@ -317,6 +327,7 @@ export default function SettingsProfilePage() {
       username: profile?.username ?? "",
       location: profile?.location ?? "",
       current_role: profile?.currentRole ?? "",
+      primary_role: profile?.primaryRole ?? "",
       date_of_birth: profile?.dateOfBirth ?? "",
       bio: profile?.bio ?? "",
       discord_username: profile?.discordUsername ?? "",
@@ -343,6 +354,7 @@ export default function SettingsProfilePage() {
         username: data.username.trim(),
         location: data.location.trim() || undefined,
         current_role: data.current_role.trim() || undefined,
+        primary_role: data.primary_role,
         date_of_birth: data.date_of_birth || undefined,
         bio: data.bio.trim() || undefined,
         discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
@@ -521,6 +533,49 @@ export default function SettingsProfilePage() {
                 placeholder="e.g. Frontend Developer, CS student, Freelance designer"
                 className={inputStyles}
                 {...register("current_role")}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="primary-role" className={labelStyles}>
+                Primary Community Role
+              </Label>
+              <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
+                Identify yourself with one of your assigned roles to the community.
+              </p>
+              <Controller
+                control={control}
+                name="primary_role"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                  >
+                    <SelectTrigger
+                      id="primary-role"
+                      className="h-11 w-full rounded-none border border-zinc-200 bg-white px-3 font-mono text-sm focus:border-zinc-900 transition-all focus:ring-0 focus-visible:ring-0 outline-none shadow-none text-left flex justify-between items-center text-zinc-900 dark:bg-white dark:text-zinc-900"
+                    >
+                      <SelectValue placeholder="None (Default)" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-[200px]">
+                      <SelectItem
+                        value="none"
+                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                      >
+                        None (Default)
+                      </SelectItem>
+                      {profile?.roles?.map((role) => (
+                        <SelectItem
+                          key={role}
+                          value={role}
+                          className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                        >
+                          {formatRoleLabel(role)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
             </div>
 

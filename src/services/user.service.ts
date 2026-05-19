@@ -22,6 +22,7 @@ export interface UserProfile {
   experienceLevel: string | null;
   memberStatus: string | null;
   currentRole: string | null;
+  primaryRole: string | null;
   discordUsername: string | null;
   primaryGoal: string | null;
   communityGoals: string[];
@@ -45,6 +46,7 @@ export interface CommunityMember {
   location: string;
   experienceLevel: string;
   currentRole: string;
+  primaryRole: string;
   discordUsername: string;
   githubHandle: string;
   twitterHandle: string;
@@ -68,6 +70,7 @@ export interface UpdateMeRequest {
   experience_level?: string;
   member_status?: string;
   current_role?: string;
+  primary_role?: string;
   discord_username?: string;
   primary_goal?: string;
   community_goals?: string[];
