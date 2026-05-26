@@ -27,12 +27,12 @@ Roles are how permissions get assigned to members. A role is a named bundle of p
 You can use wildcards when building a role to grant broad access:
 
 ```
-members.*   → all members permissions (except destructive)
+users.*   → all user permissions (except destructive)
 *.view      → view access on every resource
 *           → everything (except destructive) — use carefully
 ```
 
-Destructive permissions (`members.deactivate`, `roles.delete`) must always be listed explicitly.
+Destructive permissions (`users.suspend`, `users.delete`, `roles.delete`) must always be listed explicitly.
 
 ## Primary Community Role
 

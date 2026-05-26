@@ -8,7 +8,7 @@ order: 2
 
 Every permission codename in the system. This list is the source of truth for what actions exist.
 
-Permissions are served to the frontend via `GET /api/v1/permissions/` — the admin role builder reads from this endpoint.
+Permissions are served to the frontend via `GET /api/v1/auth/admin/permissions/` — the admin role builder reads from this endpoint.
 
 > **When adding a new permission:** add it here, in `AGENTS.md`, and in `apps/common/permissions.py` on the backend.
 
@@ -17,9 +17,12 @@ Permissions are served to the frontend via `GET /api/v1/permissions/` — the ad
 | Codename | Description | Destructive |
 |---|---|---|
 | `admin.panel.access` | Access the admin panel | No |
-| `members.view` | View member list and profiles | No |
-| `members.edit` | Edit any member's profile | No |
-| `members.deactivate` | Deactivate a member account | **Yes** |
+| `users.view` | View all users in the system | No |
+| `users.create` | Create a new user manually | No |
+| `users.edit` | Edit another user's profile/data | No |
+| `users.delete` | Delete a user permanently | **Yes** |
+| `users.suspend` | Suspend/deactivate a user account | **Yes** |
+| `users.reactivate` | Reactivate a suspended user account | No |
 | `roles.view` | View all roles | No |
 | `roles.create` | Create new roles | No |
 | `roles.edit` | Edit existing roles | No |
@@ -28,10 +31,15 @@ Permissions are served to the frontend via `GET /api/v1/permissions/` — the ad
 | `roles.revoke` | Remove roles from members | No |
 | `profile.view` | View public profiles | No |
 | `profile.edit` | Edit own profile | No |
+| `profiles.view` | View managed profile records | No |
+| `profiles.edit` | Edit another user's profile details | No |
 | `permissions.view` | View the master permission list | No |
 | `activity.view` | View own activity log | No |
+| `activity.view_any` | View activity logs for other users | No |
 | `security.view` | View own active sessions | No |
 | `security.revoke` | Revoke own sessions | No |
+| `sessions.view_any` | View sessions for other users | No |
+| `sessions.revoke_any` | Revoke sessions for other users | No |
 | `docs.view` | View the community documentation portal | No |
 
 ## Planned permissions (Coming Soon features)

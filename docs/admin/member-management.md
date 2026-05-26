@@ -9,6 +9,7 @@ Go to Admin Panel → Members. The list shows:
 - Full name
 - Email
 - Assigned roles
+- Account status
 - Verification status
 - Join date
 
@@ -29,15 +30,39 @@ The assignment is recorded with the assigning admin's identity for audit purpose
 2. Find the role under their current roles
 3. Click "Remove" — the role is revoked immediately
 
-## Deactivating a member
+## Suspending a member
 
-Requires the `members.deactivate` permission (must be explicitly granted — wildcards don't cover this).
+Requires the `users.suspend` permission (must be explicitly granted — wildcards don't cover this).
 
 1. Open the member's detail view
-2. Click "Deactivate Account"
+2. Click "Suspend"
 3. Confirm — the member is immediately signed out of all sessions and cannot sign in again
 
-Deactivation is logged in the activity log. It is not reversible from the UI in v1 — contact a developer to reactivate.
+Suspension is logged in the activity log.
+
+## Reactivating a member
+
+Requires the `users.reactivate` permission.
+
+1. Open the suspended member's detail view
+2. Click "Reactivate"
+3. Confirm — the member can sign in again immediately
+
+## Deleting a member
+
+Requires the `users.delete` permission (must be explicitly granted — wildcards don't cover this).
+
+1. Open the member's detail view
+2. Click "Delete"
+3. Confirm — the account is permanently removed
+
+## Viewing and revoking member sessions
+
+Requires `sessions.view_any` to view sessions and `sessions.revoke_any` to revoke them.
+
+1. Open the member's detail view
+2. Scroll to Active Sessions
+3. Click "Revoke" on a specific session or "Revoke All" to sign out every device
 
 ## See also
 

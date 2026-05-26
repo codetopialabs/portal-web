@@ -15,7 +15,7 @@ Requires: `roles.view`
 
 ### Members
 View and manage community members — search, filter, assign roles.  
-Requires: `members.view`  
+Requires: `users.view`  
 → See [Member Management](./member-management.md)
 
 ## Coming Soon sections
@@ -41,8 +41,13 @@ The admin panel does not have a single "admin" role. Access to each section is c
 - Creating roles → `roles.create`
 - Editing roles → `roles.edit`
 - Assigning roles → `roles.assign`
-- Seeing the members section → `members.view`
-- Editing members → `members.edit`
-- Deactivating members → `members.deactivate` (must be explicit — no wildcards)
+- Seeing the members section → `users.view`
+- Editing members → `users.edit`
+- Suspending members → `users.suspend` (must be explicit — no wildcards)
+- Reactivating members → `users.reactivate`
+- Deleting members → `users.delete` (must be explicit — no wildcards)
+- Viewing member sessions → `sessions.view_any`
+- Revoking member sessions → `sessions.revoke_any`
+- Viewing org-wide activity logs → `activity.view_any`
 
-A member can have `admin.panel.access` and `members.view` without having `roles.view` — they'd see the admin panel and the members section but not the roles section.
+A member can have `admin.panel.access` and `users.view` without having `roles.view` — they'd see the admin panel and the members section but not the roles section.

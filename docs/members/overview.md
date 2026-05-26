@@ -40,14 +40,14 @@ Once onboarded, the member sees their personalised portal. What they see depends
 - Members with `admin.panel.access`: Admin Panel
 - Other sections unlock as roles are assigned
 
-## Account deactivation
+## Account suspension
 
-An admin with `members.deactivate` permission can deactivate a member account. This:
+An admin with `users.suspend` permission can suspend a member account. This:
 - Prevents the member from signing in
 - Revokes all active sessions immediately
 - Is logged in the activity log
 
-Deactivation is a destructive action — it cannot be granted via wildcard.
+Suspension is a destructive action — it cannot be granted via wildcard.
 
 ## See also
 

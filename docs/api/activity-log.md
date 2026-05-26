@@ -4,7 +4,7 @@ Every significant action on a member account is recorded in the activity log. Lo
 
 ## Viewing the log
 
-Activity logs are accessible to admins via the Admin Panel (Coming Soon in v1). Members can see their own recent activity in Settings → Security.
+Activity logs are accessible to admins via the Activity page when they have `activity.view_any`. Members can see their own recent activity in Settings → Security.
 
 ## Event types
 
@@ -48,9 +48,12 @@ Activity logs are accessible to admins via the Admin Panel (Coming Soon in v1). 
 | `role_assigned` | Admin assigns a role to a member |
 | `role_revoked` | Admin removes a role from a member |
 | `role_created` | Admin creates a new role |
-| `role_edited` | Admin edits a role's permissions |
+| `role_updated` | Admin edits a role's permissions |
 | `role_deleted` | Admin deletes a role |
-| `member_deactivated` | Admin deactivates a member account |
+| `user_updated` | Admin edits a member account |
+| `user_suspended` | Admin suspends a member account |
+| `user_reactivated` | Admin reactivates a member account |
+| `user_deleted` | Admin deletes a member account |
 
 ### OAuth and API key events (Coming Soon)
 

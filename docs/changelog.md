@@ -4,6 +4,80 @@ category: General
 order: 1
 ---
 
+## [2026-05-26] Role slug admin URLs
+
+**What changed:** Updated admin role detail, edit, update, and delete flows to use the role slug instead of the numeric role ID.
+**Affected areas:** Admin Roles, Permission System docs.
+**Permissions added:** none.
+**Breaking changes:** Yes - admin role URLs now use `/admin/roles/[slug]` and `/admin/roles/[slug]/edit`.
+
+## [2026-05-26] Role permission detail accordions
+
+**What changed:** Reworked the role detail permissions view into resource-based accordions that expand wildcard grants and explain unrestricted access.
+**Affected areas:** Admin Roles.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin roles list polish
+
+**What changed:** Refined the admin roles list with boxy summary stats, clearer search/filter controls, role risk labels, and more readable role rows.
+**Affected areas:** Admin Roles.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Role assignment permission previews
+
+**What changed:** Added plain-English permission previews when assigning or revoking member roles so admins can understand what access a role grants or removes before confirming.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin member edit polish
+
+**What changed:** Refined the admin member edit page with a wider boxy layout, member preview header, grouped profile fields, account state panel, and clearer save controls.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin member detail polish
+
+**What changed:** Refined the individual admin member page into a GitHub-style profile layout and moved risky account/session controls into a red bottom danger zone with typed confirmation before every dangerous action.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin members list polish
+
+**What changed:** Refined the admin members list with calmer visual styling, clearer member rows, summary stats, readable filters, and friendlier empty/error states.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-27] Admin High-Fidelity Detail & Security Refactor
+
+**What changed:** Migrated admin member management from UUIDs to human-readable usernames in URLs. Rebuilt the member detail page with a high-fidelity "boxy" UI and implemented typed confirmation guards for all destructive administrative actions.
+**Affected areas:** Admin Panel (/admin/members/[username]), User Profiles (/@username).
+**Permissions added:** None.
+**Breaking changes:** Yes — URLs for admin member detail have changed from `/admin/members/[id]` to `/admin/members/[username]`.
+
+## [2026-05-26] Admin members table refresh
+
+**What changed:** Redesigned the admin members list with avatar-based rows, compact status chips, and client-side pagination controls.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin wiring alignment and org activity view
+
+**What changed:** Aligned admin roles/members UI with the updated backend endpoints, added org-wide activity viewing, and introduced session management for member accounts.  
+**Affected areas:** Admin Members, Admin Roles, Activity Log, Permission System, Docs.  
+**Permissions added:** `users.*`, `sessions.view_any`, `sessions.revoke_any`, `activity.view_any` (replacing `members.*` in the UI).  
+**Breaking changes:** Yes — permission codenames in the frontend now use `users.*` instead of `members.*`.  
+title: Changelog
+category: General
+order: 1
+---
+
 # Changelog
 
 All notable changes to the Codetopia Community Portal are documented here.

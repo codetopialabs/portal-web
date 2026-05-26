@@ -9,7 +9,8 @@ The role builder lets admins create and edit roles without any code changes.
    - **Name** — a unique slug, e.g. `event_organizer` (lowercase letters, numbers, and underscores)
    - **Display name** — human-readable, e.g. "Event Organizer"
    - **Description** — optional, explains what this role is for
-3. Select permissions from the master list — permissions are grouped by resource namespace (e.g. all `members.*` permissions together, all `roles.*` together)
+   - **Rank** — lower numbers mean higher authority
+3. Select permissions from the master list — permissions are grouped by resource namespace (e.g. all `users.*` permissions together, all `roles.*` together)
 4. Click Create Role
 
 The role is immediately available to assign to members.
@@ -28,7 +29,7 @@ Roles can be deleted unless they are system roles (`member`, `core_member`). Del
 
 When selecting permissions, you can type a wildcard directly:
 
-- `members.*` — grants all members permissions except destructive ones
+- `users.*` — grants all user permissions except destructive ones
 - `*.view` — grants view access on every resource
 - `*` — grants everything except destructive permissions
 
@@ -36,7 +37,7 @@ Wildcards are stored as-is in the role's permission list and resolved at check t
 
 ## Destructive permissions
 
-`members.deactivate` and `roles.delete` must be selected explicitly — they do not appear when a wildcard is used. They are highlighted in the permission picker to make them easy to identify.
+`users.suspend`, `users.delete`, and `roles.delete` must be selected explicitly — they do not appear when a wildcard is used. They are highlighted in the permission picker to make them easy to identify.
 
 ## See also
 

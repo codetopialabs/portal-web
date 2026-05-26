@@ -39,7 +39,7 @@ Two methods are supported:
 Authorization: Bearer <access_token>
 ```
 
-Obtained from `POST /api/v1/auth/token/`. Expires after a configured period. Use the refresh token to get a new access token without re-authenticating.
+Obtained from `POST /api/v1/auth/login/`. Expires after a configured period. Use the refresh token to get a new access token without re-authenticating.
 
 ### API key (external devices and apps)
 
@@ -72,36 +72,41 @@ Selected read-heavy endpoints are cached in Redis with short TTLs. Writes immedi
 Every endpoint declares a required permission. Requests without the required permission receive HTTP 403.
 
 ```
-GET  /api/v1/users/          → requires members.view
-PATCH /api/v1/users/{id}/    → requires members.edit
-GET  /api/v1/roles/          → requires roles.view
-POST /api/v1/roles/          → requires roles.create
+GET  /api/v1/users/members/  → requires profile.view
+GET  /api/v1/auth/admin/users/ → requires users.view
+GET  /api/v1/auth/admin/roles/ → requires roles.view
+POST /api/v1/auth/admin/roles/ → requires roles.create
 ```
 
 ## Key endpoints (v1)
 
 | Method | Endpoint | Permission | Description |
 |---|---|---|---|
-| POST | `/api/v1/auth/token/` | none | Sign in, get tokens |
+| POST | `/api/v1/auth/login/` | none | Sign in, get tokens |
 | POST | `/api/v1/auth/token/refresh/` | none | Refresh access token |
 | POST | `/api/v1/auth/register/` | none | Register new member |
-| GET | `/api/v1/users/me/` | authenticated | Get own profile + permissions |
-| PATCH | `/api/v1/users/me/` | authenticated | Update own profile |
-| GET | `/api/v1/users/` | `members.view` | List all members |
-| GET | `/api/v1/users/{id}/` | `members.view` | Get member detail |
-| PATCH | `/api/v1/users/{id}/` | `members.edit` | Edit member profile |
-| GET | `/api/v1/roles/` | `roles.view` | List all roles |
-| POST | `/api/v1/roles/` | `roles.create` | Create a role |
-| GET | `/api/v1/roles/{id}/` | `roles.view` | Get role detail |
-| PATCH | `/api/v1/roles/{id}/` | `roles.edit` | Edit a role |
-| DELETE | `/api/v1/roles/{id}/` | `roles.delete` | Delete a role |
-| POST | `/api/v1/users/{id}/roles/` | `roles.assign` | Assign role to member |
-| DELETE | `/api/v1/users/{id}/roles/{role_id}/` | `roles.revoke` | Remove role from member |
-| GET | `/api/v1/permissions/` | `permissions.view` | Get master permission list |
-| GET | `/api/v1/admin/members/` | `members.view` | List community members for admins |
-| GET | `/api/v1/admin/members/{id}/` | `members.view` | Get admin member detail |
-| PATCH | `/api/v1/admin/members/{id}/` | `members.edit` | Update member profile fields |
-| POST | `/api/v1/admin/members/{id}/deactivate/` | `members.deactivate` | Deactivate a member account |
+| GET | `/api/v1/auth/me/` | authenticated | Get own profile + permissions |
+| PATCH | `/api/v1/auth/me/` | authenticated | Update own profile |
+| GET | `/api/v1/users/members/` | `profile.view` | List community members |
+| GET | `/api/v1/users/members/{username}/` | `profile.view` | Get member profile |
+| GET | `/api/v1/auth/admin/roles/` | `roles.view` | List all roles |
+| POST | `/api/v1/auth/admin/roles/` | `roles.create` | Create a role |
+| GET | `/api/v1/auth/admin/roles/{slug}/` | `roles.view` | Get role detail |
+| PATCH | `/api/v1/auth/admin/roles/{slug}/` | `roles.edit` | Edit a role |
+| DELETE | `/api/v1/auth/admin/roles/{slug}/` | `roles.delete` | Delete a role |
+| POST | `/api/v1/auth/admin/roles/assign/` | `roles.assign` | Assign role to member |
+| POST | `/api/v1/auth/admin/roles/revoke/` | `roles.revoke` | Remove role from member |
+| GET | `/api/v1/auth/admin/permissions/` | `permissions.view` | Get master permission list |
+| GET | `/api/v1/auth/admin/users/` | `users.view` | List community members for admins |
+| GET | `/api/v1/auth/admin/users/{id}/` | `users.view` | Get admin member detail |
+| PATCH | `/api/v1/auth/admin/users/{id}/` | `users.edit` | Update member profile fields |
+| DELETE | `/api/v1/auth/admin/users/{id}/` | `users.delete` | Delete a member account |
+| POST | `/api/v1/auth/admin/users/{id}/suspend/` | `users.suspend` | Suspend a member account |
+| POST | `/api/v1/auth/admin/users/{id}/reactivate/` | `users.reactivate` | Reactivate a member account |
+| GET | `/api/v1/auth/admin/users/{id}/sessions/` | `sessions.view_any` | List member sessions |
+| POST | `/api/v1/auth/admin/users/{id}/sessions/{sessionId}/revoke/` | `sessions.revoke_any` | Revoke a session |
+| POST | `/api/v1/auth/admin/users/{id}/sessions/revoke-all/` | `sessions.revoke_any` | Revoke all sessions |
+| GET | `/api/v1/auth/admin/activity/` | `activity.view_any` | List org activity logs |
 
 > **When adding a new endpoint:** add it to this table and update `docs/changelog.md`.
 

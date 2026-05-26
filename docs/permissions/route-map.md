@@ -20,11 +20,11 @@ Every protected page in the portal declares the permission required to access it
 | `/admin` | `admin.panel.access` | Any member with this permission |
 | `/admin/roles` | `roles.view` | |
 | `/admin/roles/new` | `roles.create` | |
-| `/admin/roles/[id]` | `roles.view` | |
-| `/admin/roles/[id]/edit` | `roles.edit` | |
-| `/admin/members` | `members.view` | |
-| `/admin/members/[id]` | `members.view` | |
-| `/admin/members/[id]/edit` | `members.edit` | |
+| `/admin/roles/[slug]` | `roles.view` | |
+| `/admin/roles/[slug]/edit` | `roles.edit` | |
+| `/admin/members` | `users.view` | |
+| `/admin/members/[username]` | `users.view` | |
+| `/admin/members/[username]/edit` | `users.edit` | |
 | `/@username` | `profile.view` | Any authenticated member |
 | `/settings/profile` | `profile.edit` | Own profile |
 | `/settings/security` | `security.view` | Own sessions and password settings |
