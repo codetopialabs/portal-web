@@ -23,7 +23,7 @@ const BASE_MENU_GROUPS: NavGroup[] = [
 ];
 
 const ADMIN_MENU_GROUP: NavGroup = {
-  label: "Admin",
+  label: "Panels",
   items: [
     {
       icon: ShieldCheck,

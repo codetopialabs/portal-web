@@ -184,21 +184,20 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
 
   return (
     <section className="overflow-hidden border border-zinc-200 bg-white">
-      <div className="relative h-32 sm:h-40 bg-zinc-950 text-white overflow-hidden">
+      <div className="relative h-32 sm:h-40 bg-zinc-100 border-b border-zinc-200 overflow-hidden">
         {/* biome-ignore lint/performance/noImgElement: user-provided image */}
         <img
           src={getCoverUrl(member.coverImageUrl, member.fullName)}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-45"
+          className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-multiply"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-        <div className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-300">
-          <span className="inline-flex items-center gap-1.5 border border-white/15 bg-black/40 px-2.5 py-1 backdrop-blur-sm">
+        <div className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.2em]">
+          <span className="inline-flex items-center gap-1.5 border border-zinc-900 bg-zinc-900 text-white px-2.5 py-1">
             <Sparkles className="h-3 w-3 text-amber-300" />
             Featured member
           </span>
-          <span className="inline-flex items-center gap-1.5 border border-white/15 bg-black/40 px-2.5 py-1 backdrop-blur-sm">
+          <span className="inline-flex items-center gap-1.5 border border-zinc-200 bg-white text-zinc-600 px-2.5 py-1">
             — Recently joined
           </span>
         </div>
@@ -210,7 +209,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <Link
                 href={`/@${member.username}`}
-                className="relative -mt-12 sm:-mt-16 h-24 w-24 shrink-0 border-4 border-white bg-white p-0.5 overflow-hidden shadow-sm sm:h-28 sm:w-28"
+                className="relative -mt-12 sm:-mt-16 h-24 w-24 shrink-0 border-[3px] border-white bg-white p-0.5 overflow-hidden shadow-sm sm:h-28 sm:w-28"
               >
                 {/* biome-ignore lint/performance/noImgElement: user avatar */}
                 <img
@@ -237,7 +236,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
 
                 <Link
                   href={`/@${member.username}`}
-                  className="mt-3 sm:mt-0 inline-flex h-9 w-fit shrink-0 items-center gap-2 border border-zinc-900 bg-zinc-900 px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800"
+                  className="mt-3 sm:mt-0 inline-flex h-9 w-fit shrink-0 items-center gap-2 border border-zinc-900 bg-zinc-900 px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800 hover:text-white"
                 >
                   View profile
                   <ArrowRight className="h-3.5 w-3.5" />

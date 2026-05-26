@@ -1,9 +1,9 @@
 "use client";
 
-import { ChevronLeft, ShieldCheck, Sparkles, ShieldPlus, AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronLeft, FilePenLine } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreateRole, usePermissionList } from "@/hooks/useAdmin";
+import { useRole as useAdminRole, usePermissionList, useUpdateRole } from "@/hooks/useAdmin";
 import type { PermissionEntry } from "@/services/admin.service";
 
 // ─── Permission picker ────────────────────────────────────────────────────────
@@ -118,45 +118,39 @@ function PermissionPicker({
 
 // ─── Form ─────────────────────────────────────────────────────────────────────
 
-const SLUG_REGEX = /^[a-z0-9_]+$/;
-
-function NewRoleForm() {
+function RoleEditForm({ slug }: { slug: string }) {
   const router = useRouter();
-  const { mutate: createRole, isPending } = useCreateRole();
+  const { data: role, isLoading, isError } = useAdminRole(slug);
+  const { mutate: updateRole, isPending } = useUpdateRole();
 
-  const [name, setName] = useState("");
+  const [initialized, setInitialized] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
   const [rank, setRank] = useState("");
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [errors, setErrors] = useState<{ displayName?: string; rank?: string; form?: string }>({});
 
-  const [errors, setErrors] = useState<{
-    name?: string;
-    displayName?: string;
-    rank?: string;
-    form?: string;
-  }>({});
+  useEffect(() => {
+    if (role && !initialized) {
+      setDisplayName(role.displayName ?? "");
+      setDescription(role.description ?? "");
+      setRank(String(role.rank ?? ""));
+      setPermissions(role.permissions ?? []);
+      setInitialized(true);
+    }
+  }, [role, initialized]);
 
   function validate(): boolean {
     const next: typeof errors = {};
-
-    if (!name.trim()) {
-      next.name = "Identifier is required.";
-    } else if (!SLUG_REGEX.test(name)) {
-      next.name = "Identifier must be lowercase letters, numbers, and underscores only.";
-    }
-
     if (!displayName.trim()) {
       next.displayName = "Display name is required.";
     }
-
     const rankValue = Number(rank);
     if (!rank.trim()) {
       next.rank = "Rank is required.";
     } else if (Number.isNaN(rankValue) || rankValue < 1 || rankValue > 99) {
       next.rank = "Rank must be a number between 1 and 99.";
     }
-
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -165,35 +159,42 @@ function NewRoleForm() {
     e.preventDefault();
     if (!validate()) return;
 
-    createRole(
+    updateRole(
       {
-        name: name.trim(),
-        displayName: displayName.trim(),
-        description: description.trim(),
-        rank: Number(rank),
-        permissions,
+        slug,
+        data: {
+          displayName: displayName.trim(),
+          description: description.trim(),
+          rank: Number(rank),
+          permissions,
+        },
       },
       {
-        onSuccess: () => {
-          toast.success("Role created successfully.");
-          router.push("/admin/roles");
+        onSuccess: (updatedRole) => {
+          toast.success("Role updated successfully.");
+          router.push(`/admin/roles/${updatedRole.name}`);
         },
-        onError: (err: unknown) => {
-          const status = (err as { response?: { status?: number } })?.response?.status;
-          if (status === 400) {
-            setErrors((prev) => ({
-              ...prev,
-              name: "Ident conflict: Role already exists.",
-            }));
-          } else {
-            setErrors((prev) => ({
-              ...prev,
-              form: "CORE_PROCESS_FAILURE: FAILED TO PERSIST ROLE",
-            }));
-          }
+        onError: () => {
+          setErrors((prev) => ({
+            ...prev,
+            form: "CORE_PROCESS_FAILURE: FAILED TO UPDATE ROLE",
+          }));
         },
       }
     );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <Skeleton className="h-40 w-full rounded-none" />
+        <Skeleton className="h-80 w-full rounded-none" />
+      </div>
+    );
+  }
+
+  if (isError || !role) {
+    return <div className="bg-red-50 border border-red-200 p-8 text-center" />;
   }
 
   return (
@@ -202,12 +203,12 @@ function NewRoleForm() {
       <div className="bg-white border border-zinc-200">
         <div className="px-6 py-4 border-b border-zinc-200 bg-zinc-50/50">
           <h2 className="font-sans font-black uppercase tracking-widest text-xs text-zinc-900">
-            Authority Archetype Definition
+            Authority Archetype Revision
           </h2>
         </div>
         <div className="px-6 py-8 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Name */}
+            {/* Name (read-only) */}
             <div className="space-y-2">
               <Label
                 htmlFor="name"
@@ -217,22 +218,13 @@ function NewRoleForm() {
               </Label>
               <Input
                 id="name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
-                }}
-                placeholder="authority_id"
-                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all uppercase"
-                aria-invalid={!!errors.name}
+                value={role.name}
+                readOnly
+                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-100/50 text-zinc-400 cursor-not-allowed uppercase"
               />
-              {errors.name ? (
-                <p className="font-mono text-[10px] text-red-500 uppercase">{errors.name}</p>
-              ) : (
-                <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-tight">
-                  lowercase_only / numbers / underscores
-                </p>
-              )}
+              <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-tight italic">
+                LOCKED: RECORD_IDENT_IMMUTABLE
+              </p>
             </div>
 
             {/* Rank */}
@@ -253,8 +245,7 @@ function NewRoleForm() {
                   setRank(e.target.value);
                   if (errors.rank) setErrors((prev) => ({ ...prev, rank: undefined }));
                 }}
-                placeholder="10"
-                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all"
+                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all font-bold"
                 aria-invalid={!!errors.rank}
               />
               {errors.rank ? (
@@ -280,9 +271,10 @@ function NewRoleForm() {
               value={displayName}
               onChange={(e) => {
                 setDisplayName(e.target.value);
-                if (errors.displayName) setErrors((prev) => ({ ...prev, displayName: undefined }));
+                if (errors.displayName) {
+                  setErrors((prev) => ({ ...prev, displayName: undefined }));
+                }
               }}
-              placeholder="Official Role Title"
               className="font-sans text-sm font-black uppercase tracking-tight rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all"
               aria-invalid={!!errors.displayName}
             />
@@ -303,8 +295,8 @@ function NewRoleForm() {
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the responsibilities and scope of this role..."
               rows={3}
+              placeholder="Describe the responsibilities and scope of this role..."
               className="w-full border border-zinc-200 bg-zinc-50 px-4 py-3 font-mono text-xs text-zinc-700 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 focus:bg-white rounded-none transition-all resize-none shadow-inner"
             />
           </div>
@@ -319,7 +311,7 @@ function NewRoleForm() {
               Authority Grid Nodes
             </h2>
             <p className="font-mono text-[10px] text-zinc-400 mt-1 uppercase tracking-widest">
-              Assign permission vectors to this authority archetype.
+              Modify active permission vectors for this authority archetype.
             </p>
           </div>
           <p className="font-mono text-[10px] text-zinc-900 font-black uppercase tracking-widest">
@@ -346,13 +338,13 @@ function NewRoleForm() {
           disabled={isPending}
           className="w-full md:w-auto font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white bg-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-800 transition-all shadow-xl disabled:opacity-50"
         >
-          {isPending ? "BUFFERING_SYNCING…" : "INIT_ARCHETYPE"}
+          {isPending ? "BUFFERING_SYNCING…" : "SYNC_ARCHETYPE_CHANGES"}
         </button>
         <Link
-          href="/admin/roles"
+          href={`/admin/roles/${role.name}`}
           className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-colors"
         >
-          CANCEL_OPERATION
+          DISCARD_REVISIONS
         </Link>
       </div>
     </form>
@@ -361,45 +353,47 @@ function NewRoleForm() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-function NewRolePageContent() {
+function EditRolePageContent({ slug }: { slug: string }) {
   return (
     <div className="max-w-3xl mx-auto pb-20 px-4 md:px-0">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-8">
         <Link
-          href="/admin/roles"
+          href={`/admin/roles/${slug}`}
           className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1.5"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
-          BACK_TO_MATRICES
+          BACK_TO_ARCHETYPE
         </Link>
       </div>
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-12">
-        <div className="h-12 w-12 flex items-center justify-center border border-zinc-900 bg-zinc-900 text-white shadow-lg">
-          <ShieldPlus className="w-6 h-6" />
+        <div className="h-12 w-12 flex items-center justify-center border border-zinc-900 bg-white text-zinc-900 shadow-lg">
+          <FilePenLine className="w-6 h-6" />
         </div>
         <div>
           <h1 className="font-sans font-black uppercase tracking-tight text-3xl text-zinc-900">
-            Archetype Creation
+            Archetype Revision
           </h1>
           <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest mt-1">
-            Constructing a new authority matrix record
+            Modifying existing authority matrix parameters
           </p>
         </div>
       </div>
 
-      <NewRoleForm />
+      <RoleEditForm slug={slug} />
     </div>
   );
 }
 
-export default function NewRolePage() {
+export default function EditRolePage() {
+  const { slug } = useParams<{ slug: string }>();
+
   return (
-    <RouteGuard permission="roles.create">
+    <RouteGuard permission="roles.edit">
       <DashboardShell>
-        <NewRolePageContent />
+        <EditRolePageContent slug={slug} />
       </DashboardShell>
     </RouteGuard>
   );

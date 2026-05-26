@@ -3,33 +3,26 @@ export interface Role {
   name: string;
   displayName: string;
   description: string;
+  rank: number;
   permissions: string[];
   isSystem: boolean;
   memberCount: number;
 }
 
-export interface RoleMember {
-  id: string;
-  communityId: string;
-  username: string;
-  fullName: string;
-  profilePictureUrl: string | null;
-}
-
-export interface RoleDetail extends Role {
-  members: RoleMember[];
-}
+export type RoleDetail = Role;
 
 export interface CreateRoleInput {
   name: string;
   displayName: string;
   description?: string;
+  rank: number;
   permissions: string[];
 }
 
 export interface UpdateRoleInput {
   displayName?: string;
   description?: string;
+  rank?: number;
   permissions?: string[];
 }
 
@@ -38,45 +31,44 @@ export interface AdminMember {
   communityId: string;
   email: string;
   username: string;
-  fullName: string;
-  roles: string[];
+  profilePictureUrl?: string | null;
+  coverImageUrl?: string | null;
+  isActive: boolean;
   isEmailVerified: boolean;
-  joinedAt: string;
-}
-
-export interface AdminMemberDetail extends AdminMember {
+  isOnboarded: boolean;
+  fullName: string;
+  primaryRole: string | null;
+  primaryRoleRank: number | null;
+  roles: string[];
   bio: string | null;
-  discipline: string | null;
-  experienceLevel: string | null;
   skills: string[];
-  location: string | null;
-  discordUsername: string | null;
   githubHandle: string | null;
   twitterHandle: string | null;
   linkedinUrl: string | null;
   websiteUrl: string | null;
-  profilePictureUrl: string | null;
-  coverImageUrl: string | null;
+  discipline: string | null;
+  experienceLevel: string | null;
+  discordUsername: string | null;
   primaryGoal: string | null;
   communityGoals: string[];
-  memberStatus: string | null;
+  referralSource: string | null;
+  dateOfBirth: string | null;
+  location: string | null;
   currentRole: string | null;
+  memberStatus: string | null;
+  createdAt: string;
+  updatedAt: string;
+  joinedAt: string;
 }
 
+export type AdminMemberDetail = AdminMember;
+
 export interface UpdateMemberInput {
+  username?: string;
+  isEmailVerified?: boolean;
   fullName?: string;
   bio?: string;
-  discipline?: string;
-  experienceLevel?: string;
-  skills?: string[];
   location?: string;
-  discordUsername?: string;
-  githubHandle?: string;
-  twitterHandle?: string;
-  linkedinUrl?: string;
-  websiteUrl?: string;
-  primaryGoal?: string;
-  communityGoals?: string[];
   memberStatus?: string;
   currentRole?: string;
 }
@@ -91,4 +83,5 @@ export interface MemberListParams {
   search?: string;
   role?: string;
   isEmailVerified?: boolean;
+  isActive?: boolean;
 }

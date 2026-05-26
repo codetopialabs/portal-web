@@ -16,7 +16,7 @@ import { useUserStore } from "@/store/user.store";
  *
  * Usage:
  *   const canManageRoles = usePermission("roles.edit");
- *   const canDeactivate = usePermission("members.deactivate"); // destructive — exact only
+ *   const canSuspend = usePermission("users.suspend"); // destructive — exact only
  */
 export function usePermission(permission: string): boolean {
   const permissions = useUserStore((s) => s.profile?.permissions ?? EMPTY_PERMISSIONS);

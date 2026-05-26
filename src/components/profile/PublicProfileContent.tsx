@@ -33,7 +33,7 @@ export function PublicProfileContent() {
   let username = paramUsername ? decodeURIComponent(paramUsername) : "";
   username = username.startsWith("@") ? username.substring(1) : username;
   const currentUser = useUserStore((s) => s.profile);
-  const canEditMembers = usePermission("members.edit");
+  const canEditMembers = usePermission("users.edit");
   const canEditOwnProfile = usePermission("profile.edit");
 
   const {

@@ -37,13 +37,11 @@ export function getInitials(name: string) {
 export function getMemberFilterOptions(members: CommunityMember[]) {
   return {
     roles: getUniqueValues(
-      members.map((member) => {
-        const primaryRole = member.primaryRole
-          ? formatRoleLabel(member.primaryRole)
-          : member.communityRoles?.[0]
-            ? formatRoleLabel(member.communityRoles[0])
-            : "Member";
-        return primaryRole;
+      members.flatMap((member) => {
+        const roles = [...(member.communityRoles || [])];
+        if (member.primaryRole) roles.push(member.primaryRole);
+        if (roles.length === 0) roles.push("Member");
+        return roles.map(formatRoleLabel);
       })
     ),
     skills: getUniqueValues(members.flatMap((member) => member.skills)),
@@ -55,12 +53,12 @@ export function filterMembers(members: CommunityMember[], search: string, filter
   const normalizedSearch = search.trim().toLowerCase();
 
   return members.filter((member) => {
-    const primaryRole = member.primaryRole
-      ? formatRoleLabel(member.primaryRole)
-      : member.communityRoles?.[0]
-        ? formatRoleLabel(member.communityRoles[0])
-        : "Member";
-    const matchesRole = filters.role === "all" || primaryRole === filters.role;
+    const allRoles = [...(member.communityRoles || [])];
+    if (member.primaryRole) allRoles.push(member.primaryRole);
+    if (allRoles.length === 0) allRoles.push("Member");
+    const formattedRoles = allRoles.map(formatRoleLabel);
+
+    const matchesRole = filters.role === "all" || formattedRoles.includes(filters.role);
     const matchesSkill = filters.skill === "all" || member.skills.includes(filters.skill);
     const matchesExperience =
       filters.experience === "all" || member.experienceLevel === filters.experience;
@@ -73,8 +71,8 @@ export function filterMembers(members: CommunityMember[], search: string, filter
       return true;
     }
 
-    return [member.fullName, member.username, primaryRole, member.location, ...member.skills].some(
-      (value) => value.toLowerCase().includes(normalizedSearch)
+    return [member.fullName, member.username, ...formattedRoles, member.location, ...member.skills].some(
+      (value) => value && value.toLowerCase().includes(normalizedSearch)
     );
   });
 }

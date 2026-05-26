@@ -1,9 +1,8 @@
 "use client";
 
-import { ExternalLink, Globe, MapPin, Pencil } from "lucide-react";
+import { ExternalLink, MapPin, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { usePermission } from "@/hooks/usePermission";
 import { cn, getAvatarUrl } from "@/lib/utils";
@@ -26,14 +25,12 @@ interface MemberCardProps {
 
 export function MemberCard({ member, compact = false }: MemberCardProps) {
   const router = useRouter();
-  const canEditMembers = usePermission("members.edit");
+  const canEditMembers = usePermission("users.edit");
   const primaryRole = member.primaryRole
     ? formatRoleLabel(member.primaryRole)
     : member.communityRoles?.[0]
       ? formatRoleLabel(member.communityRoles[0])
       : "Member";
-
-  const hasSocials = member.githubHandle || member.linkedinUrl || member.websiteUrl;
 
   const profileHref = `/@${member.username}`;
 
@@ -124,44 +121,6 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
           </div>
         )}
 
-        {/* Social links */}
-        {!compact && hasSocials && (
-          <div className="mt-2.5 flex items-center gap-1.5">
-            {member.githubHandle && (
-              <a
-                href={`https://github.com/${member.githubHandle}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-6 w-6 items-center justify-center border border-zinc-200 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-700"
-                title="GitHub"
-              >
-                <FaGithub className="h-2.5 w-2.5" />
-              </a>
-            )}
-            {member.linkedinUrl && (
-              <a
-                href={member.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-6 w-6 items-center justify-center border border-zinc-200 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-700"
-                title="LinkedIn"
-              >
-                <FaLinkedin className="h-2.5 w-2.5" />
-              </a>
-            )}
-            {member.websiteUrl && (
-              <a
-                href={member.websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-6 w-6 items-center justify-center border border-zinc-200 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-700"
-                title="Website"
-              >
-                <Globe className="h-2.5 w-2.5" />
-              </a>
-            )}
-          </div>
-        )}
       </div>
     </article>
   );

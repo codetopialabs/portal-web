@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Calendar, Code2, FileText, Key, ShieldCheck, Star, Users } from "lucide-react";
+import { ArrowUpRight, BookOpen, Calendar, Code2, FileText, Key, ShieldCheck, Star, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -32,37 +32,6 @@ function ComingSoonCard({
     </div>
   );
 }
-
-// ─── Tab navigation ───────────────────────────────────────────────────────────
-
-const TABS = [
-  { id: "roles", label: "Roles" },
-  { id: "members", label: "Members" },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
-
-function AdminTabs({ activeTab }: { activeTab: TabId }) {
-  return (
-    <div className="flex border-b border-zinc-200 mb-8">
-      {TABS.map((tab) => (
-        <Link
-          key={tab.id}
-          href={`/admin?tab=${tab.id}`}
-          className={`px-5 py-3 font-mono text-xs uppercase tracking-widest transition-colors border-b-2 -mb-px ${
-            activeTab === tab.id
-              ? "border-zinc-900 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-700"
-          }`}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-// ─── Coming Soon sections ─────────────────────────────────────────────────────
 
 const COMING_SOON_SECTIONS = [
   {
@@ -102,16 +71,11 @@ const COMING_SOON_SECTIONS = [
   },
 ];
 
-// ─── Admin page content ───────────────────────────────────────────────────────
-
 function AdminPageContent() {
-  const searchParams = useSearchParams();
-  const activeTab = (searchParams.get("tab") as TabId) ?? "roles";
-
   return (
     <div className="max-w-6xl mx-auto pb-20">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 border-b border-zinc-200 pb-8">
         <div className="flex items-center gap-3 mb-2">
           <ShieldCheck className="w-5 h-5 text-zinc-400" />
           <h1 className="font-sans font-black uppercase tracking-widest text-xl text-zinc-900">
@@ -119,62 +83,54 @@ function AdminPageContent() {
           </h1>
         </div>
         <p className="font-mono text-xs text-zinc-400">
-          Manage roles, permissions, and community members.
+          Platform management tools and upcoming modules.
         </p>
       </div>
 
-      {/* Tab navigation */}
-      <AdminTabs activeTab={activeTab} />
-
-      {/* Tab content */}
-      {activeTab === "roles" && (
-        <div className="space-y-8">
-          {/* Roles tab — links to roles list */}
-          <div className="flex items-center justify-between">
-            <p className="font-mono text-xs text-zinc-400">
-              Manage community roles and their permissions.
-            </p>
-            <Link
-              href="/admin/roles"
-              className="font-mono text-xs uppercase tracking-widest text-zinc-900 border border-zinc-200 px-4 py-2 hover:bg-zinc-50 transition-colors"
-            >
-              View All Roles →
-            </Link>
-          </div>
-
-          {/* Coming Soon sections */}
-          <div>
-            <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
-              Coming Soon
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {COMING_SOON_SECTIONS.map((section) => (
-                <ComingSoonCard
-                  key={section.name}
-                  icon={section.icon}
-                  name={section.name}
-                  description={section.description}
-                />
-              ))}
+      {/* Coming Soon sections */}
+      <div>
+        <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {COMING_SOON_SECTIONS.map((section) => (
+            <ComingSoonCard
+              key={section.name}
+              icon={section.icon}
+              name={section.name}
+              description={section.description}
+            />
+          ))}
+        </div>
+      </div>
+      {/* Management */}
+      <div className="mt-8">
+        <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
+          Management
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Link href="/admin/members" className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors">
+            <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
+            <Users className="w-5 h-5 text-zinc-400" />
+            <div className="space-y-1">
+              <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
+                Members
+              </p>
+              <p className="font-mono text-xs text-zinc-400">View and manage community members.</p>
             </div>
-          </div>
+          </Link>
+          <Link href="/admin/roles" className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors">
+            <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
+            <ShieldCheck className="w-5 h-5 text-zinc-400" />
+            <div className="space-y-1">
+              <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
+                Roles
+              </p>
+              <p className="font-mono text-xs text-zinc-400">Create and manage permission roles.</p>
+            </div>
+          </Link>
         </div>
-      )}
-
-      {activeTab === "members" && (
-        <div className="space-y-8">
-          {/* Members tab — links to members list */}
-          <div className="flex items-center justify-between">
-            <p className="font-mono text-xs text-zinc-400">View and manage community members.</p>
-            <Link
-              href="/admin/members"
-              className="font-mono text-xs uppercase tracking-widest text-zinc-900 border border-zinc-200 px-4 py-2 hover:bg-zinc-50 transition-colors"
-            >
-              View All Members →
-            </Link>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

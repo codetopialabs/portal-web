@@ -28,8 +28,10 @@ export function DashboardSidebar() {
 
   const menuGroups = getDashboardMenuGroups(canAccessAdmin);
 
-  function isActive(activePrefix: string) {
-    return activePrefix === "/" ? pathname === "/" : pathname.startsWith(activePrefix);
+  function isActive(activePrefix: string, href: string) {
+    if (activePrefix === "/") return pathname === "/";
+    if (href === "/admin" && pathname !== "/admin") return false;
+    return pathname.startsWith(activePrefix);
   }
 
   function itemClass(active: boolean) {
@@ -75,7 +77,7 @@ export function DashboardSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className="gap-0">
                 {group.items.map((item) => {
-                  const active = isActive(item.activePrefix);
+                  const active = isActive(item.activePrefix, item.href);
                   return (
                     <SidebarMenuItem key={item.label}>
                       <SidebarMenuButton

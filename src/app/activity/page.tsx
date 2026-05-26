@@ -14,8 +14,12 @@ import {
   UserPlus,
 } from "lucide-react";
 import React from "react";
+import type { DriveStep } from "driver.js";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { useAdminActivity } from "@/hooks/useAdmin";
+import { usePermission } from "@/hooks/usePermission";
+import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { type ActivityLogEntry, SessionService } from "@/services/auth.service";
 
 // ─── event type config ────────────────────────────────────────────────────────
@@ -42,6 +46,15 @@ const EVENT_CONFIG: Record<
   avatar_updated: { icon: User, category: "profile", color: "text-zinc-600" },
   session_revoked: { icon: Laptop, category: "session", color: "text-red-500" },
   all_sessions_revoked: { icon: Laptop, category: "session", color: "text-red-600" },
+  role_assigned: { icon: Shield, category: "account", color: "text-indigo-600" },
+  role_revoked: { icon: Shield, category: "account", color: "text-indigo-400" },
+  role_created: { icon: Shield, category: "account", color: "text-indigo-600" },
+  role_updated: { icon: Shield, category: "account", color: "text-indigo-500" },
+  role_deleted: { icon: ShieldAlert, category: "account", color: "text-red-500" },
+  user_updated: { icon: User, category: "profile", color: "text-zinc-700" },
+  user_suspended: { icon: ShieldAlert, category: "account", color: "text-red-500" },
+  user_reactivated: { icon: Shield, category: "account", color: "text-emerald-600" },
+  user_deleted: { icon: ShieldAlert, category: "account", color: "text-red-700" },
 };
 
 const CATEGORY_FILTERS: { label: string; value: EventCategory | "all" }[] = [
@@ -70,6 +83,14 @@ function timeAgo(iso: string): string {
   });
 }
 
+function formatEventLabel(eventType?: string): string {
+  if (!eventType) return "Activity";
+  return eventType
+    .split("_")
+    .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : ""))
+    .join(" ");
+}
+
 const PAGE_SIZE = 15;
 
 // ─── page ─────────────────────────────────────────────────────────────────────
@@ -83,14 +104,44 @@ export default function ActivityPage() {
 }
 
 function ActivityPageContent() {
+  const canViewOrgActivity = usePermission("activity.view_any");
   const [entries, setEntries] = React.useState<ActivityLogEntry[]>([]);
   const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [errorStatus, setErrorStatus] = React.useState<number | null>(null);
   const [page, setPage] = React.useState(1);
   const [filter, setFilter] = React.useState<EventCategory | "all">("all");
+  const [viewMode, setViewMode] = React.useState<"mine" | "org">("mine");
+
+  const orgOffset = (page - 1) * PAGE_SIZE;
+  const {
+    data: orgActivity,
+    isLoading: orgLoading,
+    isError: orgError,
+    error: orgErrorValue,
+  } = useAdminActivity(
+    { limit: PAGE_SIZE, offset: orgOffset },
+    viewMode === "org" && canViewOrgActivity
+  );
+
+  const walkthroughSteps: DriveStep[] = [
+    {
+      element: "#activity-org-toggle",
+      popover: {
+        title: "Org Activity",
+        description: "Switch to the organization-wide activity stream when you have access.",
+      },
+    },
+  ];
+
+  useWalkthrough({
+    tourId: "org_activity_view",
+    steps: walkthroughSteps,
+    enabled: canViewOrgActivity,
+  });
 
   React.useEffect(() => {
+    if (viewMode !== "mine") return;
     setLoading(true);
     setErrorStatus(null);
     SessionService.getActivity(PAGE_SIZE, (page - 1) * PAGE_SIZE)
@@ -102,17 +153,31 @@ function ActivityPageContent() {
         setErrorStatus(err.status || 500);
       })
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, viewMode]);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [viewMode, filter]);
+
+  const activeEntries = viewMode === "org" ? orgActivity?.results ?? [] : entries;
 
   const filtered =
     filter === "all"
-      ? entries
-      : entries.filter((e) => EVENT_CONFIG[e.eventType]?.category === filter);
+      ? activeEntries
+      : activeEntries.filter((e) => EVENT_CONFIG[e.eventType]?.category === filter);
 
+  const activeTotal = viewMode === "org" ? orgActivity?.total ?? 0 : total;
   const totalPages =
     filter === "all"
-      ? Math.max(1, Math.ceil(total / PAGE_SIZE))
+      ? Math.max(1, Math.ceil(activeTotal / PAGE_SIZE))
       : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  const isLoadingState = viewMode === "org" ? orgLoading : loading;
+  const errorStatusValue =
+    viewMode === "org"
+      ? (orgErrorValue as { status?: number } | undefined)?.status ?? (orgError ? 500 : null)
+      : errorStatus;
+  const totalCount = activeTotal || activeEntries.length;
 
   return (
     <DashboardShell>
@@ -129,9 +194,29 @@ function ActivityPageContent() {
               Review sign-ins, account changes, profile updates, and session events tied to your
               account.
             </p>
+            {canViewOrgActivity && (
+              <div id="activity-org-toggle" className="mt-4 flex flex-wrap gap-2">
+                {[
+                  { label: "My Activity", value: "mine" as const },
+                  { label: "Org Activity", value: "org" as const },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setViewMode(option.value)}
+                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${viewMode === option.value
+                        ? "bg-zinc-900 text-white border-zinc-900"
+                        : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
+                      }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <span className="w-fit border border-zinc-200 bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500">
-            {total || entries.length} events
+            {totalCount} events
           </span>
         </div>
 
@@ -145,11 +230,10 @@ function ActivityPageContent() {
                 setFilter(f.value);
                 setPage(1);
               }}
-              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
-                filter === f.value
+              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${filter === f.value
                   ? "bg-zinc-900 text-white border-zinc-900"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-              }`}
+                }`}
             >
               {f.label}
             </button>
@@ -157,7 +241,7 @@ function ActivityPageContent() {
         </div>
 
         {/* log */}
-        {loading ? (
+        {isLoadingState ? (
           <div className="flex items-center justify-center py-20">
             <div className="flex items-center gap-2">
               {[0, 1, 2].map((i) => (
@@ -169,7 +253,7 @@ function ActivityPageContent() {
               ))}
             </div>
           </div>
-        ) : errorStatus === 403 ? (
+        ) : errorStatusValue === 403 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center border border-zinc-200 bg-white space-y-4">
             <div className="w-14 h-14 border border-red-100 bg-red-50 flex items-center justify-center rounded-full">
               <ShieldAlert className="w-6 h-6 text-red-600" />
@@ -199,6 +283,10 @@ function ActivityPageContent() {
                 color: "text-zinc-400",
               };
               const Icon = cfg.icon;
+              const eventLabel =
+                "eventLabel" in entry && entry.eventLabel
+                  ? entry.eventLabel
+                  : formatEventLabel(entry.eventType);
               return (
                 <div
                   key={entry.id}
@@ -211,7 +299,7 @@ function ActivityPageContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-mono font-semibold text-sm text-zinc-900 leading-tight">
-                          {entry.eventLabel}
+                          {eventLabel}
                         </p>
                         {entry.detail && (
                           <p className="font-mono text-xs text-zinc-400 mt-0.5">{entry.detail}</p>
@@ -239,9 +327,8 @@ function ActivityPageContent() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs text-zinc-400">
-              {filter === "all" ? total : filtered.length} event
-              {(filter === "all" ? total : filtered.length) !== 1 ? "s" : ""} · page {page} of{" "}
-              {totalPages}
+              {filter === "all" ? totalCount : filtered.length} event
+              {(filter === "all" ? totalCount : filtered.length) !== 1 ? "s" : ""} · page {page} of {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <button
