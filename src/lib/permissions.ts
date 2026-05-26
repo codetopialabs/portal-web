@@ -6,7 +6,11 @@
  */
 
 // Permissions that must be explicitly listed in a role — wildcards never grant them.
-export const DESTRUCTIVE_PERMISSIONS = new Set<string>(["members.deactivate", "roles.delete"]);
+export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
+  "users.delete",
+  "users.suspend",
+  "roles.delete",
+]);
 
 /**
  * Route → Permission map.
@@ -19,11 +23,11 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin": "admin.panel.access",
   "/admin/roles": "roles.view",
   "/admin/roles/new": "roles.create",
-  "/admin/roles/[id]": "roles.view",
-  "/admin/roles/[id]/edit": "roles.edit",
-  "/admin/members": "members.view",
-  "/admin/members/[id]": "members.view",
-  "/admin/members/[id]/edit": "members.edit",
+  "/admin/roles/[slug]": "roles.view",
+  "/admin/roles/[slug]/edit": "roles.edit",
+  "/admin/members": "users.view",
+  "/admin/members/[username]": "users.view",
+  "/admin/members/[username]/edit": "users.edit",
   "/settings/profile": "profile.edit",
   "/settings/security": "security.view",
   "/settings/apps": "authenticated",
@@ -39,13 +43,13 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   pattern: RegExp;
   permission: string | "authenticated";
 }> = [
-  { pattern: /^\/@[^/]+$/, permission: "profile.view" },
-  { pattern: /^\/admin\/roles\/[^/]+\/edit$/, permission: "roles.edit" },
-  { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
-  { pattern: /^\/admin\/members\/[^/]+\/edit$/, permission: "members.edit" },
-  { pattern: /^\/admin\/members\/[^/]+$/, permission: "members.view" },
-  { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
-];
+    { pattern: /^\/@[^/]+$/, permission: "profile.view" },
+    { pattern: /^\/admin\/roles\/[^/]+\/edit$/, permission: "roles.edit" },
+    { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
+    { pattern: /^\/admin\/members\/[^/]+\/edit$/, permission: "users.edit" },
+    { pattern: /^\/admin\/members\/[^/]+$/, permission: "users.view" },
+    { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
+  ];
 
 /**
  * Resolve whether a permission is granted given a permission set.
@@ -61,18 +65,18 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
 export function resolvePermission(permission: string, permissionSet: string[]): boolean {
   const set = new Set(permissionSet);
 
-  // 1. Destructive permissions require exact match — no wildcard expansion
-  if (DESTRUCTIVE_PERMISSIONS.has(permission)) {
-    return set.has(permission);
-  }
-
-  // 2. "*" grants all non-destructive permissions
-  if (set.has("*")) return true;
-
-  // 3. Exact match
+  // 1. Exact match always wins (even for destructive)
   if (set.has(permission)) return true;
 
-  // 4. "resource.*" in set (e.g. "members.*" covers "members.edit")
+  // 2. Destructive permissions require exact match — no wildcard expansion
+  if (DESTRUCTIVE_PERMISSIONS.has(permission)) {
+    return false;
+  }
+
+  // 3. "*" grants all non-destructive permissions
+  if (set.has("*")) return true;
+
+  // 4. "resource.*" in set (e.g. "users.*" covers "users.edit")
   const dotIndex = permission.indexOf(".");
   if (dotIndex !== -1) {
     const resource = permission.substring(0, dotIndex);
@@ -80,7 +84,7 @@ export function resolvePermission(permission: string, permissionSet: string[]): 
 
     if (set.has(`${resource}.*`)) return true;
 
-    // 5. "*.action" in set (e.g. "*.view" covers "members.view")
+    // 5. "*.action" in set (e.g. "*.view" covers "users.view")
     if (set.has(`*.${action}`)) return true;
   }
 
