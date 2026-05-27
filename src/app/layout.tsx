@@ -1,7 +1,9 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { Toaster } from "sonner";
+import { Providers } from "@/components/layout/Providers";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -15,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Codetopia | Identity Provider",
-  description: "Secure and sovereign identity management for the Codetopia community.",
+  title: "Codetopia | Community Portal",
+  description: "The official community portal for The Codetopian Collective.",
 };
 
 export default function RootLayout({
@@ -25,13 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark h-full">
+    <html lang="en" className="h-full" data-scroll-behavior="smooth">
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-black text-white flex flex-col overflow-x-hidden`}
+        className={`${spaceGrotesk.variable} ${inter.variable} antialiased min-h-screen bg-white text-zinc-950 flex flex-col overflow-x-hidden`}
       >
-        <Toaster position="top-center" richColors theme="dark" />
-        {children}
-        <Analytics />
+        <Providers>
+          <TooltipProvider>
+            <Toaster position="top-center" richColors theme="dark" />
+            {children}
+            <Analytics />
+          </TooltipProvider>
+        </Providers>
       </body>
     </html>
   );

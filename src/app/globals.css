@@ -3,9 +3,9 @@
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
 
-html {
+/* html {
   scroll-behavior: smooth;
-}
+} */
 
 /* Offset anchor scroll targets to account for sticky header */
 /* :target {
@@ -56,6 +56,10 @@ html {
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Override default Tailwind Zinc colors to white */
+  --color-zinc-50: #ffffff;
+  --color-zinc-100: #ffffff;
 
   /* New Primitive Colors from JSON Config */
   --color-grey-50: var(--grey-50);
@@ -127,7 +131,7 @@ html {
 
 :root {
   /* Primitive Grays */
-  --grey-50: #f9fafb;
+  --grey-50: #ffffff;
   --grey-100: #f3f4f6;
   --grey-200: #e5e7eb;
   --grey-300: #d1d5db;
@@ -178,17 +182,17 @@ html {
   --radius: 0.625rem;
 
   /* LIGHT MODE SEMANTICS */
-  --background: var(--grey-50);
+  --background: #ffffff;
   --foreground: var(--grey-900);
 
-  --card: var(--grey-50);
+  --card: #ffffff;
   --card-foreground: var(--grey-900);
 
-  --popover: var(--grey-50);
+  --popover: #ffffff;
   --popover-foreground: var(--grey-900);
 
   --primary: var(--grey-900);
-  --primary-foreground: var(--grey-50);
+  --primary-foreground: #ffffff;
 
   --secondary: var(--grey-100);
   --secondary-foreground: var(--grey-900);
@@ -325,4 +329,187 @@ html {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* highlight.js styling */
+  pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+  }
+
+  .hljs {
+    color: #abb2bf;
+    background: #282c34;
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    color: #5c6370;
+    font-style: italic;
+  }
+
+  .hljs-doctag,
+  .hljs-keyword,
+  .hljs-formula {
+    color: #c678dd;
+  }
+
+  .hljs-section,
+  .hljs-name,
+  .hljs-selector-tag,
+  .hljs-deletion,
+  .hljs-subst {
+    color: #e06c75;
+  }
+
+  .hljs-literal {
+    color: #56b6c2;
+  }
+
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-addition,
+  .hljs-attribute,
+  .hljs-meta-string {
+    color: #98c379;
+  }
+
+  .hljs-built_in,
+  .hljs-class .hljs-title {
+    color: #e6c07b;
+  }
+
+  .hljs-attr,
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-type,
+  .hljs-selector-class,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-number {
+    color: #d19a66;
+  }
+
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-link,
+  .hljs-meta,
+  .hljs-selector-id,
+  .hljs-title {
+    color: #61afef;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .hljs-strong {
+    font-weight: bold;
+  }
+
+  .hljs-link {
+    text-decoration: underline;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+}
+
+/* ── Driver.js Custom Industrial Theme ── */
+.codetopia-driver-theme.driver-popover {
+  border-radius: 0 !important;
+  border: 1px solid var(--grey-900) !important;
+  background-color: #ffffff !important;
+  color: var(--grey-900) !important;
+  box-shadow: 4px 4px 0px 0px var(--grey-200) !important;
+  padding: 20px !important;
+}
+
+.dark .codetopia-driver-theme.driver-popover {
+  background-color: var(--grey-900) !important;
+  border: 1px solid var(--grey-800) !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+}
+
+.codetopia-driver-theme .driver-popover-title {
+  font-family: var(--font-sans);
+  font-weight: 900 !important;
+  font-size: 1.125rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem !important;
+}
+
+.codetopia-driver-theme .driver-popover-description {
+  font-family: var(--font-mono);
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+}
+
+.codetopia-driver-theme .driver-popover-footer {
+  margin-top: 1rem !important;
+}
+
+.codetopia-driver-theme .driver-popover-progress-text {
+  font-family: var(--font-mono);
+  font-weight: 700 !important;
+  font-size: 0.65rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.codetopia-driver-theme .driver-popover-footer button {
+  border-radius: 0 !important;
+  font-family: var(--font-mono);
+  font-weight: 900 !important;
+  font-size: 0.65rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.2s !important;
+  text-shadow: none !important;
+}
+
+.codetopia-driver-theme .driver-popover-next-btn,
+.codetopia-driver-theme .driver-popover-done-btn {
+  background-color: var(--grey-900) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--grey-900) !important;
+}
+
+.codetopia-driver-theme .driver-popover-next-btn:hover,
+.codetopia-driver-theme .driver-popover-done-btn:hover {
+  background-color: var(--grey-800) !important;
+}
+
+.codetopia-driver-theme .driver-popover-prev-btn {
+  background-color: #ffffff !important;
+  color: var(--grey-900) !important;
+  border: 1px solid var(--grey-200) !important;
+}
+
+.codetopia-driver-theme .driver-popover-prev-btn:hover {
+  background-color: var(--grey-100) !important;
+  border-color: var(--grey-900) !important;
+}
+
+.dark .codetopia-driver-theme .driver-popover-next-btn,
+.dark .codetopia-driver-theme .driver-popover-done-btn {
+  background-color: #ffffff !important;
+  color: var(--grey-900) !important;
+  border-color: #ffffff !important;
+}
+
+.dark .codetopia-driver-theme .driver-popover-prev-btn {
+  background-color: var(--grey-900) !important;
+  color: #ffffff !important;
+  border-color: var(--grey-800) !important;
+}
+
+/* Make close button sharp */
+.codetopia-driver-theme .driver-popover-close-btn {
+  border-radius: 0 !important;
 }

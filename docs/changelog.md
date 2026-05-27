@@ -1,0 +1,176 @@
+---
+title: Changelog
+category: General
+order: 1
+---
+
+## [2026-05-26] Role slug admin URLs
+
+**What changed:** Updated admin role detail, edit, update, and delete flows to use the role slug instead of the numeric role ID.
+**Affected areas:** Admin Roles, Permission System docs.
+**Permissions added:** none.
+**Breaking changes:** Yes - admin role URLs now use `/admin/roles/[slug]` and `/admin/roles/[slug]/edit`.
+
+## [2026-05-26] Role permission detail accordions
+
+**What changed:** Reworked the role detail permissions view into resource-based accordions that expand wildcard grants and explain unrestricted access.
+**Affected areas:** Admin Roles.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin roles list polish
+
+**What changed:** Refined the admin roles list with boxy summary stats, clearer search/filter controls, role risk labels, and more readable role rows.
+**Affected areas:** Admin Roles.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Role assignment permission previews
+
+**What changed:** Added plain-English permission previews when assigning or revoking member roles so admins can understand what access a role grants or removes before confirming.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin member edit polish
+
+**What changed:** Refined the admin member edit page with a wider boxy layout, member preview header, grouped profile fields, account state panel, and clearer save controls.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin member detail polish
+
+**What changed:** Refined the individual admin member page into a GitHub-style profile layout and moved risky account/session controls into a red bottom danger zone with typed confirmation before every dangerous action.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin members list polish
+
+**What changed:** Refined the admin members list with calmer visual styling, clearer member rows, summary stats, readable filters, and friendlier empty/error states.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-27] Admin High-Fidelity Detail & Security Refactor
+
+**What changed:** Migrated admin member management from UUIDs to human-readable usernames in URLs. Rebuilt the member detail page with a high-fidelity "boxy" UI and implemented typed confirmation guards for all destructive administrative actions.
+**Affected areas:** Admin Panel (/admin/members/[username]), User Profiles (/@username).
+**Permissions added:** None.
+**Breaking changes:** Yes — URLs for admin member detail have changed from `/admin/members/[id]` to `/admin/members/[username]`.
+
+## [2026-05-26] Admin members table refresh
+
+**What changed:** Redesigned the admin members list with avatar-based rows, compact status chips, and client-side pagination controls.
+**Affected areas:** Admin Members.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-26] Admin wiring alignment and org activity view
+
+**What changed:** Aligned admin roles/members UI with the updated backend endpoints, added org-wide activity viewing, and introduced session management for member accounts.  
+**Affected areas:** Admin Members, Admin Roles, Activity Log, Permission System, Docs.  
+**Permissions added:** `users.*`, `sessions.view_any`, `sessions.revoke_any`, `activity.view_any` (replacing `members.*` in the UI).  
+**Breaking changes:** Yes — permission codenames in the frontend now use `users.*` instead of `members.*`.  
+title: Changelog
+category: General
+order: 1
+---
+
+# Changelog
+
+All notable changes to the Codetopia Community Portal are documented here.
+
+---
+
+## [2026-05-19] Performance and reliability upgrades
+
+**What changed:** Added Redis-backed caching for high-traffic profile and member endpoints and introduced global plus auth-specific rate limits.
+**Affected areas:** Authentication API, Community Member API, API Throttling.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-19] Primary role selection and rendering
+
+**What changed:** Implemented primary role selection for community members, enabling them to choose one of their assigned roles to highlight as their primary identifier. Supported this by extending the Django `Profile` model and serialization, updating the Next.js form and types, and rendering the chosen role across public profiles and the member directory.  
+**Affected areas:** User Profile Model, Settings Profile Page, Public Profiles, Member Cards, Community Member Directory, API Serializers.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-19] Walkthrough state synchronization with backend
+
+**What changed:** Implemented backend database storage for completed user onboarding walkthroughs, migrating from purely local storage to persistent DB sync. Corrected and modernized Django serializers and API endpoints to completely resolve stale imports and legacy single-role definitions.  
+**Affected areas:** User Profile Model, Authentication Serializers, Profile Views, Walkthrough Hooks, Onboarding Flows.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-19] Settings page onboarding walkthrough
+
+**What changed:** Implemented an interactive onboarding walkthrough for the user settings page using driver.js, guiding members through navigation tabs, avatar and cover uploading, personal info, social links, skill tags, and applying settings updates.  
+**Affected areas:** Settings Layout, Profile Settings Page.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-19] Frontend structure cleanup
+
+**What changed:** Centralized dashboard and public profile views into shared components, moved navigation data into shared modules, and consolidated shared types/helpers to reduce oversized files without altering user-facing behavior.  
+**Affected areas:** Dashboard, Public Profiles, Navigation.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-18] Portal workspace layout refresh
+
+**What changed:** Refined dashboard and workspace page layouts, simplified page headers, and removed duplicated Programs and Resources tabs from Community so each sidebar section has a clearer purpose.  
+**Affected areas:** Dashboard, Community, Programs, Mentorship, Resources, Admin Panel, Settings, Activity Log.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-18] Permission-aware portal polish
+
+**What changed:** Tightened protected page guards, added permission-based member edit actions, and refreshed member/admin data after role or profile changes.  
+**Affected areas:** Community, Public Profiles, Settings, Activity Log, Programs, Mentorship, Resources, Admin Members.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-17] Documentation UI refresh
+
+**What changed:** Refined the documentation portal with a signature black sidebar, stronger typography, improved mobile navigation, and cleaner article, table, and code styles.  
+**Affected areas:** Documentation Portal.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-17] Public profile UI refresh
+
+**What changed:** Improved public profile layout as a standalone personal website, refreshed loading and not-found states, and removed community IDs from public profile display.  
+**Affected areas:** Public Profiles, Member Directory.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-17] Dashboard UI refresh
+
+**What changed:** Refined the member dashboard with a richer profile hero, clearer status metrics, improved portal module cards, and a cleaner community snapshot.  
+**Affected areas:** Dashboard.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-16] Community directory code cleanup
+
+**What changed:** Refactored the Community page into focused tabs, member directory, filter, member card, loading, and data-loading modules without changing the visible feature set.  
+**Affected areas:** Community.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-16] Community Portal v1 implementation
+
+**What changed:** Added admin roles and members management screens, role builder flows, and permission-guarded routing.  
+**Affected areas:** Admin Panel, Roles, Members, Permissions, Activity Log, API.  
+**Permissions added:** none.  
+**Breaking changes:** No.
+
+## [2026-05-16] Initial spec — Community Portal v1
+
+**What changed:** Requirements, design conventions, and permission system defined. No code shipped yet.  
+**Affected areas:** Entire portal — this is the foundation spec.  
+**Permissions added:** `admin.panel.access`, `members.view`, `members.edit`, `members.deactivate`, `roles.view`, `roles.create`, `roles.edit`, `roles.delete`, `roles.assign`, `roles.revoke`, `profile.view`, `profile.edit`, `permissions.view`  
+**Breaking changes:** No — greenfield.
