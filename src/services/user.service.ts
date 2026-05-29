@@ -86,8 +86,8 @@ export interface UpdateMeRequest {
 interface UploadSignature {
   signature: string;
   timestamp: number;
-  cloud_name: string;
-  api_key: string;
+  cloudName: string;
+  apiKey: string;
   folder: string;
 }
 
@@ -121,11 +121,11 @@ export const UserService = {
     const sig = sigResponse.data.data;
     const form = new FormData();
     form.append("file", file);
-    form.append("api_key", sig.api_key);
+    form.append("api_key", sig.apiKey);
     form.append("timestamp", String(sig.timestamp));
     form.append("signature", sig.signature);
     form.append("folder", sig.folder);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`, {
       method: "POST",
       body: form,
     });
@@ -143,11 +143,11 @@ export const UserService = {
     const sig = sigResponse.data.data;
     const form = new FormData();
     form.append("file", file);
-    form.append("api_key", sig.api_key);
+    form.append("api_key", sig.apiKey);
     form.append("timestamp", String(sig.timestamp));
     form.append("signature", sig.signature);
     form.append("folder", `${sig.folder}/cover`);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`, {
       method: "POST",
       body: form,
     });
