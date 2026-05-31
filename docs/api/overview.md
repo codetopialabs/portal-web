@@ -72,41 +72,73 @@ Selected read-heavy endpoints are cached in Redis with short TTLs. Writes immedi
 Every endpoint declares a required permission. Requests without the required permission receive HTTP 403.
 
 ```
-GET  /api/v1/users/members/  → requires profile.view
-GET  /api/v1/auth/admin/users/ → requires users.view
-GET  /api/v1/auth/admin/roles/ → requires roles.view
-POST /api/v1/auth/admin/roles/ → requires roles.create
+GET  /api/v1/users/members/    → requires profile.view
+GET  /api/v1/users/            → requires users.view
+GET  /api/v1/roles/            → requires roles.view
+POST /api/v1/roles/            → requires roles.create
 ```
 
 ## Key endpoints (v1)
+
+### Authentication (`/api/v1/auth/`)
 
 | Method | Endpoint | Permission | Description |
 |---|---|---|---|
 | POST | `/api/v1/auth/login/` | none | Sign in, get tokens |
 | POST | `/api/v1/auth/token/refresh/` | none | Refresh access token |
 | POST | `/api/v1/auth/register/` | none | Register new member |
+| POST | `/api/v1/auth/logout/` | authenticated | Sign out |
 | GET | `/api/v1/auth/me/` | authenticated | Get own profile + permissions |
 | PATCH | `/api/v1/auth/me/` | authenticated | Update own profile |
+| POST | `/api/v1/auth/change-password/` | authenticated | Change own password |
+| GET | `/api/v1/auth/sessions/` | `security.view` | List own sessions |
+| DELETE | `/api/v1/auth/sessions/{id}/` | `security.revoke` | Revoke own session |
+
+### Community members (`/api/v1/users/members/`)
+
+| Method | Endpoint | Permission | Description |
+|---|---|---|---|
 | GET | `/api/v1/users/members/` | `profile.view` | List community members |
-| GET | `/api/v1/users/members/{username}/` | `profile.view` | Get member profile |
-| GET | `/api/v1/auth/admin/roles/` | `roles.view` | List all roles |
-| POST | `/api/v1/auth/admin/roles/` | `roles.create` | Create a role |
-| GET | `/api/v1/auth/admin/roles/{slug}/` | `roles.view` | Get role detail |
-| PATCH | `/api/v1/auth/admin/roles/{slug}/` | `roles.edit` | Edit a role |
-| DELETE | `/api/v1/auth/admin/roles/{slug}/` | `roles.delete` | Delete a role |
-| POST | `/api/v1/auth/admin/roles/assign/` | `roles.assign` | Assign role to member |
-| POST | `/api/v1/auth/admin/roles/revoke/` | `roles.revoke` | Remove role from member |
-| GET | `/api/v1/auth/admin/permissions/` | `permissions.view` | Get master permission list |
-| GET | `/api/v1/auth/admin/users/` | `users.view` | List community members for admins |
-| GET | `/api/v1/auth/admin/users/{id}/` | `users.view` | Get admin member detail |
-| PATCH | `/api/v1/auth/admin/users/{id}/` | `users.edit` | Update member profile fields |
-| DELETE | `/api/v1/auth/admin/users/{id}/` | `users.delete` | Delete a member account |
-| POST | `/api/v1/auth/admin/users/{id}/suspend/` | `users.suspend` | Suspend a member account |
-| POST | `/api/v1/auth/admin/users/{id}/reactivate/` | `users.reactivate` | Reactivate a member account |
-| GET | `/api/v1/auth/admin/users/{id}/sessions/` | `sessions.view_any` | List member sessions |
-| POST | `/api/v1/auth/admin/users/{id}/sessions/{sessionId}/revoke/` | `sessions.revoke_any` | Revoke a session |
-| POST | `/api/v1/auth/admin/users/{id}/sessions/revoke-all/` | `sessions.revoke_any` | Revoke all sessions |
-| GET | `/api/v1/auth/admin/activity/` | `activity.view_any` | List org activity logs |
+| GET | `/api/v1/users/members/{username}/` | none | Get member profile |
+
+### User management (`/api/v1/users/`)
+
+| Method | Endpoint | Permission | Description |
+|---|---|---|---|
+| GET | `/api/v1/users/` | `users.view` | List all users |
+| GET | `/api/v1/users/{id}/` | `users.view` | Get user detail |
+| PATCH | `/api/v1/users/{id}/` | `users.edit` | Update user profile fields |
+| DELETE | `/api/v1/users/{id}/` | `users.delete` | Delete a user account |
+| POST | `/api/v1/users/{id}/suspend/` | `users.suspend` | Suspend a user account |
+| POST | `/api/v1/users/{id}/reactivate/` | `users.reactivate` | Reactivate a user account |
+| GET | `/api/v1/users/{id}/sessions/` | `sessions.view_any` | List user sessions |
+| POST | `/api/v1/users/{id}/sessions/{sessionId}/revoke/` | `sessions.revoke_any` | Revoke a session |
+| POST | `/api/v1/users/{id}/sessions/revoke-all/` | `sessions.revoke_any` | Revoke all sessions |
+
+### Roles (`/api/v1/roles/`)
+
+| Method | Endpoint | Permission | Description |
+|---|---|---|---|
+| GET | `/api/v1/roles/` | `roles.view` | List all roles |
+| POST | `/api/v1/roles/` | `roles.create` | Create a role |
+| GET | `/api/v1/roles/{slug}/` | `roles.view` | Get role detail |
+| PATCH | `/api/v1/roles/{slug}/` | `roles.edit` | Edit a role |
+| DELETE | `/api/v1/roles/{slug}/` | `roles.delete` | Delete a role |
+| POST | `/api/v1/roles/assign/` | `roles.assign` | Assign role to member |
+| POST | `/api/v1/roles/revoke/` | `roles.revoke` | Remove role from member |
+
+### Permissions (`/api/v1/permissions/`)
+
+| Method | Endpoint | Permission | Description |
+|---|---|---|---|
+| GET | `/api/v1/permissions/` | `permissions.view` | Get master permission list |
+
+### Activity (`/api/v1/activity/`)
+
+| Method | Endpoint | Permission | Description |
+|---|---|---|---|
+| GET | `/api/v1/activity/` | `activity.view` | Own activity log |
+| GET | `/api/v1/activity/all/` | `activity.view_any` | Org-wide activity logs |
 
 > **When adding a new endpoint:** add it to this table and update `docs/changelog.md`.
 

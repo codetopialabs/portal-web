@@ -4,6 +4,20 @@ category: General
 order: 1
 ---
 
+## [2026-05-30] Public profiles without authentication
+
+**What changed:** Made member public profiles (`/@username`) accessible to visitors without requiring them to log in, similar to public LinkedIn profiles.
+**Affected areas:** Public Profiles, Member Profile API.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-05-30] API URL restructuring
+
+**What changed:** Moved all backend API routes from admin-scoped `/api/v1/auth/admin/*` to entity-scoped root paths: `/api/v1/roles/`, `/api/v1/users/`, `/api/v1/permissions/`, `/api/v1/activity/`. Frontend services split from monolithic `admin.service.ts` into per-entity service and type files.
+**Affected areas:** All admin API endpoints, frontend services, frontend types, frontend hooks.
+**Permissions added:** none.
+**Breaking changes:** Yes — all `/auth/admin/*` API URLs have moved. See `docs/api/overview.md` for the new endpoints.
+
 ## [2026-05-26] Role slug admin URLs
 
 **What changed:** Updated admin role detail, edit, update, and delete flows to use the role slug instead of the numeric role ID.
