@@ -24,12 +24,16 @@ export function SignupForm() {
   const password = watch("password", "");
   const mutation = useRegisterMutation();
 
+  function sanitizeUsername(value: string): string {
+    return value.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  }
+
   function onSubmit(data: SignupFormValues) {
     mutation.mutate({
       firstName: data.firstName.trim(),
       lastName: data.lastName.trim(),
       email: data.email.trim().toLowerCase(),
-      username: data.username.trim(),
+      username: sanitizeUsername(data.username),
       password: data.password,
     });
   }
@@ -160,17 +164,24 @@ export function SignupForm() {
                 required: "Username is required",
                 minLength: { value: 3, message: "Min 3 characters" },
                 pattern: {
-                  value: /^[a-zA-Z0-9_]+$/,
-                  message: "Letters, numbers and underscores only",
+                  value: /^[a-z0-9_-]+$/,
+                  message: "Lowercase letters, numbers, underscores and hyphens only",
                 },
                 validate: async (value) => {
-                  if (value.length < 3) return true; // let minLength handle it
-                  const normalized = value.trim();
+                  if (value.length < 3) return true;
+                  const normalized = sanitizeUsername(value);
                   const available = await AuthService.checkUsername(normalized).catch(() => true);
                   return available || "Username is already taken";
                 },
+                onChange: (e) => {
+                  e.target.value = sanitizeUsername(e.target.value);
+                },
               })}
             />
+            <p className="text-zinc-500 text-xs">
+              Lowercase letters, numbers, <code className="text-zinc-400">_</code> and{" "}
+              <code className="text-zinc-400">-</code> only
+            </p>
             {errors.username && <p className="text-red-400 text-xs">{errors.username.message}</p>}
           </div>
 

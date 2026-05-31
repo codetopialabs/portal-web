@@ -1,31 +1,3 @@
-export interface Role {
-  id: number;
-  name: string;
-  displayName: string;
-  description: string;
-  rank: number;
-  permissions: string[];
-  isSystem: boolean;
-  memberCount: number;
-}
-
-export type RoleDetail = Role;
-
-export interface CreateRoleInput {
-  name: string;
-  displayName: string;
-  description?: string;
-  rank: number;
-  permissions: string[];
-}
-
-export interface UpdateRoleInput {
-  displayName?: string;
-  description?: string;
-  rank?: number;
-  permissions?: string[];
-}
-
 export interface AdminMember {
   id: string;
   communityId: string;
@@ -36,10 +8,10 @@ export interface AdminMember {
   isActive: boolean;
   isEmailVerified: boolean;
   isOnboarded: boolean;
-  fullName: string;
   primaryRole: string | null;
   primaryRoleRank: number | null;
   roles: string[];
+  fullName: string;
   bio: string | null;
   skills: string[];
   githubHandle: string | null;
@@ -70,14 +42,8 @@ export interface UpdateMemberInput {
   fullName?: string;
   bio?: string;
   location?: string;
-  memberStatus?: string;
   currentRole?: string;
-}
-
-export interface PermissionEntry {
-  codename: string;
-  description: string;
-  isDestructive: boolean;
+  memberStatus?: string;
 }
 
 export interface MemberListParams {
@@ -85,4 +51,14 @@ export interface MemberListParams {
   role?: string;
   isEmailVerified?: boolean;
   isActive?: boolean;
+}
+
+export interface AdminUserSession {
+  id: number;
+  userId: string;
+  deviceName: string;
+  ipAddress: string | null;
+  userAgent: string;
+  createdAt: string;
+  isCurrent: boolean;
 }

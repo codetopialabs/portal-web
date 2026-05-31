@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Loader2, Plus, User, X } from "lucide-react";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaBehance,
@@ -35,6 +35,7 @@ interface ProfileFormValues {
   full_name: string;
   username: string;
   date_of_birth: string;
+  gender: string;
   discord_username: string;
   bio: string;
   github_handle: string;
@@ -170,6 +171,10 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  useEffect(() => {
+    setAvatarUrl(onboarding.avatarUrl ?? profile?.profilePictureUrl ?? null);
+  }, [onboarding.avatarUrl, profile?.profilePictureUrl]);
+
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -227,6 +232,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       full_name: onboarding.fullName || profile?.fullName || "",
       username: onboarding.username || profile?.username || "",
       date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
+      gender: onboarding.gender || profile?.gender || "",
       discord_username: onboarding.discordUsername || profile?.discordUsername || "",
       bio: onboarding.bio || profile?.bio || "",
       github_handle: onboarding.githubHandle || profile?.githubHandle || "",
@@ -242,6 +248,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       fullName: v.full_name,
       username: v.username,
       dateOfBirth: v.date_of_birth,
+      gender: v.gender,
       discordUsername: v.discord_username,
       bio: v.bio,
       githubHandle: v.github_handle,
@@ -281,6 +288,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         twitter_handle: data.twitter_handle || undefined,
         website_url: data.website_url || undefined,
         date_of_birth: data.date_of_birth || undefined,
+        gender: data.gender || undefined,
         profile_picture_url: avatarUrl || undefined,
         is_onboarded: true,
       });
@@ -475,6 +483,24 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 {errors.date_of_birth && (
                   <p className="text-red-500 text-xs font-mono">{errors.date_of_birth.message}</p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="gender" className={labelStyles}>
+                  Gender{" "}
+                  <span className="text-zinc-300 font-normal normal-case tracking-normal">
+                    (optional)
+                  </span>
+                </label>
+                <select
+                  id="gender"
+                  className="h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus:outline-none focus:border-zinc-900 transition-all appearance-none cursor-pointer"
+                  {...register("gender")}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
               </div>
 
               <div className="space-y-2">

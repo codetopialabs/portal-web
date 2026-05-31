@@ -12,6 +12,7 @@ export interface UserProfile {
   fullName: string;
   profilePictureUrl: string | null;
   coverImageUrl: string | null;
+  gender: string | null;
   bio: string | null;
   skills: string[];
   githubHandle: string | null;
@@ -41,6 +42,7 @@ export interface CommunityMember {
   fullName: string;
   profilePictureUrl: string;
   coverImageUrl: string;
+  gender: string;
   bio: string;
   skills: string[];
   location: string;
@@ -60,6 +62,7 @@ export interface CommunityMember {
 export interface UpdateMeRequest {
   full_name?: string;
   username?: string;
+  gender?: string;
   bio?: string;
   skills?: string[];
   github_handle?: string;
@@ -135,10 +138,8 @@ export const UserService = {
   },
 
   async uploadCoverImage(file: File): Promise<string> {
-    // Reuse the same signature endpoint — Cloudinary folder is per-user,
-    // we just append /cover to distinguish from the avatar
     const sigResponse = await axiosInstance.get<{ data: UploadSignature }>(
-      "/auth/cloudinary-signature/"
+      "/auth/cloudinary-signature/?type=cover"
     );
     const sig = sigResponse.data.data;
     const form = new FormData();
@@ -146,7 +147,7 @@ export const UserService = {
     form.append("api_key", sig.apiKey);
     form.append("timestamp", String(sig.timestamp));
     form.append("signature", sig.signature);
-    form.append("folder", `${sig.folder}/cover`);
+    form.append("folder", sig.folder);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`, {
       method: "POST",
       body: form,
