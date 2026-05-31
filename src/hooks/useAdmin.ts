@@ -1,13 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  AdminService,
-  type CreateRoleInput,
-  type MemberListParams,
-  type UpdateMemberInput,
-  type UpdateRoleInput,
-} from "@/services/admin.service";
+import { RolesService } from "@/services/roles.service";
+import { UsersService } from "@/services/users.service";
+import { PermissionsService } from "@/services/permissions.service";
+import { ActivityService } from "@/services/activity.service";
+import type { CreateRoleInput, UpdateRoleInput } from "@/types/roles.types";
+import type { MemberListParams, UpdateMemberInput } from "@/types/users.types";
 
 // ─── Query keys ───────────────────────────────────────────────────────────────
 
@@ -28,14 +27,14 @@ export const adminKeys = {
 export function useRoles() {
   return useQuery({
     queryKey: adminKeys.roles,
-    queryFn: () => AdminService.getRoles(),
+    queryFn: () => RolesService.getRoles(),
   });
 }
 
 export function useRole(slug: string) {
   return useQuery({
     queryKey: adminKeys.role(slug),
-    queryFn: () => AdminService.getRole(slug),
+    queryFn: () => RolesService.getRole(slug),
     enabled: !!slug,
   });
 }
@@ -43,7 +42,7 @@ export function useRole(slug: string) {
 export function useCreateRole() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateRoleInput) => AdminService.createRole(data),
+    mutationFn: (data: CreateRoleInput) => RolesService.createRole(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
     },
@@ -54,7 +53,7 @@ export function useUpdateRole() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ slug, data }: { slug: string; data: UpdateRoleInput }) =>
-      AdminService.updateRole(slug, data),
+      RolesService.updateRole(slug, data),
     onSuccess: (_result, { slug }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
       queryClient.invalidateQueries({ queryKey: adminKeys.role(slug) });
@@ -65,7 +64,7 @@ export function useUpdateRole() {
 export function useDeleteRole() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (slug: string) => AdminService.deleteRole(slug),
+    mutationFn: (slug: string) => RolesService.deleteRole(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
     },
@@ -78,7 +77,7 @@ export function useAssignRole() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, roleName }: { userId: string; roleName: string }) =>
-      AdminService.assignRole(userId, roleName),
+      RolesService.assignRole(userId, roleName),
     onSuccess: (_result, { userId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(userId) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -92,7 +91,7 @@ export function useRevokeRole() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, roleName }: { userId: string; roleName: string }) =>
-      AdminService.revokeRole(userId, roleName),
+      RolesService.revokeRole(userId, roleName),
     onSuccess: (_result, { userId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(userId) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -107,14 +106,14 @@ export function useRevokeRole() {
 export function useAdminMembers(params?: MemberListParams) {
   return useQuery({
     queryKey: adminKeys.users(params),
-    queryFn: () => AdminService.getAdminMembers(params),
+    queryFn: () => UsersService.getUsers(params),
   });
 }
 
 export function useAdminMember(id: string) {
   return useQuery({
     queryKey: adminKeys.user(id),
-    queryFn: () => AdminService.getAdminMember(id),
+    queryFn: () => UsersService.getUser(id),
     enabled: !!id,
   });
 }
@@ -123,7 +122,7 @@ export function useUpdateAdminMember() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateMemberInput }) =>
-      AdminService.updateAdminMember(id, data),
+      UsersService.updateUser(id, data),
     onSuccess: (_result, { id }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -135,7 +134,7 @@ export function useUpdateAdminMember() {
 export function useSuspendMember() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => AdminService.suspendMember(id),
+    mutationFn: (id: string) => UsersService.suspendUser(id),
     onSuccess: (_result, id) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -147,7 +146,7 @@ export function useSuspendMember() {
 export function useReactivateMember() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => AdminService.reactivateMember(id),
+    mutationFn: (id: string) => UsersService.reactivateUser(id),
     onSuccess: (_result, id) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -159,7 +158,7 @@ export function useReactivateMember() {
 export function useDeleteMember() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => AdminService.deleteMember(id),
+    mutationFn: (id: string) => UsersService.deleteUser(id),
     onSuccess: (_result, id) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
@@ -173,7 +172,7 @@ export function useDeleteMember() {
 export function useAdminUserSessions(id: string, enabled = true) {
   return useQuery({
     queryKey: adminKeys.userSessions(id),
-    queryFn: () => AdminService.getAdminUserSessions(id),
+    queryFn: () => UsersService.getUserSessions(id),
     enabled: !!id && enabled,
   });
 }
@@ -182,7 +181,7 @@ export function useRevokeAdminUserSession() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userId, sessionId }: { userId: string; sessionId: number }) =>
-      AdminService.revokeAdminUserSession(userId, sessionId),
+      UsersService.revokeUserSession(userId, sessionId),
     onSuccess: (_result, { userId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.userSessions(userId) });
     },
@@ -192,7 +191,7 @@ export function useRevokeAdminUserSession() {
 export function useRevokeAllAdminUserSessions() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId: string) => AdminService.revokeAllAdminUserSessions(userId),
+    mutationFn: (userId: string) => UsersService.revokeAllUserSessions(userId),
     onSuccess: (_result, userId) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.userSessions(userId) });
     },
@@ -211,7 +210,7 @@ export function useAdminActivity(
       page: params.offset,
       limit: params.limit,
     }),
-    queryFn: () => AdminService.getAdminActivity(params.limit, params.offset, params.userId),
+    queryFn: () => ActivityService.getAllActivity(params.limit, params.offset, params.userId),
     enabled,
   });
 }
@@ -221,6 +220,6 @@ export function useAdminActivity(
 export function usePermissionList() {
   return useQuery({
     queryKey: adminKeys.permissions,
-    queryFn: () => AdminService.getPermissions(),
+    queryFn: () => PermissionsService.getPermissions(),
   });
 }

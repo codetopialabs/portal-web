@@ -2,8 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { DriveStep } from "driver.js";
-import { ArrowRight, MapPin, Pencil, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
+import { ArrowRight, Copy, MapPin, Pencil, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { ProfileCompletionCarousel } from "@/components/dashboard/ProfileCompletionCarousel";
 import { DASHBOARD_MODULES, DASHBOARD_NEXT_ACTIONS } from "@/data/dashboard";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
@@ -188,25 +189,48 @@ export function DashboardContent() {
               </div>
             </div>
 
-            <aside className="w-full shrink-0 border border-zinc-900 bg-zinc-950 p-5 lg:w-72 lg:mt-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                    Profile strength
-                  </p>
-                  <p className="mt-2 font-sans text-3xl font-black text-white">
-                    {profileStrength}%
-                  </p>
-                  <p
-                    className={`mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] ${strengthColor.replace("-600", "-400")}`}
-                  >
-                    {strengthText}
-                  </p>
+            <aside className="w-full shrink-0 border border-zinc-900 bg-zinc-950 p-5 lg:w-72 lg:mt-6 flex flex-col justify-between gap-6">
+              <div>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                      Profile strength
+                    </p>
+                    <p className="mt-2 font-sans text-3xl font-black text-white">
+                      {profileStrength}%
+                    </p>
+                    <p
+                      className={`mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] ${strengthColor.replace("-600", "-400")}`}
+                    >
+                      {strengthText}
+                    </p>
+                  </div>
+                  <UserRoundCheck className="h-5 w-5 text-emerald-400 shrink-0" />
                 </div>
-                <UserRoundCheck className="h-5 w-5 text-emerald-400 shrink-0" />
+                <div className="mt-4 h-1.5 bg-zinc-800">
+                  <div className={`h-full ${barColor}`} style={{ width: `${profileStrength}%` }} />
+                </div>
               </div>
-              <div className="mt-4 h-1.5 bg-zinc-800">
-                <div className={`h-full ${barColor}`} style={{ width: `${profileStrength}%` }} />
+
+              <div className="pt-5 border-t border-zinc-800">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                  Community ID
+                </p>
+                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 border border-zinc-800 bg-black p-1.5">
+                  <span className="font-mono text-[11px] text-zinc-300 px-2 truncate">
+                    {profile.communityId}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(profile.communityId);
+                      toast.success("Community ID copied to clipboard!");
+                    }}
+                    title="Copy ID"
+                    className="shrink-0 flex items-center justify-center h-7 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-zinc-800"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </button>
+                </div>
               </div>
             </aside>
           </div>

@@ -132,6 +132,7 @@ interface ProfileFormValues {
   current_role: string;
   primary_role: string;
   date_of_birth: string;
+  gender: string;
   bio: string;
   discord_username: string;
   github_handle: string;
@@ -168,9 +169,11 @@ export default function SettingsProfilePage() {
     { id: string; platform: string; label: string; url: string }[]
   >([]);
   const [showPicker, setShowPicker] = useState(false);
-  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
   const walkthroughSteps: DriveStep[] = [
@@ -249,7 +252,7 @@ export default function SettingsProfilePage() {
     enabled: Boolean(profile),
   });
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -260,19 +263,14 @@ export default function SettingsProfilePage() {
       toast.error("Image must be smaller than 5 MB.");
       return;
     }
-    setAvatarUploading(true);
-    try {
-      const url = await UserService.uploadAvatar(file);
-      await updateMe({ profile_picture_url: url });
-      toast.success("Profile photo updated.");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setAvatarUploading(false);
-    }
+    
+    const previewUrl = URL.createObjectURL(file);
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarPreview(previewUrl);
+    setAvatarFile(file);
   }
 
-  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -283,16 +281,11 @@ export default function SettingsProfilePage() {
       toast.error("Cover image must be smaller than 10 MB.");
       return;
     }
-    setCoverUploading(true);
-    try {
-      const url = await UserService.uploadCoverImage(file);
-      await updateMe({ cover_image_url: url });
-      toast.success("Cover image updated.");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setCoverUploading(false);
-    }
+    
+    const previewUrl = URL.createObjectURL(file);
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverPreview(previewUrl);
+    setCoverFile(file);
   }
 
   function addCustomLink(platform: string) {
@@ -329,6 +322,7 @@ export default function SettingsProfilePage() {
       current_role: profile?.currentRole ?? "",
       primary_role: profile?.primaryRole ?? "",
       date_of_birth: profile?.dateOfBirth ?? "",
+      gender: profile?.gender ?? "",
       bio: profile?.bio ?? "",
       discord_username: profile?.discordUsername ?? "",
       github_handle: profile?.githubHandle ?? "",
@@ -349,6 +343,16 @@ export default function SettingsProfilePage() {
 
   async function onSubmit(data: ProfileFormValues) {
     try {
+      let newCoverUrl = profile?.coverImageUrl;
+      let newAvatarUrl = profile?.profilePictureUrl;
+
+      if (coverFile) {
+        newCoverUrl = await UserService.uploadCoverImage(coverFile);
+      }
+      if (avatarFile) {
+        newAvatarUrl = await UserService.uploadAvatar(avatarFile);
+      }
+
       await updateMe({
         full_name: data.full_name.trim(),
         username: data.username.trim(),
@@ -356,6 +360,7 @@ export default function SettingsProfilePage() {
         current_role: data.current_role.trim() || undefined,
         primary_role: data.primary_role,
         date_of_birth: data.date_of_birth || undefined,
+        gender: data.gender || undefined,
         bio: data.bio.trim() || undefined,
         discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         github_handle: data.github_handle.trim() || undefined,
@@ -363,9 +368,22 @@ export default function SettingsProfilePage() {
         twitter_handle: data.twitter_handle.trim() || undefined,
         website_url: data.website_url.trim() || undefined,
         skills,
+        cover_image_url: newCoverUrl ?? undefined,
+        profile_picture_url: newAvatarUrl ?? undefined,
       });
+
       toast.success("Profile updated.");
       reset(data);
+      if (coverFile) {
+        setCoverFile(null);
+        if (coverPreview) URL.revokeObjectURL(coverPreview);
+        setCoverPreview(null);
+      }
+      if (avatarFile) {
+        setAvatarFile(null);
+        if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+        setAvatarPreview(null);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     }
@@ -390,19 +408,19 @@ export default function SettingsProfilePage() {
           <button
             type="button"
             className="w-full relative group cursor-pointer h-24 bg-zinc-100 flex items-center justify-center"
-            onClick={() => !coverUploading && coverInputRef.current?.click()}
-            disabled={coverUploading}
+            onClick={() => !isSubmitting && coverInputRef.current?.click()}
+            disabled={isSubmitting}
           >
-            {profile?.coverImageUrl ? (
+            {coverPreview || profile?.coverImageUrl ? (
               // biome-ignore lint/performance/noImgElement: cover image
-              <img src={profile.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+              <img src={coverPreview || profile?.coverImageUrl || ""} alt="Cover" className="w-full h-full object-cover" />
             ) : (
               <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                 No cover image
               </span>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {coverUploading ? (
+              {isSubmitting && coverFile ? (
                 <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
                 <Camera className="w-4 h-4 text-white" />
@@ -411,18 +429,18 @@ export default function SettingsProfilePage() {
           </button>
           <button
             type="button"
-            disabled={coverUploading}
+            disabled={isSubmitting}
             onClick={() => coverInputRef.current?.click()}
             className="w-full h-9 border-t border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {coverUploading ? (
+            {isSubmitting && coverFile ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
               </>
             ) : (
               <>
                 <Camera className="w-3.5 h-3.5" />{" "}
-                {profile?.coverImageUrl ? "Change Cover" : "Upload Cover"}
+                {profile?.coverImageUrl || coverPreview ? "Change Cover" : "Upload Cover"}
               </>
             )}
           </button>
@@ -438,19 +456,19 @@ export default function SettingsProfilePage() {
           <button
             type="button"
             className="relative group cursor-pointer"
-            onClick={() => !avatarUploading && avatarInputRef.current?.click()}
-            disabled={avatarUploading}
+            onClick={() => !isSubmitting && avatarInputRef.current?.click()}
+            disabled={isSubmitting}
           >
             <div className="w-24 h-24 rounded-none overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center p-1">
               {/* biome-ignore lint/performance/noImgElement: user avatar */}
               <img
-                src={getAvatarUrl(profile?.profilePictureUrl, profile?.fullName ?? "User")}
+                src={avatarPreview || getAvatarUrl(profile?.profilePictureUrl, profile?.fullName ?? "User")}
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              {avatarUploading ? (
+            <div className="absolute inset-0 rounded-none bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              {isSubmitting && avatarFile ? (
                 <Loader2 className="w-4 h-4 text-white animate-spin" />
               ) : (
                 <Camera className="w-4 h-4 text-white" />
@@ -465,11 +483,11 @@ export default function SettingsProfilePage() {
           </div>
           <button
             type="button"
-            disabled={avatarUploading}
+            disabled={isSubmitting}
             onClick={() => avatarInputRef.current?.click()}
             className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {avatarUploading ? (
+            {isSubmitting && avatarFile ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…
               </>
@@ -505,7 +523,18 @@ export default function SettingsProfilePage() {
                 <Label htmlFor="username" className={labelStyles}>
                   Username
                 </Label>
-                <Input id="username" className={inputStyles} {...register("username")} />
+                <Input
+                  id="username"
+                  className={inputStyles}
+                  {...register("username", {
+                    onChange: (e) => {
+                      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+                    },
+                  })}
+                />
+                <p className="font-mono text-[10px] text-zinc-400">
+                  Lowercase letters, numbers, <code>_</code> and <code>-</code> only
+                </p>
               </div>
             </div>
 
@@ -593,6 +622,21 @@ export default function SettingsProfilePage() {
                 className={inputStyles}
                 {...register("date_of_birth")}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gender" className={labelStyles}>
+                Gender <span className="text-zinc-300 font-normal normal-case tracking-normal">(optional)</span>
+              </Label>
+              <select
+                id="gender"
+                className="h-11 w-full rounded-none border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus:outline-none focus:border-zinc-900 transition-all appearance-none cursor-pointer"
+                {...register("gender")}
+              >
+                <option value="">Prefer not to say</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
             </div>
 
             <div className="space-y-2">
@@ -790,8 +834,16 @@ export default function SettingsProfilePage() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => reset()}
-            disabled={!isDirty && skills.join() === (profile?.skills ?? []).join()}
+            onClick={() => {
+              reset();
+              if (coverPreview) URL.revokeObjectURL(coverPreview);
+              if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+              setCoverPreview(null);
+              setCoverFile(null);
+              setAvatarPreview(null);
+              setAvatarFile(null);
+            }}
+            disabled={!isDirty && skills.join() === (profile?.skills ?? []).join() && !avatarFile && !coverFile}
             className="h-10 rounded-none border-zinc-200 font-mono text-xs uppercase tracking-widest px-6 hover:border-zinc-400"
           >
             Discard

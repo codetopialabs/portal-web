@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateRole, usePermissionList } from "@/hooks/useAdmin";
-import type { PermissionEntry } from "@/services/admin.service";
+import type { PermissionEntry } from "@/types/permissions.types";
 
 // ─── Permission picker ────────────────────────────────────────────────────────
 

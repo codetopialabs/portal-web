@@ -32,7 +32,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRole as useAdminRole, useDeleteRole, usePermissionList } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
 import { resolvePermission } from "@/lib/permissions";
-import type { PermissionEntry } from "@/services/admin.service";
+import type { PermissionEntry } from "@/types/permissions.types";
 
 type PermissionGroup = {
   resource: string;

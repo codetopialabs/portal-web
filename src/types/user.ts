@@ -27,6 +27,7 @@ export interface UserProfile {
   referralSource: string | null;
   location: string | null;
   dateOfBirth: string | null;
+  gender: string | null;
   completedWalkthroughs: string[];
 }
 
@@ -53,6 +54,7 @@ export interface CommunityMember {
   isEmailVerified: boolean;
   isOnboarded: boolean;
   joinedAt: string;
+  gender: string;
 }
 
 export interface UpdateMeRequest {
@@ -75,6 +77,7 @@ export interface UpdateMeRequest {
   referral_source?: string;
   location?: string;
   date_of_birth?: string;
+  gender?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;
   cover_image_url?: string;

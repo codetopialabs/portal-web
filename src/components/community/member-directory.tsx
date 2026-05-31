@@ -2,7 +2,7 @@
 
 import { ArrowRight, MapPin, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,9 @@ import {
   type MemberFilters,
 } from "./member-directory-utils";
 import { MemberFilterPopover } from "./member-filter-popover";
+
+const INITIAL_VISIBLE_COUNT = 6;
+const LOAD_MORE_COUNT = 6;
 
 interface MemberDirectoryProps {
   members: CommunityMember[];
@@ -38,11 +41,22 @@ export function MemberDirectory({
     ...EMPTY_FILTERS,
     role: initialRoleFilter || "all",
   });
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const feedKey = useMemo(
+    () => `${search}|${filters.role}|${filters.skill}|${filters.experience}`,
+    [filters.experience, filters.role, filters.skill, search]
+  );
+  const lastFeedKeyRef = useRef(feedKey);
 
   const options = useMemo(() => getMemberFilterOptions(members), [members]);
   const filteredMembers = useMemo(
     () => filterMembers(members, search, filters),
     [filters, members, search]
+  );
+  const visibleMembers = useMemo(
+    () => filteredMembers.slice(0, visibleCount),
+    [filteredMembers, visibleCount]
   );
   const featuredMembers = useMemo(
     () =>
@@ -51,6 +65,31 @@ export function MemberDirectory({
         .slice(0, 1),
     [members]
   );
+
+  useEffect(() => {
+    if (lastFeedKeyRef.current === feedKey) return;
+    lastFeedKeyRef.current = feedKey;
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+  }, [feedKey]);
+
+  useEffect(() => {
+    if (isLoading || visibleMembers.length >= filteredMembers.length) return;
+
+    const sentinel = loadMoreRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        setVisibleCount((current) => Math.min(current + LOAD_MORE_COUNT, filteredMembers.length));
+      },
+      { rootMargin: "300px 0px" }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [filteredMembers.length, isLoading, visibleMembers.length]);
 
   function updateFilters(nextFilters: MemberFilters) {
     setFilters(nextFilters);
@@ -142,7 +181,7 @@ export function MemberDirectory({
         {isLoading ? (
           <MemberCardSkeletons />
         ) : (
-          filteredMembers.map((member) => <MemberCard key={member.id} member={member} />)
+          visibleMembers.map((member) => <MemberCard key={member.id} member={member} />)
         )}
 
         {!isLoading && filteredMembers.length === 0 && (
@@ -163,6 +202,18 @@ export function MemberDirectory({
             >
               Clear filters
             </button>
+          </div>
+        )}
+
+        {!isLoading && filteredMembers.length > visibleMembers.length && (
+          <div
+            ref={loadMoreRef}
+            className="flex items-center justify-between border border-zinc-200 bg-white px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 sm:col-span-2 lg:col-span-3"
+          >
+            <span>
+              Showing {visibleMembers.length} of {filteredMembers.length}
+            </span>
+            <span>Scroll for more</span>
           </div>
         )}
       </div>

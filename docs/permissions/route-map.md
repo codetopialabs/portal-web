@@ -25,7 +25,7 @@ Every protected page in the portal declares the permission required to access it
 | `/admin/members` | `users.view` | |
 | `/admin/members/[username]` | `users.view` | |
 | `/admin/members/[username]/edit` | `users.edit` | |
-| `/@username` | `profile.view` | Any authenticated member |
+| `/@username` | none (public) | Any visitor |
 | `/settings/profile` | `profile.edit` | Own profile |
 | `/settings/security` | `security.view` | Own sessions and password settings |
 | `/settings/apps` | authenticated | Connected apps placeholder |
