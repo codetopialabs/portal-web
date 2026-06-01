@@ -26,6 +26,7 @@ export interface OnboardingData {
   username: string;
   dateOfBirth: string;
   gender: string;
+  nationality: string;
   discordUsername: string;
   bio: string;
   githubHandle: string;
@@ -61,6 +62,7 @@ const INITIAL: OnboardingData = {
   username: "",
   dateOfBirth: "",
   gender: "",
+  nationality: "",
   discordUsername: "",
   bio: "",
   githubHandle: "",

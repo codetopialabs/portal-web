@@ -43,6 +43,7 @@ interface ProfileFormValues {
   username: string;
   date_of_birth: string;
   gender: string;
+  nationality: string;
   discord_username: string;
   bio: string;
   github_handle: string;
@@ -265,6 +266,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       username: onboarding.username || profile?.username || "",
       date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
       gender: onboarding.gender || profile?.gender || "",
+      nationality: onboarding.nationality || profile?.nationality || "",
       discord_username: onboarding.discordUsername || profile?.discordUsername || "",
       bio: onboarding.bio || profile?.bio || "",
       github_handle: onboarding.githubHandle || profile?.githubHandle || "",
@@ -281,6 +283,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       username: v.username,
       dateOfBirth: v.date_of_birth,
       gender: v.gender,
+      nationality: v.nationality,
       discordUsername: v.discord_username,
       bio: v.bio,
       githubHandle: v.github_handle,
@@ -321,6 +324,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         website_url: data.website_url || undefined,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
+        nationality: data.nationality || undefined,
         profile_picture_url: avatarUrl || undefined,
         is_onboarded: true,
       });
@@ -542,6 +546,21 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 />
                 {errors.gender && (
                   <p className="text-red-500 text-xs font-mono">{errors.gender.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="nationality" className={labelStyles}>
+                  Nationality *
+                </label>
+                <input
+                  id="nationality"
+                  className={inputStyles}
+                  placeholder="e.g. Ghanaian, Nigerian, British"
+                  {...register("nationality", { required: "Nationality is required" })}
+                />
+                {errors.nationality && (
+                  <p className="text-red-500 text-xs font-mono">{errors.nationality.message}</p>
                 )}
               </div>
 

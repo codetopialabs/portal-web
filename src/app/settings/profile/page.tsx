@@ -133,6 +133,7 @@ interface ProfileFormValues {
   primary_role: string;
   date_of_birth: string;
   gender: string;
+  nationality: string;
   bio: string;
   discord_username: string;
   github_handle: string;
@@ -341,6 +342,7 @@ export default function SettingsProfilePage() {
       primary_role: profile?.primaryRole ?? "",
       date_of_birth: profile?.dateOfBirth ?? "",
       gender: profile?.gender ?? "",
+      nationality: profile?.nationality ?? "",
       bio: profile?.bio ?? "",
       discord_username: profile?.discordUsername ?? "",
       github_handle: profile?.githubHandle ?? "",
@@ -379,6 +381,7 @@ export default function SettingsProfilePage() {
         primary_role: data.primary_role,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
+        nationality: data.nationality || undefined,
         bio: data.bio.trim() || undefined,
         discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         github_handle: data.github_handle.trim() || undefined,
@@ -678,6 +681,18 @@ export default function SettingsProfilePage() {
               {errors.gender && (
                 <p className="text-red-500 text-xs font-mono">{errors.gender.message}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="nationality" className={labelStyles}>
+                Nationality
+              </Label>
+              <Input
+                id="nationality"
+                placeholder="e.g. Ghanaian, Nigerian, British"
+                className={inputStyles}
+                {...register("nationality")}
+              />
             </div>
 
             <div className="space-y-2">

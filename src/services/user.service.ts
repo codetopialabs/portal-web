@@ -31,6 +31,7 @@ export interface UserProfile {
   location: string | null;
   dateOfBirth: string | null;
   completedWalkthroughs: string[];
+  nationality: string | null;
 }
 
 export interface CommunityMember {
@@ -80,6 +81,7 @@ export interface UpdateMeRequest {
   referral_source?: string;
   location?: string;
   date_of_birth?: string;
+  nationality?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;
   cover_image_url?: string;
