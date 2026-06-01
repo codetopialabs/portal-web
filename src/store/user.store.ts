@@ -32,6 +32,18 @@ export const useUserStore = create<UserState>((set) => ({
   updateMe: async (data: UpdateMeRequest) => {
     const profile = await UserService.updateMe(data);
     set({ profile });
+
+    // Invalidate the React Query me cache and community members list so any
+    // component using useMe() or useCommunityMembers() picks up the change.
+    // We import lazily to avoid a circular dependency at module load time.
+    try {
+      const { getQueryClient } = await import("@/lib/queryClient");
+      const qc = getQueryClient();
+      qc.setQueryData(["me"], profile);
+      qc.invalidateQueries({ queryKey: ["community-members"] });
+    } catch {
+      // Query client not available (e.g. SSR or test env) — store update is enough.
+    }
   },
 
   setOnboarded: () => {

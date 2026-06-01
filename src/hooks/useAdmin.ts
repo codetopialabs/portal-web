@@ -7,6 +7,7 @@ import { PermissionsService } from "@/services/permissions.service";
 import { ActivityService } from "@/services/activity.service";
 import type { CreateRoleInput, UpdateRoleInput } from "@/types/roles.types";
 import type { MemberListParams, UpdateMemberInput } from "@/types/users.types";
+import { ME_QUERY_KEY } from "@/hooks/useMe";
 
 // ─── Query keys ───────────────────────────────────────────────────────────────
 
@@ -57,6 +58,8 @@ export function useUpdateRole() {
     onSuccess: (_result, { slug }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
       queryClient.invalidateQueries({ queryKey: adminKeys.role(slug) });
+      // Role permissions changed — current user's permissions may be stale.
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     },
   });
 }
@@ -67,6 +70,8 @@ export function useDeleteRole() {
     mutationFn: (slug: string) => RolesService.deleteRole(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
+      // A role was deleted — current user may have held it.
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     },
   });
 }
@@ -83,6 +88,8 @@ export function useAssignRole() {
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
       queryClient.invalidateQueries({ queryKey: ["community-members"] });
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
+      // The target user's permissions changed — if they're the current user, refresh me.
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     },
   });
 }
@@ -97,6 +104,8 @@ export function useRevokeRole() {
       queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
       queryClient.invalidateQueries({ queryKey: ["community-members"] });
       queryClient.invalidateQueries({ queryKey: adminKeys.roles });
+      // The target user's permissions changed — if they're the current user, refresh me.
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     },
   });
 }
