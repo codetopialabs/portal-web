@@ -158,6 +158,23 @@ function Divider() {
   return <div className="border-t border-zinc-100" />;
 }
 
+const BIO_MAX = 1000;
+
+function BioCharCount({ watch }: { watch: (name: string) => string }) {
+  const value = watch("bio") || "";
+  const count = value.length;
+  const near = count >= BIO_MAX * 0.85;
+  const over = count > BIO_MAX;
+  return (
+    <p
+      className={`text-right font-mono text-[10px] ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+        }`}
+    >
+      {count} / {BIO_MAX}
+    </p>
+  );
+}
+
 export default function SettingsProfilePage() {
   const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
@@ -312,6 +329,7 @@ export default function SettingsProfilePage() {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<ProfileFormValues>({
@@ -670,8 +688,14 @@ export default function SettingsProfilePage() {
                 id="bio"
                 placeholder="Tell the community who you are..."
                 className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
-                {...register("bio")}
+                {...register("bio", {
+                  maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
+                })}
               />
+              <BioCharCount watch={watch} />
+              {errors.bio && (
+                <p className="font-mono text-xs text-red-500">{errors.bio.message}</p>
+              )}
             </div>
           </div>
         </section>

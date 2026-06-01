@@ -154,6 +154,29 @@ function Divider() {
   return <div className="border-t border-zinc-100" />;
 }
 
+function BioCharCount({
+  fieldName,
+  max,
+  watch,
+}: {
+  fieldName: string;
+  max: number;
+  watch: (name: string) => string;
+}) {
+  const value = watch(fieldName) || "";
+  const count = value.length;
+  const near = count >= max * 0.85;
+  const over = count > max;
+  return (
+    <p
+      className={`text-right font-mono text-[10px] mt-1 ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+        }`}
+    >
+      {count} / {max}
+    </p>
+  );
+}
+
 export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileProps) {
   const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
@@ -234,6 +257,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     register,
     handleSubmit,
     getValues,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     defaultValues: {
@@ -553,12 +577,20 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <label htmlFor="bio" className={labelStyles}>
                   Bio
                 </label>
-                <textarea
-                  id="bio"
-                  placeholder="Tell the community who you are..."
-                  className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
-                  {...register("bio")}
-                />
+                <div className="relative">
+                  <textarea
+                    id="bio"
+                    placeholder="Tell the community who you are..."
+                    className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                    {...register("bio", {
+                      maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
+                    })}
+                  />
+                  <BioCharCount fieldName="bio" max={1000} watch={watch} />
+                </div>
+                {errors.bio && (
+                  <p className="text-red-500 text-xs font-mono">{errors.bio.message}</p>
+                )}
               </div>
             </div>
           </section>
