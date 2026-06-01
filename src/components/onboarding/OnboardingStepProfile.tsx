@@ -533,7 +533,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       >
                         <SelectValue placeholder="Select your gender" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1">
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
                       </SelectContent>
