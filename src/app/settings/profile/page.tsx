@@ -263,7 +263,7 @@ export default function SettingsProfilePage() {
       toast.error("Image must be smaller than 5 MB.");
       return;
     }
-    
+
     const previewUrl = URL.createObjectURL(file);
     if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarPreview(previewUrl);
@@ -281,7 +281,7 @@ export default function SettingsProfilePage() {
       toast.error("Cover image must be smaller than 10 MB.");
       return;
     }
-    
+
     const previewUrl = URL.createObjectURL(file);
     if (coverPreview) URL.revokeObjectURL(coverPreview);
     setCoverPreview(previewUrl);
@@ -312,7 +312,7 @@ export default function SettingsProfilePage() {
     register,
     handleSubmit,
     control,
-    formState: { isSubmitting, isDirty },
+    formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<ProfileFormValues>({
     defaultValues: {
@@ -586,7 +586,7 @@ export default function SettingsProfilePage() {
                     >
                       <SelectValue placeholder="None (Default)" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-[200px]">
+                    <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
                       <SelectItem
                         value="none"
                         className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
@@ -626,17 +626,40 @@ export default function SettingsProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="gender" className={labelStyles}>
-                Gender <span className="text-zinc-300 font-normal normal-case tracking-normal">(optional)</span>
+                Gender *
               </Label>
-              <select
-                id="gender"
-                className="h-11 w-full rounded-none border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus:outline-none focus:border-zinc-900 transition-all appearance-none cursor-pointer"
-                {...register("gender")}
-              >
-                <option value="">Prefer not to say</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
+              <Controller
+                name="gender"
+                control={control}
+                rules={{ required: "Gender is required" }}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      id="gender"
+                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                    >
+                      <SelectValue placeholder="Select your gender" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
+                      <SelectItem
+                        value="Male"
+                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                      >
+                        Male
+                      </SelectItem>
+                      <SelectItem
+                        value="Female"
+                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                      >
+                        Female
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.gender && (
+                <p className="text-red-500 text-xs font-mono">{errors.gender.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
