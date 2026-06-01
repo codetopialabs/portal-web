@@ -4,6 +4,20 @@ category: General
 order: 1
 ---
 
+## [2026-06-01] Dashboard Community ID placement update
+
+**What changed:** Moved the Community ID on the dashboard out of the profile-strength sidebar and placed it directly in the primary profile action row beside the Edit Profile control for cleaner placement.
+**Affected areas:** Dashboard profile header.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-06-01] Required onboarding gender selection and unified dropdown
+
+**What changed:** Updated onboarding and settings profile forms so gender must be selected before submitting, limited gender options to only `Male` and `Female`, and replaced browser-native gender selects with the shared shadcn-styled select for a consistent form UI.
+**Affected areas:** Onboarding (Profile step), Settings (Profile), form validation and input styling.
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-05-30] Public profiles without authentication
 
 **What changed:** Made member public profiles (`/@username`) accessible to visitors without requiring them to log in, similar to public LinkedIn profiles.
