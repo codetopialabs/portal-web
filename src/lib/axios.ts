@@ -61,11 +61,13 @@ async function attemptRefresh(): Promise<string> {
   const refreshToken = getCookie("refreshToken");
   if (!refreshToken) throw new Error("No refresh token");
 
-  // Call the refresh endpoint directly (not through axiosInstance to avoid loops)
+  // Call the refresh endpoint directly (not through axiosInstance to avoid loops).
+  // Hard 10 s timeout — if the server doesn't respond, fail fast and redirect to login
+  // rather than leaving the user stuck on the loading screen indefinitely.
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`,
     { refresh_token: refreshToken },
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json" }, timeout: 10_000 }
   );
 
   // Response envelope: { data: { accessToken, refreshToken, tokenType, expiresIn } }
@@ -163,10 +165,10 @@ axiosInstance.interceptors.response.use(
       errorMessage = errors.detail
         ? String(errors.detail)
         : (() => {
-            const firstKey = Object.keys(errors)[0];
-            const firstMsg = errors[firstKey];
-            return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
-          })();
+          const firstKey = Object.keys(errors)[0];
+          const firstMsg = errors[firstKey];
+          return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
+        })();
     }
 
     // ─── Toast notification ──────────────────────────────────────────────────
