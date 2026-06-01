@@ -111,6 +111,7 @@ export interface UserSession {
   ipAddress: string | null;
   userAgent: string;
   createdAt: string;
+  lastSeenAt: string | null;
   isCurrent: boolean;
 }
 
