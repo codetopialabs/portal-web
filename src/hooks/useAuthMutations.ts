@@ -1,7 +1,8 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { ME_QUERY_KEY } from "@/hooks/useMe";
 import { AuthService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useOnboardingStore } from "@/store/onboarding.store";
@@ -57,6 +58,7 @@ export function useLogoutMutation() {
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const clearSession = useAuthStore((s) => s.clearSession);
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => AuthService.logout(session?.accessToken ?? ""),
@@ -64,6 +66,8 @@ export function useLogoutMutation() {
       clearSession();
       useUserStore.getState().reset();
       useOnboardingStore.getState().reset();
+      // Clear the React Query me cache so the next login starts fresh.
+      queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
 
       // Clear walkthrough local storage cache so a different logged-in user on the same device starts fresh
       for (let i = localStorage.length - 1; i >= 0; i--) {
