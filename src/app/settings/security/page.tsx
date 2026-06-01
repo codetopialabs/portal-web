@@ -71,6 +71,10 @@ function timeAgo(iso: string): string {
   return `${days}d ago`;
 }
 
+function formatSessionAgeLabel(createdAt: string, lastSeenAt: string | null): string {
+  return `Last active ${timeAgo(lastSeenAt ?? createdAt)}`;
+}
+
 // ─── Change Password ──────────────────────────────────────────────────────────
 
 interface PasswordFormValues {
@@ -191,12 +195,12 @@ function ChangePasswordSection() {
           >
             {isSubmitting
               ? [0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
-                    style={{ animationDelay: `${i * 0.15}s` }}
-                  />
-                ))
+                <span
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))
               : "Update Password"}
           </button>
         </div>
@@ -264,6 +268,11 @@ function ActiveSessionsSection() {
         )}
       </div>
 
+      <div className="bg-zinc-50 border border-zinc-200 p-4 font-mono text-xs text-zinc-500 space-y-1">
+        <p>Sessions expire after 30 minutes of inactivity.</p>
+        <p>Sessions also have a hard maximum lifetime of 7 days.</p>
+      </div>
+
       <div className="bg-white border border-zinc-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -286,7 +295,7 @@ function ActiveSessionsSection() {
               <p className="font-mono font-bold text-sm text-zinc-900 uppercase tracking-tight">
                 Access Restricted
               </p>
-              <p className="font-mono text-xs text-zinc-500 max-w-[240px] mx-auto">
+              <p className="font-mono text-xs text-zinc-500 max-w-60 mx-auto">
                 Your account does not have clearance to view active session telemetry.
               </p>
             </div>
@@ -319,7 +328,7 @@ function ActiveSessionsSection() {
                       )}
                     </div>
                     <p className="font-mono text-xs text-zinc-400 mt-0.5">
-                      {session.ipAddress ?? "Unknown IP"} · {timeAgo(session.createdAt)}
+                      {session.ipAddress ?? "Unknown IP"} · {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)}
                     </p>
                   </div>
                   {!session.isCurrent && (
