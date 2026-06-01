@@ -364,7 +364,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="absolute inset-0 rounded-none bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 {avatarUploading ? (
                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                 ) : (
