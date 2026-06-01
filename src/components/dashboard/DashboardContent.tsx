@@ -186,6 +186,24 @@ export function DashboardContent() {
                   <Pencil className="h-3.5 w-3.5" />
                   Edit Profile
                 </Link>
+                <div className="inline-flex h-9 items-center gap-2 border border-zinc-200 bg-zinc-50 pl-2 pr-1">
+                  <span className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-500">
+                    ID
+                  </span>
+                  <span className="max-w-[9.5rem] truncate font-mono text-[11px] text-zinc-700">
+                    {profile.communityId}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(profile.communityId);
+                      toast.success("Community ID copied to clipboard!");
+                    }}
+                    title="Copy community ID"
+                    className="shrink-0 flex h-7 w-8 items-center justify-center border border-zinc-200 bg-white text-zinc-500 transition-colors hover:border-zinc-900 hover:text-zinc-900"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -209,27 +227,6 @@ export function DashboardContent() {
                 </div>
                 <div className="mt-4 h-1.5 bg-zinc-800">
                   <div className={`h-full ${barColor}`} style={{ width: `${profileStrength}%` }} />
-                </div>
-              </div>
-
-              <div className="pt-5 border-t border-zinc-800">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                  Community ID
-                </p>
-                <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 border border-zinc-800 bg-black p-1.5">
-                  <span className="font-mono text-[11px] text-zinc-300 px-2 truncate">
-                    {profile.communityId}
-                  </span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(profile.communityId);
-                      toast.success("Community ID copied to clipboard!");
-                    }}
-                    title="Copy ID"
-                    className="shrink-0 flex items-center justify-center h-7 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors border border-zinc-800"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </button>
                 </div>
               </div>
             </aside>
