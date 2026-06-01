@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { type LoginFormValues, useLoginMutation } from "@/hooks/useAuthMutations";
 import { AuthService } from "@/services/auth.service";
 
-export function LoginForm() {
+export function LoginForm({ sessionExpired = false }: { sessionExpired?: boolean }) {
   const [step, setStep] = useState<"email" | "password">("email");
   const [showPassword, setShowPassword] = useState(false);
   const mutation = useLoginMutation();
@@ -48,6 +48,20 @@ export function LoginForm() {
           <h2 className="text-2xl font-sans font-bold text-white">Sign In</h2>
           <p className="font-mono text-sm text-zinc-400">Continue to Codetopia Community</p>
         </div>
+
+        {sessionExpired && (
+          <div className="flex items-start gap-3 border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <span className="mt-px text-amber-400 shrink-0">⚠</span>
+            <div>
+              <p className="font-mono text-xs font-bold text-amber-400 uppercase tracking-widest">
+                Session expired
+              </p>
+              <p className="font-mono text-xs text-amber-400/80 mt-0.5">
+                Your session has expired. Please sign in again to continue.
+              </p>
+            </div>
+          </div>
+        )}
 
         {step === "email" ? (
           <>

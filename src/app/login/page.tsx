@@ -2,7 +2,14 @@ import Image from "next/image";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Footer } from "@/components/layout/Footer";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reason?: string }>;
+}) {
+  const { reason } = await searchParams;
+  const sessionExpired = reason === "session_expired";
+
   return (
     <main className="min-h-screen bg-black flex flex-col font-mono text-white relative">
       {/* Top Navbar */}
@@ -22,7 +29,7 @@ export default function LoginPage() {
       {/* Main Content Node */}
       <div className="flex-1 flex flex-col items-center justify-center z-10 px-4 w-full mt-12 mb-16">
         {/* The Auth Card */}
-        <LoginForm />
+        <LoginForm sessionExpired={sessionExpired} />
       </div>
 
       {/* Footer */}

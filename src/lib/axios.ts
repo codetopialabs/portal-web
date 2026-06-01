@@ -134,10 +134,24 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         rejectQueue(refreshError);
 
-        // Refresh failed — clear session and redirect to login
+        // Refresh failed — clear cookies, clear the in-memory stores,
+        // then redirect to login with a session-expired flag so the login
+        // page can show the right message.
         clearAuthCookies();
+
+        // Clear Zustand stores without importing them at module level
+        // (avoids circular dependency: store → axios → store).
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          try {
+            const { useAuthStore } = await import("@/store/auth.store");
+            const { useUserStore } = await import("@/store/user.store");
+            useAuthStore.getState().clearSession();
+            useUserStore.getState().reset();
+          } catch {
+            // If dynamic import fails for any reason, the cookie clear above
+            // is still sufficient — the user will land on /login cleanly.
+          }
+          window.location.href = "/login?reason=session_expired";
         }
         return Promise.reject(refreshError);
       }

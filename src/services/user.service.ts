@@ -9,6 +9,7 @@ export interface UserProfile {
   permissions: string[];
   isOnboarded: boolean;
   isEmailVerified: boolean;
+  lastLoginAt: string | null;
   fullName: string;
   profilePictureUrl: string | null;
   coverImageUrl: string | null;

@@ -93,6 +93,7 @@ function ProfileDropdown() {
   const name = profile?.fullName ?? "—";
   const email = profile?.email ?? "—";
   const avatarUrl = profile?.profilePictureUrl;
+
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen((v) => !v)} className="flex items-center group">

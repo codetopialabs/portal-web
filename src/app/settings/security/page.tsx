@@ -328,7 +328,7 @@ function ActiveSessionsSection() {
                       )}
                     </div>
                     <p className="font-mono text-xs text-zinc-400 mt-0.5">
-                      {session.ipAddress ?? "Unknown IP"} · {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)}
+                      {session.ipAddress ?? "Unknown IP"} · {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)} · Signed in {timeAgo(session.createdAt)}
                     </p>
                   </div>
                   {!session.isCurrent && (
