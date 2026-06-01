@@ -3,7 +3,7 @@
 import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Loader2, Plus, User, X } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   FaBehance,
   FaCodepen,
@@ -22,6 +22,13 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 import { getAvatarUrl } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { UserService } from "@/services/user.service";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
@@ -223,6 +230,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   }
 
   const {
+    control,
     register,
     handleSubmit,
     getValues,
@@ -487,20 +495,30 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
               <div className="space-y-2">
                 <label htmlFor="gender" className={labelStyles}>
-                  Gender{" "}
-                  <span className="text-zinc-300 font-normal normal-case tracking-normal">
-                    (optional)
-                  </span>
+                  Gender *
                 </label>
-                <select
-                  id="gender"
-                  className="h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus:outline-none focus:border-zinc-900 transition-all appearance-none cursor-pointer"
-                  {...register("gender")}
-                >
-                  <option value="">Prefer not to say</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
+                <Controller
+                  name="gender"
+                  control={control}
+                  rules={{ required: "Gender is required" }}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        id="gender"
+                        className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                      >
+                        <SelectValue placeholder="Select your gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Male">Male</SelectItem>
+                        <SelectItem value="Female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.gender && (
+                  <p className="text-red-500 text-xs font-mono">{errors.gender.message}</p>
+                )}
               </div>
 
               <div className="space-y-2">
