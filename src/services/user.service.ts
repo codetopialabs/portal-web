@@ -9,6 +9,7 @@ export interface UserProfile {
   permissions: string[];
   isOnboarded: boolean;
   isEmailVerified: boolean;
+  lastLoginAt: string | null;
   fullName: string;
   profilePictureUrl: string | null;
   coverImageUrl: string | null;
@@ -31,6 +32,7 @@ export interface UserProfile {
   location: string | null;
   dateOfBirth: string | null;
   completedWalkthroughs: string[];
+  nationality: string | null;
 }
 
 export interface CommunityMember {
@@ -54,6 +56,7 @@ export interface CommunityMember {
   twitterHandle: string;
   linkedinUrl: string;
   websiteUrl: string;
+  discipline: string;
   isEmailVerified: boolean;
   isOnboarded: boolean;
   joinedAt: string;
@@ -80,6 +83,7 @@ export interface UpdateMeRequest {
   referral_source?: string;
   location?: string;
   date_of_birth?: string;
+  nationality?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;
   cover_image_url?: string;

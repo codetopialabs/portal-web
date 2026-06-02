@@ -7,7 +7,6 @@ import { Controller, useForm } from "react-hook-form";
 import {
   FaBehance,
   FaCodepen,
-  FaDiscord,
   FaDribbble,
   FaFacebook,
   FaGithub,
@@ -22,6 +21,7 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 import { getAvatarUrl } from "@/lib/utils";
+import { NationalitySelect } from "@/components/ui/nationality-select";
 import {
   Select,
   SelectContent,
@@ -43,7 +43,7 @@ interface ProfileFormValues {
   username: string;
   date_of_birth: string;
   gender: string;
-  discord_username: string;
+  nationality: string;
   bio: string;
   github_handle: string;
   linkedin_url: string;
@@ -154,6 +154,29 @@ function Divider() {
   return <div className="border-t border-zinc-100" />;
 }
 
+function BioCharCount({
+  fieldName,
+  max,
+  watch,
+}: {
+  fieldName: string;
+  max: number;
+  watch: (name: string) => string;
+}) {
+  const value = watch(fieldName) || "";
+  const count = value.length;
+  const near = count >= max * 0.85;
+  const over = count > max;
+  return (
+    <p
+      className={`text-right font-mono text-[10px] mt-1 ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+        }`}
+    >
+      {count} / {max}
+    </p>
+  );
+}
+
 export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileProps) {
   const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
@@ -234,14 +257,16 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     register,
     handleSubmit,
     getValues,
+    watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     defaultValues: {
-      full_name: onboarding.fullName || profile?.fullName || "",
-      username: onboarding.username || profile?.username || "",
+      full_name: profile?.fullName || "",
+      username: profile?.username || "",
       date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
       gender: onboarding.gender || profile?.gender || "",
-      discord_username: onboarding.discordUsername || profile?.discordUsername || "",
+      nationality: onboarding.nationality || profile?.nationality || "",
       bio: onboarding.bio || profile?.bio || "",
       github_handle: onboarding.githubHandle || profile?.githubHandle || "",
       linkedin_url: onboarding.linkedinUrl || profile?.linkedinUrl || "",
@@ -250,6 +275,26 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     },
   });
 
+  // Populate the form from profile once it's available. We use the callback
+  // form of reset() so we can read whatever the user has already typed
+  // (current.*) and only fill in blanks from profile. full_name and username
+  // always come from profile — the user cannot set them in a prior step.
+  useEffect(() => {
+    if (!profile) return;
+    reset((current) => ({
+      full_name: current.full_name || profile.fullName || "",
+      username: current.username || profile.username || "",
+      date_of_birth: current.date_of_birth || profile.dateOfBirth || "",
+      gender: current.gender || profile.gender || "",
+      nationality: current.nationality || profile.nationality || "",
+      bio: current.bio || profile.bio || "",
+      github_handle: current.github_handle || profile.githubHandle || "",
+      linkedin_url: current.linkedin_url || profile.linkedinUrl || "",
+      twitter_handle: current.twitter_handle || profile.twitterHandle || "",
+      website_url: current.website_url || profile.websiteUrl || "",
+    }));
+  }, [profile, reset]);
+
   function saveToStore() {
     const v = getValues();
     onboarding.merge({
@@ -257,7 +302,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       username: v.username,
       dateOfBirth: v.date_of_birth,
       gender: v.gender,
-      discordUsername: v.discord_username,
+      nationality: v.nationality,
       bio: v.bio,
       githubHandle: v.github_handle,
       linkedinUrl: v.linkedin_url,
@@ -288,7 +333,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       await updateMe({
         full_name: data.full_name.trim(),
         username: data.username.trim(),
-        discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         bio: data.bio || undefined,
         skills,
         github_handle: data.github_handle || undefined,
@@ -297,6 +341,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         website_url: data.website_url || undefined,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
+        nationality: data.nationality || undefined,
         profile_picture_url: avatarUrl || undefined,
         is_onboarded: true,
       });
@@ -364,7 +409,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="absolute inset-0 rounded-none bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 {avatarUploading ? (
                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                 ) : (
@@ -509,7 +554,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       >
                         <SelectValue placeholder="Select your gender" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1">
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
                       </SelectContent>
@@ -522,30 +567,24 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="discord-username" className={labelStyles}>
-                  Discord Username
+                <label htmlFor="nationality" className={labelStyles}>
+                  Nationality *
                 </label>
-                <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
-                  Helps us identify and connect your account on Discord.
-                </p>
-                <div className="flex items-center gap-3 border border-zinc-200 bg-white px-3 focus-within:border-zinc-900 transition-all">
-                  <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
-                  <input
-                    id="discord-username"
-                    className="flex-1 h-11 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
-                    placeholder="your_username"
-                    {...register("discord_username", {
-                      validate: (v) =>
-                        !v.trim() ||
-                        v.trim().replace(/^@/, "").length >= 2 ||
-                        "Enter a valid Discord username",
-                    })}
-                  />
-                </div>
-                {errors.discord_username && (
-                  <p className="text-red-500 text-xs font-mono">
-                    {errors.discord_username.message}
-                  </p>
+                <Controller
+                  name="nationality"
+                  control={control}
+                  rules={{ required: "Nationality is required" }}
+                  render={({ field }) => (
+                    <NationalitySelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      variant="onboarding"
+                      error={!!errors.nationality}
+                    />
+                  )}
+                />
+                {errors.nationality && (
+                  <p className="text-red-500 text-xs font-mono">{errors.nationality.message}</p>
                 )}
               </div>
 
@@ -553,12 +592,20 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <label htmlFor="bio" className={labelStyles}>
                   Bio
                 </label>
-                <textarea
-                  id="bio"
-                  placeholder="Tell the community who you are..."
-                  className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
-                  {...register("bio")}
-                />
+                <div className="relative">
+                  <textarea
+                    id="bio"
+                    placeholder="Tell the community who you are..."
+                    className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                    {...register("bio", {
+                      maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
+                    })}
+                  />
+                  <BioCharCount fieldName="bio" max={1000} watch={watch} />
+                </div>
+                {errors.bio && (
+                  <p className="text-red-500 text-xs font-mono">{errors.bio.message}</p>
+                )}
               </div>
             </div>
           </section>

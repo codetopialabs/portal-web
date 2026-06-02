@@ -28,6 +28,7 @@ export interface UserProfile {
   location: string | null;
   dateOfBirth: string | null;
   gender: string | null;
+  nationality: string | null;
   completedWalkthroughs: string[];
 }
 
@@ -78,6 +79,7 @@ export interface UpdateMeRequest {
   location?: string;
   date_of_birth?: string;
   gender?: string;
+  nationality?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;
   cover_image_url?: string;

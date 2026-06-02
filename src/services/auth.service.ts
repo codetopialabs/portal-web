@@ -145,7 +145,7 @@ export const SessionService = {
   ): Promise<{ results: ActivityLogEntry[]; total: number }> {
     const response = await axiosInstance.get<{
       data: { results: ActivityLogEntry[]; total: number };
-    }>("/auth/activity/", { params: { limit, offset } });
+    }>("/activity/", { params: { limit, offset } });
     return response.data.data;
   },
 };

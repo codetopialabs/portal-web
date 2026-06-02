@@ -35,7 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
-import { getAvatarUrl } from "@/lib/utils";
+import { getAvatarUrl, toTitleCase } from "@/lib/utils";
+import { NationalitySelect } from "@/components/ui/nationality-select";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 
@@ -133,6 +134,7 @@ interface ProfileFormValues {
   primary_role: string;
   date_of_birth: string;
   gender: string;
+  nationality: string;
   bio: string;
   discord_username: string;
   github_handle: string;
@@ -156,6 +158,23 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
 
 function Divider() {
   return <div className="border-t border-zinc-100" />;
+}
+
+const BIO_MAX = 1000;
+
+function BioCharCount({ watch }: { watch: (name: string) => string }) {
+  const value = watch("bio") || "";
+  const count = value.length;
+  const near = count >= BIO_MAX * 0.85;
+  const over = count > BIO_MAX;
+  return (
+    <p
+      className={`text-right font-mono text-[10px] ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+        }`}
+    >
+      {count} / {BIO_MAX}
+    </p>
+  );
 }
 
 export default function SettingsProfilePage() {
@@ -312,6 +331,8 @@ export default function SettingsProfilePage() {
     register,
     handleSubmit,
     control,
+    watch,
+    setValue,
     formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<ProfileFormValues>({
@@ -323,6 +344,7 @@ export default function SettingsProfilePage() {
       primary_role: profile?.primaryRole ?? "",
       date_of_birth: profile?.dateOfBirth ?? "",
       gender: profile?.gender ?? "",
+      nationality: profile?.nationality ?? "",
       bio: profile?.bio ?? "",
       discord_username: profile?.discordUsername ?? "",
       github_handle: profile?.githubHandle ?? "",
@@ -357,10 +379,11 @@ export default function SettingsProfilePage() {
         full_name: data.full_name.trim(),
         username: data.username.trim(),
         location: data.location.trim() || undefined,
-        current_role: data.current_role.trim() || undefined,
+        current_role: data.current_role.trim() ? toTitleCase(data.current_role) : undefined,
         primary_role: data.primary_role,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
+        nationality: data.nationality || undefined,
         bio: data.bio.trim() || undefined,
         discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         github_handle: data.github_handle.trim() || undefined,
@@ -561,8 +584,31 @@ export default function SettingsProfilePage() {
                 id="current-role"
                 placeholder="e.g. Frontend Developer, CS student, Freelance designer"
                 className={inputStyles}
-                {...register("current_role")}
+                {...register("current_role", {
+                  maxLength: { value: 100, message: "Occupation must be 100 characters or less" },
+                  onBlur: (e) => setValue("current_role", toTitleCase(e.target.value), { shouldDirty: true }),
+                })}
+                maxLength={100}
               />
+              {(() => {
+                const val = watch("current_role") || "";
+                const count = val.length;
+                return (
+                  <p
+                    className={`text-right font-mono text-[10px] ${count >= 100
+                      ? "text-red-500"
+                      : count >= 85
+                        ? "text-amber-500"
+                        : "text-zinc-400"
+                      }`}
+                  >
+                    {count} / 100
+                  </p>
+                );
+              })()}
+              {errors.current_role && (
+                <p className="font-mono text-xs text-red-500">{errors.current_role.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -663,6 +709,23 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="nationality" className={labelStyles}>
+                Nationality
+              </Label>
+              <Controller
+                name="nationality"
+                control={control}
+                render={({ field }) => (
+                  <NationalitySelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    variant="settings"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="bio" className={labelStyles}>
                 Bio
               </Label>
@@ -670,8 +733,14 @@ export default function SettingsProfilePage() {
                 id="bio"
                 placeholder="Tell the community who you are..."
                 className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
-                {...register("bio")}
+                {...register("bio", {
+                  maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
+                })}
               />
+              <BioCharCount watch={watch} />
+              {errors.bio && (
+                <p className="font-mono text-xs text-red-500">{errors.bio.message}</p>
+              )}
             </div>
           </div>
         </section>

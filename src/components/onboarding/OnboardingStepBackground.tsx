@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
+import { toTitleCase } from "@/lib/utils";
 
 interface OnboardingStepBackgroundProps {
   onNext: () => void;
@@ -96,9 +97,8 @@ function Divider() {
 function CheckIndicator({ selected }: { selected: boolean }) {
   return (
     <div
-      className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-all duration-150 ${
-        selected ? "bg-white border-white" : "border-zinc-300 bg-white"
-      }`}
+      className={`w-4 h-4 shrink-0 border flex items-center justify-center transition-all duration-150 ${selected ? "bg-white border-white" : "border-zinc-300 bg-white"
+        }`}
     >
       {selected && (
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
@@ -132,26 +132,23 @@ function RadioItem({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-colors duration-150 ${
-        selected ? "bg-zinc-900" : "bg-white hover:bg-zinc-50"
-      } ${className ?? ""}`}
+      className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-colors duration-150 ${selected ? "bg-zinc-900" : "bg-white hover:bg-zinc-50"
+        } ${className ?? ""}`}
     >
       <div className="mt-0.5">
         <CheckIndicator selected={selected} />
       </div>
       <div className="min-w-0">
         <p
-          className={`font-mono text-xs uppercase tracking-widest leading-snug transition-colors ${
-            selected ? "text-white font-bold" : "text-zinc-600 font-medium"
-          }`}
+          className={`font-mono text-xs uppercase tracking-widest leading-snug transition-colors ${selected ? "text-white font-bold" : "text-zinc-600 font-medium"
+            }`}
         >
           {label}
         </p>
         {description && (
           <p
-            className={`font-mono text-[11px] mt-1 leading-relaxed transition-colors ${
-              selected ? "text-zinc-400" : "text-zinc-400"
-            }`}
+            className={`font-mono text-[11px] mt-1 leading-relaxed transition-colors ${selected ? "text-zinc-400" : "text-zinc-400"
+              }`}
           >
             {description}
           </p>
@@ -227,7 +224,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
         discipline: resolvedDiscipline,
         experience_level: experienceLevel as string,
         member_status: resolvedStatus,
-        current_role: currentRole.trim() || undefined,
+        current_role: currentRole.trim() ? toTitleCase(currentRole) : undefined,
       });
       onNext();
     } catch (err) {
@@ -389,10 +386,22 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
               id="current-role"
               type="text"
               value={currentRole}
+              maxLength={100}
               onChange={(e) => setCurrentRole(e.target.value)}
+              onBlur={(e) => setCurrentRole(toTitleCase(e.target.value))}
               placeholder="e.g. Frontend Developer at Acme Ltd, CS student at UG, Freelance designer"
               className="h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all"
             />
+            <p
+              className={`text-right font-mono text-[10px] ${currentRole.length >= 100
+                ? "text-red-500"
+                : currentRole.length >= 85
+                  ? "text-amber-500"
+                  : "text-zinc-400"
+                }`}
+            >
+              {currentRole.length} / 100
+            </p>
           </div>
         </section>
 

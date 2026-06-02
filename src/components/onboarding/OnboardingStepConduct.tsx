@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Mail, ShieldAlert, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Mail, ShieldAlert, X } from "lucide-react";
 import { useState } from "react";
 import { useOnboardingStore } from "@/store/onboarding.store";
 
@@ -126,6 +126,15 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
   const [agreed, setAgreed] = useState(conductAgreed);
   const [activeTab, setActiveTab] = useState<Tab>("encouraged");
 
+  const TABS: Tab[] = ["encouraged", "restricted", "enforcement"];
+  const currentTabIndex = TABS.indexOf(activeTab);
+  const isLastTab = activeTab === "enforcement";
+
+  function goNextTab() {
+    const next = TABS[currentTabIndex + 1];
+    if (next) setActiveTab(next);
+  }
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
       <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
@@ -144,11 +153,10 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("encouraged")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
-            activeTab === "encouraged"
-              ? "border-emerald-500 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "encouraged"
+            ? "border-emerald-500 text-zinc-900"
+            : "border-transparent text-zinc-400 hover:text-zinc-600"
+            }`}
         >
           <span className="w-1.5 h-1.5 bg-emerald-500 shrink-0" />
           Encouraged
@@ -156,11 +164,10 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("restricted")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
-            activeTab === "restricted"
-              ? "border-red-500 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "restricted"
+            ? "border-red-500 text-zinc-900"
+            : "border-transparent text-zinc-400 hover:text-zinc-600"
+            }`}
         >
           <span className="w-1.5 h-1.5 bg-red-500 shrink-0" />
           Restricted
@@ -168,11 +175,10 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("enforcement")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
-            activeTab === "enforcement"
-              ? "border-zinc-900 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "enforcement"
+            ? "border-zinc-900 text-zinc-900"
+            : "border-transparent text-zinc-400 hover:text-zinc-600"
+            }`}
         >
           <span className="w-1.5 h-1.5 bg-zinc-900 shrink-0" />
           Enforcement
@@ -276,23 +282,25 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         )}
       </div>
 
-      {/* Agreement */}
-      <label className="flex gap-3 items-start cursor-pointer border border-zinc-200 bg-white p-4 hover:bg-zinc-50 transition-colors mb-6">
-        <input
-          type="checkbox"
-          checked={agreed}
-          onChange={(e) => {
-            setAgreed(e.target.checked);
-            merge({ conductAgreed: e.target.checked });
-          }}
-          className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
-        />
-        <span className="text-sm font-mono text-zinc-600 leading-relaxed">
-          I have read and understood the Codetopia Community Code of Conduct and Enforcement Policy.
-          I agree to uphold these standards and acknowledge that violations may result in
-          consequences up to and including permanent removal.
-        </span>
-      </label>
+      {/* Agreement — only shown on the last tab */}
+      {isLastTab && (
+        <label className="flex gap-3 items-start cursor-pointer border border-zinc-200 bg-white p-4 hover:bg-zinc-50 transition-colors mb-6">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => {
+              setAgreed(e.target.checked);
+              merge({ conductAgreed: e.target.checked });
+            }}
+            className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
+          />
+          <span className="text-sm font-mono text-zinc-600 leading-relaxed">
+            I have read and understood the Codetopia Community Code of Conduct and Enforcement Policy.
+            I agree to uphold these standards and acknowledge that violations may result in
+            consequences up to and including permanent removal.
+          </span>
+        </label>
+      )}
 
       <div className="flex items-center gap-3">
         <button
@@ -302,14 +310,25 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </button>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!agreed}
-          className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          <Check className="w-3.5 h-3.5" /> I Agree — Continue
-        </button>
+
+        {!isLastTab ? (
+          <button
+            type="button"
+            onClick={goNextTab}
+            className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2"
+          >
+            Next <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!agreed}
+            className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <Check className="w-3.5 h-3.5" /> I Agree — Continue
+          </button>
+        )}
       </div>
     </div>
   );

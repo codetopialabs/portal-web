@@ -59,7 +59,7 @@ export function buildStrengthItems(profile: UserProfile): StrengthItem[] {
     {
       key: "location",
       label: "Location",
-      weight: 8,
+      weight: 5,
       fulfilled: Boolean(profile.location),
       href: "/settings/profile",
       hint: "Add your city or country.",
@@ -83,10 +83,18 @@ export function buildStrengthItems(profile: UserProfile): StrengthItem[] {
     {
       key: "goal",
       label: "Primary goal",
-      weight: 8,
+      weight: 5,
       fulfilled: Boolean(profile.primaryGoal),
       href: "/settings/profile",
       hint: "Tell the community what you're working toward.",
+    },
+    {
+      key: "nationality",
+      label: "Nationality",
+      weight: 8,
+      fulfilled: Boolean(profile.nationality),
+      href: "/settings/profile",
+      hint: "Add your nationality to complete your profile.",
     },
   ];
 }

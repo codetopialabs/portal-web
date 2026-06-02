@@ -2,20 +2,28 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowRight,
-  BriefcaseBusiness,
+  Bot,
+  BrainCircuit,
   CalendarDays,
+  Cloud,
+  Code2,
+  Cpu,
+  FileText,
+  FlaskConical,
   Globe,
-  GraduationCap,
+  HelpCircle,
   Link2,
   MapPin,
-  MessageCircle,
   Pencil,
+  Paintbrush,
+  Shield,
+  Smartphone,
   Sparkles,
-  UserRoundCheck,
+  TestTube2,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
+import type { ComponentType } from "react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
@@ -28,10 +36,35 @@ import { useUserStore } from "@/store/user.store";
 import type { SocialLink } from "@/types/profile";
 import { normalizeUrl } from "@/utils/url";
 
+// ─── Discipline icon + label map ─────────────────────────────────────────────
+
+interface DisciplineMeta {
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  color: string; // tailwind text colour
+}
+
+const DISCIPLINE_MAP: Record<string, DisciplineMeta> = {
+  software_engineering: { label: "Software Engineering", icon: Code2, color: "text-sky-400" },
+  ux_ui_design: { label: "UX / UI Design", icon: Paintbrush, color: "text-pink-400" },
+  data_science: { label: "Data Science", icon: FlaskConical, color: "text-violet-400" },
+  ml_ai: { label: "Machine Learning / AI", icon: BrainCircuit, color: "text-amber-400" },
+  cybersecurity: { label: "Cybersecurity", icon: Shield, color: "text-red-400" },
+  cloud_devops: { label: "Cloud / DevOps", icon: Cloud, color: "text-cyan-400" },
+  product_management: { label: "Product Management", icon: Sparkles, color: "text-emerald-400" },
+  hardware_embedded: { label: "Hardware / Embedded", icon: Cpu, color: "text-orange-400" },
+  robotics_iot: { label: "Robotics / IoT", icon: Bot, color: "text-lime-400" },
+  mobile_development: { label: "Mobile Development", icon: Smartphone, color: "text-blue-400" },
+  qa_testing: { label: "QA / Testing", icon: TestTube2, color: "text-yellow-400" },
+  technical_writing: { label: "Technical Writing", icon: FileText, color: "text-zinc-300" },
+  other: { label: "Other", icon: HelpCircle, color: "text-zinc-400" },
+};
+
 export function PublicProfileContent() {
   const { username: paramUsername } = useParams<{ username: string }>();
   let username = paramUsername ? decodeURIComponent(paramUsername) : "";
   username = username.startsWith("@") ? username.substring(1) : username;
+
   const currentUser = useUserStore((s) => s.profile);
   const canEditMembers = usePermission("users.edit");
   const canEditOwnProfile = usePermission("profile.edit");
@@ -62,20 +95,27 @@ export function PublicProfileContent() {
     notFound();
   }
 
+  // ─── derived values ───────────────────────────────────────────────────────
+
   const primaryRole = profile.primaryRole
     ? formatRoleLabel(profile.primaryRole)
     : profile.communityRoles?.[0]
       ? formatRoleLabel(profile.communityRoles[0])
       : "Member";
+
   const roleList =
     profile.communityRoles && profile.communityRoles.length > 0
       ? profile.communityRoles.map(formatRoleLabel)
       : ["Member"];
-  const displayRole = profile.currentRole || "Community Member";
-  const displayLocation = profile.location || "Remote";
-  const displayExperience = profile.experienceLevel || "Not specified";
+
+  const jobTitle = profile.currentRole || null;
+  const displayLocation = profile.location || null;
+  const discipline = profile.discipline
+    ? (DISCIPLINE_MAP[profile.discipline] ?? { label: profile.discipline.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()), icon: HelpCircle, color: "text-zinc-400" })
+    : null;
   const skills = profile.skills ?? [];
-  const firstName = profile.fullName.split(" ")[0] || "this member";
+  const firstName = profile.fullName?.split(" ")[0] || "This member";
+
   const isOwnProfile = currentUser?.username === username;
   const showOwnProfileEdit = isOwnProfile && canEditOwnProfile;
   const showAdminEdit = !isOwnProfile && canEditMembers;
@@ -90,7 +130,7 @@ export function PublicProfileContent() {
   }
   if (profile.twitterHandle) {
     socialLinks.push({
-      label: "X",
+      label: "X / Twitter",
       href: `https://x.com/${profile.twitterHandle.replace(/^@/, "")}`,
       icon: FaXTwitter,
     });
@@ -110,14 +150,18 @@ export function PublicProfileContent() {
     });
   }
 
+  // ─── render ───────────────────────────────────────────────────────────────
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-zinc-950">
       <PublicProfileHeader />
 
       <main className="flex-grow">
+
+        {/* ── Hero ── */}
         <section className="relative min-h-[28rem] bg-zinc-950 pt-16 text-white">
           <div className="absolute inset-0">
-            {/* biome-ignore lint/performance/noImgElement: user-provided image */}
+            {/* biome-ignore lint/performance/noImgElement: user cover image */}
             <img
               src={getCoverUrl(profile.coverImageUrl, profile.fullName)}
               alt=""
@@ -128,54 +172,147 @@ export function PublicProfileContent() {
           </div>
 
           <div className="relative mx-auto flex min-h-[calc(28rem-4rem)] max-w-7xl items-end px-4 py-10 sm:px-6 lg:py-14">
-            <div className="grid w-full gap-8 lg:grid-cols-[1fr_20rem] lg:items-end">
-              <div>
-                <div className="mb-7 flex flex-wrap items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-300">
+            <div className="w-full">
+              {/* Community role + discipline badges */}
+              <div className="mb-6 flex flex-wrap items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-300">
+                <span className="inline-flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5">
+                  <Sparkles className="h-3 w-3 text-amber-300" />
+                  {primaryRole}
+                </span>
+                {discipline && (
                   <span className="inline-flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5">
-                    <Sparkles className="h-3 w-3 text-amber-300" />
-                    Personal profile
+                    <discipline.icon className={`h-3 w-3 ${discipline.color}`} />
+                    {discipline.label}
                   </span>
-                  <span className="inline-flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5">
-                    <UserRoundCheck className="h-3 w-3 text-emerald-300" />
-                    {primaryRole}
-                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
+                {/* Avatar */}
+                <div className="h-28 w-28 shrink-0 border border-white/30 bg-white p-1 shadow-2xl sm:h-36 sm:w-36">
+                  {/* biome-ignore lint/performance/noImgElement: user avatar */}
+                  <img
+                    src={getAvatarUrl(profile.profilePictureUrl, profile.fullName)}
+                    alt={profile.fullName}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
 
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
-                  <div className="h-28 w-28 shrink-0 border border-white/30 bg-white p-1 shadow-2xl sm:h-36 sm:w-36">
-                    {/* biome-ignore lint/performance/noImgElement: user-provided image */}
-                    <img
-                      src={getAvatarUrl(profile.profilePictureUrl, profile.fullName)}
-                      alt={profile.fullName}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-emerald-300">
-                      {displayRole}
-                    </p>
-                    <h1 className="mt-2 max-w-4xl font-sans text-4xl font-black leading-[0.95] tracking-normal text-white sm:text-6xl">
-                      {profile.fullName}
-                    </h1>
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-200">
-                      <span className="inline-flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-sky-300" />
-                        {displayLocation}
-                      </span>
-                      <span className="hidden h-1 w-1 bg-zinc-500 sm:block" />
-                      <span className="inline-flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-amber-300" />
-                        Joined {formatJoinedAt(profile.joinedAt)}
-                      </span>
-                    </div>
+                {/* Name + meta */}
+                <div className="min-w-0">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-emerald-300">
+                    {jobTitle ?? primaryRole}
+                  </p>
+                  <h1 className="mt-2 max-w-4xl font-sans text-4xl font-black leading-[0.95] tracking-normal text-white sm:text-6xl">
+                    {profile.fullName}
+                  </h1>
+                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-300">
+                    <span className="inline-flex items-center gap-2">
+                      <MapPin className="h-3.5 w-3.5 text-sky-300" />
+                      {displayLocation ?? "Remote"}
+                    </span>
+                    <span className="inline-flex items-center gap-2">
+                      <CalendarDays className="h-3.5 w-3.5 text-amber-300" />
+                      Joined {formatJoinedAt(profile.joinedAt)}
+                    </span>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <aside className="border border-white/15 bg-black/35 p-5 backdrop-blur-md">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                  Connect
+        {/* ── Main body ── */}
+        <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-20 sm:px-6 lg:grid-cols-[1.4fr_0.6fr]">
+
+          {/* Left — bio + skills */}
+          <div className="space-y-6">
+
+            {/* Bio */}
+            <div className="border border-zinc-200 bg-white p-6 sm:p-8">
+              <h2 className="font-sans text-xl font-black text-zinc-950">Bio</h2>
+              <div className="mt-5">
+                {profile.bio ? (
+                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600 sm:text-base">
+                    {profile.bio}
+                  </p>
+                ) : (
+                  <p className="font-mono text-sm text-zinc-400 italic">
+                    {firstName} hasn't added a bio yet.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Skills */}
+            <div className="border border-zinc-200 bg-white p-6 sm:p-8">
+              <h2 className="font-sans text-xl font-black text-zinc-950">Skills</h2>
+              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                Tools and focus areas
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {skills.length > 0 ? (
+                  skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-700"
+                    >
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="font-mono text-sm text-zinc-400 italic">No skills added yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right — roles, links, edit */}
+          <aside className="space-y-5">
+
+            {/* Discipline */}
+            {discipline && (
+              <div className="border border-zinc-200 bg-white p-5">
+                <h2 className="font-sans text-base font-black text-zinc-950">Discipline</h2>
+                <p className="mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                  Primary focus area
+                </p>
+                <div className="mt-4 flex items-center gap-3 border border-zinc-100 bg-zinc-50 px-3 py-3">
+                  <discipline.icon className={`h-5 w-5 shrink-0 ${discipline.color}`} />
+                  <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
+                    {discipline.label}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Community roles */}
+            <div className="border border-zinc-200 bg-white p-5">
+              <h2 className="font-sans text-base font-black text-zinc-950">Community Roles</h2>
+              <p className="mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                Access level
+              </p>
+              <div className="mt-4 space-y-2">
+                {roleList.map((role) => (
+                  <div
+                    key={role}
+                    className="flex items-center justify-between border border-zinc-100 bg-zinc-50 px-3 py-2.5"
+                  >
+                    <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
+                      {role}
+                    </span>
+                    <span className="h-1.5 w-1.5 shrink-0 bg-zinc-900" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Social links */}
+            {socialLinks.length > 0 && (
+              <div className="border border-zinc-200 bg-white p-5">
+                <h2 className="font-sans text-base font-black text-zinc-950">Links</h2>
+                <p className="mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                  Find {firstName} online
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {socialLinks.map((link) => {
@@ -187,163 +324,18 @@ export function PublicProfileContent() {
                         target="_blank"
                         rel="noreferrer"
                         title={link.label}
-                        className="inline-flex h-11 w-11 items-center justify-center border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-zinc-950"
+                        className="flex h-10 w-10 items-center justify-center border border-zinc-200 bg-zinc-50 text-zinc-500 transition-colors hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
                       >
                         <Icon className="h-4 w-4" />
                       </a>
                     );
                   })}
-                  {socialLinks.length === 0 ? (
-                    <p className="text-sm leading-6 text-zinc-400">
-                      No public links have been added yet.
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="mt-6 border-t border-white/10 pt-5">
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                    Community role
-                  </p>
-                  <p className="mt-2 font-sans text-2xl font-black text-white">{primaryRole}</p>
-                </div>
-              </aside>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:px-6 md:grid-cols-3">
-          <div className="border border-zinc-200 bg-white p-5">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
-              Role
-            </p>
-            <p className="mt-3 flex items-center gap-2 font-sans text-lg font-black text-zinc-950">
-              <BriefcaseBusiness className="h-4 w-4 text-zinc-500" />
-              {displayRole}
-            </p>
-          </div>
-          <div className="border border-zinc-200 bg-white p-5">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
-              Experience
-            </p>
-            <p className="mt-3 flex items-center gap-2 font-sans text-lg font-black text-zinc-950">
-              <GraduationCap className="h-4 w-4 text-zinc-500" />
-              {displayExperience}
-            </p>
-          </div>
-          <div className="border border-zinc-200 bg-white p-5">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500">
-              Location
-            </p>
-            <p className="mt-3 flex items-center gap-2 font-sans text-lg font-black text-zinc-950">
-              <MapPin className="h-4 w-4 text-zinc-500" />
-              {displayLocation}
-            </p>
-          </div>
-        </section>
-
-        <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-20 pt-2 sm:px-6 lg:grid-cols-[1.35fr_0.65fr]">
-          <div className="space-y-6">
-            <section className="border border-zinc-200 bg-white p-6 sm:p-8">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="font-sans text-2xl font-black text-zinc-950">About</h2>
-                  <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                    Member introduction
-                  </p>
                 </div>
               </div>
-              <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-zinc-700 sm:text-base">
-                {profile.bio || `${firstName} has not added a profile bio yet.`}
-              </p>
-            </section>
+            )}
 
-            <section className="border border-zinc-200 bg-white p-6 sm:p-8">
-              <div>
-                <h2 className="font-sans text-2xl font-black text-zinc-950">Skills</h2>
-                <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                  Tools and focus areas
-                </p>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {skills.length > 0 ? (
-                  skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-800"
-                    >
-                      {skill}
-                    </span>
-                  ))
-                ) : (
-                  <p className="text-sm leading-6 text-zinc-500">
-                    No skills have been added to this profile yet.
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
-
-          <aside className="space-y-6">
-            <section className="border border-zinc-200 bg-white p-6">
-              <h2 className="font-sans text-xl font-black text-zinc-950">Roles</h2>
-              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                Community access
-              </p>
-              <div className="mt-5 space-y-2">
-                {roleList.map((role) => (
-                  <div
-                    key={role}
-                    className="flex items-center justify-between border border-zinc-200 bg-zinc-50 px-3 py-2.5"
-                  >
-                    <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
-                      {role}
-                    </span>
-                    <span className="h-1.5 w-1.5 bg-zinc-900" />
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="border border-zinc-200 bg-white p-6">
-              <h2 className="font-sans text-xl font-black text-zinc-950">Contact</h2>
-              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                Public links
-              </p>
-              <div className="mt-5 space-y-2">
-                {profile.discordUsername ? (
-                  <div className="flex items-center gap-3 border border-zinc-200 px-3 py-2.5 text-sm text-zinc-700">
-                    <MessageCircle className="h-4 w-4 text-zinc-500" />
-                    {profile.discordUsername}
-                  </div>
-                ) : null}
-                {socialLinks.length > 0 ? (
-                  socialLinks.map((link) => {
-                    const Icon = link.icon;
-                    return (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-between gap-3 border border-zinc-200 px-3 py-2.5 text-sm text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
-                      >
-                        <span className="inline-flex items-center gap-3">
-                          <Icon className="h-4 w-4 text-zinc-500" />
-                          {link.label}
-                        </span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </a>
-                    );
-                  })
-                ) : !profile.discordUsername ? (
-                  <p className="text-sm leading-6 text-zinc-500">
-                    No public contact links have been added.
-                  </p>
-                ) : null}
-              </div>
-            </section>
-
-            {showOwnProfileEdit ? (
+            {/* Edit buttons */}
+            {showOwnProfileEdit && (
               <Link
                 href="/settings/profile"
                 className="inline-flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 px-5 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800"
@@ -351,17 +343,17 @@ export function PublicProfileContent() {
                 Edit Your Profile
                 <Link2 className="h-4 w-4" />
               </Link>
-            ) : null}
+            )}
 
-            {showAdminEdit ? (
+            {showAdminEdit && (
               <Link
-                href={`/admin/members/${profile.id}/edit`}
+                href={`/admin/members/${profile.username}/edit`}
                 className="inline-flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 px-5 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-950 transition-colors hover:bg-zinc-900 hover:text-white"
               >
                 <Pencil className="h-4 w-4" />
                 Edit Member
               </Link>
-            ) : null}
+            )}
           </aside>
         </section>
       </main>
