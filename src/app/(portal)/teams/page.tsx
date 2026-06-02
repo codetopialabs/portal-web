@@ -1,11 +1,10 @@
 "use client";
 
-import { Plus, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import Link from "next/link";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePermission } from "@/hooks/usePermission";
 import { useMyTeams } from "@/hooks/useTeams";

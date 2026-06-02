@@ -203,6 +203,7 @@ export function DashboardContent() {
                     {profile.communityId}
                   </span>
                   <button
+                    type="button"
                     onClick={() => {
                       navigator.clipboard.writeText(profile.communityId);
                       toast.success("Community ID copied to clipboard!");

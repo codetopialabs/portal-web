@@ -77,7 +77,7 @@ export function filterMembers(members: CommunityMember[], search: string, filter
       ...formattedRoles,
       member.location,
       ...member.skills,
-    ].some((value) => value && value.toLowerCase().includes(normalizedSearch));
+    ].some((value) => value?.toLowerCase().includes(normalizedSearch));
   });
 }
 

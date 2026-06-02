@@ -25,7 +25,6 @@ import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import type { ComponentType } from "react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
-import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
@@ -113,12 +112,12 @@ export function PublicProfileContent() {
   const displayLocation = profile.location || null;
   const discipline = profile.discipline
     ? (DISCIPLINE_MAP[profile.discipline] ?? {
-        label: profile.discipline
-          .replace(/_/g, " ")
-          .replace(/\b\w/g, (l: string) => l.toUpperCase()),
-        icon: HelpCircle,
-        color: "text-zinc-400",
-      })
+      label: profile.discipline
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+      icon: HelpCircle,
+      color: "text-zinc-400",
+    })
     : null;
   const skills = profile.skills ?? [];
   const firstName = profile.fullName?.split(" ")[0] || "This member";
@@ -365,4 +364,3 @@ export function PublicProfileContent() {
     </div>
   );
 }
-

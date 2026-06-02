@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { ActivityCalendar, type ThemeInput } from "react-activity-calendar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContributions } from "@/hooks/useTeams";

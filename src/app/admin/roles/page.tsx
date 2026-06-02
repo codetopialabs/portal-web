@@ -19,7 +19,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -387,11 +386,10 @@ function RoleFilterPopover({
       <PopoverTrigger asChild>
         <Button
           type="button"
-          className={`h-11 shrink-0 rounded-none border-2 px-5 font-mono text-sm font-bold shadow-[3px_3px_0px_0px_var(--color-grey-200)] transition-all hover:-translate-y-px hover:shadow-[5px_5px_0px_0px_var(--color-grey-200)] active:translate-y-0 ${
-            isFiltered
+          className={`h-11 shrink-0 rounded-none border-2 px-5 font-mono text-sm font-bold shadow-[3px_3px_0px_0px_var(--color-grey-200)] transition-all hover:-translate-y-px hover:shadow-[5px_5px_0px_0px_var(--color-grey-200)] active:translate-y-0 ${isFiltered
               ? "border-grey-900 bg-grey-900 text-white"
               : "border-grey-900 bg-white text-grey-900 hover:bg-grey-50"
-          }`}
+            }`}
         >
           <Filter className="mr-2 h-4 w-4" />
           {isFiltered ? `Filtered · ${filter}` : "Filter"}
