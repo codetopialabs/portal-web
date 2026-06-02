@@ -56,6 +56,7 @@ export interface CommunityMember {
   twitterHandle: string;
   linkedinUrl: string;
   websiteUrl: string;
+  discipline: string;
   isEmailVerified: boolean;
   isOnboarded: boolean;
   joinedAt: string;

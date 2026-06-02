@@ -7,7 +7,6 @@ import { Controller, useForm } from "react-hook-form";
 import {
   FaBehance,
   FaCodepen,
-  FaDiscord,
   FaDribbble,
   FaFacebook,
   FaGithub,
@@ -44,7 +43,6 @@ interface ProfileFormValues {
   date_of_birth: string;
   gender: string;
   nationality: string;
-  discord_username: string;
   bio: string;
   github_handle: string;
   linkedin_url: string;
@@ -259,15 +257,15 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     handleSubmit,
     getValues,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     defaultValues: {
-      full_name: onboarding.fullName || profile?.fullName || "",
-      username: onboarding.username || profile?.username || "",
+      full_name: profile?.fullName || "",
+      username: profile?.username || "",
       date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
       gender: onboarding.gender || profile?.gender || "",
       nationality: onboarding.nationality || profile?.nationality || "",
-      discord_username: onboarding.discordUsername || profile?.discordUsername || "",
       bio: onboarding.bio || profile?.bio || "",
       github_handle: onboarding.githubHandle || profile?.githubHandle || "",
       linkedin_url: onboarding.linkedinUrl || profile?.linkedinUrl || "",
@@ -275,6 +273,26 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       website_url: onboarding.websiteUrl || profile?.websiteUrl || "",
     },
   });
+
+  // Populate the form from profile once it's available. We use the callback
+  // form of reset() so we can read whatever the user has already typed
+  // (current.*) and only fill in blanks from profile. full_name and username
+  // always come from profile — the user cannot set them in a prior step.
+  useEffect(() => {
+    if (!profile) return;
+    reset((current) => ({
+      full_name: current.full_name || profile.fullName || "",
+      username: current.username || profile.username || "",
+      date_of_birth: current.date_of_birth || profile.dateOfBirth || "",
+      gender: current.gender || profile.gender || "",
+      nationality: current.nationality || profile.nationality || "",
+      bio: current.bio || profile.bio || "",
+      github_handle: current.github_handle || profile.githubHandle || "",
+      linkedin_url: current.linkedin_url || profile.linkedinUrl || "",
+      twitter_handle: current.twitter_handle || profile.twitterHandle || "",
+      website_url: current.website_url || profile.websiteUrl || "",
+    }));
+  }, [profile, reset]);
 
   function saveToStore() {
     const v = getValues();
@@ -284,7 +302,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       dateOfBirth: v.date_of_birth,
       gender: v.gender,
       nationality: v.nationality,
-      discordUsername: v.discord_username,
       bio: v.bio,
       githubHandle: v.github_handle,
       linkedinUrl: v.linkedin_url,
@@ -315,7 +332,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       await updateMe({
         full_name: data.full_name.trim(),
         username: data.username.trim(),
-        discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
         bio: data.bio || undefined,
         skills,
         github_handle: data.github_handle || undefined,
@@ -561,34 +577,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 />
                 {errors.nationality && (
                   <p className="text-red-500 text-xs font-mono">{errors.nationality.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="discord-username" className={labelStyles}>
-                  Discord Username
-                </label>
-                <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
-                  Helps us identify and connect your account on Discord.
-                </p>
-                <div className="flex items-center gap-3 border border-zinc-200 bg-white px-3 focus-within:border-zinc-900 transition-all">
-                  <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
-                  <input
-                    id="discord-username"
-                    className="flex-1 h-11 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
-                    placeholder="your_username"
-                    {...register("discord_username", {
-                      validate: (v) =>
-                        !v.trim() ||
-                        v.trim().replace(/^@/, "").length >= 2 ||
-                        "Enter a valid Discord username",
-                    })}
-                  />
-                </div>
-                {errors.discord_username && (
-                  <p className="text-red-500 text-xs font-mono">
-                    {errors.discord_username.message}
-                  </p>
                 )}
               </div>
 
