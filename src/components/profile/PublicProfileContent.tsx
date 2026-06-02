@@ -112,12 +112,12 @@ export function PublicProfileContent() {
   const displayLocation = profile.location || null;
   const discipline = profile.discipline
     ? (DISCIPLINE_MAP[profile.discipline] ?? {
-      label: profile.discipline
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (l: string) => l.toUpperCase()),
-      icon: HelpCircle,
-      color: "text-zinc-400",
-    })
+        label: profile.discipline
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+        icon: HelpCircle,
+        color: "text-zinc-400",
+      })
     : null;
   const skills = profile.skills ?? [];
   const firstName = profile.fullName?.split(" ")[0] || "This member";

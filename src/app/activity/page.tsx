@@ -205,10 +205,11 @@ function ActivityPageContent() {
                     key={option.value}
                     type="button"
                     onClick={() => setViewMode(option.value)}
-                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${viewMode === option.value
+                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                      viewMode === option.value
                         ? "bg-zinc-900 text-white border-zinc-900"
                         : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -231,10 +232,11 @@ function ActivityPageContent() {
                 setFilter(f.value);
                 setPage(1);
               }}
-              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${filter === f.value
+              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                filter === f.value
                   ? "bg-zinc-900 text-white border-zinc-900"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-                }`}
+              }`}
             >
               {f.label}
             </button>
