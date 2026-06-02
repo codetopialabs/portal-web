@@ -26,6 +26,7 @@ import { notFound, useParams } from "next/navigation";
 import type { ComponentType } from "react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
+import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
 import { formatJoinedAt, formatRoleLabel } from "@/components/profile/utils";
@@ -359,6 +360,10 @@ export function PublicProfileContent() {
       </main>
 
       <PublicProfileFooter />
+    </div>
+  );
+}
+
     </div>
   );
 }

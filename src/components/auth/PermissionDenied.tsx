@@ -15,11 +15,11 @@ export function PermissionDenied({ permission }: PermissionDeniedProps) {
     <div className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-500">
       {/* AWS-style industrial lock icon */}
       <div className="relative mb-8">
-        <div className="absolute -inset-4 rounded-full bg-destructive/10 blur-xl animate-pulse" />
-        <div className="relative flex h-24 w-24 items-center justify-center rounded-2xl border-2 border-destructive/30 bg-background/50 shadow-2xl backdrop-blur-sm">
+        <div className="absolute -inset-4 rounded-none bg-destructive/10 blur-xl animate-pulse" />
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-none border-2 border-destructive/30 bg-background/50 shadow-2xl backdrop-blur-sm">
           <Lock className="h-12 w-12 text-destructive" strokeWidth={1.5} />
         </div>
-        <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-destructive shadow-lg">
+        <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-none border-2 border-background bg-destructive shadow-lg">
           <ShieldAlert className="h-4 w-4 text-white" />
         </div>
       </div>

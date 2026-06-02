@@ -33,8 +33,9 @@ export function UserInitializer() {
       const profile = await UserService.getMe();
       return profile;
     },
-    enabled: !!session?.accessToken,
+    enabled: !!session,
     staleTime: 60_000,
+    retry: 0,
   });
 
   // Keep the Zustand store in sync so all existing consumers (usePermission,
@@ -51,7 +52,7 @@ export function UserInitializer() {
   }, [data]);
 
   useEffect(() => {
-    if (!session?.accessToken) return;
+    if (!session) return;
     useUserStore.setState({ isLoading });
   }, [isLoading, session]);
 

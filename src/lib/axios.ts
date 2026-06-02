@@ -62,12 +62,12 @@ async function attemptRefresh(): Promise<string> {
   if (!refreshToken) throw new Error("No refresh token");
 
   // Call the refresh endpoint directly (not through axiosInstance to avoid loops).
-  // Hard 10 s timeout — if the server doesn't respond, fail fast and redirect to login
+  // Hard 15s timeout — if the server doesn't respond, fail fast with a network error
   // rather than leaving the user stuck on the loading screen indefinitely.
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`,
     { refresh_token: refreshToken },
-    { headers: { "Content-Type": "application/json" }, timeout: 10_000 }
+    { headers: { "Content-Type": "application/json" }, timeout: 15_000 }
   );
 
   // Response envelope: { data: { accessToken, refreshToken, tokenType, expiresIn } }
@@ -132,9 +132,24 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
+
+        const isNetworkError = 
+          (typeof navigator !== "undefined" && !navigator.onLine) ||
+          (axios.isAxiosError(refreshError) && (!refreshError.response || refreshError.code === "ECONNABORTED"));
+
+        if (isNetworkError) {
+          const errMsg =
+            axios.isAxiosError(refreshError) && refreshError.code === "ECONNABORTED"
+              ? "Connection timed out. Please try again."
+              : "You appear to be offline. Please check your connection and try again.";
+          const netError = new Error(errMsg);
+          rejectQueue(netError);
+          return Promise.reject(netError);
+        }
+
         rejectQueue(refreshError);
 
-        // Refresh failed — clear cookies, clear the in-memory stores,
+        // Refresh failed (invalid token) — clear cookies, clear the in-memory stores,
         // then redirect to login with a session-expired flag so the login
         // page can show the right message.
         clearAuthCookies();

@@ -34,6 +34,8 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/community": "authenticated",
   "/mentorship": "authenticated",
   "/resources": "authenticated",
+  "/teams": "teams.view",
+  "/teams/new": "teams.create",
   "/activity": "activity.view",
   "/docs": "docs.view",
 };
@@ -44,6 +46,7 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   permission: string | "authenticated";
 }> = [
     { pattern: /^\/@[^/]+$/, permission: "profile.view" },
+    { pattern: /^\/teams\/[^/]+(\/.*)?$/, permission: "authenticated" }, // Scoped checks handled in-page or by backend
     { pattern: /^\/admin\/roles\/[^/]+\/edit$/, permission: "roles.edit" },
     { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
     { pattern: /^\/admin\/members\/[^/]+\/edit$/, permission: "users.edit" },
