@@ -35,7 +35,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
-import { getAvatarUrl } from "@/lib/utils";
+import { getAvatarUrl, toTitleCase } from "@/lib/utils";
+import { NationalitySelect } from "@/components/ui/nationality-select";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 
@@ -331,6 +332,7 @@ export default function SettingsProfilePage() {
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<ProfileFormValues>({
@@ -377,7 +379,7 @@ export default function SettingsProfilePage() {
         full_name: data.full_name.trim(),
         username: data.username.trim(),
         location: data.location.trim() || undefined,
-        current_role: data.current_role.trim() || undefined,
+        current_role: data.current_role.trim() ? toTitleCase(data.current_role) : undefined,
         primary_role: data.primary_role,
         date_of_birth: data.date_of_birth || undefined,
         gender: data.gender || undefined,
@@ -582,8 +584,31 @@ export default function SettingsProfilePage() {
                 id="current-role"
                 placeholder="e.g. Frontend Developer, CS student, Freelance designer"
                 className={inputStyles}
-                {...register("current_role")}
+                {...register("current_role", {
+                  maxLength: { value: 100, message: "Occupation must be 100 characters or less" },
+                  onBlur: (e) => setValue("current_role", toTitleCase(e.target.value), { shouldDirty: true }),
+                })}
+                maxLength={100}
               />
+              {(() => {
+                const val = watch("current_role") || "";
+                const count = val.length;
+                return (
+                  <p
+                    className={`text-right font-mono text-[10px] ${count >= 100
+                      ? "text-red-500"
+                      : count >= 85
+                        ? "text-amber-500"
+                        : "text-zinc-400"
+                      }`}
+                  >
+                    {count} / 100
+                  </p>
+                );
+              })()}
+              {errors.current_role && (
+                <p className="font-mono text-xs text-red-500">{errors.current_role.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -687,11 +712,16 @@ export default function SettingsProfilePage() {
               <Label htmlFor="nationality" className={labelStyles}>
                 Nationality
               </Label>
-              <Input
-                id="nationality"
-                placeholder="e.g. Ghanaian, Nigerian, British"
-                className={inputStyles}
-                {...register("nationality")}
+              <Controller
+                name="nationality"
+                control={control}
+                render={({ field }) => (
+                  <NationalitySelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    variant="settings"
+                  />
+                )}
               />
             </div>
 

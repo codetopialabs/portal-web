@@ -21,3 +21,15 @@ export function getCoverUrl(url: string | null | undefined, name: string): strin
   if (imageUrl) return imageUrl;
   return `https://api.dicebear.com/9.x/shapes/svg?seed=${encodeURIComponent(name)}&backgroundColor=000000,ffffff&shape1Color=e5e7eb`;
 }
+
+/**
+ * Converts a string to title case (e.g. "FRONTEND DEVELOPER" → "Frontend Developer").
+ * Always applies — any casing the user types is normalised on blur/submit.
+ */
+export function toTitleCase(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  return trimmed
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}

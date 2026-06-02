@@ -21,6 +21,7 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 import { getAvatarUrl } from "@/lib/utils";
+import { NationalitySelect } from "@/components/ui/nationality-select";
 import {
   Select,
   SelectContent,
@@ -569,11 +570,18 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <label htmlFor="nationality" className={labelStyles}>
                   Nationality *
                 </label>
-                <input
-                  id="nationality"
-                  className={inputStyles}
-                  placeholder="e.g. Ghanaian, Nigerian, British"
-                  {...register("nationality", { required: "Nationality is required" })}
+                <Controller
+                  name="nationality"
+                  control={control}
+                  rules={{ required: "Nationality is required" }}
+                  render={({ field }) => (
+                    <NationalitySelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      variant="onboarding"
+                      error={!!errors.nationality}
+                    />
+                  )}
                 />
                 {errors.nationality && (
                   <p className="text-red-500 text-xs font-mono">{errors.nationality.message}</p>
