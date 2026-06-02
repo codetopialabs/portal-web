@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axios";
 import { DESTRUCTIVE_PERMISSIONS } from "@/lib/permissions";
-import { ApiResponse } from "@/types/api.types";
-import { PermissionEntry } from "@/types/permissions.types";
+import type { ApiResponse } from "@/types/api.types";
+import type { PermissionEntry } from "@/types/permissions.types";
 
 const PERMISSIONS_BASE = "/permissions";
 

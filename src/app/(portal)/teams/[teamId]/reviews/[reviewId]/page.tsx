@@ -117,14 +117,17 @@ function ReviewDetailContent() {
                 review.status === "open"
                   ? "border-emerald-200 text-emerald-700"
                   : review.status === "approved"
-                  ? "border-violet-200 text-violet-700"
-                  : "border-zinc-200 text-zinc-400"
+                    ? "border-violet-200 text-violet-700"
+                    : "border-zinc-200 text-zinc-400"
               }`}
             >
               {review.status}
             </Badge>
             {review.category && (
-              <Badge variant="secondary" className="font-mono text-[10px] uppercase tracking-widest bg-zinc-100 text-zinc-500">
+              <Badge
+                variant="secondary"
+                className="font-mono text-[10px] uppercase tracking-widest bg-zinc-100 text-zinc-500"
+              >
                 {review.category}
               </Badge>
             )}
@@ -141,7 +144,8 @@ function ReviewDetailContent() {
               className="h-6 w-6 border border-zinc-200 object-cover"
             />
             <p className="font-mono text-xs text-zinc-500">
-              <span className="font-bold text-zinc-900">{review.author.fullName}</span> opened this review
+              <span className="font-bold text-zinc-900">{review.author.fullName}</span> opened this
+              review
             </p>
           </div>
         </div>
@@ -176,7 +180,10 @@ function ReviewDetailContent() {
                     <div className="absolute left-0 top-0">
                       {/* biome-ignore lint/performance/noImgElement: comment author avatar */}
                       <img
-                        src={getAvatarUrl(comment.author.profilePictureUrl, comment.author.fullName)}
+                        src={getAvatarUrl(
+                          comment.author.profilePictureUrl,
+                          comment.author.fullName
+                        )}
                         alt={comment.author.fullName}
                         className="h-8 w-8 border border-zinc-200 object-cover bg-white"
                       />
@@ -286,7 +293,7 @@ function ReviewDetailContent() {
                 {membership?.teamId === teamId ? "My Team Workspace" : "View Team Dashboard"}
               </Link>
             </div>
-            
+
             <div className="pt-6 border-t border-zinc-100">
               <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-3">
                 Timeline

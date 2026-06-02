@@ -30,7 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMembers, useRoles } from "@/hooks/useAdmin";
 import { getAvatarUrl } from "@/lib/utils";
-import type { MemberListParams, AdminMember } from "@/types/users.types";
+import type { AdminMember, MemberListParams } from "@/types/users.types";
 import { AdminMemberFilterPopover, type AdminMemberFilters } from "./admin-member-filter-popover";
 
 function MembersTableSkeleton() {

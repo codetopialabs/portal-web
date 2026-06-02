@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
-import { AdminActivityEntry } from "@/types/activity.types";
-import { ApiResponse } from "@/types/api.types";
+import type { AdminActivityEntry } from "@/types/activity.types";
+import type { ApiResponse } from "@/types/api.types";
 
 const ACTIVITY_BASE = "/activity";
 

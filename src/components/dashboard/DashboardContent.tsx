@@ -2,7 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { DriveStep } from "driver.js";
-import { ArrowRight, Copy, MapPin, Pencil, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Copy,
+  MapPin,
+  Pencil,
+  ShieldCheck,
+  Sparkles,
+  UserRoundCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";

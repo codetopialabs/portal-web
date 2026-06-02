@@ -12,7 +12,7 @@ export function SessionLoadError({ message, onReset, onRetry }: SessionLoadError
           Session could not load
         </p>
         <p className="mt-2 font-mono text-xs leading-6 text-zinc-500">{message}</p>
-        
+
         <div className="mt-5 flex flex-col gap-2">
           {onRetry && (
             <button

@@ -33,14 +33,12 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
     <div className="border border-zinc-200 bg-white p-6">
       <div className="flex flex-col gap-6">
         <div>
-          <h3 className="font-sans text-xl font-black text-zinc-950">
-            Contribution Activity
-          </h3>
+          <h3 className="font-sans text-xl font-black text-zinc-950">Contribution Activity</h3>
           <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
             Work reviews & approvals
           </p>
         </div>
-        
+
         <div className="overflow-x-auto pb-2">
           <ActivityCalendar
             data={data}
@@ -51,8 +49,18 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
                 more: "More",
               },
               months: [
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
               ],
               totalCount: "{{count}} contributions in the last year",
             }}

@@ -237,9 +237,7 @@ function RoleRow({
               <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
-          {canDelete && !role.isSystem && (
-            <DeleteRoleButton slug={role.name} name={role.name} />
-          )}
+          {canDelete && !role.isSystem && <DeleteRoleButton slug={role.name} name={role.name} />}
         </div>
       </div>
     </div>
@@ -301,9 +299,7 @@ function RolesListContent() {
         <p className="font-sans text-base font-black uppercase text-error-700">
           Roles could not be loaded
         </p>
-        <p className="mt-2 font-mono text-xs text-error-600">
-          Refresh the page and try again.
-        </p>
+        <p className="mt-2 font-mono text-xs text-error-600">Refresh the page and try again.</p>
       </div>
     );
   }
@@ -312,9 +308,7 @@ function RolesListContent() {
     return (
       <div className="border-2 border-grey-900 bg-white p-14 text-center shadow-[4px_4px_0px_0px_var(--color-grey-200)]">
         <Shield className="mx-auto mb-3 h-8 w-8 text-icon-muted" />
-        <p className="font-sans text-base font-black uppercase text-text-primary">
-          No roles found
-        </p>
+        <p className="font-sans text-base font-black uppercase text-text-primary">No roles found</p>
         <p className="mt-2 font-mono text-xs text-text-tertiary">
           Create the first role to start assigning permissions.
         </p>
@@ -475,8 +469,8 @@ function RolesPageContent() {
               Roles
             </h1>
             <p className="mt-3 font-mono text-sm leading-relaxed text-text-tertiary">
-              Manage permission bundles, review sensitive access, and configure
-              which members can use admin tools.
+              Manage permission bundles, review sensitive access, and configure which members can
+              use admin tools.
             </p>
           </div>
 

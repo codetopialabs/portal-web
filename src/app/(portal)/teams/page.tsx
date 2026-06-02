@@ -1,14 +1,14 @@
 "use client";
 
-import { Users, Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMyTeams } from "@/hooks/useTeams";
 import { usePermission } from "@/hooks/usePermission";
+import { useMyTeams } from "@/hooks/useTeams";
 
 export default function TeamsDirectoryPage() {
   return (
@@ -74,7 +74,8 @@ function TeamsDirectoryContent() {
               You are not in a team yet
             </h3>
             <p className="mt-2 max-w-xs font-mono text-xs leading-5 text-zinc-500">
-              Teams are where the magic happens. Join one to start collaborating and tracking your contributions.
+              Teams are where the magic happens. Join one to start collaborating and tracking your
+              contributions.
             </p>
             {canCreate && (
               <Link
@@ -107,7 +108,10 @@ function TeamsDirectoryContent() {
                       </p>
                     )}
                   </div>
-                  <Badge variant="outline" className="shrink-0 font-mono text-[10px] uppercase tracking-widest rounded-none">
+                  <Badge
+                    variant="outline"
+                    className="shrink-0 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                  >
                     {team.memberTagName}
                   </Badge>
                 </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { ME_QUERY_KEY } from "@/hooks/useMe";
+import { UserService } from "@/services/user.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useUserStore } from "@/store/user.store";
-import { UserService } from "@/services/user.service";
 
 /**
  * Bootstraps the user profile on mount when a session exists, and keeps it

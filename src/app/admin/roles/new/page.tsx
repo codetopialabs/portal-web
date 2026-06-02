@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ShieldCheck, Sparkles, ShieldPlus, AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ShieldCheck, ShieldPlus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

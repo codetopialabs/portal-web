@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
-import { ApiResponse } from "@/types/api.types";
-import { CreateRoleInput, Role, RoleDetail, UpdateRoleInput } from "@/types/roles.types";
+import type { ApiResponse } from "@/types/api.types";
+import type { CreateRoleInput, Role, RoleDetail, UpdateRoleInput } from "@/types/roles.types";
 
 const ROLES_BASE = "/roles";
 

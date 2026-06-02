@@ -19,7 +19,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMyMembership, useSendInvite, useTeam, useTeamMembers, useTeamReviews } from "@/hooks/useTeams";
+import {
+  useMyMembership,
+  useSendInvite,
+  useTeam,
+  useTeamMembers,
+  useTeamReviews,
+} from "@/hooks/useTeams";
 import { getAvatarUrl } from "@/lib/utils";
 
 export default function TeamDashboardPage() {
@@ -78,7 +84,9 @@ function TeamDashboardContent() {
     return (
       <DashboardShell>
         <div className="flex flex-col items-center justify-center py-24 border border-zinc-200 bg-white text-center">
-          <p className="font-mono text-sm text-zinc-500">Team not found or you don't have access.</p>
+          <p className="font-mono text-sm text-zinc-500">
+            Team not found or you don't have access.
+          </p>
           <Link
             href="/teams"
             className="mt-4 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
@@ -111,7 +119,10 @@ function TeamDashboardContent() {
                   Team Workspace
                 </p>
                 {membership && (
-                  <Badge variant="outline" className="font-mono text-[10px] uppercase tracking-widest rounded-none">
+                  <Badge
+                    variant="outline"
+                    className="font-mono text-[10px] uppercase tracking-widest rounded-none"
+                  >
                     {isLead ? "Lead" : team.memberTagName}
                   </Badge>
                 )}
@@ -227,12 +238,13 @@ function TeamDashboardContent() {
                     </div>
                     <Badge
                       variant="outline"
-                      className={`shrink-0 font-mono text-[10px] uppercase tracking-widest rounded-none ${review.status === "open"
+                      className={`shrink-0 font-mono text-[10px] uppercase tracking-widest rounded-none ${
+                        review.status === "open"
                           ? "border-emerald-200 text-emerald-700"
                           : review.status === "approved"
                             ? "border-violet-200 text-violet-700"
                             : "border-zinc-200 text-zinc-400"
-                        }`}
+                      }`}
                     >
                       {review.status}
                     </Badge>
@@ -262,10 +274,7 @@ function TeamDashboardContent() {
                 </div>
               ) : (
                 members.map((member) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between px-4 py-3"
-                  >
+                  <div key={member.id} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       {/* biome-ignore lint/performance/noImgElement: member avatar */}
                       <img

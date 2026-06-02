@@ -133,9 +133,10 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
 
-        const isNetworkError = 
+        const isNetworkError =
           (typeof navigator !== "undefined" && !navigator.onLine) ||
-          (axios.isAxiosError(refreshError) && (!refreshError.response || refreshError.code === "ECONNABORTED"));
+          (axios.isAxiosError(refreshError) &&
+            (!refreshError.response || refreshError.code === "ECONNABORTED"));
 
         if (isNetworkError) {
           const errMsg =
@@ -194,10 +195,10 @@ axiosInstance.interceptors.response.use(
       errorMessage = errors.detail
         ? String(errors.detail)
         : (() => {
-          const firstKey = Object.keys(errors)[0];
-          const firstMsg = errors[firstKey];
-          return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
-        })();
+            const firstKey = Object.keys(errors)[0];
+            const firstMsg = errors[firstKey];
+            return String(Array.isArray(firstMsg) ? firstMsg[0] : firstMsg);
+          })();
     }
 
     // ─── Toast notification ──────────────────────────────────────────────────

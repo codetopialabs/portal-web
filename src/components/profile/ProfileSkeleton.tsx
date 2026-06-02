@@ -1,7 +1,6 @@
 export function ProfileSkeleton() {
   return (
     <main className="animate-pulse">
-
       {/* ── Hero ── */}
       <section className="relative min-h-[28rem] bg-zinc-950 pt-16">
         <div className="absolute inset-0 bg-zinc-800" />
@@ -35,7 +34,6 @@ export function ProfileSkeleton() {
 
       {/* ── Main body ── */}
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-20 sm:px-6 lg:grid-cols-[1.4fr_0.6fr]">
-
         {/* Left — bio + skills */}
         <div className="space-y-6">
           {/* Bio */}

@@ -89,7 +89,10 @@ function CreateTeamContent() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {/* Team Name */}
           <div className="space-y-1.5">
-            <Label htmlFor="name" className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
+            <Label
+              htmlFor="name"
+              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
+            >
               Team Name
             </Label>
             <Input
@@ -100,14 +103,15 @@ function CreateTeamContent() {
               placeholder="e.g. Developer Squad"
               className="h-10 font-mono text-sm rounded-none"
             />
-            {errors.name && (
-              <p className="font-mono text-xs text-red-500">{errors.name}</p>
-            )}
+            {errors.name && <p className="font-mono text-xs text-red-500">{errors.name}</p>}
           </div>
 
           {/* Member Tag Name */}
           <div className="space-y-1.5">
-            <Label htmlFor="memberTagName" className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
+            <Label
+              htmlFor="memberTagName"
+              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
+            >
               Member Tag
             </Label>
             <Input
@@ -128,7 +132,10 @@ function CreateTeamContent() {
 
           {/* Description */}
           <div className="space-y-1.5">
-            <Label htmlFor="description" className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700">
+            <Label
+              htmlFor="description"
+              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
+            >
               Description{" "}
               <span className="font-mono text-[10px] normal-case tracking-normal text-zinc-400">
                 (optional)

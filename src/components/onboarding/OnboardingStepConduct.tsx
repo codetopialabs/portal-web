@@ -153,10 +153,11 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("encouraged")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "encouraged"
-            ? "border-emerald-500 text-zinc-900"
-            : "border-transparent text-zinc-400 hover:text-zinc-600"
-            }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
+            activeTab === "encouraged"
+              ? "border-emerald-500 text-zinc-900"
+              : "border-transparent text-zinc-400 hover:text-zinc-600"
+          }`}
         >
           <span className="w-1.5 h-1.5 bg-emerald-500 shrink-0" />
           Encouraged
@@ -164,10 +165,11 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("restricted")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "restricted"
-            ? "border-red-500 text-zinc-900"
-            : "border-transparent text-zinc-400 hover:text-zinc-600"
-            }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
+            activeTab === "restricted"
+              ? "border-red-500 text-zinc-900"
+              : "border-transparent text-zinc-400 hover:text-zinc-600"
+          }`}
         >
           <span className="w-1.5 h-1.5 bg-red-500 shrink-0" />
           Restricted
@@ -175,10 +177,11 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={() => setActiveTab("enforcement")}
-          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${activeTab === "enforcement"
-            ? "border-zinc-900 text-zinc-900"
-            : "border-transparent text-zinc-400 hover:text-zinc-600"
-            }`}
+          className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
+            activeTab === "enforcement"
+              ? "border-zinc-900 text-zinc-900"
+              : "border-transparent text-zinc-400 hover:text-zinc-600"
+          }`}
         >
           <span className="w-1.5 h-1.5 bg-zinc-900 shrink-0" />
           Enforcement
@@ -295,8 +298,8 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
             className="mt-0.5 w-4 h-4 accent-zinc-900 shrink-0"
           />
           <span className="text-sm font-mono text-zinc-600 leading-relaxed">
-            I have read and understood the Codetopia Community Code of Conduct and Enforcement Policy.
-            I agree to uphold these standards and acknowledge that violations may result in
+            I have read and understood the Codetopia Community Code of Conduct and Enforcement
+            Policy. I agree to uphold these standards and acknowledge that violations may result in
             consequences up to and including permanent removal.
           </span>
         </label>

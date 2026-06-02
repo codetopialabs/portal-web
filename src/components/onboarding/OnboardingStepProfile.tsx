@@ -20,7 +20,6 @@ import {
   FaWhatsapp,
   FaXTwitter,
 } from "react-icons/fa6";
-import { getAvatarUrl } from "@/lib/utils";
 import { NationalitySelect } from "@/components/ui/nationality-select";
 import {
   Select,
@@ -29,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAvatarUrl } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
@@ -169,8 +169,9 @@ function BioCharCount({
   const over = count > max;
   return (
     <p
-      className={`text-right font-mono text-[10px] mt-1 ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
-        }`}
+      className={`text-right font-mono text-[10px] mt-1 ${
+        over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+      }`}
     >
       {count} / {max}
     </p>

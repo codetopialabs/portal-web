@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Circle,
-  FileText,
-  Loader2,
-  Plus,
-  XCircle,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, FileText, Loader2, Plus, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -166,7 +158,10 @@ function ReviewsListContent() {
                       {review.title}
                     </h3>
                     {review.category && (
-                      <Badge variant="secondary" className="font-mono text-[9px] uppercase tracking-widest bg-zinc-100 text-zinc-500">
+                      <Badge
+                        variant="secondary"
+                        className="font-mono text-[9px] uppercase tracking-widest bg-zinc-100 text-zinc-500"
+                      >
                         {review.category}
                       </Badge>
                     )}
@@ -190,8 +185,8 @@ function ReviewsListContent() {
                       review.status === "open"
                         ? "border-emerald-200 text-emerald-700"
                         : review.status === "approved"
-                        ? "border-violet-200 text-violet-700"
-                        : "border-zinc-200 text-zinc-400"
+                          ? "border-violet-200 text-violet-700"
+                          : "border-zinc-200 text-zinc-400"
                     }`}
                   >
                     {review.status}
@@ -218,7 +213,10 @@ function ReviewsListContent() {
 
             <div className="grid gap-5 py-6">
               <div className="space-y-1.5">
-                <Label htmlFor="title" className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                <Label
+                  htmlFor="title"
+                  className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500"
+                >
                   Title
                 </Label>
                 <Input
@@ -232,7 +230,10 @@ function ReviewsListContent() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="category" className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                <Label
+                  htmlFor="category"
+                  className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500"
+                >
                   Category (optional)
                 </Label>
                 <Input
@@ -245,7 +246,10 @@ function ReviewsListContent() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="description" className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                <Label
+                  htmlFor="description"
+                  className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500"
+                >
                   Description
                 </Label>
                 <textarea
