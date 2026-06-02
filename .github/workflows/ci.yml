@@ -34,14 +34,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: echo "path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
       - name: Cache pnpm store
         uses: actions/cache@v4
         with:
-          path: ${{ steps.pnpm-store.outputs.path }}
+          path: ~/.local/share/pnpm/store
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: pnpm-store-${{ runner.os }}-
 
