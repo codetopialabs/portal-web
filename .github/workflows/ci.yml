@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint · Build · Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1' }}
+      DEV_BYPASS_AUTH: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Step 1: Biome (lint + format check) ──────────────────────────────
+      - name: Biome check
+        run: pnpm run lint
+
+      # ── Step 2: Next.js build ─────────────────────────────────────────────
+      - name: Next.js build
+        run: pnpm run build
+
+      # ── Step 3: React Doctor health audit ────────────────────────────────
+      - name: React Doctor
+        run: npx -y react-doctor@latest .
+
+      # ── Hand off to Vercel's own pipeline ────────────────────────────────
+      # Vercel auto-deploys on push. Configure branch protection rules in
+      # GitHub (Settings → Branches → Require status checks) to gate Vercel
+      # deployment on this "Lint · Build · Health Check" job passing first.
