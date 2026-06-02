@@ -14,8 +14,8 @@ import {
   HelpCircle,
   Link2,
   MapPin,
-  Pencil,
   Paintbrush,
+  Pencil,
   Shield,
   Smartphone,
   Sparkles,
@@ -111,7 +111,13 @@ export function PublicProfileContent() {
   const jobTitle = profile.currentRole || null;
   const displayLocation = profile.location || null;
   const discipline = profile.discipline
-    ? (DISCIPLINE_MAP[profile.discipline] ?? { label: profile.discipline.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()), icon: HelpCircle, color: "text-zinc-400" })
+    ? (DISCIPLINE_MAP[profile.discipline] ?? {
+        label: profile.discipline
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l: string) => l.toUpperCase()),
+        icon: HelpCircle,
+        color: "text-zinc-400",
+      })
     : null;
   const skills = profile.skills ?? [];
   const firstName = profile.fullName?.split(" ")[0] || "This member";
@@ -157,7 +163,6 @@ export function PublicProfileContent() {
       <PublicProfileHeader />
 
       <main className="flex-grow">
-
         {/* ── Hero ── */}
         <section className="relative min-h-[28rem] bg-zinc-950 pt-16 text-white">
           <div className="absolute inset-0">
@@ -224,10 +229,8 @@ export function PublicProfileContent() {
 
         {/* ── Main body ── */}
         <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-20 sm:px-6 lg:grid-cols-[1.4fr_0.6fr]">
-
           {/* Left — bio + skills */}
           <div className="space-y-6">
-
             {/* Bio */}
             <div className="border border-zinc-200 bg-white p-6 sm:p-8">
               <h2 className="font-sans text-xl font-black text-zinc-950">Bio</h2>
@@ -269,7 +272,6 @@ export function PublicProfileContent() {
 
           {/* Right — roles, links, edit */}
           <aside className="space-y-5">
-
             {/* Discipline */}
             {discipline && (
               <div className="border border-zinc-200 bg-white p-5">

@@ -1,8 +1,17 @@
 "use client";
 
-import { ArrowUpRight, BookOpen, Calendar, Code2, FileText, Key, ShieldCheck, Star, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  BookOpen,
+  Calendar,
+  Code2,
+  FileText,
+  Key,
+  ShieldCheck,
+  Star,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
@@ -109,7 +118,10 @@ function AdminPageContent() {
           Management
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link href="/admin/members" className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors">
+          <Link
+            href="/admin/members"
+            className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors"
+          >
             <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
             <Users className="w-5 h-5 text-zinc-400" />
             <div className="space-y-1">
@@ -119,7 +131,10 @@ function AdminPageContent() {
               <p className="font-mono text-xs text-zinc-400">View and manage community members.</p>
             </div>
           </Link>
-          <Link href="/admin/roles" className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors">
+          <Link
+            href="/admin/roles"
+            className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors"
+          >
             <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
             <ShieldCheck className="w-5 h-5 text-zinc-400" />
             <div className="space-y-1">

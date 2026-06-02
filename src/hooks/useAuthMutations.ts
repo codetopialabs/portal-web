@@ -72,7 +72,7 @@ export function useLogoutMutation() {
       // Clear walkthrough local storage cache so a different logged-in user on the same device starts fresh
       for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
-        if (key && key.startsWith("codetopia_walkthrough_")) {
+        if (key?.startsWith("codetopia_walkthrough_")) {
           localStorage.removeItem(key);
         }
       }

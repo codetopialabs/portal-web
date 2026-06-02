@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 
 /**
  * Singleton QueryClient instance shared across the app.
@@ -10,10 +10,10 @@ import { QueryClient } from "@tanstack/react-query";
 let client: QueryClient | null = null;
 
 export function setQueryClient(qc: QueryClient) {
-    client = qc;
+  client = qc;
 }
 
 export function getQueryClient(): QueryClient {
-    if (!client) throw new Error("QueryClient not initialised yet");
-    return client;
+  if (!client) throw new Error("QueryClient not initialised yet");
+  return client;
 }

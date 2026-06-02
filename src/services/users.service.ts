@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
-import { ApiResponse } from "@/types/api.types";
-import {
+import type { ApiResponse } from "@/types/api.types";
+import type {
   AdminMember,
   AdminMemberDetail,
   AdminUserSession,

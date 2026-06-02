@@ -2,9 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { DriveStep } from "driver.js";
-import { ArrowRight, Copy, MapPin, Pencil, ShieldCheck, Sparkles, UserRoundCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Copy,
+  MapPin,
+  Pencil,
+  ShieldCheck,
+  Sparkles,
+  UserRoundCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileCompletionCarousel } from "@/components/dashboard/ProfileCompletionCarousel";
 import { DASHBOARD_MODULES, DASHBOARD_NEXT_ACTIONS } from "@/data/dashboard";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
@@ -194,6 +203,7 @@ export function DashboardContent() {
                     {profile.communityId}
                   </span>
                   <button
+                    type="button"
                     onClick={() => {
                       navigator.clipboard.writeText(profile.communityId);
                       toast.success("Community ID copied to clipboard!");
@@ -263,6 +273,8 @@ export function DashboardContent() {
           </Link>
         ))}
       </section>
+
+      <ContributionGraph username={profile.username} />
 
       <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
         <div className="border border-zinc-200 bg-white p-6">

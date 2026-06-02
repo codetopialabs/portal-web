@@ -27,6 +27,7 @@ import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NationalitySelect } from "@/components/ui/nationality-select";
 import {
   Select,
   SelectContent,
@@ -36,7 +37,6 @@ import {
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { getAvatarUrl, toTitleCase } from "@/lib/utils";
-import { NationalitySelect } from "@/components/ui/nationality-select";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 
@@ -169,8 +169,9 @@ function BioCharCount({ watch }: { watch: (name: string) => string }) {
   const over = count > BIO_MAX;
   return (
     <p
-      className={`text-right font-mono text-[10px] ${over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
-        }`}
+      className={`text-right font-mono text-[10px] ${
+        over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+      }`}
     >
       {count} / {BIO_MAX}
     </p>
@@ -436,7 +437,11 @@ export default function SettingsProfilePage() {
           >
             {coverPreview || profile?.coverImageUrl ? (
               // biome-ignore lint/performance/noImgElement: cover image
-              <img src={coverPreview || profile?.coverImageUrl || ""} alt="Cover" className="w-full h-full object-cover" />
+              <img
+                src={coverPreview || profile?.coverImageUrl || ""}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
                 No cover image
@@ -485,7 +490,10 @@ export default function SettingsProfilePage() {
             <div className="w-24 h-24 rounded-none overflow-hidden border border-zinc-200 bg-zinc-100 flex items-center justify-center p-1">
               {/* biome-ignore lint/performance/noImgElement: user avatar */}
               <img
-                src={avatarPreview || getAvatarUrl(profile?.profilePictureUrl, profile?.fullName ?? "User")}
+                src={
+                  avatarPreview ||
+                  getAvatarUrl(profile?.profilePictureUrl, profile?.fullName ?? "User")
+                }
                 alt="Avatar"
                 className="w-full h-full object-cover"
               />
@@ -586,7 +594,8 @@ export default function SettingsProfilePage() {
                 className={inputStyles}
                 {...register("current_role", {
                   maxLength: { value: 100, message: "Occupation must be 100 characters or less" },
-                  onBlur: (e) => setValue("current_role", toTitleCase(e.target.value), { shouldDirty: true }),
+                  onBlur: (e) =>
+                    setValue("current_role", toTitleCase(e.target.value), { shouldDirty: true }),
                 })}
                 maxLength={100}
               />
@@ -595,12 +604,13 @@ export default function SettingsProfilePage() {
                 const count = val.length;
                 return (
                   <p
-                    className={`text-right font-mono text-[10px] ${count >= 100
-                      ? "text-red-500"
-                      : count >= 85
-                        ? "text-amber-500"
-                        : "text-zinc-400"
-                      }`}
+                    className={`text-right font-mono text-[10px] ${
+                      count >= 100
+                        ? "text-red-500"
+                        : count >= 85
+                          ? "text-amber-500"
+                          : "text-zinc-400"
+                    }`}
                   >
                     {count} / 100
                   </p>
@@ -738,9 +748,7 @@ export default function SettingsProfilePage() {
                 })}
               />
               <BioCharCount watch={watch} />
-              {errors.bio && (
-                <p className="font-mono text-xs text-red-500">{errors.bio.message}</p>
-              )}
+              {errors.bio && <p className="font-mono text-xs text-red-500">{errors.bio.message}</p>}
             </div>
           </div>
         </section>
@@ -935,7 +943,12 @@ export default function SettingsProfilePage() {
               setAvatarPreview(null);
               setAvatarFile(null);
             }}
-            disabled={!isDirty && skills.join() === (profile?.skills ?? []).join() && !avatarFile && !coverFile}
+            disabled={
+              !isDirty &&
+              skills.join() === (profile?.skills ?? []).join() &&
+              !avatarFile &&
+              !coverFile
+            }
             className="h-10 rounded-none border-zinc-200 font-mono text-xs uppercase tracking-widest px-6 hover:border-zinc-400"
           >
             Discard

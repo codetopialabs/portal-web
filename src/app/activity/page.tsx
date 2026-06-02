@@ -1,5 +1,6 @@
 "use client";
 
+import type { DriveStep } from "driver.js";
 import {
   AppWindow,
   Filter,
@@ -14,7 +15,6 @@ import {
   UserPlus,
 } from "lucide-react";
 import React from "react";
-import type { DriveStep } from "driver.js";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { useAdminActivity } from "@/hooks/useAdmin";
@@ -155,18 +155,19 @@ function ActivityPageContent() {
       .finally(() => setLoading(false));
   }, [page, viewMode]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally resets pagination when view mode or filter changes
   React.useEffect(() => {
     setPage(1);
   }, [viewMode, filter]);
 
-  const activeEntries = viewMode === "org" ? orgActivity?.results ?? [] : entries;
+  const activeEntries = viewMode === "org" ? (orgActivity?.results ?? []) : entries;
 
   const filtered =
     filter === "all"
       ? activeEntries
       : activeEntries.filter((e) => EVENT_CONFIG[e.eventType]?.category === filter);
 
-  const activeTotal = viewMode === "org" ? orgActivity?.total ?? 0 : total;
+  const activeTotal = viewMode === "org" ? (orgActivity?.total ?? 0) : total;
   const totalPages =
     filter === "all"
       ? Math.max(1, Math.ceil(activeTotal / PAGE_SIZE))
@@ -175,7 +176,7 @@ function ActivityPageContent() {
   const isLoadingState = viewMode === "org" ? orgLoading : loading;
   const errorStatusValue =
     viewMode === "org"
-      ? (orgErrorValue as { status?: number } | undefined)?.status ?? (orgError ? 500 : null)
+      ? ((orgErrorValue as { status?: number } | undefined)?.status ?? (orgError ? 500 : null))
       : errorStatus;
   const totalCount = activeTotal || activeEntries.length;
 
@@ -204,10 +205,11 @@ function ActivityPageContent() {
                     key={option.value}
                     type="button"
                     onClick={() => setViewMode(option.value)}
-                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${viewMode === option.value
+                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                      viewMode === option.value
                         ? "bg-zinc-900 text-white border-zinc-900"
                         : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -230,10 +232,11 @@ function ActivityPageContent() {
                 setFilter(f.value);
                 setPage(1);
               }}
-              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${filter === f.value
+              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                filter === f.value
                   ? "bg-zinc-900 text-white border-zinc-900"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-                }`}
+              }`}
             >
               {f.label}
             </button>
@@ -328,7 +331,8 @@ function ActivityPageContent() {
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs text-zinc-400">
               {filter === "all" ? totalCount : filtered.length} event
-              {(filter === "all" ? totalCount : filtered.length) !== 1 ? "s" : ""} · page {page} of {totalPages}
+              {(filter === "all" ? totalCount : filtered.length) !== 1 ? "s" : ""} · page {page} of{" "}
+              {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <button

@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-06-02] Team Management & Contribution Panel
+
+**What changed:** Launched a comprehensive workspace for teams to collaborate, open contribution reviews, and track progress via a GitHub-style Contribution Graph.
+**Affected areas:** Portal Dashboard, Public Profiles, `/teams` workspace.
+**Permissions added:** `teams.view`, `teams.create`, `teams.view:[id]`, `teams.manage:[id]`, `teams.create_review:[id]`, `teams.approve_review:[id]`.
+**Breaking changes:** No.
+
 ## [2026-06-01] Dashboard Community ID placement update
 
 **What changed:** Moved the Community ID on the dashboard out of the profile-strength sidebar and placed it directly in the primary profile action row beside the Edit Profile control for cleaner placement.
@@ -100,20 +107,11 @@ order: 1
 **What changed:** Aligned admin roles/members UI with the updated backend endpoints, added org-wide activity viewing, and introduced session management for member accounts.  
 **Affected areas:** Admin Members, Admin Roles, Activity Log, Permission System, Docs.  
 **Permissions added:** `users.*`, `sessions.view_any`, `sessions.revoke_any`, `activity.view_any` (replacing `members.*` in the UI).  
-**Breaking changes:** Yes — permission codenames in the frontend now use `users.*` instead of `members.*`.  
-title: Changelog
-category: General
-order: 1
----
-
-# Changelog
-
-All notable changes to the Codetopia Community Portal are documented here.
+**Breaking changes:** Yes — permission codenames in the frontend now use `users.*` instead of `members.*`.
 
 ---
 
 ## [2026-05-19] Performance and reliability upgrades
-
 **What changed:** Added Redis-backed caching for high-traffic profile and member endpoints and introduced global plus auth-specific rate limits.
 **Affected areas:** Authentication API, Community Member API, API Throttling.
 **Permissions added:** none.

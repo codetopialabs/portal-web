@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { ME_QUERY_KEY } from "@/hooks/useMe";
+import { UserService } from "@/services/user.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useUserStore } from "@/store/user.store";
-import { UserService } from "@/services/user.service";
 
 /**
  * Bootstraps the user profile on mount when a session exists, and keeps it
@@ -33,8 +33,9 @@ export function UserInitializer() {
       const profile = await UserService.getMe();
       return profile;
     },
-    enabled: !!session?.accessToken,
+    enabled: !!session,
     staleTime: 60_000,
+    retry: 0,
   });
 
   // Keep the Zustand store in sync so all existing consumers (usePermission,
@@ -51,7 +52,7 @@ export function UserInitializer() {
   }, [data]);
 
   useEffect(() => {
-    if (!session?.accessToken) return;
+    if (!session) return;
     useUserStore.setState({ isLoading });
   }, [isLoading, session]);
 

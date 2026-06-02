@@ -29,7 +29,5 @@ export function getCoverUrl(url: string | null | undefined, name: string): strin
 export function toTitleCase(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return trimmed;
-  return trimmed
-    .toLowerCase()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return trimmed.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }

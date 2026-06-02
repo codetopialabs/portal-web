@@ -41,8 +41,7 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
 
   const profileHref = `/@${member.username}`;
 
-  const occupation =
-    member.currentRole?.trim() || `${primaryRole} at Codetopia Community`;
+  const occupation = member.currentRole?.trim() || `${primaryRole} at Codetopia Community`;
 
   const location = member.location?.trim() || "Somewhere on Earth";
 
@@ -75,7 +74,6 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
 
       {/* Right column — everything aligned under the name */}
       <div className="min-w-0 flex-1">
-
         {/* Name row */}
         <div className="flex items-start justify-between gap-2">
           <p className="truncate font-sans text-[14px] font-bold leading-tight text-zinc-900 group-hover:underline group-hover:underline-offset-4">

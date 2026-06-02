@@ -195,12 +195,12 @@ function ChangePasswordSection() {
           >
             {isSubmitting
               ? [0, 1, 2].map((i) => (
-                <span
-                  key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                />
-              ))
+                  <span
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-white animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
+                  />
+                ))
               : "Update Password"}
           </button>
         </div>
@@ -328,7 +328,9 @@ function ActiveSessionsSection() {
                       )}
                     </div>
                     <p className="font-mono text-xs text-zinc-400 mt-0.5">
-                      {session.ipAddress ?? "Unknown IP"} · {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)} · Signed in {timeAgo(session.createdAt)}
+                      {session.ipAddress ?? "Unknown IP"} ·{" "}
+                      {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)} · Signed in{" "}
+                      {timeAgo(session.createdAt)}
                     </p>
                   </div>
                   {!session.isCurrent && (
