@@ -100,7 +100,9 @@ export function buildStrengthItems(profile: UserProfile): StrengthItem[] {
 }
 
 export function calcStrength(items: StrengthItem[]): number {
-  return items.filter((i) => i.fulfilled).reduce((acc, i) => acc + i.weight, 0);
+  const total = items.filter((i) => i.fulfilled).reduce((acc, i) => acc + i.weight, 0);
+  const maxWeight = items.reduce((acc, i) => acc + i.weight, 0);
+  return Math.round((total / maxWeight) * 100);
 }
 
 export function strengthLabel(pct: number): { text: string; color: string } {

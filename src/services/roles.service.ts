@@ -7,7 +7,7 @@ const ROLES_BASE = "/roles";
 export const RolesService = {
   async getRoles(): Promise<Role[]> {
     const res = await axiosInstance.get<ApiResponse<Role[]>>(`${ROLES_BASE}/`);
-    return res.data.data;
+    return res.data.data.filter((r) => !r.isSystem && !r.name.startsWith("team_"));
   },
 
   async getRole(slug: string): Promise<RoleDetail> {

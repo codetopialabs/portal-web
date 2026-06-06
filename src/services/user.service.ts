@@ -104,8 +104,10 @@ export const UserService = {
     return response.data.data;
   },
 
-  async getCommunityMembers(): Promise<CommunityMember[]> {
-    const response = await axiosInstance.get<{ data: CommunityMember[] }>("/users/members/");
+  async getCommunityMembers(search?: string): Promise<CommunityMember[]> {
+    const response = await axiosInstance.get<{ data: CommunityMember[] }>("/users/members/", {
+      params: { search },
+    });
     return response.data.data;
   },
 

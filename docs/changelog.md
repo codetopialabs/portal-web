@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-06-06] Teams invite notifications & review UX
+
+**What changed:** Added transactional email on team invite dispatch, global in-app invite badge and dismissible banner in the dashboard shell, and polished review detail page (richer header, merged chronological timeline, improved inline comment editing, redesigned sidebar) and review list (stacked assignee avatars with +N, structured empty states).
+**Affected areas:** `/teams/[teamSlug]` workspace, `/teams/[teamSlug]/reviews`, `/teams/[teamSlug]/reviews/[reviewId]`, `DashboardSidebar`, `DashboardShell`, backend `apps/teams/`.
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-06-02] Team Management & Contribution Panel
 
 **What changed:** Launched a comprehensive workspace for teams to collaborate, open contribution reviews, and track progress via a GitHub-style Contribution Graph.
