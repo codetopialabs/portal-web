@@ -25,7 +25,6 @@ function CreateTeamContent() {
 
   const [formData, setFormData] = useState({
     name: "",
-    memberTagName: "",
     description: "",
   });
 
@@ -34,7 +33,6 @@ function CreateTeamContent() {
   function validate(): boolean {
     const next: Partial<typeof formData> = {};
     if (!formData.name.trim()) next.name = "Team name is required.";
-    if (!formData.memberTagName.trim()) next.memberTagName = "Member tag name is required.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -45,11 +43,10 @@ function CreateTeamContent() {
 
     const team = await createTeam({
       name: formData.name.trim(),
-      memberTagName: formData.memberTagName.trim(),
       description: formData.description.trim() || undefined,
     });
 
-    router.push(`/teams/${team.id}`);
+    router.push(`/teams/${team.slug}`);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -104,30 +101,6 @@ function CreateTeamContent() {
               className="h-10 font-mono text-sm rounded-none"
             />
             {errors.name && <p className="font-mono text-xs text-red-500">{errors.name}</p>}
-          </div>
-
-          {/* Member Tag Name */}
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="memberTagName"
-              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
-            >
-              Member Tag
-            </Label>
-            <Input
-              id="memberTagName"
-              name="memberTagName"
-              value={formData.memberTagName}
-              onChange={handleChange}
-              placeholder="e.g. Dev, Designer, Writer"
-              className="h-10 font-mono text-sm rounded-none"
-            />
-            {errors.memberTagName && (
-              <p className="font-mono text-xs text-red-500">{errors.memberTagName}</p>
-            )}
-            <p className="font-mono text-[10px] text-zinc-400">
-              What members of this team will be called (e.g. "Dev" → "Dev Team").
-            </p>
           </div>
 
           {/* Description */}
