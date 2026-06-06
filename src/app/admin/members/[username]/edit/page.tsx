@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ChevronLeft, Mail, MapPin, Shield, User } from "lucide-react";
+import { CheckCircle2, Mail, MapPin, Shield } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -360,28 +360,6 @@ function SideFact({
 function EditMemberPageContent({ username }: { username: string }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
-      <div className="mb-6 flex items-center gap-2">
-        <Link
-          href={`/admin/members/${username}`}
-          className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
-        >
-          <ChevronLeft className="h-3.5 w-3.5" />
-          Member Details
-        </Link>
-      </div>
-
-      <div className="mb-8 border-b border-grey-200 pb-6">
-        <div className="mb-3 flex items-center gap-3">
-          <User className="h-5 w-5 text-icon-tertiary" />
-          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
-            Edit Member
-          </h1>
-        </div>
-        <p className="max-w-2xl font-mono text-sm leading-relaxed text-text-tertiary">
-          Update profile metadata and account verification for this community member.
-        </p>
-      </div>
-
       <MemberEditForm identifier={username} />
     </div>
   );

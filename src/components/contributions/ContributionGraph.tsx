@@ -1,32 +1,83 @@
 "use client";
 
+import { useState } from "react";
 import { ActivityCalendar, type ThemeInput } from "react-activity-calendar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useContributions } from "@/hooks/useTeams";
+import type { ContributionDay } from "@/services/teams.service";
 
 interface ContributionGraphProps {
   username: string;
+  joinedAt?: string;
 }
 
-export function ContributionGraph({ username }: ContributionGraphProps) {
-  const { data, isLoading, isError } = useContributions(username);
-
-  const explicitTheme: ThemeInput = {
-    light: ["#f4f4f5", "#d1d5db", "#9ca3af", "#4b5563", "#18181b"],
-    dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
-  };
-
-  if (isLoading) {
-    return <Skeleton className="h-48 w-full" />;
+export function ContributionGraph({ username, joinedAt }: ContributionGraphProps) {
+  const currentYear = new Date().getFullYear();
+  const joinYear = joinedAt ? new Date(joinedAt).getFullYear() : currentYear;
+  const years = [];
+  for (let y = currentYear; y >= joinYear; y--) {
+    years.push(y);
   }
 
-  if (isError || !data) {
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
+  const { data, isLoading, isError } = useContributions(username, selectedYear);
+
+  const explicitTheme: ThemeInput = {
+    light: ["#f0fdf4", "#86efac", "#4ade80", "#16a34a", "#14532d"],
+  };
+
+  const isWrappedResponse = (value: unknown): value is { data: ContributionDay[] } => {
+    return (
+      typeof value === "object" &&
+      value !== null &&
+      "data" in value &&
+      Array.isArray((value as { data?: unknown }).data)
+    );
+  };
+
+  const contributions = Array.isArray(data) ? data : isWrappedResponse(data) ? data.data : [];
+
+  if (isError || (!isLoading && !data && !isWrappedResponse(data))) {
     return (
       <div className="flex h-48 w-full items-center justify-center border border-zinc-200 bg-white">
         <p className="font-mono text-xs text-zinc-400">Could not load contribution data.</p>
       </div>
     );
   }
+
+  const paddedContributions = (() => {
+    const map = new Map(contributions.map((d) => [d.date, d]));
+    const result: ContributionDay[] = [];
+
+    if (selectedYear !== undefined) {
+      // Pad from Jan 1 to Dec 31
+      const startDate = new Date(Date.UTC(selectedYear, 0, 1));
+      const endDate = new Date(Date.UTC(selectedYear, 11, 31));
+      for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
+        const yearStr = d.getUTCFullYear();
+        const monthStr = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const dayStr = String(d.getUTCDate()).padStart(2, "0");
+        const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+
+        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0 });
+      }
+    } else {
+      // Pad last 365 days
+      const today = new Date();
+      for (let i = 364; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const yearStr = d.getFullYear();
+        const monthStr = String(d.getMonth() + 1).padStart(2, "0");
+        const dayStr = String(d.getDate()).padStart(2, "0");
+        const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
+
+        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0 });
+      }
+    }
+    return result;
+  })();
+
+  const emptyState = !isLoading && contributions.length === 0;
 
   return (
     <div className="border border-zinc-200 bg-white p-6">
@@ -38,32 +89,81 @@ export function ContributionGraph({ username }: ContributionGraphProps) {
           </p>
         </div>
 
-        <div className="overflow-x-auto pb-2">
-          <ActivityCalendar
-            data={data}
-            theme={explicitTheme}
-            labels={{
-              legend: {
-                less: "Less",
-                more: "More",
-              },
-              months: [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ],
-              totalCount: "{{count}} contributions in the last year",
-            }}
-          />
+        <div className="flex flex-col lg:flex-row">
+          <div className="flex-1 overflow-x-auto pb-2 min-h-56 pr-4">
+            {isLoading ? (
+              <div className="h-full w-full flex items-center justify-center border border-dashed border-zinc-200 bg-zinc-50">
+                <p className="font-mono text-xs text-zinc-400 animate-pulse">
+                  Loading contributions...
+                </p>
+              </div>
+            ) : emptyState ? (
+              <div className="flex h-full w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50 text-center min-h-40">
+                <p className="max-w-xs text-sm text-zinc-500">
+                  No contributions found for {selectedYear ? selectedYear : "the last year"}.
+                </p>
+              </div>
+            ) : (
+              <ActivityCalendar
+                data={paddedContributions}
+                theme={explicitTheme}
+                colorScheme="light"
+                blockSize={15}
+                blockMargin={4}
+                labels={{
+                  legend: {
+                    less: "Less",
+                    more: "More",
+                  },
+                  months: [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ],
+                  totalCount: selectedYear
+                    ? `{{count}} contributions in ${selectedYear}`
+                    : "{{count}} contributions in the last year",
+                }}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-row lg:flex-col gap-1 shrink-0 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 border-l border-zinc-100 pl-4 lg:min-w-24">
+            <button
+              type="button"
+              onClick={() => setSelectedYear(undefined)}
+              className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
+                selectedYear === undefined
+                  ? "bg-zinc-950 text-white font-bold"
+                  : "text-zinc-400 hover:text-zinc-950 hover:bg-zinc-100"
+              }`}
+            >
+              Last year
+            </button>
+            {years.map((year) => (
+              <button
+                key={year}
+                type="button"
+                onClick={() => setSelectedYear(year)}
+                className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
+                  selectedYear === year
+                    ? "bg-zinc-950 text-white font-bold"
+                    : "text-zinc-400 hover:text-zinc-950 hover:bg-zinc-100"
+                }`}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

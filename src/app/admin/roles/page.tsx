@@ -53,7 +53,7 @@ function roleTone(name: string, isSystem: boolean) {
       icon: ShieldAlert,
       label: isSystem ? "System" : "High Access",
       badgeClass: "border-error-500 bg-error-50 text-error-700",
-      iconWrapClass: "border-2 border-error-500 bg-error-50 text-error-600",
+      iconWrapClass: "border border-error-200 bg-error-50 text-error-600",
       accent: "border-l-error-500",
     };
   }
@@ -62,7 +62,7 @@ function roleTone(name: string, isSystem: boolean) {
       icon: ShieldCheck,
       label: "Operational",
       badgeClass: "border-info-500 bg-info-50 text-info-700",
-      iconWrapClass: "border-2 border-info-500 bg-info-50 text-info-600",
+      iconWrapClass: "border border-info-200 bg-info-50 text-info-600",
       accent: "border-l-info-500",
     };
   }
@@ -70,7 +70,7 @@ function roleTone(name: string, isSystem: boolean) {
     icon: Shield,
     label: "Community",
     badgeClass: "border-grey-300 bg-grey-100 text-text-secondary",
-    iconWrapClass: "border-2 border-grey-300 bg-grey-50 text-text-tertiary",
+    iconWrapClass: "border border-grey-200 bg-grey-50 text-text-tertiary",
     accent: "border-l-grey-300",
   };
 }
@@ -104,7 +104,7 @@ function DeleteRoleButton({ slug, name }: { slug: string; name: string }) {
       size="sm"
       onClick={handleDelete}
       disabled={isPending}
-      className="h-8 rounded-none font-mono text-xs font-bold transition-all hover:-translate-y-px active:translate-y-0"
+      className="h-8 rounded-none font-mono text-xs font-bold"
     >
       <Trash2 className="h-3.5 w-3.5" />
       {confirming ? "Confirm Delete" : "Delete"}
@@ -122,7 +122,7 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="group border-2 border-grey-900 bg-white p-5 shadow-[4px_4px_0px_0px_var(--color-grey-200)] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[6px_6px_0px_0px_var(--color-grey-200)]">
+    <div className="border border-grey-200 bg-white p-5 transition-colors hover:bg-grey-50">
       <div className="mb-4 flex items-center justify-between gap-2">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
           {label}
@@ -157,7 +157,7 @@ function RoleRow({
 
   return (
     <div
-      className={`group border-2 border-grey-900 bg-white border-l-4 ${tone.accent} p-5 shadow-[4px_4px_0px_0px_var(--color-grey-200)] transition-all duration-150 hover:-translate-x-px hover:-translate-y-px hover:shadow-[6px_6px_0px_0px_var(--color-grey-200)]`}
+      className={`border border-grey-200 bg-white border-l-2 ${tone.accent} p-5 transition-colors hover:bg-grey-50`}
     >
       <div className="flex flex-col gap-5 md:flex-row md:items-center">
         {/* Role identity */}
@@ -229,7 +229,7 @@ function RoleRow({
             asChild
             variant="outline"
             size="sm"
-            className="h-8 rounded-none border-grey-900 font-mono text-xs font-bold transition-all hover:-translate-y-px hover:bg-grey-900 hover:text-white active:translate-y-0"
+            className="h-8 rounded-none border-grey-200 font-mono text-xs font-bold hover:border-grey-300 hover:bg-grey-50"
           >
             <Link href={`/admin/roles/${role.name}`}>
               Details
@@ -293,7 +293,7 @@ function RolesListContent() {
 
   if (isError) {
     return (
-      <div className="border-2 border-error-500 bg-error-50 p-10 text-center shadow-[4px_4px_0px_0px_var(--color-error-200)]">
+      <div className="border border-error-200 bg-error-50 p-10 text-center">
         <ShieldAlert className="mx-auto mb-3 h-8 w-8 text-error-500" />
         <p className="font-sans text-base font-black uppercase text-error-700">
           Roles could not be loaded
@@ -305,7 +305,7 @@ function RolesListContent() {
 
   if (!roles || roles.length === 0) {
     return (
-      <div className="border-2 border-grey-900 bg-white p-14 text-center shadow-[4px_4px_0px_0px_var(--color-grey-200)]">
+      <div className="border border-grey-200 bg-white p-14 text-center">
         <Shield className="mx-auto mb-3 h-8 w-8 text-icon-muted" />
         <p className="font-sans text-base font-black uppercase text-text-primary">No roles found</p>
         <p className="mt-2 font-mono text-xs text-text-tertiary">
@@ -314,7 +314,7 @@ function RolesListContent() {
         {canCreate && (
           <Button
             asChild
-            className="mt-8 h-10 rounded-none border-2 border-grey-900 bg-grey-900 font-mono text-xs font-bold text-white shadow-[4px_4px_0px_0px_var(--color-grey-300)] transition-all hover:-translate-y-px hover:shadow-[6px_6px_0px_0px_var(--color-grey-300)] active:translate-y-0"
+            className="mt-8 h-10 rounded-none border border-grey-900 bg-grey-900 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800"
           >
             <Link href="/admin/roles/new">
               <Plus className="h-3.5 w-3.5" />
@@ -343,7 +343,7 @@ function RolesListContent() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search roles by name or description…"
-            className="h-11 rounded-none border-2 border-grey-900 bg-white pl-10 font-mono text-sm shadow-[3px_3px_0px_0px_var(--color-grey-200)] focus-visible:ring-0 focus-visible:border-grey-900"
+            className="h-11 rounded-none border-grey-200 bg-white pl-10 font-mono text-sm focus-visible:border-grey-900 focus-visible:ring-2 focus-visible:ring-grey-900/10"
           />
         </div>
         <RoleFilterPopover filter={filter} onChange={setFilter} onReset={() => setFilter("all")} />
@@ -351,7 +351,7 @@ function RolesListContent() {
 
       {/* Roles List */}
       {filteredRoles.length === 0 ? (
-        <div className="border-2 border-grey-200 bg-grey-50 p-10 text-center">
+        <div className="border border-grey-200 bg-grey-50 p-10 text-center">
           <p className="font-sans text-base font-black uppercase text-text-primary">
             No matching roles
           </p>
@@ -386,10 +386,10 @@ function RoleFilterPopover({
       <PopoverTrigger asChild>
         <Button
           type="button"
-          className={`h-11 shrink-0 rounded-none border-2 px-5 font-mono text-sm font-bold shadow-[3px_3px_0px_0px_var(--color-grey-200)] transition-all hover:-translate-y-px hover:shadow-[5px_5px_0px_0px_var(--color-grey-200)] active:translate-y-0 ${
+          className={`h-11 shrink-0 rounded-none border px-5 font-mono text-sm font-bold transition-colors ${
             isFiltered
-              ? "border-grey-900 bg-grey-900 text-white"
-              : "border-grey-900 bg-white text-grey-900 hover:bg-grey-50"
+              ? "border-grey-900 bg-grey-900 text-white hover:bg-grey-800"
+              : "border-grey-200 bg-white text-grey-900 hover:border-grey-300 hover:bg-grey-50"
           }`}
         >
           <Filter className="mr-2 h-4 w-4" />
@@ -398,9 +398,9 @@ function RoleFilterPopover({
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="flex w-full flex-col rounded-none border-2 border-grey-900 bg-white p-0 shadow-[6px_6px_0px_0px_var(--color-grey-200)] sm:w-[320px]"
+        className="flex w-full flex-col rounded-none border border-grey-200 bg-white p-0 shadow-none sm:w-[320px]"
       >
-        <div className="border-b-2 border-grey-900 p-4">
+        <div className="border-b border-grey-200 p-4">
           <h3 className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
             Filter Roles
           </h3>
@@ -414,10 +414,10 @@ function RoleFilterPopover({
             Role type
           </p>
           <Select value={filter} onValueChange={(v) => onChange(v as RoleFilter)}>
-            <SelectTrigger className="h-10 w-full rounded-none border-2 border-grey-900 bg-white font-mono text-sm focus:ring-0">
+            <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm focus:border-grey-900 focus:ring-2 focus:ring-grey-900/10">
               <SelectValue placeholder="All roles" />
             </SelectTrigger>
-            <SelectContent className="rounded-none border-2 border-grey-900 font-mono text-sm shadow-[4px_4px_0px_0px_var(--color-grey-200)]">
+            <SelectContent className="rounded-none border-grey-200 font-mono text-sm shadow-none">
               <SelectItem value="all">All roles</SelectItem>
               <SelectItem value="system">System roles only</SelectItem>
               <SelectItem value="custom">Custom roles only</SelectItem>
@@ -425,12 +425,12 @@ function RoleFilterPopover({
           </Select>
         </div>
 
-        <div className="flex shrink-0 gap-3 border-t-2 border-grey-900 bg-grey-50 p-4">
+        <div className="flex shrink-0 gap-3 border-t border-grey-200 bg-grey-50 p-4">
           <Button
             type="button"
             variant="outline"
             onClick={onReset}
-            className="h-10 flex-1 rounded-none border-2 border-grey-300 bg-white font-mono text-sm font-bold text-text-secondary transition-all hover:border-grey-900 hover:text-text-primary"
+            className="h-10 flex-1 rounded-none border border-grey-200 bg-white font-mono text-sm font-bold text-text-secondary transition-colors hover:border-grey-300 hover:bg-grey-50 hover:text-text-primary"
           >
             <RotateCcw className="mr-2 h-3.5 w-3.5" />
             Reset
@@ -438,7 +438,7 @@ function RoleFilterPopover({
           <PopoverClose asChild>
             <Button
               type="button"
-              className="h-10 flex-1 rounded-none border-2 border-grey-900 bg-grey-900 font-mono text-sm font-bold text-white transition-all hover:bg-grey-800"
+              className="h-10 flex-1 rounded-none border border-grey-900 bg-grey-900 font-mono text-sm font-bold text-white transition-colors hover:bg-grey-800"
             >
               Apply
             </Button>
@@ -455,7 +455,7 @@ function RolesPageContent() {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
       {/* Page Header */}
-      <div className="mb-10 border-b-2 border-grey-900 pb-8">
+      <div className="mb-8">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <div className="mb-1 flex items-center gap-2">
@@ -476,7 +476,7 @@ function RolesPageContent() {
           {canCreate && (
             <Button
               asChild
-              className="h-11 shrink-0 rounded-none border-2 border-grey-900 bg-grey-900 font-mono text-xs font-bold text-white shadow-[4px_4px_0px_0px_var(--color-grey-300)] transition-all hover:-translate-y-px hover:shadow-[6px_6px_0px_0px_var(--color-grey-300)] active:translate-y-0"
+              className="h-11 shrink-0 rounded-none border border-grey-900 bg-grey-900 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800"
             >
               <Link href="/admin/roles/new">
                 <Plus className="h-3.5 w-3.5" />

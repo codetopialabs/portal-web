@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ChevronLeft, FilePenLine } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -297,7 +297,7 @@ function RoleEditForm({ slug }: { slug: string }) {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Describe the responsibilities and scope of this role..."
-              className="w-full border border-zinc-200 bg-zinc-50 px-4 py-3 font-mono text-xs text-zinc-700 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 focus:bg-white rounded-none transition-all resize-none shadow-inner"
+              className="w-full resize-none rounded-none border border-zinc-200 bg-zinc-50 px-4 py-3 font-mono text-xs text-zinc-700 placeholder:text-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-none"
             />
           </div>
         </div>
@@ -336,7 +336,7 @@ function RoleEditForm({ slug }: { slug: string }) {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full md:w-auto font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white bg-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-800 transition-all shadow-xl disabled:opacity-50"
+          className="w-full border border-zinc-900 bg-zinc-900 px-10 py-4 font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 disabled:opacity-50 md:w-auto"
         >
           {isPending ? "BUFFERING_SYNCING…" : "SYNC_ARCHETYPE_CHANGES"}
         </button>
@@ -356,32 +356,6 @@ function RoleEditForm({ slug }: { slug: string }) {
 function EditRolePageContent({ slug }: { slug: string }) {
   return (
     <div className="max-w-3xl mx-auto pb-20 px-4 md:px-0">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 mb-8">
-        <Link
-          href={`/admin/roles/${slug}`}
-          className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-1.5"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          BACK_TO_ARCHETYPE
-        </Link>
-      </div>
-
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-12">
-        <div className="h-12 w-12 flex items-center justify-center border border-zinc-900 bg-white text-zinc-900 shadow-lg">
-          <FilePenLine className="w-6 h-6" />
-        </div>
-        <div>
-          <h1 className="font-sans font-black uppercase tracking-tight text-3xl text-zinc-900">
-            Archetype Revision
-          </h1>
-          <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest mt-1">
-            Modifying existing authority matrix parameters
-          </p>
-        </div>
-      </div>
-
       <RoleEditForm slug={slug} />
     </div>
   );

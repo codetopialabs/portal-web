@@ -10,7 +10,6 @@ import {
   MapPin,
   Search,
   UserCheck,
-  Users,
   UserX,
 } from "lucide-react";
 import Link from "next/link";
@@ -125,20 +124,6 @@ function MembersPageContent() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
-      <div className="mb-8 border-b border-grey-200 pb-8">
-        <div className="max-w-2xl">
-          <div className="mb-3 flex items-center gap-3">
-            <Users className="h-5 w-5 text-icon-tertiary" />
-            <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
-              Members
-            </h1>
-          </div>
-          <p className="font-mono text-sm leading-relaxed text-text-tertiary">
-            Review community accounts, verification status, assigned roles, and member records.
-          </p>
-        </div>
-      </div>
-
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="group relative flex-1">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-icon-muted transition-colors group-focus-within:text-icon-primary" />
@@ -251,31 +236,23 @@ function MembersPageContent() {
                   <StatusBadge active={member.isActive} verified={member.isEmailVerified} />
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {member.roles.length === 0 && (
-                    <Badge
-                      variant="outline"
-                      className="h-6 rounded-none px-2.5 text-[11px] text-text-tertiary"
-                    >
-                      No role
-                    </Badge>
+                <div className="flex flex-wrap gap-1.5">
+                  {member.roles.length > 0 ? (
+                    member.roles.slice(0, 2).map((roleDisplayName) => (
+                      <span
+                        key={roleDisplayName}
+                        className="inline-flex items-center border border-grey-200 bg-white px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-text-secondary"
+                      >
+                        {roleDisplayName}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="font-mono text-xs text-text-tertiary">-</span>
                   )}
-                  {member.roles.slice(0, 2).map((role) => (
-                    <Badge
-                      key={role}
-                      variant="secondary"
-                      className="h-6 rounded-none border-grey-200 px-2.5 text-[11px] font-bold text-text-secondary"
-                    >
-                      {role}
-                    </Badge>
-                  ))}
                   {member.roles.length > 2 && (
-                    <Badge
-                      variant="outline"
-                      className="h-6 rounded-none px-2.5 text-[11px] text-text-tertiary"
-                    >
+                    <span className="inline-flex items-center border border-grey-200 bg-white px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                       +{member.roles.length - 2}
-                    </Badge>
+                    </span>
                   )}
                 </div>
 

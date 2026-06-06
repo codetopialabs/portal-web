@@ -3,7 +3,6 @@
 import {
   AlertTriangle,
   ArrowRight,
-  ChevronLeft,
   ChevronRight,
   LockKeyhole,
   Shield,
@@ -532,16 +531,6 @@ function SideFact({ label, value }: { label: string; value: string }) {
 function RoleDetailPageContent({ slug }: { slug: string }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
-      <div className="mb-6">
-        <Link
-          href="/admin/roles"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
-        >
-          <ChevronLeft className="h-3.5 w-3.5" />
-          Roles
-        </Link>
-      </div>
-
       <RoleDetailContent slug={slug} />
     </div>
   );
