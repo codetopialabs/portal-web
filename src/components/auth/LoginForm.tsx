@@ -12,10 +12,16 @@ import { Input } from "@/components/ui/input";
 import { type LoginFormValues, useLoginMutation } from "@/hooks/useAuthMutations";
 import { AuthService } from "@/services/auth.service";
 
-export function LoginForm({ sessionExpired = false }: { sessionExpired?: boolean }) {
+export function LoginForm({
+  sessionExpired = false,
+  next,
+}: {
+  sessionExpired?: boolean;
+  next?: string;
+}) {
   const [step, setStep] = useState<"email" | "password">("email");
   const [showPassword, setShowPassword] = useState(false);
-  const mutation = useLoginMutation();
+  const mutation = useLoginMutation(next);
   const resendMutation = useMutation({
     mutationFn: (email: string) => AuthService.resendVerification(email),
   });
