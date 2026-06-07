@@ -23,7 +23,7 @@ export interface SignupFormValues {
   confirmPassword?: string;
 }
 
-export function useLoginMutation() {
+export function useLoginMutation(next?: string) {
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
 
@@ -34,7 +34,11 @@ export function useLoginMutation() {
       if (!tokens.isOnboarded) {
         useOnboardingStore.getState().reset();
       }
-      router.push(tokens.isOnboarded ? "/" : "/onboarding");
+      if (next) {
+        router.push(next);
+      } else {
+        router.push(tokens.isOnboarded ? "/" : "/onboarding");
+      }
     },
   });
 }

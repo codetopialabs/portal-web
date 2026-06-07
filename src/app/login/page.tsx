@@ -5,9 +5,9 @@ import { Footer } from "@/components/layout/Footer";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reason?: string }>;
+  searchParams: Promise<{ reason?: string; next?: string }>;
 }) {
-  const { reason } = await searchParams;
+  const { reason, next } = await searchParams;
   const sessionExpired = reason === "session_expired";
 
   return (
@@ -29,7 +29,7 @@ export default async function LoginPage({
       {/* Main Content Node */}
       <div className="flex-1 flex flex-col items-center justify-center z-10 px-4 w-full mt-12 mb-16">
         {/* The Auth Card */}
-        <LoginForm sessionExpired={sessionExpired} />
+        <LoginForm sessionExpired={sessionExpired} next={next} />
       </div>
 
       {/* Footer */}

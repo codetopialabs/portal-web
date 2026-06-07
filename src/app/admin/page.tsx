@@ -83,19 +83,6 @@ const COMING_SOON_SECTIONS = [
 function AdminPageContent() {
   return (
     <div className="max-w-6xl mx-auto pb-20">
-      {/* Header */}
-      <div className="mb-8 border-b border-zinc-200 pb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <ShieldCheck className="w-5 h-5 text-zinc-400" />
-          <h1 className="font-sans font-black uppercase tracking-widest text-xl text-zinc-900">
-            Admin Panel
-          </h1>
-        </div>
-        <p className="font-mono text-xs text-zinc-400">
-          Platform management tools and upcoming modules.
-        </p>
-      </div>
-
       {/* Coming Soon sections */}
       <div>
         <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">

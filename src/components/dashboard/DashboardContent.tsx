@@ -122,7 +122,7 @@ export function DashboardContent() {
             alt=""
             className="absolute inset-0 h-full w-full object-cover opacity-45"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
           <div className="absolute top-5 left-5 sm:left-7 lg:left-8 flex flex-wrap items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-zinc-300">
             <span className="inline-flex items-center gap-1.5 border border-white/15 bg-black/40 px-2.5 py-1 backdrop-blur-sm">
@@ -274,7 +274,7 @@ export function DashboardContent() {
         ))}
       </section>
 
-      <ContributionGraph username={profile.username} />
+      <ContributionGraph username={profile.username} joinedAt={profile.joinedAt ?? undefined} />
 
       <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
         <div className="border border-zinc-200 bg-white p-6">

@@ -7,12 +7,12 @@ const BASE_MENU_GROUPS: NavGroup[] = [
     items: [
       { icon: Home, label: "Dashboard", href: "/", activePrefix: "/" },
       { icon: Globe, label: "Community", href: "/community", activePrefix: "/community" },
-      { icon: Users, label: "Teams", href: "/teams", activePrefix: "/teams" },
     ],
   },
   {
     label: "My Space",
     items: [
+      { icon: Users, label: "Teams", href: "/teams", activePrefix: "/teams" },
       { icon: UserCheck, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
       { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
     ],

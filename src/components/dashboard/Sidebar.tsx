@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getDashboardMenuGroups } from "@/data/navigation";
 import { usePermission } from "@/hooks/usePermission";
+import { useMyInvites } from "@/hooks/useTeams";
 import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
@@ -27,6 +28,8 @@ export function DashboardSidebar() {
   const canAccessAdmin = usePermission("admin.panel.access");
 
   const menuGroups = getDashboardMenuGroups(canAccessAdmin);
+  const { data: myInvites } = useMyInvites();
+  const pendingInviteCount = myInvites?.filter((i) => i.status === "pending").length ?? 0;
 
   function isActive(activePrefix: string, href: string) {
     if (activePrefix === "/") return pathname === "/";
@@ -91,6 +94,11 @@ export function DashboardSidebar() {
                           <span className="font-mono text-[11px] uppercase tracking-wider">
                             {item.label}
                           </span>
+                          {item.label === "Teams" && pendingInviteCount > 0 && (
+                            <span className="ml-auto flex h-4 min-w-4 items-center justify-center bg-white text-black font-mono text-[9px] font-bold px-1">
+                              {pendingInviteCount > 9 ? "9+" : pendingInviteCount}
+                            </span>
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

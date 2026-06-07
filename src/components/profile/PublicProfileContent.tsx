@@ -25,10 +25,11 @@ import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import type { ComponentType } from "react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
-import { formatJoinedAt, formatRoleLabel } from "@/components/profile/utils";
+import { formatJoinedAt } from "@/components/profile/utils";
 import { usePermission } from "@/hooks/usePermission";
 import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
@@ -97,15 +98,11 @@ export function PublicProfileContent() {
 
   // ─── derived values ───────────────────────────────────────────────────────
 
-  const primaryRole = profile.primaryRole
-    ? formatRoleLabel(profile.primaryRole)
-    : profile.communityRoles?.[0]
-      ? formatRoleLabel(profile.communityRoles[0])
-      : "Member";
+  const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
 
   const roleList =
     profile.communityRoles && profile.communityRoles.length > 0
-      ? profile.communityRoles.map(formatRoleLabel)
+      ? profile.communityRoles
       : ["Member"];
 
   const jobTitle = profile.currentRole || null;
@@ -172,8 +169,8 @@ export function PublicProfileContent() {
               alt=""
               className="h-full w-full object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,#00000066_0%,#00000033_32%,#000000e6_92%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,#000000e6_0%,#00000099_42%,#00000026_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,#00000030_0%,#00000010_32%,#00000060_92%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,#00000060_0%,#00000040_42%,#0000000f_100%)]" />
           </div>
 
           <div className="relative mx-auto flex min-h-[calc(28rem-4rem)] max-w-7xl items-end px-4 py-10 sm:px-6 lg:py-14">
@@ -357,6 +354,11 @@ export function PublicProfileContent() {
               </Link>
             )}
           </aside>
+        </section>
+
+        {/* ── Contributions ── */}
+        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} />
         </section>
       </main>
 

@@ -5,9 +5,9 @@ import type { ApiResponse } from "@/types/api.types";
 
 export interface Team {
   id: string;
+  slug: string;
   name: string;
   description: string | null;
-  memberTagName: string;
   createdAt: string;
   memberCount?: number;
 }
@@ -29,16 +29,51 @@ export interface TeamMember {
 export interface TeamInvite {
   id: string;
   teamId: string;
+  teamSlug: string;
+  teamName: string;
   userId: string;
   status: "pending" | "accepted" | "declined";
   expiresAt: string;
   createdAt: string;
+  team?: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    memberCount?: number;
+  };
   user: {
     id: string;
     username: string;
     fullName: string;
     profilePictureUrl: string | null;
   };
+  invitedBy?: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  };
+}
+
+export interface TeamLabel {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: string;
+}
+
+export interface ReviewEvent {
+  id: string;
+  eventType: string;
+  actor: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  };
+  context: Record<string, any>;
+  createdAt: string;
 }
 
 export interface Review {
@@ -52,6 +87,14 @@ export interface Review {
   createdAt: string;
   updatedAt: string;
   commentsCount: number;
+  labels: TeamLabel[];
+  assignees: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  }[];
+  events: ReviewEvent[];
   author: {
     id: string;
     username: string;
@@ -65,7 +108,9 @@ export interface ReviewComment {
   reviewId: string;
   authorId: string;
   text: string;
+  isEdited: boolean;
   createdAt: string;
+  updatedAt: string;
   author: {
     id: string;
     username: string;
@@ -82,7 +127,6 @@ export interface ContributionDay {
 
 export interface CreateTeamInput {
   name: string;
-  memberTagName: string;
   description?: string;
 }
 
@@ -113,7 +157,10 @@ export const TeamsService = {
 
   /** Create a new team. The calling user becomes the Lead automatically. */
   async createTeam(data: CreateTeamInput): Promise<Team> {
-    const res = await axiosInstance.post<ApiResponse<Team>>("/teams/", data);
+    const res = await axiosInstance.post<ApiResponse<Team>>("/teams/", {
+      name: data.name,
+      description: data.description,
+    });
     return res.data.data;
   },
 
@@ -127,6 +174,11 @@ export const TeamsService = {
   async getMyMembership(teamId: string): Promise<TeamMember> {
     const res = await axiosInstance.get<ApiResponse<TeamMember>>(`/teams/${teamId}/members/me/`);
     return res.data.data;
+  },
+
+  /** Remove a member from a team. */
+  async removeMember(teamId: string, userId: string): Promise<void> {
+    await axiosInstance.delete(`/teams/${teamId}/members/${userId}/`);
   },
 
   // ─── Invites ───────────────────────────────────────────────────────────────
@@ -146,13 +198,24 @@ export const TeamsService = {
   },
 
   /** Accept a team invite (the invitee calls this). */
-  async acceptInvite(teamId: string, inviteId: string): Promise<void> {
-    await axiosInstance.post(`/teams/${teamId}/invites/${inviteId}/accept/`);
+  async acceptInvite(teamSlug: string, inviteId: string): Promise<void> {
+    await axiosInstance.post(`/teams/${teamSlug}/invites/${inviteId}/accept/`);
   },
 
   /** Decline a team invite. */
-  async declineInvite(teamId: string, inviteId: string): Promise<void> {
-    await axiosInstance.post(`/teams/${teamId}/invites/${inviteId}/decline/`);
+  async declineInvite(teamSlug: string, inviteId: string): Promise<void> {
+    await axiosInstance.post(`/teams/${teamSlug}/invites/${inviteId}/decline/`);
+  },
+
+  /** Revoke a pending invite (team leads only). */
+  async revokeInvite(teamId: string, inviteId: string): Promise<void> {
+    await axiosInstance.delete(`/teams/${teamId}/invites/${inviteId}/revoke/`);
+  },
+
+  /** Get my invites */
+  async getMyInvites(): Promise<TeamInvite[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamInvite[]>>(`/teams/invites/mine/`);
+    return res.data.data;
   },
 
   // ─── Reviews ──────────────────────────────────────────────────────────────
@@ -179,16 +242,18 @@ export const TeamsService = {
 
   /** Approve a review (team leads only). */
   async approveReview(teamId: string, reviewId: string): Promise<Review> {
-    const res = await axiosInstance.post<ApiResponse<Review>>(
-      `/teams/${teamId}/reviews/${reviewId}/approve/`
+    const res = await axiosInstance.patch<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/`,
+      { status: "approved" }
     );
     return res.data.data;
   },
 
   /** Close a review. */
   async closeReview(teamId: string, reviewId: string): Promise<Review> {
-    const res = await axiosInstance.post<ApiResponse<Review>>(
-      `/teams/${teamId}/reviews/${reviewId}/close/`
+    const res = await axiosInstance.patch<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/`,
+      { status: "closed" }
     );
     return res.data.data;
   },
@@ -216,12 +281,106 @@ export const TeamsService = {
     return res.data.data;
   },
 
+  /** Edit a comment. */
+  async editComment(
+    teamId: string,
+    reviewId: string,
+    commentId: string,
+    data: { text: string }
+  ): Promise<ReviewComment> {
+    const res = await axiosInstance.patch<ApiResponse<ReviewComment>>(
+      `/teams/${teamId}/reviews/${reviewId}/comments/${commentId}/`,
+      data
+    );
+    return res.data.data;
+  },
+
+  /** Delete a comment. */
+  async deleteComment(teamId: string, reviewId: string, commentId: string): Promise<void> {
+    await axiosInstance.delete(`/teams/${teamId}/reviews/${reviewId}/comments/${commentId}/`);
+  },
+
+  /** Edit a review's title/description. */
+  async editReview(
+    teamId: string,
+    reviewId: string,
+    data: { title?: string; description?: string }
+  ): Promise<Review> {
+    const res = await axiosInstance.patch<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/`,
+      data
+    );
+    return res.data.data;
+  },
+
+  /** Reopen a review. */
+  async reopenReview(teamId: string, reviewId: string): Promise<Review> {
+    const res = await axiosInstance.patch<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/`,
+      { status: "open" }
+    );
+    return res.data.data;
+  },
+
+  // ─── Labels ───────────────────────────────────────────────────────────────
+
+  /** List labels for a team. */
+  async getTeamLabels(teamId: string): Promise<TeamLabel[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamLabel[]>>(`/teams/${teamId}/labels/`);
+    return res.data.data;
+  },
+
+  /** Create a label for a team. */
+  async createTeamLabel(teamId: string, data: { name: string; color: string }): Promise<TeamLabel> {
+    const res = await axiosInstance.post<ApiResponse<TeamLabel>>(`/teams/${teamId}/labels/`, data);
+    return res.data.data;
+  },
+
+  /** Add a label to a review. */
+  async addReviewLabel(teamId: string, reviewId: string, labelId: string): Promise<Review> {
+    const res = await axiosInstance.post<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/labels/`,
+      { label_id: labelId }
+    );
+    return res.data.data;
+  },
+
+  /** Remove a label from a review. */
+  async removeReviewLabel(teamId: string, reviewId: string, labelId: string): Promise<Review> {
+    const res = await axiosInstance.delete<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/labels/`,
+      { data: { label_id: labelId } }
+    );
+    return res.data.data;
+  },
+
+  // ─── Assignees ────────────────────────────────────────────────────────────
+
+  /** Add an assignee to a review. */
+  async addReviewAssignee(teamId: string, reviewId: string, userId: string): Promise<Review> {
+    const res = await axiosInstance.post<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/assignees/`,
+      { user_id: userId }
+    );
+    return res.data.data;
+  },
+
+  /** Remove an assignee from a review. */
+  async removeReviewAssignee(teamId: string, reviewId: string, userId: string): Promise<Review> {
+    const res = await axiosInstance.delete<ApiResponse<Review>>(
+      `/teams/${teamId}/reviews/${reviewId}/assignees/`,
+      { data: { user_id: userId } }
+    );
+    return res.data.data;
+  },
+
   // ─── Contribution Graph ───────────────────────────────────────────────────
 
-  /** Fetch the contribution graph data for a given username. */
-  async getContributions(username: string): Promise<ContributionDay[]> {
+  /** Fetch a user's contributions (approved reviews) for graph rendering. */
+  async getContributions(username: string, year?: number): Promise<ContributionDay[]> {
     const res = await axiosInstance.get<ApiResponse<ContributionDay[]>>(
-      `/users/${username}/contributions/`
+      `/teams/contributions/${username}/`,
+      { params: year ? { year } : {} }
     );
     return res.data.data;
   },

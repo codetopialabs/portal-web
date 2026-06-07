@@ -3,7 +3,6 @@
 import { MapPin, Pencil, Smile } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatRoleLabel } from "@/components/profile/utils";
 import { usePermission } from "@/hooks/usePermission";
 import { cn, getAvatarUrl } from "@/lib/utils";
 import type { CommunityMember } from "@/services/user.service";
@@ -33,11 +32,7 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
   const router = useRouter();
   const canEditMembers = usePermission("users.edit");
 
-  const primaryRole = member.primaryRole
-    ? formatRoleLabel(member.primaryRole)
-    : member.communityRoles?.[0]
-      ? formatRoleLabel(member.communityRoles[0])
-      : "Member";
+  const primaryRole = member.primaryRole || member.communityRoles?.[0] || "Member";
 
   const profileHref = `/@${member.username}`;
 

@@ -160,7 +160,7 @@ function ActivityPageContent() {
     setPage(1);
   }, [viewMode, filter]);
 
-  const activeEntries = viewMode === "org" ? (orgActivity?.results ?? []) : entries;
+  const activeEntries = viewMode === "org" ? (orgActivity?.results ?? []) : (entries ?? []);
 
   const filtered =
     filter === "all"
@@ -171,14 +171,14 @@ function ActivityPageContent() {
   const totalPages =
     filter === "all"
       ? Math.max(1, Math.ceil(activeTotal / PAGE_SIZE))
-      : Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      : Math.max(1, Math.ceil((filtered?.length ?? 0) / PAGE_SIZE));
 
   const isLoadingState = viewMode === "org" ? orgLoading : loading;
   const errorStatusValue =
     viewMode === "org"
       ? ((orgErrorValue as { status?: number } | undefined)?.status ?? (orgError ? 500 : null))
       : errorStatus;
-  const totalCount = activeTotal || activeEntries.length;
+  const totalCount = activeTotal ?? activeEntries?.length ?? 0;
 
   return (
     <DashboardShell>
