@@ -274,7 +274,7 @@ export function DashboardContent() {
         ))}
       </section>
 
-      <ContributionGraph username={profile.username} joinedAt={profile.createdAt} />
+      <ContributionGraph username={profile.username} joinedAt={profile.joinedAt ?? undefined} />
 
       <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
         <div className="border border-zinc-200 bg-white p-6">

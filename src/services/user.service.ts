@@ -33,6 +33,7 @@ export interface UserProfile {
   dateOfBirth: string | null;
   completedWalkthroughs: string[];
   nationality: string | null;
+  joinedAt: string | null;
 }
 
 export interface CommunityMember {
