@@ -25,18 +25,9 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
     light: ["#f0fdf4", "#86efac", "#4ade80", "#16a34a", "#14532d"],
   };
 
-  const isWrappedResponse = (value: unknown): value is { data: ContributionDay[] } => {
-    return (
-      typeof value === "object" &&
-      value !== null &&
-      "data" in value &&
-      Array.isArray((value as { data?: unknown }).data)
-    );
-  };
+  const contributions = data ?? [];
 
-  const contributions = Array.isArray(data) ? data : isWrappedResponse(data) ? data.data : [];
-
-  if (isError || (!isLoading && !data && !isWrappedResponse(data))) {
+  if (isError || (!isLoading && !data)) {
     return (
       <div className="flex h-48 w-full items-center justify-center border border-zinc-200 bg-white">
         <p className="font-mono text-xs text-zinc-400">Could not load contribution data.</p>
