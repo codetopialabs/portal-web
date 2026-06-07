@@ -107,7 +107,9 @@ function DiscordLinkContent() {
 
               <div className="rounded-lg border border-white/10 bg-white/5 px-5 py-4 text-sm text-zinc-300 space-y-1">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Linking as</p>
-                <p className="text-white font-medium">{session?.accessToken ? "your portal account" : "—"}</p>
+                <p className="text-white font-medium">
+                  {session?.accessToken ? "your portal account" : "—"}
+                </p>
               </div>
 
               <button
