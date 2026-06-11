@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import Image from "next/image";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Footer } from "@/components/layout/Footer";
@@ -29,7 +30,13 @@ export default async function LoginPage({
       {/* Main Content Node */}
       <div className="flex-1 flex flex-col items-center justify-center z-10 px-4 w-full mt-12 mb-16">
         {/* The Auth Card */}
-        <LoginForm sessionExpired={sessionExpired} next={next} />
+        {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+            <LoginForm sessionExpired={sessionExpired} next={next} />
+          </GoogleOAuthProvider>
+        ) : (
+          <LoginForm sessionExpired={sessionExpired} next={next} />
+        )}
       </div>
 
       {/* Footer */}

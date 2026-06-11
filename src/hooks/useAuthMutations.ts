@@ -43,6 +43,34 @@ export function useLoginMutation(next?: string) {
   });
 }
 
+export function useSocialLoginMutation(next?: string) {
+  const router = useRouter();
+  const setSession = useAuthStore((s) => s.setSession);
+
+  return useMutation({
+    mutationFn: ({
+      provider,
+      tokenOrCode,
+      redirectUri,
+    }: {
+      provider: "google" | "github";
+      tokenOrCode: string;
+      redirectUri?: string;
+    }) => AuthService.socialLogin(provider, tokenOrCode, redirectUri),
+    onSuccess: (tokens) => {
+      setSession(tokens);
+      if (!tokens.isOnboarded) {
+        useOnboardingStore.getState().reset();
+      }
+      if (next) {
+        router.push(next);
+      } else {
+        router.push(tokens.isOnboarded ? "/" : "/onboarding");
+      }
+    },
+  });
+}
+
 export function useRegisterMutation() {
   return useMutation({
     mutationFn: (data: SignupFormValues) =>
