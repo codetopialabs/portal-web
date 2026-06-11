@@ -71,11 +71,13 @@ export function AdminMemberFilterPopover({
                     Loading roles...
                   </SelectItem>
                 )}
-                {roles?.map((r) => (
-                  <SelectItem key={r.id} value={r.name}>
-                    {r.displayName}
-                  </SelectItem>
-                ))}
+                {roles
+                  ?.filter((r) => r.name.trim() !== "")
+                  .map((r) => (
+                    <SelectItem key={r.id} value={r.name}>
+                      {r.displayName}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

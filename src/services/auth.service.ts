@@ -41,6 +41,23 @@ export const AuthService = {
     return response.data.data;
   },
 
+  async socialLogin(
+    provider: "google" | "github",
+    tokenOrCode: string,
+    redirectUri?: string
+  ): Promise<TokenResponse> {
+    const payload =
+      provider === "google"
+        ? { token: tokenOrCode }
+        : { code: tokenOrCode, redirect_uri: redirectUri };
+
+    const response = await axiosInstance.post<ApiResponse<TokenResponse>>(
+      `/auth/${provider}/`,
+      payload
+    );
+    return response.data.data;
+  },
+
   async logout(accessToken: string): Promise<void> {
     await axiosInstance.post("/auth/logout/", undefined, {
       headers: { Authorization: `Bearer ${accessToken}` },

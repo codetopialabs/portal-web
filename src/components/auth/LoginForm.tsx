@@ -3,14 +3,23 @@
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter as useNextRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { type LoginFormValues, useLoginMutation } from "@/hooks/useAuthMutations";
+import {
+  type LoginFormValues,
+  useLoginMutation,
+  useSocialLoginMutation,
+} from "@/hooks/useAuthMutations";
 import { AuthService } from "@/services/auth.service";
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+const HAS_SOCIAL_PROVIDERS = !!(GOOGLE_CLIENT_ID || GITHUB_CLIENT_ID);
 
 export function LoginForm({
   sessionExpired = false,
@@ -21,10 +30,36 @@ export function LoginForm({
 }) {
   const [step, setStep] = useState<"email" | "password">("email");
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const nextRouter = useNextRouter();
   const mutation = useLoginMutation(next);
+  const socialMutation = useSocialLoginMutation(next);
   const resendMutation = useMutation({
     mutationFn: (email: string) => AuthService.resendVerification(email),
   });
+
+  // Guard against React Strict Mode double-mount consuming the GitHub code twice.
+  // GitHub OAuth codes are single-use — a second exchange attempt will fail.
+  const githubCodeProcessed = useRef(false);
+
+  // Handle GitHub callback from URL
+  useEffect(() => {
+    const code = searchParams?.get("code");
+    if (code && !githubCodeProcessed.current) {
+      githubCodeProcessed.current = true;
+      const redirectUri = window.location.origin + "/login";
+      socialMutation.mutate({ provider: "github", tokenOrCode: code, redirectUri });
+      // Clean the code from the URL using Next.js router so searchParams updates properly
+      nextRouter.replace("/login" + (next ? `?next=${next}` : ""));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, next, nextRouter, socialMutation.mutate]);
+
+  const handleGithubLogin = useCallback(() => {
+    if (!GITHUB_CLIENT_ID) return;
+    const redirectUri = window.location.origin + "/login";
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=user:email`;
+  }, []);
 
   const {
     register,
@@ -109,34 +144,46 @@ export function LoginForm({
                 )}
               </Button>
             </form>
+            {HAS_SOCIAL_PROVIDERS && (
+              <>
+                <div className="relative py-1">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-zinc-700/60" />
+                  </div>
+                  <div className="relative flex justify-center text-xs text-zinc-500">
+                    <span className="bg-black px-3">Or continue with</span>
+                  </div>
+                </div>
 
-            <div className="relative py-1">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-zinc-700/60" />
-              </div>
-              <div className="relative flex justify-center text-xs text-zinc-500">
-                <span className="bg-black px-3">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
-                disabled={mutation.isPending}
-              >
-                <FcGoogle className="mr-2 h-4 w-4" />
-                Google
-              </Button>
-              <Button
-                variant="outline"
-                className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
-                disabled={mutation.isPending}
-              >
-                <FaGithub className="mr-2 h-4 w-4" />
-                GitHub
-              </Button>
-            </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {GOOGLE_CLIENT_ID && (
+                    <GoogleLoginButton
+                      onToken={(token) =>
+                        socialMutation.mutate({ provider: "google", tokenOrCode: token })
+                      }
+                      disabled={mutation.isPending || socialMutation.isPending}
+                    />
+                  )}
+                  {GITHUB_CLIENT_ID && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGithubLogin}
+                      className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
+                      disabled={mutation.isPending || socialMutation.isPending}
+                    >
+                      <FaGithub className="mr-2 h-4 w-4" />
+                      GitHub
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
+            {socialMutation.isError && (
+              <p className="text-red-400 text-xs">
+                {socialMutation.error?.message || "Social login failed. Please try again."}
+              </p>
+            )}{" "}
           </>
         ) : (
           <form

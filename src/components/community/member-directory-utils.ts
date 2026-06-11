@@ -38,7 +38,7 @@ export function getMemberFilterOptions(members: CommunityMember[]) {
   return {
     roles: getUniqueValues(
       members.flatMap((member) => {
-        const roles = [...(member.communityRoles || [])];
+        const roles = [...(member.communityRoles || [])].filter((r) => r.trim() !== "");
         if (member.primaryRole) roles.push(member.primaryRole);
         if (roles.length === 0) roles.push("Member");
         return roles.map(formatRoleLabel);
@@ -53,7 +53,7 @@ export function filterMembers(members: CommunityMember[], search: string, filter
   const normalizedSearch = search.trim().toLowerCase();
 
   return members.filter((member) => {
-    const allRoles = [...(member.communityRoles || [])];
+    const allRoles = [...(member.communityRoles || [])].filter((r) => r.trim() !== "");
     if (member.primaryRole) allRoles.push(member.primaryRole);
     if (allRoles.length === 0) allRoles.push("Member");
     const formattedRoles = allRoles.map(formatRoleLabel);

@@ -157,15 +157,17 @@ export function DashboardContent() {
                   </h1>
 
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {profile.roles && profile.roles.length > 0 ? (
-                      profile.roles.map((role) => (
-                        <span
-                          key={role}
-                          className="inline-flex items-center border border-zinc-950 bg-zinc-950 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white"
-                        >
-                          {role}
-                        </span>
-                      ))
+                    {profile.roles && profile.roles.filter((r) => r.trim() !== "").length > 0 ? (
+                      profile.roles
+                        .filter((r) => r.trim() !== "")
+                        .map((role) => (
+                          <span
+                            key={role}
+                            className="inline-flex items-center border border-zinc-950 bg-zinc-950 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white"
+                          >
+                            {role}
+                          </span>
+                        ))
                     ) : (
                       <span className="inline-flex items-center border border-zinc-950 bg-zinc-950 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-white">
                         Member
