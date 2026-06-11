@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-06-11] Fix team invites and production image domain whitelist
+
+**What changed:** Resolved team invite acceptance and revoking failures by updating Django URL routing to match UUIDs instead of integers. Added `api.dicebear.com` to Next.js images domain configuration to allow loading default fallback avatars in production. Fixed a casing typo for `invitedBy` inside the team workspace view.
+**Affected areas:** `/teams/[teamSlug]` workspace, `/teams` dashboard invites banner, Next.js image domain config (`next.config.ts`), backend URL router (`apps/teams/urls.py`).
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-06-06] Teams invite notifications & review UX
 
 **What changed:** Added transactional email on team invite dispatch, global in-app invite badge and dismissible banner in the dashboard shell, and polished review detail page (richer header, merged chronological timeline, improved inline comment editing, redesigned sidebar) and review list (stacked assignee avatars with +N, structured empty states).

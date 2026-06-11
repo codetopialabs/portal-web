@@ -100,10 +100,8 @@ export function PublicProfileContent() {
 
   const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
 
-  const roleList =
-    profile.communityRoles && profile.communityRoles.length > 0
-      ? profile.communityRoles
-      : ["Member"];
+  const filteredRoles = profile.communityRoles?.filter((r: string) => r.trim() !== "") || [];
+  const roleList = filteredRoles.length > 0 ? filteredRoles : ["Member"];
 
   const jobTitle = profile.currentRole || null;
   const displayLocation = profile.location || null;

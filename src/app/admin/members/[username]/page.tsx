@@ -573,34 +573,38 @@ function MemberDetailContent({ username }: { username: string }) {
               </span>
             </div>
             <div className="space-y-5 p-5">
-              {member.roles.length === 0 ? (
+              {member.roles.filter((r) => r.trim() !== "").length === 0 ? (
                 <p className="font-mono text-sm text-text-tertiary">No roles assigned.</p>
               ) : (
                 <div className="divide-y divide-grey-200 border border-grey-200">
-                  {member.roles.map((roleName) => (
-                    <div
-                      key={roleName}
-                      className="flex items-center justify-between gap-4 px-4 py-3"
-                    >
-                      <div>
-                        <p className="font-mono text-sm font-bold text-text-primary">{roleName}</p>
-                        <p className="mt-1 font-mono text-xs text-text-muted">
-                          {rolesByName.get(roleName)?.permissions.length ?? 0} permissions currently
-                          granted by this role.
-                        </p>
+                  {member.roles
+                    .filter((r) => r.trim() !== "")
+                    .map((roleName) => (
+                      <div
+                        key={roleName}
+                        className="flex items-center justify-between gap-4 px-4 py-3"
+                      >
+                        <div>
+                          <p className="font-mono text-sm font-bold text-text-primary">
+                            {roleName}
+                          </p>
+                          <p className="mt-1 font-mono text-xs text-text-muted">
+                            {rolesByName.get(roleName)?.permissions.length ?? 0} permissions
+                            currently granted by this role.
+                          </p>
+                        </div>
+                        {canRevoke && (
+                          <button
+                            type="button"
+                            onClick={() => openDangerAction({ type: "revoke-role", roleName })}
+                            className="inline-flex h-8 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50"
+                          >
+                            <UserMinus className="h-3.5 w-3.5" />
+                            Revoke
+                          </button>
+                        )}
                       </div>
-                      {canRevoke && (
-                        <button
-                          type="button"
-                          onClick={() => openDangerAction({ type: "revoke-role", roleName })}
-                          className="inline-flex h-8 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50"
-                        >
-                          <UserMinus className="h-3.5 w-3.5" />
-                          Revoke
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
 

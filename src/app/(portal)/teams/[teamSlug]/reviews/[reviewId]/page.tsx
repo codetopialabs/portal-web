@@ -23,6 +23,7 @@ import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -118,7 +119,9 @@ function ReviewDetailContent() {
   function handleComment(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (!commentText.trim()) return;
-    createComment({ text: commentText.trim() }, { onSuccess: () => setCommentText("") });
+    const text = commentText.trim();
+    setCommentText(""); // Clear immediately for instant UX
+    createComment({ text });
   }
 
   function handleSaveReview() {
@@ -379,25 +382,31 @@ function ReviewDetailContent() {
                   }
 
                   // Comment
-                  const isCommentAuthor = user?.id === item.author.id;
+                  const isOptimistic = (item as any)._optimistic;
+                  const isCommentAuthor = !isOptimistic && user?.id === item.author?.id;
                   const isEditing = editingCommentId === item.id;
 
                   return (
                     <div key={item.id} className="relative pl-12">
                       <div className="absolute left-0 top-0">
                         <Image
-                          src={getAvatarUrl(item.author.profilePictureUrl, item.author.fullName)}
+                          src={getAvatarUrl(
+                            item.author?.profilePictureUrl ?? null,
+                            item.author?.fullName ?? "…"
+                          )}
                           alt=""
                           width={32}
                           height={32}
                           className="h-8 w-8 border border-zinc-200 object-cover bg-white"
                         />
                       </div>
-                      <div className="border border-zinc-200 bg-white shadow-sm group">
+                      <div
+                        className={`border border-zinc-200 bg-white shadow-sm group ${isOptimistic ? "opacity-60" : ""}`}
+                      >
                         <div className="bg-zinc-50 px-4 py-2 border-b border-zinc-200 flex items-center justify-between">
                           <div className="flex gap-2 items-center">
                             <span className="font-mono text-[10px] font-bold text-zinc-900">
-                              {item.author.fullName}
+                              {isOptimistic ? "Sending…" : item.author?.fullName}
                             </span>
                             <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-400">
                               {new Date(item.createdAt).toLocaleDateString()}
@@ -406,7 +415,7 @@ function ReviewDetailContent() {
                               <span className="font-mono text-[9px] text-zinc-400">(edited)</span>
                             )}
                           </div>
-                          {(isCommentAuthor || isLead) && !isEditing && (
+                          {(isCommentAuthor || isLead) && !isEditing && !isOptimistic && (
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button
@@ -431,14 +440,20 @@ function ReviewDetailContent() {
                                     <Pencil className="h-3 w-3 mr-2" /> Edit
                                   </Button>
                                 )}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="w-full justify-start text-xs font-mono text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  onClick={() => deleteComment(item.id)}
+                                <ConfirmModal
+                                  title="Delete Comment"
+                                  description="Are you sure you want to delete this comment? This action cannot be undone."
+                                  confirmText="Delete"
+                                  onConfirm={() => deleteComment(item.id)}
                                 >
-                                  <Trash2 className="h-3 w-3 mr-2" /> Delete
-                                </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full justify-start text-xs font-mono text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-3 w-3 mr-2" /> Delete
+                                  </Button>
+                                </ConfirmModal>
                               </PopoverContent>
                             </Popover>
                           )}
@@ -708,14 +723,21 @@ function ReviewDetailContent() {
                     </Button>
                   )}
                   {canClose && (
-                    <Button
-                      onClick={() => closeReview()}
-                      disabled={closePending}
-                      variant="ghost"
-                      className="w-full justify-start font-mono text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-600 hover:bg-red-50"
+                    <ConfirmModal
+                      title="Close Review"
+                      description="Are you sure you want to close this review? You can reopen it later if needed."
+                      confirmText="Close Review"
+                      onConfirm={() => closeReview()}
+                      isLoading={closePending}
                     >
-                      <XCircle className="mr-2 h-3.5 w-3.5" /> Close
-                    </Button>
+                      <Button
+                        disabled={closePending}
+                        variant="ghost"
+                        className="w-full justify-start font-mono text-[10px] uppercase tracking-widest text-zinc-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <XCircle className="mr-2 h-3.5 w-3.5" /> Close
+                      </Button>
+                    </ConfirmModal>
                   )}
                 </div>
               ) : (

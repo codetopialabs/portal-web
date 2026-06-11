@@ -13,6 +13,7 @@ export function useMyTeams() {
   return useQuery({
     queryKey: ["teams"],
     queryFn: () => TeamsService.getMyTeams(),
+    staleTime: 1000 * 30, // 30 seconds
   });
 }
 
@@ -21,6 +22,7 @@ export function useTeam(teamId: string) {
     queryKey: ["teams", teamId],
     queryFn: () => TeamsService.getTeam(teamId),
     enabled: Boolean(teamId),
+    staleTime: 1000 * 30, // 30 seconds
   });
 }
 
@@ -44,6 +46,7 @@ export function useTeamMembers(teamId: string) {
     queryKey: ["teams", teamId, "members"],
     queryFn: () => TeamsService.getTeamMembers(teamId),
     enabled: Boolean(teamId),
+    staleTime: 1000 * 30,
   });
 }
 
@@ -52,6 +55,8 @@ export function useMyMembership(teamId: string) {
     queryKey: ["teams", teamId, "members", "me"],
     queryFn: () => TeamsService.getMyMembership(teamId),
     enabled: Boolean(teamId),
+    staleTime: 1000 * 30,
+    retry: false, // Don't retry 403s (non-member)
   });
 }
 
@@ -59,11 +64,22 @@ export function useRemoveMember(teamId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) => TeamsService.removeMember(teamId, userId),
+    onMutate: async (userId) => {
+      await qc.cancelQueries({ queryKey: ["teams", teamId, "members"] });
+      const previous = qc.getQueryData<any[]>(["teams", teamId, "members"]);
+      qc.setQueryData(["teams", teamId, "members"], (old: any[]) =>
+        (old ?? []).filter((m) => m.user.id !== userId)
+      );
+      return { previous };
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
       toast.success("Member removed.");
     },
-    onError: (error: any) => {
+    onError: (error: any, _userId, context) => {
+      if (context?.previous) {
+        qc.setQueryData(["teams", teamId, "members"], context.previous);
+      }
       toast.error(error.response?.data?.detail || "Failed to remove member.");
     },
   });
@@ -76,6 +92,8 @@ export function useTeamInvites(teamId: string) {
     queryKey: ["teams", teamId, "invites"],
     queryFn: () => TeamsService.getInvites(teamId),
     enabled: Boolean(teamId),
+    staleTime: 1000 * 30,
+    retry: false,
   });
 }
 
@@ -83,6 +101,7 @@ export function useMyInvites() {
   return useQuery({
     queryKey: ["teams", "invites", "mine"],
     queryFn: () => TeamsService.getMyInvites(),
+    staleTime: 1000 * 15, // 15 seconds — invites change more often
   });
 }
 
@@ -105,11 +124,15 @@ export function useAcceptInvite(teamId: string) {
   return useMutation({
     mutationFn: (inviteId: string) => TeamsService.acceptInvite(teamId, inviteId),
     onSuccess: () => {
+      // Invalidate everything team-related so the UI re-fetches membership, members, invites
       qc.invalidateQueries({ queryKey: ["teams"] });
+      qc.invalidateQueries({ queryKey: ["teams", "invites", "mine"] });
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members", "me"] });
       toast.success("Invite accepted! You are now a team member.");
     },
-    onError: () => {
-      toast.error("Failed to accept invite.");
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.detail || "Failed to accept invite.");
     },
   });
 }
@@ -123,8 +146,8 @@ export function useDeclineInvite(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", "invites", "mine"] });
       toast.success("Invite declined.");
     },
-    onError: () => {
-      toast.error("Failed to decline invite.");
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.detail || "Failed to decline invite.");
     },
   });
 }
@@ -150,6 +173,7 @@ export function useTeamReviews(teamId: string) {
     queryKey: ["teams", teamId, "reviews"],
     queryFn: () => TeamsService.getReviews(teamId),
     enabled: Boolean(teamId),
+    staleTime: 1000 * 20, // 20 seconds
   });
 }
 
@@ -212,6 +236,7 @@ export function useReviewComments(teamId: string, reviewId: string) {
     queryKey: ["teams", teamId, "reviews", reviewId, "comments"],
     queryFn: () => TeamsService.getComments(teamId, reviewId),
     enabled: Boolean(teamId) && Boolean(reviewId),
+    staleTime: 1000 * 15, // 15 seconds
   });
 }
 
@@ -219,13 +244,48 @@ export function useCreateComment(teamId: string, reviewId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateCommentInput) => TeamsService.createComment(teamId, reviewId, data),
+    onMutate: async (data) => {
+      // Cancel any outgoing re-fetches so they don't overwrite our optimistic update
+      await qc.cancelQueries({ queryKey: ["teams", teamId, "reviews", reviewId, "comments"] });
+      const previousComments = qc.getQueryData<any[]>([
+        "teams",
+        teamId,
+        "reviews",
+        reviewId,
+        "comments",
+      ]);
+      // Optimistically add a placeholder comment
+      const optimistic = {
+        id: `optimistic-${Date.now()}`,
+        text: data.text,
+        isEdited: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        // author will be filled in by the real response; use null as placeholder
+        author: null,
+        _optimistic: true,
+      };
+      qc.setQueryData(["teams", teamId, "reviews", reviewId, "comments"], (old: any[]) => [
+        ...(old ?? []),
+        optimistic,
+      ]);
+      return { previousComments };
+    },
+    onError: (_err, _data, context) => {
+      // Roll back
+      if (context?.previousComments) {
+        qc.setQueryData(
+          ["teams", teamId, "reviews", reviewId, "comments"],
+          context.previousComments
+        );
+      }
+      toast.error("Failed to post comment.");
+    },
     onSuccess: () => {
+      // Replace the optimistic entry with the real server response
       qc.invalidateQueries({
         queryKey: ["teams", teamId, "reviews", reviewId, "comments"],
       });
-    },
-    onError: () => {
-      toast.error("Failed to post comment.");
     },
   });
 }

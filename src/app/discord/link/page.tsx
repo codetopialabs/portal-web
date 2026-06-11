@@ -86,8 +86,8 @@ function DiscordLinkContent() {
         />
       </header>
 
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-[420px] space-y-6">
+      <div className="flex-1 flex items-start justify-center px-4 pt-32">
+        <div className="w-full max-w-105 space-y-6">
           {(state === "loading" || authLoading) && (
             <div className="flex items-center gap-3">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

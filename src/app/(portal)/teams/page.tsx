@@ -162,7 +162,7 @@ function TeamsDirectoryContent() {
 
         {/* Empty state — no teams AND no invites */}
         {!isLoading && !isError && !hasTeams && !hasInvites && (
-          <div className="flex flex-col items-center justify-center py-32 border border-zinc-200 bg-white text-center rounded-none">
+          <div className="flex flex-col items-center justify-center py-12 border border-zinc-200 bg-white text-center rounded-none">
             <div className="mb-6 flex h-16 w-16 items-center justify-center border border-zinc-100 bg-zinc-50 rounded-none">
               <Users className="h-6 w-6 text-zinc-300" />
             </div>
