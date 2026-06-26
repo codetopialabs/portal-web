@@ -12,6 +12,33 @@ export interface Team {
   memberCount?: number;
 }
 
+export interface ActivityActor {
+  id: string;
+  username: string;
+  fullName: string;
+  profilePictureUrl: string;
+}
+
+export type ActivityType =
+  | "review_opened"
+  | "status_changed"
+  | "assigned"
+  | "unassigned"
+  | "labeled"
+  | "unlabeled"
+  | "review_edited"
+  | "commented"
+  | "member_joined";
+
+export interface ActivityItem {
+  id: string;
+  type: ActivityType;
+  actor: ActivityActor;
+  review: { id: string; title: string } | null;
+  context: { to?: string; from?: string; snippet?: string; role?: string; label?: string };
+  createdAt: string;
+}
+
 export interface TeamMember {
   id: string;
   userId: string;
@@ -152,6 +179,14 @@ export const TeamsService = {
   /** Fetch a single team's details. */
   async getTeam(teamId: string): Promise<Team> {
     const res = await axiosInstance.get<ApiResponse<Team>>(`/teams/${teamId}/`);
+    return res.data.data;
+  },
+
+  /** Merged, time-sorted activity feed for the team workspace overview. */
+  async getTeamActivity(teamSlug: string): Promise<ActivityItem[]> {
+    const res = await axiosInstance.get<ApiResponse<ActivityItem[]>>(
+      `/teams/${teamSlug}/activity/`
+    );
     return res.data.data;
   },
 

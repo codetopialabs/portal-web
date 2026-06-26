@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Calendar,
+  ClipboardCheck,
   Code2,
   FileText,
   Key,
@@ -69,14 +70,36 @@ const COMING_SOON_SECTIONS = [
     description: "Award and manage community experience points.",
   },
   {
-    icon: Key,
-    name: "API Key Management",
-    description: "Create and revoke API keys for external integrations.",
-  },
-  {
     icon: Code2,
     name: "OAuth Client Management",
     description: "Manage OAuth clients and application authorizations.",
+  },
+];
+
+const MANAGEMENT_SECTIONS = [
+  {
+    href: "/admin/members",
+    icon: Users,
+    name: "Members",
+    description: "View and manage community members.",
+  },
+  {
+    href: "/admin/roles",
+    icon: ShieldCheck,
+    name: "Roles",
+    description: "Create and manage permission roles.",
+  },
+  {
+    href: "/admin/reflections",
+    icon: ClipboardCheck,
+    name: "Reflections",
+    description: "Review members' monthly reflections.",
+  },
+  {
+    href: "/admin/api-keys",
+    icon: Key,
+    name: "API Keys",
+    description: "Issue and revoke keys for external integrations.",
   },
 ];
 
@@ -105,32 +128,22 @@ function AdminPageContent() {
           Management
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link
-            href="/admin/members"
-            className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors"
-          >
-            <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
-            <Users className="w-5 h-5 text-zinc-400" />
-            <div className="space-y-1">
-              <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
-                Members
-              </p>
-              <p className="font-mono text-xs text-zinc-400">View and manage community members.</p>
-            </div>
-          </Link>
-          <Link
-            href="/admin/roles"
-            className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors"
-          >
-            <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
-            <ShieldCheck className="w-5 h-5 text-zinc-400" />
-            <div className="space-y-1">
-              <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
-                Roles
-              </p>
-              <p className="font-mono text-xs text-zinc-400">Create and manage permission roles.</p>
-            </div>
-          </Link>
+          {MANAGEMENT_SECTIONS.map((section) => (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="group relative bg-white border border-zinc-200 p-6 flex flex-col items-start gap-3 hover:bg-zinc-50 transition-colors"
+            >
+              <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-zinc-300 group-hover:text-zinc-600 transition-colors" />
+              <section.icon className="w-5 h-5 text-zinc-400" />
+              <div className="space-y-1">
+                <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
+                  {section.name}
+                </p>
+                <p className="font-mono text-xs text-zinc-400">{section.description}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </div>

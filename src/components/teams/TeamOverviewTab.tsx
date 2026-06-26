@@ -1,138 +1,216 @@
 "use client";
 
-import { Check, CheckCircle2, Circle, FileText, X, XCircle } from "lucide-react";
+import {
+  Check,
+  GitPullRequestArrow,
+  MessageSquare,
+  Pencil,
+  RotateCcw,
+  Tag,
+  UserPlus,
+  Users,
+  X,
+  XCircle,
+} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAcceptInvite, useDeclineInvite } from "@/hooks/useTeams";
-import type { Review, TeamInvite } from "@/services/teams.service";
+import { useAcceptInvite, useDeclineInvite, useTeamActivity } from "@/hooks/useTeams";
+import { getAvatarUrl } from "@/lib/utils";
+import type { ActivityItem, TeamInvite } from "@/services/teams.service";
 
 interface TeamOverviewTabProps {
   teamSlug: string;
   teamName: string;
-  reviews: Review[] | undefined;
-  reviewsLoading: boolean;
   myInvite: TeamInvite | undefined;
 }
 
-export function TeamOverviewTab({
+function relativeTime(iso: string) {
+  const d = new Date(iso);
+  const s = (Date.now() - d.getTime()) / 1000;
+  if (Number.isNaN(s)) return "";
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86_400) return `${Math.floor(s / 3600)}h ago`;
+  if (s < 604_800) return `${Math.floor(s / 86_400)}d ago`;
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(d);
+}
+
+function describe(item: ActivityItem): string {
+  switch (item.type) {
+    case "review_opened":
+      return "opened";
+    case "status_changed":
+      if (item.context.to === "approved") return "approved";
+      if (item.context.to === "closed") return "closed";
+      if (item.context.to === "changes_requested") return "requested changes on";
+      if (item.context.to === "open") return "reopened";
+      return "updated the status of";
+    case "commented":
+      return "commented on";
+    case "assigned":
+    case "unassigned":
+      return "updated assignees on";
+    case "labeled":
+      return "labeled";
+    case "unlabeled":
+      return "removed a label from";
+    case "review_edited":
+      return "edited";
+    case "member_joined":
+      return "joined the team";
+    default:
+      return "updated";
+  }
+}
+
+function FeedIcon({ item }: { item: ActivityItem }) {
+  const base = "h-4 w-4 shrink-0";
+  switch (item.type) {
+    case "review_opened":
+      return <GitPullRequestArrow className={`${base} text-success-600`} />;
+    case "status_changed":
+      if (item.context.to === "approved") return <Check className={`${base} text-info-600`} />;
+      if (item.context.to === "closed") return <XCircle className={`${base} text-text-muted`} />;
+      if (item.context.to === "open") return <RotateCcw className={`${base} text-success-600`} />;
+      return <Pencil className={`${base} text-icon-tertiary`} />;
+    case "commented":
+      return <MessageSquare className={`${base} text-icon-tertiary`} />;
+    case "labeled":
+    case "unlabeled":
+      return <Tag className={`${base} text-icon-tertiary`} />;
+    case "member_joined":
+      return <UserPlus className={`${base} text-icon-tertiary`} />;
+    default:
+      return <Pencil className={`${base} text-icon-tertiary`} />;
+  }
+}
+
+function InviteBanner({
   teamSlug,
   teamName,
-  reviews,
-  reviewsLoading,
-  myInvite,
-}: TeamOverviewTabProps) {
-  const { mutate: acceptInvite, isPending: acceptPending } = useAcceptInvite(teamSlug);
-  const { mutate: declineInvite, isPending: declinePending } = useDeclineInvite(teamSlug);
+  invite,
+}: {
+  teamSlug: string;
+  teamName: string;
+  invite: TeamInvite;
+}) {
+  const { mutate: accept, isPending: accepting } = useAcceptInvite(teamSlug);
+  const { mutate: decline, isPending: declining } = useDeclineInvite(teamSlug);
+  return (
+    <div className="flex flex-col justify-between gap-4 border border-success-200 bg-success-50 p-4 sm:flex-row sm:items-center">
+      <div>
+        <h3 className="font-sans text-sm font-black text-success-900">You've been invited</h3>
+        <p className="mt-1 font-mono text-xs text-success-700">
+          {invite.invitedBy?.fullName} invited you to join {teamName}.
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        <ConfirmModal
+          title="Decline invite"
+          description={`Decline the invitation to join ${teamName}?`}
+          confirmText="Decline"
+          onConfirm={() => decline(invite.id)}
+          isLoading={declining}
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={accepting || declining}
+            className="h-9 rounded-none border-success-200 font-mono text-xs font-bold text-success-700 hover:bg-success-100"
+          >
+            <X className="mr-1.5 h-3.5 w-3.5" />
+            Decline
+          </Button>
+        </ConfirmModal>
+        <Button
+          size="sm"
+          onClick={() => accept(invite.id)}
+          disabled={accepting || declining}
+          className="h-9 rounded-none bg-success-600 font-mono text-xs font-bold text-white hover:bg-success-700"
+        >
+          <Check className="mr-1.5 h-3.5 w-3.5" />
+          Accept
+        </Button>
+      </div>
+    </div>
+  );
+}
 
-  const recentReviews = reviews?.slice(0, 5) ?? [];
+export function TeamOverviewTab({ teamSlug, teamName, myInvite }: TeamOverviewTabProps) {
+  const { data: feed, isLoading } = useTeamActivity(teamSlug);
 
   return (
-    <div className="space-y-8">
-      {myInvite && (
-        <div className="border border-emerald-200 bg-emerald-50 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="font-sans font-bold text-emerald-900">You've been invited!</h3>
-            <p className="font-mono text-xs text-emerald-700 mt-1">
-              {myInvite.invitedBy?.fullName} invited you to join {teamName}.
+    <div className="space-y-6">
+      {myInvite && <InviteBanner teamSlug={teamSlug} teamName={teamName} invite={myInvite} />}
+
+      <section className="border border-grey-200 bg-white">
+        <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-icon-tertiary" />
+            <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+              Activity
+            </h2>
+          </div>
+          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-text-muted">
+            <span className="h-1.5 w-1.5 animate-pulse bg-success-500" />
+            Live
+          </span>
+        </div>
+
+        {isLoading ? (
+          <div className="space-y-3 p-5">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-10 w-full rounded-none" />
+            ))}
+          </div>
+        ) : !feed || feed.length === 0 ? (
+          <div className="px-6 py-16 text-center">
+            <p className="font-mono text-xs text-text-muted">
+              No activity yet. Open a review to get things moving.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <ConfirmModal
-              title="Decline Invite"
-              description={`Are you sure you want to decline the invitation to join ${teamName}?`}
-              confirmText="Decline"
-              onConfirm={() => declineInvite(myInvite.id)}
-              isLoading={declinePending}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={declinePending || acceptPending}
-                className="font-mono text-[10px] uppercase tracking-widest border-emerald-200 text-emerald-700 hover:bg-emerald-100"
-              >
-                <X className="mr-1.5 h-3 w-3" />
-                Decline
-              </Button>
-            </ConfirmModal>
-            <Button
-              size="sm"
-              onClick={() => acceptInvite(myInvite.id)}
-              disabled={acceptPending || declinePending}
-              className="font-mono text-[10px] uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-700"
-            >
-              <Check className="mr-1.5 h-3 w-3" />
-              Accept
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-sans font-black uppercase tracking-tight text-zinc-950">
-            Recent Activity
-          </h2>
-        </div>
-
-        <div className="border border-zinc-200 bg-white divide-y divide-zinc-100 overflow-hidden rounded-none">
-          {reviewsLoading ? (
-            <div className="p-6 space-y-3">
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-none" />
-              ))}
-            </div>
-          ) : recentReviews.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center px-6">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center border border-zinc-100 bg-zinc-50 rounded-none">
-                <FileText className="h-5 w-5 text-zinc-300" />
-              </div>
-              <p className="font-mono text-xs text-zinc-400">No activity yet.</p>
-            </div>
-          ) : (
-            recentReviews.map((review) => (
-              <Link
-                key={review.id}
-                href={`/teams/${teamSlug}/reviews/${review.id}`}
-                className="flex items-center gap-4 px-5 py-4 hover:bg-zinc-50 transition-colors"
-              >
-                <div className="shrink-0">
-                  {review.status === "open" ? (
-                    <Circle className="h-4 w-4 text-emerald-500" />
-                  ) : review.status === "approved" ? (
-                    <CheckCircle2 className="h-4 w-4 text-violet-500" />
-                  ) : (
-                    <XCircle className="h-4 w-4 text-zinc-400" />
+        ) : (
+          <div className="divide-y divide-grey-100">
+            {feed.map((item) => (
+              <div key={item.id} className="flex items-start gap-3 px-5 py-3">
+                <Image
+                  src={getAvatarUrl(item.actor.profilePictureUrl, item.actor.fullName)}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="mt-0.5 h-6 w-6 shrink-0 border border-grey-200 object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-xs leading-5 text-text-secondary">
+                    <span className="font-bold text-text-primary">{item.actor.fullName}</span>{" "}
+                    {describe(item)}{" "}
+                    {item.review && (
+                      <Link
+                        href={`/teams/${teamSlug}/reviews/${item.review.id}`}
+                        className="font-bold text-text-primary hover:underline"
+                      >
+                        {item.review.title}
+                      </Link>
+                    )}
+                  </p>
+                  {item.context.snippet && (
+                    <p className="mt-0.5 truncate font-mono text-[11px] italic text-text-muted">
+                      "{item.context.snippet}"
+                    </p>
                   )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-mono text-sm font-semibold text-zinc-900 truncate">
-                    {review.title}
-                  </p>
-                  <p className="font-mono text-[10px] text-zinc-400 mt-0.5">
-                    by {review.author.fullName}
-                    {review.category ? ` · ${review.category}` : ""}
+                  <p className="mt-0.5 font-mono text-[10px] text-text-muted">
+                    {relativeTime(item.createdAt)}
                   </p>
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`shrink-0 font-mono text-[10px] uppercase tracking-widest rounded-none ${
-                    review.status === "open"
-                      ? "border-emerald-200 text-emerald-700"
-                      : review.status === "approved"
-                        ? "border-violet-200 text-violet-700"
-                        : "border-zinc-200 text-zinc-400"
-                  }`}
-                >
-                  {review.status}
-                </Badge>
-              </Link>
-            ))
-          )}
-        </div>
-      </div>
+                <FeedIcon item={item} />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

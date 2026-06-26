@@ -90,8 +90,8 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
     <div className="space-y-8">
       {/* Invite Form — leads only */}
       {isLead && (
-        <div className="bg-zinc-50 border border-zinc-200 p-5">
-          <h3 className="font-sans font-black uppercase tracking-tight text-zinc-950 mb-4">
+        <div className="bg-grey-50 border border-grey-200 p-5">
+          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4">
             Invite Members
           </h3>
           <form onSubmit={handleSendInvites} className="space-y-3">
@@ -109,14 +109,14 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                 autoComplete="off"
               />
               {showDropdown && searchInput && filteredResults && filteredResults.length > 0 && (
-                <div className="absolute top-full left-0 w-full mt-1 bg-white border border-zinc-200 shadow-xl z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 w-full mt-1 bg-white border border-grey-200 shadow-xl z-50 max-h-60 overflow-y-auto">
                   {filteredResults.map((user: any) => (
                     <button
                       key={user.id}
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => addInvitee(user)}
-                      className="w-full text-left px-4 py-3 hover:bg-zinc-50 border-b border-zinc-100 last:border-0 transition-colors"
+                      className="w-full text-left px-4 py-3 hover:bg-grey-50 border-b border-grey-100 last:border-0 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <Image
@@ -124,17 +124,17 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                           alt=""
                           width={32}
                           height={32}
-                          className="h-8 w-8 rounded-none object-cover border border-zinc-200 shrink-0"
+                          className="h-8 w-8 rounded-none object-cover border border-grey-200 shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <div className="font-sans text-sm font-black text-zinc-900 truncate">
+                          <div className="font-sans text-sm font-black text-text-primary truncate">
                             {user.fullName}
                           </div>
-                          <div className="font-mono text-[10px] text-zinc-500 truncate">
+                          <div className="font-mono text-[10px] text-text-tertiary truncate">
                             @{user.username}
                           </div>
                         </div>
-                        <Plus className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+                        <Plus className="h-3.5 w-3.5 text-text-muted shrink-0" />
                       </div>
                     </button>
                   ))}
@@ -147,27 +147,27 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                 {invitees.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center gap-2 bg-white border border-zinc-200 pl-1 pr-2 py-1"
+                    className="flex items-center gap-2 bg-white border border-grey-200 pl-1 pr-2 py-1"
                   >
                     <Image
                       src={getAvatarUrl(user.profilePictureUrl, user.fullName)}
                       alt=""
                       width={24}
                       height={24}
-                      className="h-6 w-6 rounded-none object-cover border border-zinc-200 shrink-0"
+                      className="h-6 w-6 rounded-none object-cover border border-grey-200 shrink-0"
                     />
                     <div className="min-w-0">
-                      <span className="font-sans text-xs font-black text-zinc-900 truncate block leading-tight">
+                      <span className="font-sans text-xs font-black text-text-primary truncate block leading-tight">
                         {user.fullName}
                       </span>
-                      <span className="font-mono text-[9px] text-zinc-400 block leading-tight">
+                      <span className="font-mono text-[9px] text-text-muted block leading-tight">
                         @{user.username}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeInvitee(user.id)}
-                      className="ml-1 text-zinc-400 hover:text-zinc-700 transition-colors"
+                      className="ml-1 text-text-muted hover:text-text-secondary transition-colors"
                       aria-label={`Remove ${user.fullName}`}
                     >
                       <X className="h-3 w-3" />
@@ -181,7 +181,7 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
               <Button
                 type="submit"
                 disabled={isBusy || invitees.length === 0}
-                className="h-10 shrink-0 font-mono text-[11px] uppercase tracking-widest rounded-none bg-zinc-900 text-white hover:bg-zinc-800"
+                className="h-10 shrink-0 font-mono text-[11px] uppercase tracking-widest rounded-none bg-grey-900 text-white hover:bg-grey-800"
               >
                 {isBusy ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -197,10 +197,10 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
 
       {/* Roster */}
       <div>
-        <h3 className="font-sans font-black uppercase tracking-tight text-zinc-950 mb-4">
+        <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4">
           Team Roster
         </h3>
-        <div className="border border-zinc-200 bg-white divide-y divide-zinc-100 overflow-hidden">
+        <div className="border border-grey-200 bg-white divide-y divide-grey-100 overflow-hidden">
           {membersLoading ? (
             <div className="p-4 space-y-3">
               {[1, 2, 3].map((i) => (
@@ -209,14 +209,14 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
             </div>
           ) : !members || members.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center px-4">
-              <Users className="h-5 w-5 text-zinc-300 mb-2" />
-              <p className="font-mono text-[10px] text-zinc-400">No members yet.</p>
+              <Users className="h-5 w-5 text-text-muted mb-2" />
+              <p className="font-mono text-[10px] text-text-muted">No members yet.</p>
             </div>
           ) : (
             members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between px-5 py-4 hover:bg-zinc-50 transition-colors group"
+                className="flex items-center justify-between px-5 py-4 hover:bg-grey-50 transition-colors group"
               >
                 <Link href={`/@${member.user.username}`} className="flex items-center gap-4 flex-1">
                   <Image
@@ -224,13 +224,13 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                     alt={member.user.fullName}
                     width={40}
                     height={40}
-                    className="h-10 w-10 border border-zinc-200 object-cover rounded-none"
+                    className="h-10 w-10 border border-grey-200 object-cover rounded-none"
                   />
                   <div className="min-w-0">
-                    <p className="font-sans text-sm font-black text-zinc-900 group-hover:underline truncate">
+                    <p className="font-sans text-sm font-black text-text-primary group-hover:underline truncate">
                       {member.user.fullName}
                     </p>
-                    <p className="font-mono text-[10px] text-zinc-400 mt-0.5">
+                    <p className="font-mono text-[10px] text-text-muted mt-0.5">
                       @{member.user.username}
                     </p>
                   </div>
@@ -254,7 +254,7 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                         variant="ghost"
                         size="icon"
                         disabled={removePending}
-                        className="h-8 w-8 text-zinc-400 hover:text-red-600 hover:bg-red-50"
+                        className="h-8 w-8 text-text-muted hover:text-red-600 hover:bg-red-50"
                         title="Remove Member"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -271,17 +271,20 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
       {/* Pending invites — leads only */}
       {isLead && pendingInvites && pendingInvites.length > 0 && (
         <div>
-          <h3 className="font-sans font-black uppercase tracking-tight text-zinc-950 mb-4 flex items-center gap-2">
+          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4 flex items-center gap-2">
             Pending Invites
-            <Badge variant="secondary" className="font-mono text-[9px] bg-zinc-100 text-zinc-500">
+            <Badge
+              variant="secondary"
+              className="font-mono text-[9px] bg-grey-100 text-text-tertiary"
+            >
               {pendingInvites.length}
             </Badge>
           </h3>
-          <div className="border border-zinc-200 bg-white divide-y divide-zinc-100 overflow-hidden">
+          <div className="border border-grey-200 bg-white divide-y divide-grey-100 overflow-hidden">
             {pendingInvites.map((invite) => (
               <div
                 key={invite.id}
-                className="flex items-center justify-between px-5 py-4 bg-zinc-50/50"
+                className="flex items-center justify-between px-5 py-4 bg-grey-50/50"
               >
                 <div className="flex items-center gap-4 opacity-70">
                   <Image
@@ -289,19 +292,19 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                     alt={invite.user.fullName}
                     width={40}
                     height={40}
-                    className="h-10 w-10 border border-zinc-200 object-cover rounded-none grayscale"
+                    className="h-10 w-10 border border-grey-200 object-cover rounded-none grayscale"
                   />
                   <div className="min-w-0">
-                    <p className="font-sans text-sm font-black text-zinc-900 truncate">
+                    <p className="font-sans text-sm font-black text-text-primary truncate">
                       {invite.user.fullName}
                     </p>
-                    <p className="font-mono text-[10px] text-zinc-500 mt-0.5">
+                    <p className="font-mono text-[10px] text-text-tertiary mt-0.5">
                       @{invite.user.username}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 flex items-center gap-1">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted flex items-center gap-1">
                     <Mail className="h-3 w-3" />
                     Sent
                   </span>

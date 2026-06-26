@@ -10,7 +10,14 @@ export interface AdminMember {
   isOnboarded: boolean;
   primaryRole: string | null;
   primaryRoleRank: number | null;
+  /** Role display names (human-readable), highest authority first. */
   roles: string[];
+  /** Role slugs/identifiers — use these for assign/revoke API calls. */
+  roleNames: string[];
+  /** Permissions granted directly to the user, independent of any role. */
+  directPermissions: string[];
+  /** Full effective permission set (roles ∪ direct permissions). */
+  effectivePermissions: string[];
   fullName: string;
   bio: string | null;
   skills: string[];

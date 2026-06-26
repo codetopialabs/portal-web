@@ -110,6 +110,35 @@ export function useRevokeRole() {
   });
 }
 
+// ─── Direct permissions ───────────────────────────────────────────────────────
+
+export function useGrantUserPermission() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, permission }: { userId: string; permission: string }) =>
+      UsersService.grantPermission(userId, permission),
+    onSuccess: (_result, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.user(userId) });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
+      // The target user's permissions changed — if they're the current user, refresh me.
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    },
+  });
+}
+
+export function useRevokeUserPermission() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, permission }: { userId: string; permission: string }) =>
+      UsersService.revokePermission(userId, permission),
+    onSuccess: (_result, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.user(userId) });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
+      queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    },
+  });
+}
+
 // ─── Members ──────────────────────────────────────────────────────────────────
 
 export function useAdminMembers(params?: MemberListParams) {

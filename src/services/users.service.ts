@@ -79,4 +79,14 @@ export const UsersService = {
     );
     return res.data.data;
   },
+
+  async grantPermission(userId: string, permission: string): Promise<void> {
+    await axiosInstance.post(`${USERS_BASE}/${userId}/permissions/`, { permission });
+  },
+
+  async revokePermission(userId: string, permission: string): Promise<void> {
+    await axiosInstance.delete(`${USERS_BASE}/${userId}/permissions/`, {
+      data: { permission },
+    });
+  },
 };

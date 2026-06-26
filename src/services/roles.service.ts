@@ -7,7 +7,9 @@ const ROLES_BASE = "/roles";
 export const RolesService = {
   async getRoles(): Promise<Role[]> {
     const res = await axiosInstance.get<ApiResponse<Role[]>>(`${ROLES_BASE}/`);
-    return res.data.data.filter((r) => !r.isSystem && !r.name.startsWith("team_"));
+    // Hide internal team-scoped roles, but keep system roles (admin, member, …)
+    // so they're visible in the registry. They render locked and can't be deleted.
+    return res.data.data.filter((r) => !r.name.startsWith("team_"));
   },
 
   async getRole(slug: string): Promise<RoleDetail> {

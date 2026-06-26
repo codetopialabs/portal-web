@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   CalendarDays,
   ChevronLeft,
+  KeyRound,
   Laptop,
   Mail,
   Shield,
@@ -49,11 +50,13 @@ import {
   useAdminUserSessions,
   useAssignRole,
   useDeleteMember,
+  useGrantUserPermission,
   usePermissionList,
   useReactivateMember,
   useRevokeAdminUserSession,
   useRevokeAllAdminUserSessions,
   useRevokeRole,
+  useRevokeUserPermission,
   useRoles,
   useSuspendMember,
 } from "@/hooks/useAdmin";
@@ -262,6 +265,8 @@ function MemberDetailContent({ username }: { username: string }) {
   const { data: permissions } = usePermissionList();
   const { mutate: assignRole, isPending: isAssigning } = useAssignRole();
   const { mutate: revokeRole, isPending: isRevoking } = useRevokeRole();
+  const { mutate: grantPermission, isPending: isGrantingPermission } = useGrantUserPermission();
+  const { mutate: revokePermission, isPending: isRevokingPermission } = useRevokeUserPermission();
   const { mutate: suspendMember, isPending: isSuspending } = useSuspendMember();
   const { mutate: reactivateMember, isPending: isReactivating } = useReactivateMember();
   const { mutate: deleteMember, isPending: isDeleting } = useDeleteMember();
@@ -271,6 +276,8 @@ function MemberDetailContent({ username }: { username: string }) {
   const canEdit = usePermission("users.edit");
   const canAssign = usePermission("roles.assign");
   const canRevoke = usePermission("roles.revoke");
+  const canAssignPermission = usePermission("permissions.assign");
+  const canRevokePermission = usePermission("permissions.revoke");
   const canSuspend = usePermission("users.suspend");
   const canReactivate = usePermission("users.reactivate");
   const canDelete = usePermission("users.delete");
@@ -283,6 +290,7 @@ function MemberDetailContent({ username }: { username: string }) {
   );
 
   const [selectedRoleName, setSelectedRoleName] = useState("");
+  const [selectedPermission, setSelectedPermission] = useState("");
   const [confirmAssignRole, setConfirmAssignRole] = useState(false);
   const [dangerAction, setDangerAction] = useState<DangerAction | null>(null);
   const [confirmationInput, setConfirmationInput] = useState("");
@@ -314,10 +322,24 @@ function MemberDetailContent({ username }: { username: string }) {
     );
   }, [dangerAction, rolesByName, permissionDescriptions]);
 
+  // Role identity is the slug (role.name). The API's `roles` field holds display
+  // names, so assignment/revocation must key off `roleNames` (the slugs) instead.
+  const assignedRoleSlugs = useMemo(
+    () => (member?.roleNames ?? []).filter((slug) => slug.trim() !== ""),
+    [member]
+  );
+
+  const directPermissions = useMemo(() => member?.directPermissions ?? [], [member]);
+
   const availableRoles = useMemo(() => {
     if (!roles || !member) return [];
-    return roles.filter((role) => !member.roles.includes(role.name));
-  }, [roles, member]);
+    return roles.filter((role) => !assignedRoleSlugs.includes(role.name));
+  }, [roles, member, assignedRoleSlugs]);
+
+  const assignablePermissions = useMemo(() => {
+    if (!permissions) return [];
+    return permissions.filter((permission) => !directPermissions.includes(permission.codename));
+  }, [permissions, directPermissions]);
 
   const pendingDangerAction =
     isRevoking ||
@@ -369,6 +391,39 @@ function MemberDetailContent({ username }: { username: string }) {
         },
         onError: () => {
           toast.error("Failed to assign role. Please try again.");
+        },
+      }
+    );
+  }
+
+  function handleGrantPermission() {
+    if (!member || !selectedPermission) return;
+
+    grantPermission(
+      { userId: member.id, permission: selectedPermission },
+      {
+        onSuccess: () => {
+          toast.success(`Permission "${selectedPermission}" granted.`);
+          setSelectedPermission("");
+        },
+        onError: () => {
+          toast.error("Failed to grant permission. Please try again.");
+        },
+      }
+    );
+  }
+
+  function handleRevokePermission(permission: string) {
+    if (!member) return;
+
+    revokePermission(
+      { userId: member.id, permission },
+      {
+        onSuccess: () => {
+          toast.success(`Permission "${permission}" revoked.`);
+        },
+        onError: () => {
+          toast.error("Failed to revoke permission. Please try again.");
         },
       }
     );
@@ -573,30 +628,32 @@ function MemberDetailContent({ username }: { username: string }) {
               </span>
             </div>
             <div className="space-y-5 p-5">
-              {member.roles.filter((r) => r.trim() !== "").length === 0 ? (
+              {assignedRoleSlugs.length === 0 ? (
                 <p className="font-mono text-sm text-text-tertiary">No roles assigned.</p>
               ) : (
                 <div className="divide-y divide-grey-200 border border-grey-200">
-                  {member.roles
-                    .filter((r) => r.trim() !== "")
-                    .map((roleName) => (
+                  {assignedRoleSlugs.map((roleSlug) => {
+                    const role = rolesByName.get(roleSlug);
+                    return (
                       <div
-                        key={roleName}
+                        key={roleSlug}
                         className="flex items-center justify-between gap-4 px-4 py-3"
                       >
                         <div>
                           <p className="font-mono text-sm font-bold text-text-primary">
-                            {roleName}
+                            {role?.displayName ?? roleSlug}
                           </p>
                           <p className="mt-1 font-mono text-xs text-text-muted">
-                            {rolesByName.get(roleName)?.permissions.length ?? 0} permissions
-                            currently granted by this role.
+                            {role?.permissions.length ?? 0} permissions currently granted by this
+                            role.
                           </p>
                         </div>
                         {canRevoke && (
                           <button
                             type="button"
-                            onClick={() => openDangerAction({ type: "revoke-role", roleName })}
+                            onClick={() =>
+                              openDangerAction({ type: "revoke-role", roleName: roleSlug })
+                            }
                             className="inline-flex h-8 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50"
                           >
                             <UserMinus className="h-3.5 w-3.5" />
@@ -604,7 +661,8 @@ function MemberDetailContent({ username }: { username: string }) {
                           </button>
                         )}
                       </div>
-                    ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -643,6 +701,101 @@ function MemberDetailContent({ username }: { username: string }) {
                       Review assignment
                     </button>
                   </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="border border-grey-200 bg-white">
+            <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-icon-tertiary" />
+                <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+                  Direct permissions
+                </h2>
+              </div>
+              <span className="font-mono text-xs text-text-tertiary">
+                {directPermissions.length} granted
+              </span>
+            </div>
+            <div className="space-y-5 p-5">
+              <p className="font-mono text-xs leading-6 text-text-tertiary">
+                Permissions granted here apply to this member directly, on top of anything their
+                roles already grant. Use them for one-off access without creating a new role.
+              </p>
+
+              {directPermissions.length === 0 ? (
+                <p className="font-mono text-sm text-text-tertiary">
+                  No direct permissions granted.
+                </p>
+              ) : (
+                <div className="divide-y divide-grey-200 border border-grey-200">
+                  {directPermissions.map((permission) => (
+                    <div
+                      key={permission}
+                      className="flex items-center justify-between gap-4 px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-mono text-sm font-bold text-text-primary">
+                          {permission}
+                        </p>
+                        <p className="mt-1 font-mono text-xs leading-5 text-text-muted">
+                          {permissionEffect(permission, permissionDescriptions)}
+                        </p>
+                      </div>
+                      {canRevokePermission && (
+                        <button
+                          type="button"
+                          onClick={() => handleRevokePermission(permission)}
+                          disabled={isRevokingPermission}
+                          className="inline-flex h-8 shrink-0 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50 disabled:opacity-50"
+                        >
+                          <UserMinus className="h-3.5 w-3.5" />
+                          Revoke
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {canAssignPermission && (
+                <div className="border-t border-grey-200 pt-5">
+                  <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                    Grant permission
+                  </p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Select value={selectedPermission} onValueChange={setSelectedPermission}>
+                      <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm sm:w-80">
+                        <SelectValue placeholder="Select a permission" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-none">
+                        {assignablePermissions.length === 0 && (
+                          <SelectItem value="none" disabled>
+                            No permissions available
+                          </SelectItem>
+                        )}
+                        {assignablePermissions.map((permission) => (
+                          <SelectItem key={permission.codename} value={permission.codename}>
+                            {permission.codename}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <button
+                      type="button"
+                      onClick={handleGrantPermission}
+                      disabled={isGrantingPermission || !selectedPermission}
+                      className="h-10 border border-grey-900 bg-grey-900 px-5 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800 disabled:opacity-50"
+                    >
+                      {isGrantingPermission ? "Granting..." : "Grant permission"}
+                    </button>
+                  </div>
+                  {selectedPermission && (
+                    <p className="mt-3 font-mono text-xs leading-5 text-text-tertiary">
+                      {permissionEffect(selectedPermission, permissionDescriptions)}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -861,7 +1014,9 @@ function MemberDetailContent({ username }: { username: string }) {
             <SheetDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
               This will remove{" "}
               <span className="font-bold text-text-primary">
-                {dangerAction?.type === "revoke-role" ? dangerAction.roleName : ""}
+                {dangerAction?.type === "revoke-role"
+                  ? (rolesByName.get(dangerAction.roleName)?.displayName ?? dangerAction.roleName)
+                  : ""}
               </span>{" "}
               from <span className="font-bold text-text-primary">@{member.username}</span>.
             </SheetDescription>

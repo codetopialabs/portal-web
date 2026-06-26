@@ -26,6 +26,17 @@ export function useTeam(teamId: string) {
   });
 }
 
+export function useTeamActivity(teamSlug: string) {
+  return useQuery({
+    queryKey: ["teams", teamSlug, "activity"],
+    queryFn: () => TeamsService.getTeamActivity(teamSlug),
+    enabled: Boolean(teamSlug),
+    // Light polling so the feed feels live without sockets; pauses when tab hidden.
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
+  });
+}
+
 export function useCreateTeam() {
   const qc = useQueryClient();
   return useMutation({

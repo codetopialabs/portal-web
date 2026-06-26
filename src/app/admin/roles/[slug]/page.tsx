@@ -3,6 +3,7 @@
 import {
   AlertTriangle,
   ArrowRight,
+  ChevronLeft,
   ChevronRight,
   LockKeyhole,
   Shield,
@@ -188,48 +189,65 @@ function RoleDetailContent({ slug }: { slug: string }) {
 
   return (
     <div className="space-y-6">
-      <header className="border border-grey-200 bg-white">
-        <div className="flex flex-col gap-5 p-5 md:flex-row md:items-start md:justify-between">
-          <div className="flex min-w-0 gap-4">
+      <div>
+        <Link
+          href="/admin/roles"
+          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Roles
+        </Link>
+      </div>
+
+      <header className="border border-grey-200 bg-white p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex min-w-0 gap-3">
             <div
-              className={`flex h-20 w-20 shrink-0 items-center justify-center border ${tone.className}`}
+              className={`flex h-11 w-11 shrink-0 items-center justify-center border ${tone.className}`}
             >
-              <RoleIcon className="h-10 w-10" />
+              <RoleIcon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <h1 className="font-sans text-3xl font-black leading-tight text-text-primary">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
                   {role.displayName}
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-none font-mono text-[10px]">
-                  {tone.label}
-                </Badge>
+                {role.isSystem && (
+                  <LockKeyhole className="h-3.5 w-3.5 text-icon-muted" aria-label="System role" />
+                )}
                 {hasGlobalWildcard && (
-                  <Badge className="h-6 rounded-none border-error-200 bg-error-50 font-mono text-[10px] text-error-700">
-                    <LockKeyhole className="h-3 w-3" />
+                  <span className="inline-flex items-center gap-1 border border-error-200 bg-error-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-error-700">
                     Unrestricted
-                  </Badge>
+                  </span>
                 )}
               </div>
-              <p className="font-mono text-sm text-text-tertiary">{role.name}</p>
-              <p className="mt-3 max-w-2xl font-mono text-xs leading-6 text-text-secondary">
-                {role.description || "No description provided."}
+              <p className="mt-0.5 font-mono text-[11px] text-text-muted">
+                {role.name} · rank {role.rank}
               </p>
+              {role.description && (
+                <p className="mt-2 max-w-2xl font-mono text-xs leading-6 text-text-secondary">
+                  {role.description}
+                </p>
+              )}
             </div>
           </div>
 
           {canEdit && (
-            <Button asChild className="h-10 rounded-none font-mono text-xs font-bold">
+            <Button
+              asChild
+              variant="outline"
+              className="h-9 shrink-0 rounded-none font-mono text-xs font-bold"
+            >
               <Link href={`/admin/roles/${role.name}/edit`}>Edit role</Link>
             </Button>
           )}
         </div>
 
-        <div className="grid grid-cols-2 border-t border-grey-200 md:grid-cols-4">
-          <HeaderStat label="Rank" value={String(role.rank)} />
-          <HeaderStat label="Members" value={String(role.memberCount)} />
-          <HeaderStat label="Permissions" value={String(role.permissions.length)} />
-          <HeaderStat label="Wildcards" value={String(wildcardCount)} />
+        <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 border-t border-grey-100 pt-4">
+          <Stat label="Members" value={role.memberCount} />
+          <Stat label="Permissions" value={role.permissions.length} />
+          <Stat label="Wildcards" value={wildcardCount} />
+          <Stat label="Destructive" value={destructiveCount} />
         </div>
       </header>
 
@@ -506,14 +524,12 @@ function RoleDetailContent({ slug }: { slug: string }) {
   );
 }
 
-function HeaderStat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="border-b border-grey-200 p-4 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
-      <p className="font-sans text-2xl font-black text-text-primary">{value}</p>
-      <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-        {label}
-      </p>
-    </div>
+    <span className="font-mono text-xs">
+      <span className="font-bold text-text-primary">{value}</span>{" "}
+      <span className="uppercase tracking-wide text-text-muted">{label}</span>
+    </span>
   );
 }
 
@@ -530,7 +546,7 @@ function SideFact({ label, value }: { label: string; value: string }) {
 
 function RoleDetailPageContent({ slug }: { slug: string }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
+    <div className="w-full pb-20">
       <RoleDetailContent slug={slug} />
     </div>
   );
