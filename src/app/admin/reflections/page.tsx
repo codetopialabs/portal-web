@@ -171,7 +171,7 @@ function PeriodPicker({
     return [...set].sort((a, b) => a - b);
   }, [periods]);
 
-  const selectedYear = value !== "all" ? new Date(value).getFullYear() : undefined;
+  const selectedYear = value !== "all" && value !== null ? new Date(value).getFullYear() : undefined;
   const defaultYear = selectedYear ?? years[years.length - 1] ?? new Date().getFullYear();
   const [displayYear, setDisplayYear] = useState(defaultYear);
   const minYear = years[0] ?? displayYear;
