@@ -1300,7 +1300,10 @@ function MemberDetailContent({ username }: { username: string }) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <label htmlFor="flag-reason" className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+            <label
+              htmlFor="flag-reason"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
+            >
               Reason
             </label>
             <textarea

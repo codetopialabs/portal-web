@@ -143,10 +143,12 @@ function MemberHistoryContent({ username }: { username: string }) {
       ) : (
         <div className="overflow-hidden border border-grey-200 bg-white">
           <div className="hidden grid-cols-[1.5fr_1fr_1fr_1fr_auto] gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3 lg:grid">
-            {["Period", "Submitted", "Reviewed", "Status", ""].map((h, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: static header labels — this array is never reordered
-              <span key={i} className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-                {h}
+            {["Period", "Submitted", "Reviewed", "Status", "actions"].map((h) => (
+              <span
+                key={h}
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
+              >
+                {h === "actions" ? "" : h}
               </span>
             ))}
           </div>
