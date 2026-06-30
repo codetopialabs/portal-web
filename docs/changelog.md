@@ -4,6 +4,41 @@ category: General
 order: 1
 ---
 
+## [2026-06-27] OAuth App Management UI
+
+**What changed:** Added an admin dashboard section to create, view, edit, and delete OAuth Applications for SSO, replacing the need to use the `seed_oauth_app` backend CLI command.
+**Affected areas:** `/admin/oauth-apps`, backend `apps/authentication/views_admin_oauth.py`.
+**Permissions added:** `oauth_apps.view`, `oauth_apps.create`, `oauth_apps.edit`, `oauth_apps.delete`.
+**Breaking changes:** No.
+
+## [2026-06-23] Single sign-on (portal as identity provider)
+
+**What changed:** The portal can now sign users into other systems via OAuth2 Authorization Code + PKCE. Added a token-authenticated `/api/v1/oauth/authorize/` (issues an authorization code for the logged-in user), an OIDC-style `/api/v1/oauth/userinfo/`, a portal `/authorize` consent screen, and a `seed_oauth_app` command to register consumer clients. The Community Admin Center's password login was replaced with "Continue with Community Portal" (PKCE start + callback that gates on `admin.panel.access`).
+**Affected areas:** portal `/authorize`, backend `apps/authentication/oauth.py` + `/o/token/`, community-website `/admin/login` + `/api/admin/auth/{start,callback}`.
+**Permissions added:** none (consumers are gated on existing permissions like `admin.panel.access`).
+**Breaking changes:** Admin Center no longer uses its local password login.
+
+## [2026-06-23] API keys for external integrations
+
+**What changed:** Admins can issue scoped API keys so external systems can call the backend without a user account. Keys carry RBAC permission scopes, are shown once at creation, and can be revoked. Added `ApiKeyAuthentication` (accepts `Authorization: Api-Key <key>` or `X-Api-Key`) and an admin UI at `/admin/api-keys`.
+**Affected areas:** backend `apps/api_keys/`, portal `/admin/api-keys`.
+**Permissions added:** `api_keys.view`, `api_keys.create`, `api_keys.revoke`.
+**Breaking changes:** No.
+
+## [2026-06-23] Monthly reflections
+
+**What changed:** Members submit a monthly reflection in a window that opens on the 25th and is due 7 days later. A dismissible prompt + banner nags until submitted; after submitting it's hidden. Reviewers (with `reflections.view_any`/`reflections.review`) read collated reflections and can approve or request changes (which reopens the form with notes). Questions are admin-configurable and snapshotted per cycle. Reminder/opening/reviewer emails are sent by the `run_reflection_reminders` command (daily cron).
+**Affected areas:** backend `apps/reflections/`, portal `/reflections`, `/admin/reflections`, `/admin/reflections/questions`, dashboard shell prompt.
+**Permissions added:** `reflections.submit` (granted to members), `reflections.view_any`, `reflections.review`, `reflections.manage`.
+**Breaking changes:** No.
+
+## [2026-06-23] Direct user permissions & member management fixes
+
+**What changed:** Admins can now grant permissions to a member directly, without creating or assigning a role — effective access is the union of role-derived and direct permissions. The member detail page gained a "Direct permissions" panel (grant via picker, revoke inline). Fixed a bug where the Roles panel keyed assignment/revocation off role display names instead of slugs, which could leave assigned roles selectable and cause revoke calls to fail; it now uses the new `roleNames` field. Role editing now rejects unknown/typo permission strings.
+**Affected areas:** `/admin/members/[username]`, backend `apps/users/` (`UserPermission` model, `/api/v1/users/<id>/permissions/`), `RoleWriteSerializer` validation.
+**Permissions added:** `permissions.assign`, `permissions.revoke`.
+**Breaking changes:** No.
+
 ## [2026-06-11] Google and GitHub OAuth Integration
 
 **What changed:** Implemented seamless social login via Google and GitHub. The frontend handles OAuth popups and sends tokens/codes to new backend custom endpoints that verify them directly and issue secure access tokens, completely bypassing the heavy `django-allauth` dependencies for a robust decoupled integration.

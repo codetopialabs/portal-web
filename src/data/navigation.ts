@@ -1,4 +1,13 @@
-import { Globe, Home, Library, Settings, ShieldCheck, UserCheck, Users } from "lucide-react";
+import {
+  ClipboardCheck,
+  Globe,
+  Home,
+  Library,
+  Settings,
+  ShieldCheck,
+  UserCheck,
+  Users,
+} from "lucide-react";
 import type { NavGroup } from "@/types/navigation";
 
 const BASE_MENU_GROUPS: NavGroup[] = [
@@ -13,6 +22,12 @@ const BASE_MENU_GROUPS: NavGroup[] = [
     label: "My Space",
     items: [
       { icon: Users, label: "Teams", href: "/teams", activePrefix: "/teams" },
+      {
+        icon: ClipboardCheck,
+        label: "Reflections",
+        href: "/reflections",
+        activePrefix: "/reflections",
+      },
       { icon: UserCheck, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
       { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
     ],

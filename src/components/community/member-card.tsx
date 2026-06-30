@@ -2,7 +2,6 @@
 
 import { MapPin, Pencil, Smile } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { usePermission } from "@/hooks/usePermission";
 import { cn, getAvatarUrl } from "@/lib/utils";
 import type { CommunityMember } from "@/services/user.service";
@@ -26,15 +25,15 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 interface MemberCardProps {
   member: CommunityMember;
   compact?: boolean;
+  onOpenModal?: (member: CommunityMember) => void;
 }
 
-export function MemberCard({ member, compact = false }: MemberCardProps) {
-  const router = useRouter();
+export function MemberCard({ member, compact = false, onOpenModal }: MemberCardProps) {
   const canEditMembers = usePermission("users.edit");
 
   const primaryRole = member.primaryRole || member.communityRoles?.[0] || "Member";
 
-  const profileHref = `/@${member.username}`;
+  const _profileHref = `/@${member.username}`;
 
   const occupation = member.currentRole?.trim() || `${primaryRole} at Codetopia Community`;
 
@@ -48,7 +47,7 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
   function handleCardClick(e: React.MouseEvent) {
     const target = e.target as HTMLElement;
     if (target.closest("a, button, [role='button']")) return;
-    router.push(profileHref);
+    if (onOpenModal) onOpenModal(member);
   }
 
   return (

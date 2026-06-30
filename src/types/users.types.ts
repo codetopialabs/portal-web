@@ -1,3 +1,15 @@
+export interface AccountFlag {
+  id: number;
+  reason: string;
+  flaggedBy: string | null;
+  flaggedAt: string;
+  isResolved: boolean;
+  resolvedAt: string | null;
+  resolvedBy: string | null;
+  resolutionNote: string;
+  profileUpdatedAfterFlag: boolean;
+}
+
 export interface AdminMember {
   id: string;
   communityId: string;
@@ -10,7 +22,14 @@ export interface AdminMember {
   isOnboarded: boolean;
   primaryRole: string | null;
   primaryRoleRank: number | null;
+  /** Role display names (human-readable), highest authority first. */
   roles: string[];
+  /** Role slugs/identifiers — use these for assign/revoke API calls. */
+  roleNames: string[];
+  /** Permissions granted directly to the user, independent of any role. */
+  directPermissions: string[];
+  /** Full effective permission set (roles ∪ direct permissions). */
+  effectivePermissions: string[];
   fullName: string;
   bio: string | null;
   skills: string[];
@@ -29,6 +48,10 @@ export interface AdminMember {
   location: string | null;
   currentRole: string | null;
   memberStatus: string | null;
+  lastLoginAt: string | null;
+  usernameLastChanged: string | null;
+  isFlagged: boolean;
+  activeFlag: AccountFlag | null;
   createdAt: string;
   updatedAt: string;
   joinedAt: string;
@@ -51,6 +74,7 @@ export interface MemberListParams {
   role?: string;
   isEmailVerified?: boolean;
   isActive?: boolean;
+  isFlagged?: boolean;
 }
 
 export interface AdminUserSession {

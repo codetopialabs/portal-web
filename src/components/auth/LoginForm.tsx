@@ -47,17 +47,17 @@ export function LoginForm({
     const code = searchParams?.get("code");
     if (code && !githubCodeProcessed.current) {
       githubCodeProcessed.current = true;
-      const redirectUri = window.location.origin + "/login";
+      const redirectUri = `${window.location.origin}/login`;
       socialMutation.mutate({ provider: "github", tokenOrCode: code, redirectUri });
       // Clean the code from the URL using Next.js router so searchParams updates properly
-      nextRouter.replace("/login" + (next ? `?next=${next}` : ""));
+      nextRouter.replace(`/login${next ? `?next=${next}` : ""}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, next, nextRouter, socialMutation.mutate]);
 
   const handleGithubLogin = useCallback(() => {
     if (!GITHUB_CLIENT_ID) return;
-    const redirectUri = window.location.origin + "/login";
+    const redirectUri = `${window.location.origin}/login`;
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${redirectUri}&scope=user:email`;
   }, []);
 

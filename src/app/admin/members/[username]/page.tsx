@@ -1,9 +1,13 @@
 "use client";
 
 import {
+  AlertTriangle,
   ArrowUpRight,
   CalendarDays,
+  CheckCircle2,
   ChevronLeft,
+  Clock,
+  KeyRound,
   Laptop,
   Mail,
   Shield,
@@ -49,13 +53,17 @@ import {
   useAdminUserSessions,
   useAssignRole,
   useDeleteMember,
+  useFlagMember,
+  useGrantUserPermission,
   usePermissionList,
   useReactivateMember,
   useRevokeAdminUserSession,
   useRevokeAllAdminUserSessions,
   useRevokeRole,
+  useRevokeUserPermission,
   useRoles,
   useSuspendMember,
+  useUnflagMember,
 } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
 import { getAvatarUrl } from "@/lib/utils";
@@ -145,16 +153,40 @@ function SideFact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StatusPill({ active }: { active: boolean }) {
+function StatusPill({
+  active,
+  isFlagged,
+  underReview,
+}: {
+  active: boolean;
+  isFlagged?: boolean;
+  underReview?: boolean;
+}) {
+  if (isFlagged) {
+    if (underReview) {
+      return (
+        <span className="inline-flex items-center gap-1.5 border border-amber-500 bg-amber-500 px-2.5 py-1 font-mono text-[11px] font-bold text-white">
+          <Clock className="h-3 w-3" />
+          Under review
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 border border-red-600 bg-red-600 px-2.5 py-1 font-mono text-[11px] font-bold text-white">
+        <AlertTriangle className="h-3 w-3" />
+        Flagged
+      </span>
+    );
+  }
   return (
     <span
-      className={`inline-flex h-6 items-center gap-1.5 border px-2.5 font-mono text-[11px] font-bold ${
+      className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[11px] font-bold ${
         active
-          ? "border-success-200 bg-success-50 text-success-700"
-          : "border-error-200 bg-error-50 text-error-700"
+          ? "border-emerald-600 bg-emerald-600 text-white"
+          : "border-zinc-800 bg-zinc-800 text-white"
       }`}
     >
-      <span className={`h-1.5 w-1.5 ${active ? "bg-success-600" : "bg-error-600"}`} />
+      {active ? <CheckCircle2 className="h-3 w-3" /> : <UserMinus className="h-3 w-3" />}
       {active ? "Active" : "Suspended"}
     </span>
   );
@@ -262,20 +294,28 @@ function MemberDetailContent({ username }: { username: string }) {
   const { data: permissions } = usePermissionList();
   const { mutate: assignRole, isPending: isAssigning } = useAssignRole();
   const { mutate: revokeRole, isPending: isRevoking } = useRevokeRole();
+  const { mutate: grantPermission, isPending: isGrantingPermission } = useGrantUserPermission();
+  const { mutate: revokePermission, isPending: isRevokingPermission } = useRevokeUserPermission();
   const { mutate: suspendMember, isPending: isSuspending } = useSuspendMember();
   const { mutate: reactivateMember, isPending: isReactivating } = useReactivateMember();
   const { mutate: deleteMember, isPending: isDeleting } = useDeleteMember();
   const { mutate: revokeSession, isPending: isRevokingSession } = useRevokeAdminUserSession();
   const { mutate: revokeAllSessions, isPending: isRevokingAll } = useRevokeAllAdminUserSessions();
+  const { mutate: flagMember, isPending: isFlagging } = useFlagMember();
+  const { mutate: unflagMember, isPending: isUnflagging } = useUnflagMember();
 
   const canEdit = usePermission("users.edit");
   const canAssign = usePermission("roles.assign");
   const canRevoke = usePermission("roles.revoke");
+  const canAssignPermission = usePermission("permissions.assign");
+  const canRevokePermission = usePermission("permissions.revoke");
   const canSuspend = usePermission("users.suspend");
   const canReactivate = usePermission("users.reactivate");
   const canDelete = usePermission("users.delete");
   const canViewSessions = usePermission("sessions.view_any");
   const canRevokeSessions = usePermission("sessions.revoke_any");
+  const canFlag = usePermission("users.flag");
+  const canReviewFlag = usePermission("users.review_flag");
 
   const { data: sessions, isLoading: sessionsLoading } = useAdminUserSessions(
     username,
@@ -283,9 +323,13 @@ function MemberDetailContent({ username }: { username: string }) {
   );
 
   const [selectedRoleName, setSelectedRoleName] = useState("");
+  const [selectedPermission, setSelectedPermission] = useState("");
   const [confirmAssignRole, setConfirmAssignRole] = useState(false);
   const [dangerAction, setDangerAction] = useState<DangerAction | null>(null);
   const [confirmationInput, setConfirmationInput] = useState("");
+  const [flagDialogOpen, setFlagDialogOpen] = useState(false);
+  const [flagReason, setFlagReason] = useState("");
+  const [unflagDialogOpen, setUnflagDialogOpen] = useState(false);
 
   const permissionDescriptions = useMemo(() => {
     return new Map(
@@ -314,10 +358,24 @@ function MemberDetailContent({ username }: { username: string }) {
     );
   }, [dangerAction, rolesByName, permissionDescriptions]);
 
+  // Role identity is the slug (role.name). The API's `roles` field holds display
+  // names, so assignment/revocation must key off `roleNames` (the slugs) instead.
+  const assignedRoleSlugs = useMemo(
+    () => (member?.roleNames ?? []).filter((slug) => slug.trim() !== ""),
+    [member]
+  );
+
+  const directPermissions = useMemo(() => member?.directPermissions ?? [], [member]);
+
   const availableRoles = useMemo(() => {
     if (!roles || !member) return [];
-    return roles.filter((role) => !member.roles.includes(role.name));
-  }, [roles, member]);
+    return roles.filter((role) => !assignedRoleSlugs.includes(role.name));
+  }, [roles, member, assignedRoleSlugs]);
+
+  const assignablePermissions = useMemo(() => {
+    if (!permissions) return [];
+    return permissions.filter((permission) => !directPermissions.includes(permission.codename));
+  }, [permissions, directPermissions]);
 
   const pendingDangerAction =
     isRevoking ||
@@ -369,6 +427,39 @@ function MemberDetailContent({ username }: { username: string }) {
         },
         onError: () => {
           toast.error("Failed to assign role. Please try again.");
+        },
+      }
+    );
+  }
+
+  function handleGrantPermission() {
+    if (!member || !selectedPermission) return;
+
+    grantPermission(
+      { userId: member.id, permission: selectedPermission },
+      {
+        onSuccess: () => {
+          toast.success(`Permission "${selectedPermission}" granted.`);
+          setSelectedPermission("");
+        },
+        onError: () => {
+          toast.error("Failed to grant permission. Please try again.");
+        },
+      }
+    );
+  }
+
+  function handleRevokePermission(permission: string) {
+    if (!member) return;
+
+    revokePermission(
+      { userId: member.id, permission },
+      {
+        onSuccess: () => {
+          toast.success(`Permission "${permission}" revoked.`);
+        },
+        onError: () => {
+          toast.error("Failed to revoke permission. Please try again.");
         },
       }
     );
@@ -452,6 +543,35 @@ function MemberDetailContent({ username }: { username: string }) {
     });
   }
 
+  function handleFlag() {
+    if (!member || !flagReason.trim()) return;
+    flagMember(
+      { id: member.id, reason: flagReason.trim() },
+      {
+        onSuccess: () => {
+          toast.success("Account flagged.");
+          setFlagDialogOpen(false);
+          setFlagReason("");
+        },
+        onError: () => toast.error("Failed to flag account."),
+      }
+    );
+  }
+
+  function handleUnflag() {
+    if (!member) return;
+    unflagMember(
+      { id: member.id },
+      {
+        onSuccess: () => {
+          toast.success("Flag resolved.");
+          setUnflagDialogOpen(false);
+        },
+        onError: () => toast.error("Failed to resolve flag."),
+      }
+    );
+  }
+
   const activeSessions = sessions ?? [];
   const modalCopy = dangerCopy(dangerAction, member.username, dangerRoleEffects);
   const canConfirmDangerAction = confirmationInput === member.username && !pendingDangerAction;
@@ -489,7 +609,11 @@ function MemberDetailContent({ username }: { username: string }) {
                 <h1 className="font-sans text-3xl font-black leading-tight text-text-primary">
                   {member.fullName || member.username}
                 </h1>
-                <StatusPill active={member.isActive} />
+                <StatusPill
+                  active={member.isActive}
+                  isFlagged={member.isFlagged}
+                  underReview={member.activeFlag?.profileUpdatedAfterFlag}
+                />
               </div>
               <p className="font-mono text-sm text-text-tertiary">@{member.username}</p>
               <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-text-secondary">
@@ -518,6 +642,26 @@ function MemberDetailContent({ username }: { username: string }) {
                 Edit profile
               </Link>
             )}
+            {!member.isFlagged && canFlag && (
+              <button
+                type="button"
+                onClick={() => setFlagDialogOpen(true)}
+                className="flex h-10 items-center justify-center gap-2 border border-red-600 bg-red-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-red-700"
+              >
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Flag account
+              </button>
+            )}
+            {member.isFlagged && canReviewFlag && (
+              <button
+                type="button"
+                onClick={() => setUnflagDialogOpen(true)}
+                className="flex h-10 items-center justify-center gap-2 border border-emerald-600 bg-emerald-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-emerald-700"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Resolve flag
+              </button>
+            )}
             <Link
               href={`/@${member.username}`}
               target="_blank"
@@ -529,13 +673,66 @@ function MemberDetailContent({ username }: { username: string }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 border-t border-grey-200 sm:grid-cols-4">
+        <div className="grid grid-cols-2 border-t border-grey-200 sm:grid-cols-4 lg:grid-cols-5">
           <HeaderStat label="Roles" value={String(member.roles.length)} />
           <HeaderStat label="Onboarded" value={member.isOnboarded ? "Yes" : "No"} />
           <HeaderStat label="Email" value={member.isEmailVerified ? "Verified" : "Pending"} />
           <HeaderStat label="Primary role" value={member.primaryRole || "None"} />
+          <HeaderStat label="Last login" value={formatDate(member.lastLoginAt)} />
         </div>
       </header>
+
+      {/* Flag banner */}
+      {member.isFlagged && member.activeFlag && (
+        <div
+          className={`mb-6 border px-5 py-4 ${member.activeFlag.profileUpdatedAfterFlag ? "border-amber-300 bg-amber-50" : "border-red-300 bg-red-50"}`}
+        >
+          <div className="flex items-start gap-3">
+            {member.activeFlag.profileUpdatedAfterFlag ? (
+              <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            ) : (
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+            )}
+            <div className="min-w-0 flex-1">
+              <p
+                className={`font-mono text-xs font-bold uppercase tracking-[0.15em] ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-700" : "text-red-700"}`}
+              >
+                {member.activeFlag.profileUpdatedAfterFlag
+                  ? "Review submitted — awaiting resolution"
+                  : "Account flagged"}
+              </p>
+              <p
+                className={`mt-1 font-mono text-sm ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-800" : "text-red-800"}`}
+              >
+                {member.activeFlag.reason}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-4">
+                <span
+                  className={`font-mono text-[10px] ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-600" : "text-red-600"}`}
+                >
+                  Flagged by{" "}
+                  <span className="font-bold">@{member.activeFlag.flaggedBy ?? "unknown"}</span>
+                </span>
+                {member.activeFlag.profileUpdatedAfterFlag && (
+                  <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-amber-700">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Member has updated their profile — review and resolve when satisfied
+                  </span>
+                )}
+              </div>
+            </div>
+            {canReviewFlag && (
+              <button
+                type="button"
+                onClick={() => setUnflagDialogOpen(true)}
+                className="shrink-0 border border-emerald-600 bg-emerald-600 px-3 py-1.5 font-mono text-xs font-bold text-white hover:bg-emerald-700"
+              >
+                Resolve flag
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <main className="space-y-6">
@@ -573,30 +770,32 @@ function MemberDetailContent({ username }: { username: string }) {
               </span>
             </div>
             <div className="space-y-5 p-5">
-              {member.roles.filter((r) => r.trim() !== "").length === 0 ? (
+              {assignedRoleSlugs.length === 0 ? (
                 <p className="font-mono text-sm text-text-tertiary">No roles assigned.</p>
               ) : (
                 <div className="divide-y divide-grey-200 border border-grey-200">
-                  {member.roles
-                    .filter((r) => r.trim() !== "")
-                    .map((roleName) => (
+                  {assignedRoleSlugs.map((roleSlug) => {
+                    const role = rolesByName.get(roleSlug);
+                    return (
                       <div
-                        key={roleName}
+                        key={roleSlug}
                         className="flex items-center justify-between gap-4 px-4 py-3"
                       >
                         <div>
                           <p className="font-mono text-sm font-bold text-text-primary">
-                            {roleName}
+                            {role?.displayName ?? roleSlug}
                           </p>
                           <p className="mt-1 font-mono text-xs text-text-muted">
-                            {rolesByName.get(roleName)?.permissions.length ?? 0} permissions
-                            currently granted by this role.
+                            {role?.permissions.length ?? 0} permissions currently granted by this
+                            role.
                           </p>
                         </div>
                         {canRevoke && (
                           <button
                             type="button"
-                            onClick={() => openDangerAction({ type: "revoke-role", roleName })}
+                            onClick={() =>
+                              openDangerAction({ type: "revoke-role", roleName: roleSlug })
+                            }
                             className="inline-flex h-8 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50"
                           >
                             <UserMinus className="h-3.5 w-3.5" />
@@ -604,7 +803,8 @@ function MemberDetailContent({ username }: { username: string }) {
                           </button>
                         )}
                       </div>
-                    ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -643,6 +843,101 @@ function MemberDetailContent({ username }: { username: string }) {
                       Review assignment
                     </button>
                   </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="border border-grey-200 bg-white">
+            <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-icon-tertiary" />
+                <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+                  Direct permissions
+                </h2>
+              </div>
+              <span className="font-mono text-xs text-text-tertiary">
+                {directPermissions.length} granted
+              </span>
+            </div>
+            <div className="space-y-5 p-5">
+              <p className="font-mono text-xs leading-6 text-text-tertiary">
+                Permissions granted here apply to this member directly, on top of anything their
+                roles already grant. Use them for one-off access without creating a new role.
+              </p>
+
+              {directPermissions.length === 0 ? (
+                <p className="font-mono text-sm text-text-tertiary">
+                  No direct permissions granted.
+                </p>
+              ) : (
+                <div className="divide-y divide-grey-200 border border-grey-200">
+                  {directPermissions.map((permission) => (
+                    <div
+                      key={permission}
+                      className="flex items-center justify-between gap-4 px-4 py-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-mono text-sm font-bold text-text-primary">
+                          {permission}
+                        </p>
+                        <p className="mt-1 font-mono text-xs leading-5 text-text-muted">
+                          {permissionEffect(permission, permissionDescriptions)}
+                        </p>
+                      </div>
+                      {canRevokePermission && (
+                        <button
+                          type="button"
+                          onClick={() => handleRevokePermission(permission)}
+                          disabled={isRevokingPermission}
+                          className="inline-flex h-8 shrink-0 items-center gap-2 border border-error-200 px-3 font-mono text-xs font-bold text-error-700 transition-colors hover:bg-error-50 disabled:opacity-50"
+                        >
+                          <UserMinus className="h-3.5 w-3.5" />
+                          Revoke
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {canAssignPermission && (
+                <div className="border-t border-grey-200 pt-5">
+                  <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                    Grant permission
+                  </p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Select value={selectedPermission} onValueChange={setSelectedPermission}>
+                      <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm sm:w-80">
+                        <SelectValue placeholder="Select a permission" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-none">
+                        {assignablePermissions.length === 0 && (
+                          <SelectItem value="none" disabled>
+                            No permissions available
+                          </SelectItem>
+                        )}
+                        {assignablePermissions.map((permission) => (
+                          <SelectItem key={permission.codename} value={permission.codename}>
+                            {permission.codename}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <button
+                      type="button"
+                      onClick={handleGrantPermission}
+                      disabled={isGrantingPermission || !selectedPermission}
+                      className="h-10 border border-grey-900 bg-grey-900 px-5 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800 disabled:opacity-50"
+                    >
+                      {isGrantingPermission ? "Granting..." : "Grant permission"}
+                    </button>
+                  </div>
+                  {selectedPermission && (
+                    <p className="mt-3 font-mono text-xs leading-5 text-text-tertiary">
+                      {permissionEffect(selectedPermission, permissionDescriptions)}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -861,7 +1156,9 @@ function MemberDetailContent({ username }: { username: string }) {
             <SheetDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
               This will remove{" "}
               <span className="font-bold text-text-primary">
-                {dangerAction?.type === "revoke-role" ? dangerAction.roleName : ""}
+                {dangerAction?.type === "revoke-role"
+                  ? (rolesByName.get(dangerAction.roleName)?.displayName ?? dangerAction.roleName)
+                  : ""}
               </span>{" "}
               from <span className="font-bold text-text-primary">@{member.username}</span>.
             </SheetDescription>
@@ -986,6 +1283,92 @@ function MemberDetailContent({ username }: { username: string }) {
             >
               {pendingDangerAction ? "Working..." : modalCopy.button}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Flag dialog */}
+      <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
+        <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-red-700">
+              Flag account
+            </DialogTitle>
+            <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
+              The member will see this reason and be prompted to fix their profile. Admins will be
+              notified when they update their profile.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label
+              htmlFor="flag-reason"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
+            >
+              Reason
+            </label>
+            <textarea
+              id="flag-reason"
+              value={flagReason}
+              onChange={(e) => setFlagReason(e.target.value)}
+              placeholder="e.g. Profile picture does not appear professional. Please upload a clear headshot."
+              rows={4}
+              className="w-full resize-none border border-grey-300 bg-white px-3 py-2.5 font-mono text-sm text-text-primary placeholder:text-text-muted focus:border-grey-900 focus:outline-none"
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setFlagDialogOpen(false);
+                setFlagReason("");
+              }}
+              className="h-10 rounded-none font-mono text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <button
+              type="button"
+              onClick={handleFlag}
+              disabled={!flagReason.trim() || isFlagging}
+              className="h-10 border border-red-600 bg-red-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+            >
+              {isFlagging ? "Flagging..." : "Flag account"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unflag dialog */}
+      <Dialog open={unflagDialogOpen} onOpenChange={setUnflagDialogOpen}>
+        <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-emerald-700">
+              Resolve flag
+            </DialogTitle>
+            <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
+              This will clear the active flag on{" "}
+              <span className="font-bold text-text-primary">@{member.username}</span>'s account. The
+              member will be notified that their account is in good standing.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setUnflagDialogOpen(false)}
+              className="h-10 rounded-none font-mono text-xs font-bold"
+            >
+              Cancel
+            </Button>
+            <button
+              type="button"
+              onClick={handleUnflag}
+              disabled={isUnflagging}
+              className="h-10 border border-emerald-600 bg-emerald-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {isUnflagging ? "Resolving..." : "Resolve flag"}
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -26,6 +26,8 @@ Every protected page in the portal declares the permission required to access it
 | `/admin/members/[username]` | `users.view` | |
 | `/admin/members/[username]/edit` | `users.edit` | |
 | `/@username` | none (public) | Any visitor |
+| `/admin/oauth-apps` | `oauth_apps.view` | OAuth Apps management |
+| `/admin/oauth-apps/new` | `oauth_apps.create` | |
 | `/settings/profile` | `profile.edit` | Own profile |
 | `/settings/security` | `security.view` | Own sessions and password settings |
 | `/settings/apps` | authenticated | Connected apps placeholder |

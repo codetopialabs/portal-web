@@ -15,6 +15,8 @@ export const UsersService = {
     const res = await axiosInstance.get<ApiResponse<AdminMember[]>>(`${USERS_BASE}/`, {
       params: {
         ...(params?.search ? { search: params.search } : {}),
+        ...(params?.isActive !== undefined ? { is_active: params.isActive } : {}),
+        ...(params?.isFlagged !== undefined ? { is_flagged: params.isFlagged } : {}),
       },
     });
     return res.data.data;
@@ -78,5 +80,25 @@ export const UsersService = {
       `${USERS_BASE}/${userId}/sessions/revoke-all/`
     );
     return res.data.data;
+  },
+
+  async grantPermission(userId: string, permission: string): Promise<void> {
+    await axiosInstance.post(`${USERS_BASE}/${userId}/permissions/`, { permission });
+  },
+
+  async revokePermission(userId: string, permission: string): Promise<void> {
+    await axiosInstance.delete(`${USERS_BASE}/${userId}/permissions/`, {
+      data: { permission },
+    });
+  },
+
+  async flagUser(userId: string, reason: string): Promise<void> {
+    await axiosInstance.post(`${USERS_BASE}/${userId}/flag/`, { reason });
+  },
+
+  async unflagUser(userId: string, resolutionNote?: string): Promise<void> {
+    await axiosInstance.delete(`${USERS_BASE}/${userId}/flag/`, {
+      data: { resolution_note: resolutionNote ?? "" },
+    });
   },
 };

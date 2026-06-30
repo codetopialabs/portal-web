@@ -2,17 +2,14 @@
 
 import {
   AlertTriangle,
-  ChevronRight,
-  Filter,
+  ArrowUpRight,
   LockKeyhole,
   Plus,
-  RotateCcw,
   Search,
   Shield,
   ShieldAlert,
   ShieldCheck,
   Trash2,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -21,14 +18,6 @@ import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteRole, useRoles } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
@@ -44,35 +33,6 @@ function RolesTableSkeleton() {
       ))}
     </div>
   );
-}
-
-function roleTone(name: string, isSystem: boolean) {
-  const lowered = name.toLowerCase();
-  if (isSystem || lowered.includes("admin") || lowered.includes("super")) {
-    return {
-      icon: ShieldAlert,
-      label: isSystem ? "System" : "High Access",
-      badgeClass: "border-error-500 bg-error-50 text-error-700",
-      iconWrapClass: "border border-error-200 bg-error-50 text-error-600",
-      accent: "border-l-error-500",
-    };
-  }
-  if (lowered.includes("manager") || lowered.includes("mod")) {
-    return {
-      icon: ShieldCheck,
-      label: "Operational",
-      badgeClass: "border-info-500 bg-info-50 text-info-700",
-      iconWrapClass: "border border-info-200 bg-info-50 text-info-600",
-      accent: "border-l-info-500",
-    };
-  }
-  return {
-    icon: Shield,
-    label: "Community",
-    badgeClass: "border-grey-300 bg-grey-100 text-text-secondary",
-    iconWrapClass: "border border-grey-200 bg-grey-50 text-text-tertiary",
-    accent: "border-l-grey-300",
-  };
 }
 
 function DeleteRoleButton({ slug, name }: { slug: string; name: string }) {
@@ -112,25 +72,36 @@ function DeleteRoleButton({ slug, name }: { slug: string; name: string }) {
   );
 }
 
-function StatCard({
+function FilterTab({
   label,
-  value,
-  icon: Icon,
+  count,
+  active,
+  onClick,
 }: {
   label: string;
-  value: number;
-  icon: React.ElementType;
+  count: number;
+  active: boolean;
+  onClick: () => void;
 }) {
   return (
-    <div className="border border-grey-200 bg-white p-5 transition-colors hover:bg-grey-50">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-          {label}
-        </p>
-        <Icon className="h-4 w-4 text-icon-tertiary" />
-      </div>
-      <p className="font-sans text-3xl font-black text-text-primary">{value}</p>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`-mb-px flex items-center gap-2 border-b-2 px-1 pb-3 font-mono text-xs font-bold uppercase tracking-wide transition-colors ${
+        active
+          ? "border-grey-900 text-text-primary"
+          : "border-transparent text-text-muted hover:text-text-primary"
+      }`}
+    >
+      {label}
+      <span
+        className={`inline-flex h-4 min-w-4 items-center justify-center px-1 font-mono text-[10px] ${
+          active ? "bg-grey-900 text-white" : "bg-grey-100 text-text-secondary"
+        }`}
+      >
+        {count}
+      </span>
+    </button>
   );
 }
 
@@ -149,94 +120,53 @@ function RoleRow({
   };
   canDelete: boolean;
 }) {
-  const tone = roleTone(role.name, role.isSystem);
-  const RoleIcon = tone.icon;
   const highRisk = role.permissions.some((p) =>
     ["users.delete", "users.suspend", "roles.delete"].includes(p)
   );
+  const detailHref = `/admin/roles/${role.name}`;
 
   return (
-    <div
-      className={`border border-grey-200 bg-white border-l-2 ${tone.accent} p-5 transition-colors hover:bg-grey-50`}
-    >
-      <div className="flex flex-col gap-5 md:flex-row md:items-center">
-        {/* Role identity */}
-        <div className="flex min-w-0 flex-1 items-start gap-4">
-          <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center ${tone.iconWrapClass}`}
-          >
-            <RoleIcon className="h-5 w-5" />
-          </div>
+    <div className="group relative border border-grey-200 bg-white transition-colors hover:border-grey-400 hover:bg-grey-50">
+      {/* Full-card link — sits behind everything else */}
+      <Link
+        href={detailHref}
+        className="absolute inset-0 z-0"
+        aria-label={`Open ${role.displayName}`}
+      />
 
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href={`/admin/roles/${role.name}`}
-                className="font-sans text-base font-black text-text-primary underline-offset-2 hover:underline"
-              >
-                {role.displayName}
-              </Link>
-              <span
-                className={`inline-flex items-center border px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide ${tone.badgeClass}`}
-              >
-                {tone.label}
-              </span>
-              {highRisk && (
-                <span className="inline-flex items-center gap-1 border border-error-400 bg-error-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-error-700">
-                  <AlertTriangle className="h-3 w-3" />
-                  Sensitive
-                </span>
-              )}
-              {role.isSystem && (
-                <span className="inline-flex items-center gap-1 border border-grey-300 bg-grey-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-text-secondary">
-                  <LockKeyhole className="h-3 w-3" />
-                  Locked
-                </span>
-              )}
-            </div>
-            <p className="mt-1 font-mono text-[11px] text-text-muted">
-              slug: {role.name} · rank {role.rank}
-            </p>
-            <p className="mt-2 line-clamp-2 font-mono text-xs leading-relaxed text-text-secondary">
-              {role.description || "No description provided."}
-            </p>
-          </div>
+      <div className="relative z-10 p-4 pointer-events-none">
+        {/* Arrow indicator */}
+        <ArrowUpRight className="absolute right-3 top-3 h-3.5 w-3.5 text-grey-300 transition-colors group-hover:text-text-secondary" />
+
+        {/* Identity */}
+        <div className="flex items-center gap-2 pr-6">
+          <span className="truncate font-sans text-sm font-bold text-text-primary">
+            {role.displayName}
+          </span>
+          {role.isSystem && (
+            <LockKeyhole className="h-3 w-3 shrink-0 text-icon-muted" aria-label="System role" />
+          )}
+          {highRisk && (
+            <AlertTriangle
+              className="h-3 w-3 shrink-0 text-error-500"
+              aria-label="Sensitive permissions"
+            />
+          )}
         </div>
+        <p className="mt-0.5 font-mono text-[11px] text-text-muted">
+          {role.name} · rank {role.rank}
+        </p>
 
-        {/* Metrics */}
-        <div className="flex items-center gap-6 md:gap-8">
-          <div className="text-center">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted">
-              Permissions
-            </p>
-            <p className="mt-1 font-sans text-2xl font-black text-text-primary">
-              {role.permissions.length}
-            </p>
+        {/* Footer */}
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-grey-100 pt-3">
+          <p className="font-mono text-[11px] text-text-tertiary">
+            <span className="font-bold text-text-secondary">{role.permissions.length}</span> perms ·{" "}
+            <span className="font-bold text-text-secondary">{role.memberCount}</span> members
+          </p>
+          {/* Delete button needs pointer-events back and a higher z-index to sit above the card link */}
+          <div className="pointer-events-auto relative z-20">
+            {canDelete && !role.isSystem && <DeleteRoleButton slug={role.name} name={role.name} />}
           </div>
-          <div className="text-center">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-text-muted">
-              Members
-            </p>
-            <p className="mt-1 font-sans text-2xl font-black text-text-primary">
-              {role.memberCount}
-            </p>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row md:items-center">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="h-8 rounded-none border-grey-200 font-mono text-xs font-bold hover:border-grey-300 hover:bg-grey-50"
-          >
-            <Link href={`/admin/roles/${role.name}`}>
-              Details
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
-          {canDelete && !role.isSystem && <DeleteRoleButton slug={role.name} name={role.name} />}
         </div>
       </div>
     </div>
@@ -267,26 +197,13 @@ function RolesListContent() {
     });
   }, [roles, search, filter]);
 
-  const roleStats = useMemo(() => {
-    const allRoles = roles ?? [];
-    return [
-      { label: "Total Roles", value: allRoles.length, icon: Shield },
-      {
-        label: "System",
-        value: allRoles.filter((r) => r.isSystem).length,
-        icon: LockKeyhole,
-      },
-      {
-        label: "Custom",
-        value: allRoles.filter((r) => !r.isSystem).length,
-        icon: ShieldCheck,
-      },
-      {
-        label: "Members Assigned",
-        value: allRoles.reduce((total, r) => total + r.memberCount, 0),
-        icon: Users,
-      },
-    ];
+  const counts = useMemo(() => {
+    const all = roles ?? [];
+    return {
+      all: all.length,
+      system: all.filter((r) => r.isSystem).length,
+      custom: all.filter((r) => !r.isSystem).length,
+    };
   }, [roles]);
 
   if (isLoading) return <RolesTableSkeleton />;
@@ -327,26 +244,38 @@ function RolesListContent() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {roleStats.map((stat) => (
-          <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
-        ))}
-      </div>
-
-      {/* Search + Filter */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-icon-muted" />
+    <div>
+      {/* Toolbar: underline tabs (with counts) + search */}
+      <div className="mb-5 flex flex-col gap-4 border-b border-grey-200 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-5">
+          <FilterTab
+            label="All"
+            count={counts.all}
+            active={filter === "all"}
+            onClick={() => setFilter("all")}
+          />
+          <FilterTab
+            label="Custom"
+            count={counts.custom}
+            active={filter === "custom"}
+            onClick={() => setFilter("custom")}
+          />
+          <FilterTab
+            label="System"
+            count={counts.system}
+            active={filter === "system"}
+            onClick={() => setFilter("system")}
+          />
+        </div>
+        <div className="relative pb-3 lg:w-72">
+          <Search className="pointer-events-none absolute left-3 top-[38%] h-4 w-4 -translate-y-1/2 text-icon-muted" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search roles by name or description…"
-            className="h-11 rounded-none border-grey-200 bg-white pl-10 font-mono text-sm focus-visible:border-grey-900 focus-visible:ring-2 focus-visible:ring-grey-900/10"
+            placeholder="Search roles"
+            className="h-9 rounded-none border-grey-200 bg-white pl-9 font-mono text-sm"
           />
         </div>
-        <RoleFilterPopover filter={filter} onChange={setFilter} onReset={() => setFilter("all")} />
       </div>
 
       {/* Roles List */}
@@ -360,7 +289,7 @@ function RolesListContent() {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredRoles.map((role) => (
             <RoleRow key={role.name} role={role} canDelete={canDelete} />
           ))}
@@ -370,90 +299,11 @@ function RolesListContent() {
   );
 }
 
-function RoleFilterPopover({
-  filter,
-  onChange,
-  onReset,
-}: {
-  filter: RoleFilter;
-  onChange: (filter: RoleFilter) => void;
-  onReset: () => void;
-}) {
-  const isFiltered = filter !== "all";
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          className={`h-11 shrink-0 rounded-none border px-5 font-mono text-sm font-bold transition-colors ${
-            isFiltered
-              ? "border-grey-900 bg-grey-900 text-white hover:bg-grey-800"
-              : "border-grey-200 bg-white text-grey-900 hover:border-grey-300 hover:bg-grey-50"
-          }`}
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          {isFiltered ? `Filtered · ${filter}` : "Filter"}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="flex w-full flex-col rounded-none border border-grey-200 bg-white p-0 shadow-none sm:w-[320px]"
-      >
-        <div className="border-b border-grey-200 p-4">
-          <h3 className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
-            Filter Roles
-          </h3>
-          <p className="mt-1 font-mono text-xs text-text-tertiary">
-            Refine the role registry by type.
-          </p>
-        </div>
-
-        <div className="space-y-2 p-4">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            Role type
-          </p>
-          <Select value={filter} onValueChange={(v) => onChange(v as RoleFilter)}>
-            <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm focus:border-grey-900 focus:ring-2 focus:ring-grey-900/10">
-              <SelectValue placeholder="All roles" />
-            </SelectTrigger>
-            <SelectContent className="rounded-none border-grey-200 font-mono text-sm shadow-none">
-              <SelectItem value="all">All roles</SelectItem>
-              <SelectItem value="system">System roles only</SelectItem>
-              <SelectItem value="custom">Custom roles only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex shrink-0 gap-3 border-t border-grey-200 bg-grey-50 p-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onReset}
-            className="h-10 flex-1 rounded-none border border-grey-200 bg-white font-mono text-sm font-bold text-text-secondary transition-colors hover:border-grey-300 hover:bg-grey-50 hover:text-text-primary"
-          >
-            <RotateCcw className="mr-2 h-3.5 w-3.5" />
-            Reset
-          </Button>
-          <PopoverClose asChild>
-            <Button
-              type="button"
-              className="h-10 flex-1 rounded-none border border-grey-900 bg-grey-900 font-mono text-sm font-bold text-white transition-colors hover:bg-grey-800"
-            >
-              Apply
-            </Button>
-          </PopoverClose>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 function RolesPageContent() {
   const canCreate = usePermission("roles.create");
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-20 md:px-0">
+    <div className="w-full pb-20">
       {/* Page Header */}
       <div className="mb-8">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">

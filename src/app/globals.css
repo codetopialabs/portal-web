@@ -318,6 +318,12 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Native checkboxes and radios use the brand black instead of the UA blue. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--grey-900);
+  }
 }
 
 @layer utilities {

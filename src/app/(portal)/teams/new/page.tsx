@@ -63,21 +63,21 @@ function CreateTeamContent() {
         {/* Back nav */}
         <Link
           href="/teams"
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:text-zinc-900"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Teams
         </Link>
 
         {/* Header */}
-        <div className="mt-6 border-b border-zinc-200 pb-6">
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
+        <div className="mt-6 border-b border-grey-200 pb-6">
+          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
             Workspace
           </p>
-          <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+          <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
             Create a Team
           </h1>
-          <p className="mt-2 font-mono text-sm leading-6 text-zinc-500">
+          <p className="mt-2 font-mono text-sm leading-6 text-text-tertiary">
             You will be assigned as Team Lead automatically. Members can be invited after creation.
           </p>
         </div>
@@ -88,7 +88,7 @@ function CreateTeamContent() {
           <div className="space-y-1.5">
             <Label
               htmlFor="name"
-              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
+              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-text-secondary"
             >
               Team Name
             </Label>
@@ -107,10 +107,10 @@ function CreateTeamContent() {
           <div className="space-y-1.5">
             <Label
               htmlFor="description"
-              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700"
+              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-text-secondary"
             >
               Description{" "}
-              <span className="font-mono text-[10px] normal-case tracking-normal text-zinc-400">
+              <span className="font-mono text-[10px] normal-case tracking-normal text-text-muted">
                 (optional)
               </span>
             </Label>
@@ -121,22 +121,22 @@ function CreateTeamContent() {
               value={formData.description}
               onChange={handleChange}
               placeholder="What is the focus of this team?"
-              className="block w-full resize-none border border-zinc-200 bg-white px-3 py-2 font-mono text-sm text-zinc-900 outline-none rounded-none placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-0 transition-colors"
+              className="block w-full resize-none border border-grey-200 bg-white px-3 py-2 font-mono text-sm text-text-primary outline-none rounded-none placeholder:text-text-muted focus:border-grey-300 focus:ring-0 transition-colors"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 border-t border-zinc-100 pt-6">
+          <div className="flex items-center justify-end gap-3 border-t border-grey-100 pt-6">
             <Link
               href="/teams"
-              className="font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:text-zinc-900"
+              className="font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
             >
               Cancel
             </Link>
             <Button
               type="submit"
               disabled={isPending}
-              className="h-10 bg-zinc-900 px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] hover:bg-zinc-800 rounded-none"
+              className="h-10 bg-grey-900 px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] hover:bg-grey-800 rounded-none"
             >
               {isPending ? (
                 <>

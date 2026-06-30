@@ -34,6 +34,15 @@ export interface UserProfile {
   completedWalkthroughs: string[];
   nationality: string | null;
   joinedAt: string | null;
+  usernameLastChanged: string | null;
+  isFlagged: boolean;
+  activeFlag: {
+    id: number;
+    reason: string;
+    flaggedBy: string | null;
+    flaggedAt: string;
+    profileUpdatedAfterFlag: boolean;
+  } | null;
 }
 
 export interface CommunityMember {

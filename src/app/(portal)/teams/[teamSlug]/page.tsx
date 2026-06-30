@@ -66,13 +66,13 @@ function TeamWorkspaceContent() {
   if (teamError || !team) {
     return (
       <DashboardShell>
-        <div className="flex flex-col items-center justify-center py-24 border border-zinc-200 bg-white text-center">
-          <p className="font-mono text-sm text-zinc-500">
+        <div className="flex flex-col items-center justify-center py-24 border border-grey-200 bg-white text-center">
+          <p className="font-mono text-sm text-text-tertiary">
             Team not found or you don't have access.
           </p>
           <Link
             href="/teams"
-            className="mt-4 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+            className="mt-4 font-mono text-xs uppercase tracking-widest text-text-muted hover:text-text-primary transition-colors"
           >
             ← Back to Teams
           </Link>
@@ -87,7 +87,7 @@ function TeamWorkspaceContent() {
         {/* Back */}
         <Link
           href="/teams"
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-zinc-400 transition-colors hover:text-zinc-900"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           All Teams
@@ -96,7 +96,7 @@ function TeamWorkspaceContent() {
         {/* Header */}
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
               Team Workspace
             </p>
             {membership && (
@@ -110,11 +110,11 @@ function TeamWorkspaceContent() {
           </div>
           <div className="flex items-end justify-between gap-4 mt-2">
             <div>
-              <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+              <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
                 {team.name}
               </h1>
               {team.description && (
-                <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
+                <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
                   {team.description}
                 </p>
               )}
@@ -123,7 +123,7 @@ function TeamWorkspaceContent() {
         </div>
 
         {/* Tab Bar */}
-        <div className="border-b border-zinc-200 flex items-center gap-6">
+        <div className="border-b border-grey-200 flex items-center gap-6">
           {[
             { key: "overview", label: "Overview" },
             { key: "reviews", label: "Reviews", count: reviews?.length },
@@ -134,17 +134,19 @@ function TeamWorkspaceContent() {
               type="button"
               onClick={() => setTab(key)}
               className={`pb-3 font-mono text-xs uppercase tracking-widest transition-colors relative flex items-center gap-2 ${
-                tab === key ? "text-zinc-950 font-bold" : "text-zinc-400 hover:text-zinc-900"
+                tab === key
+                  ? "text-text-primary font-bold"
+                  : "text-text-muted hover:text-text-primary"
               }`}
             >
               {label}
               {count !== undefined && (
-                <span className="inline-flex items-center justify-center rounded-full bg-zinc-100 px-2 py-0.5 text-[9px] font-bold text-zinc-600">
+                <span className="inline-flex items-center justify-center rounded-full bg-grey-100 px-2 py-0.5 text-[9px] font-bold text-text-secondary">
                   {count}
                 </span>
               )}
               {tab === key && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-950" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-grey-900" />
               )}
             </button>
           ))}
@@ -153,13 +155,7 @@ function TeamWorkspaceContent() {
         {/* Tab Contents */}
         <div className="mt-6">
           {tab === "overview" && (
-            <TeamOverviewTab
-              teamSlug={teamSlug}
-              teamName={team.name}
-              reviews={reviews}
-              reviewsLoading={reviewsLoading}
-              myInvite={myInvite}
-            />
+            <TeamOverviewTab teamSlug={teamSlug} teamName={team.name} myInvite={myInvite} />
           )}
           {tab === "reviews" && (
             <TeamReviewsTab teamSlug={teamSlug} reviews={reviews} reviewsLoading={reviewsLoading} />

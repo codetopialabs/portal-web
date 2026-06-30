@@ -1,134 +1,37 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ChevronLeft, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
+import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRole as useAdminRole, usePermissionList, useUpdateRole } from "@/hooks/useAdmin";
-import type { PermissionEntry } from "@/types/permissions.types";
-
-// ─── Permission picker ────────────────────────────────────────────────────────
-
-function groupPermissions(permissions: PermissionEntry[]): Record<string, PermissionEntry[]> {
-  const groups: Record<string, PermissionEntry[]> = {};
-  for (const perm of permissions) {
-    const resource = perm.codename.split(".")[0] ?? perm.codename;
-    if (!groups[resource]) {
-      groups[resource] = [];
-    }
-    groups[resource].push(perm);
-  }
-  return groups;
-}
-
-function PermissionPicker({
-  selected,
-  onChange,
-}: {
-  selected: string[];
-  onChange: (permissions: string[]) => void;
-}) {
-  const { data: permissions, isLoading, isError } = usePermissionList();
-
-  function toggle(codename: string) {
-    if (selected.includes(codename)) {
-      onChange(selected.filter((p) => p !== codename));
-    } else {
-      onChange([...selected, codename]);
-    }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items
-          <Skeleton key={i} className="h-40 w-full rounded-none" />
-        ))}
-      </div>
-    );
-  }
-
-  if (isError || !permissions) {
-    return (
-      <div className="p-8 bg-red-50 border border-red-100 text-center">
-        <p className="font-mono text-xs text-red-600 font-black uppercase tracking-widest">
-          ERROR: PERMISSION_LIST_UNAVAILABLE
-        </p>
-      </div>
-    );
-  }
-
-  const groups = groupPermissions(permissions);
-  const sortedGroups = Object.keys(groups).sort();
-
-  return (
-    <div className="space-y-6">
-      {sortedGroups.map((group) => (
-        <div key={group} className="bg-white border border-zinc-200">
-          <div className="px-5 py-3 border-b border-zinc-200 bg-zinc-50/50">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-900 font-bold">
-              {group}.* ARCHIVE
-            </span>
-          </div>
-          <div className="divide-y divide-zinc-100">
-            {groups[group].map((perm) => (
-              <label
-                key={perm.codename}
-                className="flex items-start gap-4 px-5 py-4 cursor-pointer hover:bg-zinc-50/50 transition-colors group"
-              >
-                <div className="relative flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(perm.codename)}
-                    onChange={() => toggle(perm.codename)}
-                    className="h-4 w-4 rounded-none border-zinc-300 text-zinc-900 focus:ring-zinc-900 accent-zinc-900"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-xs text-zinc-900 font-black uppercase tracking-tight">
-                      {perm.codename}
-                    </span>
-                    {perm.isDestructive && (
-                      <Badge className="rounded-none text-[8px] bg-red-100 text-red-700 hover:bg-red-100 border-none font-black uppercase tracking-[0.1em] px-1.5 h-4">
-                        DESTRUCTIVE_OP
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="font-mono text-[10px] text-zinc-400 mt-1 uppercase tracking-wider leading-relaxed">
-                    {perm.description}
-                  </p>
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Form ─────────────────────────────────────────────────────────────────────
+import { buildPermissionVocab, compressScopes } from "@/lib/scopes";
 
 function RoleEditForm({ slug }: { slug: string }) {
   const router = useRouter();
   const { data: role, isLoading, isError } = useAdminRole(slug);
   const { mutate: updateRole, isPending } = useUpdateRole();
+  const { data: allPermissions } = usePermissionList();
 
   const [initialized, setInitialized] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
   const [rank, setRank] = useState("");
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [errors, setErrors] = useState<{ displayName?: string; rank?: string; form?: string }>({});
+
+  const vocab = useMemo(() => buildPermissionVocab(allPermissions ?? []), [allPermissions]);
+  const compressed = useMemo(() => compressScopes(permissions, vocab), [permissions, vocab]);
 
   useEffect(() => {
     if (role && !initialized) {
@@ -142,15 +45,11 @@ function RoleEditForm({ slug }: { slug: string }) {
 
   function validate(): boolean {
     const next: typeof errors = {};
-    if (!displayName.trim()) {
-      next.displayName = "Display name is required.";
-    }
+    if (!displayName.trim()) next.displayName = "Display name is required.";
     const rankValue = Number(rank);
-    if (!rank.trim()) {
-      next.rank = "Rank is required.";
-    } else if (Number.isNaN(rankValue) || rankValue < 1 || rankValue > 99) {
-      next.rank = "Rank must be a number between 1 and 99.";
-    }
+    if (!rank.trim()) next.rank = "Rank is required.";
+    else if (Number.isNaN(rankValue) || rankValue < 1 || rankValue > 99)
+      next.rank = "Rank must be between 1 and 99.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -158,7 +57,6 @@ function RoleEditForm({ slug }: { slug: string }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-
     updateRole(
       {
         slug,
@@ -171,69 +69,64 @@ function RoleEditForm({ slug }: { slug: string }) {
       },
       {
         onSuccess: (updatedRole) => {
-          toast.success("Role updated successfully.");
+          toast.success("Role updated.");
           router.push(`/admin/roles/${updatedRole.name}`);
         },
-        onError: () => {
-          setErrors((prev) => ({
-            ...prev,
-            form: "CORE_PROCESS_FAILURE: FAILED TO UPDATE ROLE",
-          }));
-        },
+        onError: () =>
+          setErrors((prev) => ({ ...prev, form: "Failed to update the role. Please try again." })),
       }
     );
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-6">
+        <Skeleton className="h-48 w-full rounded-none" />
         <Skeleton className="h-40 w-full rounded-none" />
-        <Skeleton className="h-80 w-full rounded-none" />
       </div>
     );
   }
 
   if (isError || !role) {
-    return <div className="bg-red-50 border border-red-200 p-8 text-center" />;
+    return (
+      <div className="border border-error-200 bg-error-50 p-8 text-center">
+        <p className="font-sans text-base font-black text-error-700">Role could not be loaded.</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-12">
-      {/* Role details */}
-      <div className="bg-white border border-zinc-200">
-        <div className="px-6 py-4 border-b border-zinc-200 bg-zinc-50/50">
-          <h2 className="font-sans font-black uppercase tracking-widest text-xs text-zinc-900">
-            Authority Archetype Revision
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <section className="border border-grey-200 bg-white">
+        <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
+          <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+            Role details
           </h2>
         </div>
-        <div className="px-6 py-8 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Name (read-only) */}
-            <div className="space-y-2">
+        <div className="space-y-6 p-5">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="name"
-                className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold"
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
               >
-                Reference_Ident (Slug)
+                Identifier (slug)
               </Label>
               <Input
                 id="name"
                 value={role.name}
                 readOnly
-                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-100/50 text-zinc-400 cursor-not-allowed uppercase"
+                className="h-10 cursor-not-allowed rounded-none border-grey-200 bg-grey-50 font-mono text-sm text-text-muted"
               />
-              <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-tight italic">
-                LOCKED: RECORD_IDENT_IMMUTABLE
-              </p>
+              <p className="font-mono text-[10px] text-text-muted">Identifier can't be changed.</p>
             </div>
 
-            {/* Rank */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="rank"
-                className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold"
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
               >
-                Hierarchy_Priority (Rank)
+                Rank
               </Label>
               <Input
                 id="rank"
@@ -243,119 +136,146 @@ function RoleEditForm({ slug }: { slug: string }) {
                 value={rank}
                 onChange={(e) => {
                   setRank(e.target.value);
-                  if (errors.rank) setErrors((prev) => ({ ...prev, rank: undefined }));
+                  if (errors.rank) setErrors((p) => ({ ...p, rank: undefined }));
                 }}
-                className="font-mono text-sm rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all font-bold"
+                className="h-10 rounded-none border-grey-300 font-mono text-sm"
                 aria-invalid={!!errors.rank}
               />
-              {errors.rank ? (
-                <p className="font-mono text-[10px] text-red-500 uppercase">{errors.rank}</p>
-              ) : (
-                <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-tight">
-                  range [01-99] / lower = higher authority
-                </p>
-              )}
+              <p
+                className={`font-mono text-[10px] ${errors.rank ? "text-error-600" : "text-text-muted"}`}
+              >
+                {errors.rank ?? "1–99 · higher rank = more authority"}
+              </p>
             </div>
           </div>
 
-          {/* Display name */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label
               htmlFor="displayName"
-              className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
             >
-              Public_Title
+              Display name
             </Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => {
                 setDisplayName(e.target.value);
-                if (errors.displayName) {
-                  setErrors((prev) => ({ ...prev, displayName: undefined }));
-                }
+                if (errors.displayName) setErrors((p) => ({ ...p, displayName: undefined }));
               }}
-              className="font-sans text-sm font-black uppercase tracking-tight rounded-none border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-900 transition-all"
+              className="h-10 rounded-none border-grey-300 font-mono text-sm"
               aria-invalid={!!errors.displayName}
             />
             {errors.displayName && (
-              <p className="font-mono text-[10px] text-red-500 uppercase">{errors.displayName}</p>
+              <p className="font-mono text-[10px] text-error-600">{errors.displayName}</p>
             )}
           </div>
 
-          {/* Description */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <Label
               htmlFor="description"
-              className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
             >
-              Operational_Scope_Description
+              Description
             </Label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              placeholder="Describe the responsibilities and scope of this role..."
-              className="w-full resize-none rounded-none border border-zinc-200 bg-zinc-50 px-4 py-3 font-mono text-xs text-zinc-700 placeholder:text-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-none"
+              className="w-full resize-y rounded-none border border-grey-300 bg-white p-3 font-mono text-sm text-text-primary outline-none focus:border-grey-900"
             />
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Permissions */}
-      <div>
-        <div className="mb-6 flex items-end justify-between border-b border-zinc-900 pb-2">
-          <div>
-            <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
-              Authority Grid Nodes
-            </h2>
-            <p className="font-mono text-[10px] text-zinc-400 mt-1 uppercase tracking-widest">
-              Modify active permission vectors for this authority archetype.
-            </p>
-          </div>
-          <p className="font-mono text-[10px] text-zinc-900 font-black uppercase tracking-widest">
-            {permissions.length} nodes active
-          </p>
+      <section className="border border-grey-200 bg-white">
+        <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
+          <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+            Permissions
+          </h2>
+          <span className="font-mono text-xs text-text-tertiary">
+            {permissions.length} selected
+          </span>
         </div>
-        <PermissionPicker selected={permissions} onChange={setPermissions} />
-      </div>
+        <div className="space-y-4 p-5">
+          {permissions.length === 0 ? (
+            <p className="font-mono text-sm text-text-tertiary">No permissions selected.</p>
+          ) : (
+            <ScopeChips scopes={compressed} max={40} />
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setPickerOpen(true)}
+            className="h-10 rounded-none font-mono text-xs font-bold"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Edit permissions
+          </Button>
+        </div>
+      </section>
 
-      {/* Form-level error */}
       {errors.form && (
-        <div className="p-4 bg-red-50 border border-red-200 flex items-center gap-3">
-          <AlertTriangle className="w-4 h-4 text-red-600" />
-          <p className="font-mono text-[10px] text-red-600 font-bold uppercase tracking-widest">
-            {errors.form}
-          </p>
+        <div className="flex items-center gap-3 border border-error-200 bg-error-50 p-4">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-error-600" />
+          <p className="font-mono text-xs font-bold text-error-700">{errors.form}</p>
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex flex-col md:flex-row items-center gap-6 pt-6 border-t border-zinc-100">
-        <button
+      <div className="flex items-center gap-3">
+        <Button
           type="submit"
           disabled={isPending}
-          className="w-full border border-zinc-900 bg-zinc-900 px-10 py-4 font-mono text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 disabled:opacity-50 md:w-auto"
+          className="h-11 rounded-none font-mono text-xs font-bold"
         >
-          {isPending ? "BUFFERING_SYNCING…" : "SYNC_ARCHETYPE_CHANGES"}
-        </button>
+          {isPending ? "Saving..." : "Save changes"}
+        </Button>
         <Link
           href={`/admin/roles/${role.name}`}
-          className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-colors"
+          className="font-mono text-xs font-bold uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
         >
-          DISCARD_REVISIONS
+          Discard
         </Link>
       </div>
+
+      <PermissionSelectSheet
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        selected={permissions}
+        onChange={setPermissions}
+        title="Role permissions"
+        description="Choose the scopes this role grants. Destructive permissions must be selected explicitly."
+      />
     </form>
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 function EditRolePageContent({ slug }: { slug: string }) {
   return (
-    <div className="max-w-3xl mx-auto pb-20 px-4 md:px-0">
+    <div className="mx-auto max-w-3xl pb-20">
+      <div className="mb-6">
+        <Link
+          href={`/admin/roles/${slug}`}
+          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Role
+        </Link>
+      </div>
+      <header className="mb-6 flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-grey-200 bg-white">
+          <ShieldCheck className="h-5 w-5 text-icon-tertiary" />
+        </div>
+        <div>
+          <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
+            Edit role
+          </h1>
+          <p className="mt-1 font-mono text-xs text-text-tertiary">
+            Update this role's details and permissions.
+          </p>
+        </div>
+      </header>
       <RoleEditForm slug={slug} />
     </div>
   );
@@ -363,7 +283,6 @@ function EditRolePageContent({ slug }: { slug: string }) {
 
 export default function EditRolePage() {
   const { slug } = useParams<{ slug: string }>();
-
   return (
     <RouteGuard permission="roles.edit">
       <DashboardShell>
