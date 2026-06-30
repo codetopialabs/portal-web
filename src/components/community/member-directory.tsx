@@ -4,7 +4,6 @@ import { ArrowRight, MapPin, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
-import { MemberProfileModal } from "@/components/community/MemberProfileModal";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Input } from "@/components/ui/input";
 import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
@@ -37,7 +36,6 @@ export function MemberDirectory({
   initialRoleFilter = "all",
   onRoleFilterChange,
 }: MemberDirectoryProps) {
-  const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<MemberFilters>({
     ...EMPTY_FILTERS,
@@ -183,9 +181,7 @@ export function MemberDirectory({
         {isLoading ? (
           <MemberCardSkeletons />
         ) : (
-          visibleMembers.map((member) => (
-            <MemberCard key={member.id} member={member} onOpenModal={setSelectedMember} />
-          ))
+          visibleMembers.map((member) => <MemberCard key={member.id} member={member} />)
         )}
 
         {!isLoading && filteredMembers.length === 0 && (
@@ -221,12 +217,6 @@ export function MemberDirectory({
           </div>
         )}
       </div>
-
-      <MemberProfileModal
-        member={selectedMember}
-        open={selectedMember !== null}
-        onClose={() => setSelectedMember(null)}
-      />
     </div>
   );
 }

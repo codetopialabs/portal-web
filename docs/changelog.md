@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-06-30] Community profile navigation
+
+**What changed:** Community member cards now open the member's public profile page directly instead of showing the directory profile modal.
+**Affected areas:** `/community`, public profiles.
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-06-30] Admin stability fixes
 
 **What changed:** Fixed OAuth Apps rendering when the API returns camelCase OAuth fields, and locked system role edit screens so protected roles like `member` cannot be submitted into a backend validation error.
