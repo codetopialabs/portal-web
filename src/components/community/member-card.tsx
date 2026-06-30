@@ -25,15 +25,14 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 interface MemberCardProps {
   member: CommunityMember;
   compact?: boolean;
-  onOpenModal?: (member: CommunityMember) => void;
 }
 
-export function MemberCard({ member, compact = false, onOpenModal }: MemberCardProps) {
+export function MemberCard({ member, compact = false }: MemberCardProps) {
   const canEditMembers = usePermission("users.edit");
 
   const primaryRole = member.primaryRole || member.communityRoles?.[0] || "Member";
 
-  const _profileHref = `/@${member.username}`;
+  const profileHref = `/@${member.username}`;
 
   const occupation = member.currentRole?.trim() || `${primaryRole} at Codetopia Community`;
 
@@ -44,20 +43,15 @@ export function MemberCard({ member, compact = false, onOpenModal }: MemberCardP
   const hiddenCount = sortedSkills.length - visibleSkills.length;
   const funSkill = seededPick(FUN_SKILLS, member.username);
 
-  function handleCardClick(e: React.MouseEvent) {
-    const target = e.target as HTMLElement;
-    if (target.closest("a, button, [role='button']")) return;
-    if (onOpenModal) onOpenModal(member);
-  }
-
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: dynamic click navigation
-    <article
-      onClick={handleCardClick}
-      className="group relative flex cursor-pointer gap-3 border border-zinc-200 bg-white p-4 transition-all hover:border-zinc-400 hover:shadow-sm"
-    >
+    <article className="group relative flex cursor-pointer gap-3 border border-zinc-200 bg-white p-4 transition-all hover:border-zinc-400 hover:shadow-sm">
+      <Link
+        href={profileHref}
+        aria-label={`View ${member.fullName} profile`}
+        className="absolute inset-0 z-10"
+      />
       {/* Avatar */}
-      <div className="h-10 w-10 shrink-0 overflow-hidden border border-zinc-200 bg-white p-0.5">
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden border border-zinc-200 bg-white p-0.5">
         {/* biome-ignore lint/performance/noImgElement: user-provided avatar URL */}
         <img
           src={getAvatarUrl(member.profilePictureUrl, member.fullName)}
@@ -67,7 +61,7 @@ export function MemberCard({ member, compact = false, onOpenModal }: MemberCardP
       </div>
 
       {/* Right column — everything aligned under the name */}
-      <div className="min-w-0 flex-1">
+      <div className="relative min-w-0 flex-1">
         {/* Name row */}
         <div className="flex items-start justify-between gap-2">
           <p className="truncate font-sans text-[14px] font-bold leading-tight text-zinc-900 group-hover:underline group-hover:underline-offset-4">
@@ -78,7 +72,7 @@ export function MemberCard({ member, compact = false, onOpenModal }: MemberCardP
               href={`/admin/members/${member.username}/edit`}
               title={`Edit ${member.fullName}`}
               aria-label={`Edit ${member.fullName}`}
-              className="inline-flex h-6 w-6 shrink-0 items-center justify-center border border-zinc-200 text-zinc-400 opacity-0 transition-all hover:border-zinc-900 hover:bg-zinc-900 hover:text-white group-hover:opacity-100"
+              className="relative z-20 inline-flex h-6 w-6 shrink-0 items-center justify-center border border-zinc-200 text-zinc-400 opacity-0 transition-all hover:border-zinc-900 hover:bg-zinc-900 hover:text-white group-hover:opacity-100"
             >
               <Pencil className="h-2.5 w-2.5" />
             </Link>
