@@ -35,6 +35,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/reflections": "reflections.view_any",
   "/admin/reflections/questions": "reflections.manage",
   "/reflections": "reflections.submit",
+  "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",
   "/settings/security": "security.view",
   "/settings/apps": "authenticated",

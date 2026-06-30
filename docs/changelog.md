@@ -4,6 +4,20 @@ category: General
 order: 1
 ---
 
+## [2026-06-30] Admin stability fixes
+
+**What changed:** Fixed OAuth Apps rendering when the API returns camelCase OAuth fields, and locked system role edit screens so protected roles like `member` cannot be submitted into a backend validation error.
+**Affected areas:** `/admin/oauth-apps`, `/admin/roles/[slug]`, `/admin/roles/[slug]/edit`.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-06-30] Reflection submit page
+
+**What changed:** Added a dedicated `/reflections/submit` page where members answer the current monthly reflection questions, upload attachments, and resubmit when changes are requested.
+**Affected areas:** `/reflections`, `/reflections/submit`, dashboard reflection prompt, sidebar reflection shortcut.
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-06-27] OAuth App Management UI
 
 **What changed:** Added an admin dashboard section to create, view, edit, and delete OAuth Applications for SSO, replacing the need to use the `seed_oauth_app` backend CLI command.

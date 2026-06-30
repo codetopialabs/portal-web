@@ -33,7 +33,9 @@ export function ReflectionPrompt() {
   }, [shouldPrompt, modalSeen]);
 
   // Don't nag on the reflection page itself.
-  if (!shouldPrompt || pathname === "/reflections/submit") return null;
+  if (!shouldPrompt || pathname === "/reflections" || pathname === "/reflections/submit") {
+    return null;
+  }
 
   const daysRemaining = data?.daysRemaining;
   const changesRequested = data?.status === "changes_requested";

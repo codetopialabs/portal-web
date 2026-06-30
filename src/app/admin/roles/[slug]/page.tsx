@@ -232,7 +232,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
             </div>
           </div>
 
-          {canEdit && (
+          {canEdit && !role.isSystem && (
             <Button
               asChild
               variant="outline"
