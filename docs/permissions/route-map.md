@@ -17,6 +17,8 @@ Every protected page in the portal declares the permission required to access it
 | `/programs` | authenticated | Member program workspace |
 | `/mentorship` | authenticated | Member mentorship workspace |
 | `/resources` | authenticated | Member resource library |
+| `/reflections` | `reflections.submit` | Reflection history and current cycle status |
+| `/reflections/submit` | `reflections.submit` | Monthly reflection question form |
 | `/admin` | `admin.panel.access` | Any member with this permission |
 | `/admin/roles` | `roles.view` | |
 | `/admin/roles/new` | `roles.create` | |

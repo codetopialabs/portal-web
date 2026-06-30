@@ -31,6 +31,7 @@ export function useSubmitReflection() {
     }) => ReflectionsService.submit(answers, attachments),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
+      queryClient.invalidateQueries({ queryKey: ["reflections", "history", "me"] });
     },
   });
 }

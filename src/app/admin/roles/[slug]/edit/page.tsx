@@ -72,8 +72,14 @@ function RoleEditForm({ slug }: { slug: string }) {
           toast.success("Role updated.");
           router.push(`/admin/roles/${updatedRole.name}`);
         },
-        onError: () =>
-          setErrors((prev) => ({ ...prev, form: "Failed to update the role. Please try again." })),
+        onError: (error) =>
+          setErrors((prev) => ({
+            ...prev,
+            form:
+              error instanceof Error
+                ? error.message
+                : "Failed to update the role. Please try again.",
+          })),
       }
     );
   }
@@ -95,6 +101,28 @@ function RoleEditForm({ slug }: { slug: string }) {
     );
   }
 
+  if (role.isSystem) {
+    return (
+      <div className="border border-warning-200 bg-warning-50 p-8">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-700" />
+          <div>
+            <p className="font-sans text-base font-black text-warning-800">
+              System roles are locked
+            </p>
+            <p className="mt-2 font-mono text-xs leading-6 text-warning-700">
+              The {role.displayName} role is part of the platform's core access model. Its
+              permissions are managed by the backend seed/configuration so member access stays
+              consistent.
+            </p>
+            <Button asChild className="mt-5 h-10 rounded-none font-mono text-xs font-bold">
+              <Link href={`/admin/roles/${role.name}`}>Back to role</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="border border-grey-200 bg-white">

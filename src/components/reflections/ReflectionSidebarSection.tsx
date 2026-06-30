@@ -44,6 +44,10 @@ export function ReflectionSidebarSection() {
 
   const currentStatus: ReflectionStatus = (current?.status as ReflectionStatus) ?? "not_started";
   const isOpen = current?.isOpen;
+  const currentHref =
+    isOpen && (currentStatus === "not_started" || currentStatus === "changes_requested")
+      ? "/reflections/submit"
+      : "/reflections";
 
   // Past reflections = all history entries, sorted newest first (already sorted by backend)
   const past = history.slice(0, 5);
@@ -51,7 +55,7 @@ export function ReflectionSidebarSection() {
   if (isCollapsed) {
     return (
       <Link
-        href="/reflections"
+        href={currentHref}
         className={cn(
           "mx-3 flex h-9 items-center justify-center rounded-none transition-colors hover:bg-zinc-900",
           isOpen && currentStatus !== "approved" ? "text-amber-400" : "text-zinc-500"
@@ -72,7 +76,7 @@ export function ReflectionSidebarSection() {
 
       {/* Current cycle card */}
       <Link
-        href="/reflections"
+        href={currentHref}
         className="group flex items-center justify-between gap-2 rounded-none border border-zinc-800 bg-zinc-900/60 px-3 py-2.5 transition-colors hover:bg-zinc-900"
       >
         <div className="flex min-w-0 items-center gap-2">

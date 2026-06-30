@@ -44,6 +44,17 @@ import {
 import { usePermission } from "@/hooks/usePermission";
 import type { CreatedOAuthApp, OAuthApp } from "@/types/oauth-apps.types";
 
+function getClientId(app: OAuthApp | CreatedOAuthApp | null | undefined) {
+  return app?.clientId ?? app?.client_id ?? "";
+}
+
+function getRedirectUris(app: OAuthApp | null | undefined) {
+  return app?.redirectUris ?? app?.redirect_uris ?? "";
+}
+
+function getRawSecret(app: CreatedOAuthApp | null | undefined) {
+  return app?.rawSecret ?? app?.raw_secret ?? "";
+}
 function formatDate(value: string | null) {
   if (!value) return "Never";
   const d = new Date(value);
@@ -72,12 +83,12 @@ function OAuthAppSheet({
   const { mutate: updateApp, isPending: isUpdating } = useUpdateOAuthApp();
 
   const [name, setName] = useState(appToEdit?.name || "");
-  const [redirectUris, setRedirectUris] = useState(appToEdit?.redirect_uris || "");
+  const [redirectUris, setRedirectUris] = useState(getRedirectUris(appToEdit));
 
   // Update local state when appToEdit changes
   if (open && mode === "edit" && appToEdit && name === "" && name !== appToEdit.name) {
     setName(appToEdit.name);
-    setRedirectUris(appToEdit.redirect_uris);
+    setRedirectUris(getRedirectUris(appToEdit));
   }
 
   function reset() {
@@ -354,7 +365,7 @@ function OAuthAppsContent() {
                       Client ID
                     </span>
                     <code className="break-all font-mono text-xs text-text-secondary">
-                      {app.client_id}
+                      {getClientId(app)}
                     </code>
                   </div>
                   <div>
@@ -362,9 +373,14 @@ function OAuthAppsContent() {
                       Redirect URIs
                     </span>
                     <div className="font-mono text-xs text-text-secondary break-all">
-                      {app.redirect_uris.split(" ").map((uri) => (
-                        <div key={uri}>{uri}</div>
-                      ))}
+                      {getRedirectUris(app).trim() ? (
+                        getRedirectUris(app)
+                          .trim()
+                          .split(/\s+/)
+                          .map((uri) => <div key={uri}>{uri}</div>)
+                      ) : (
+                        <div className="text-text-muted">No redirect URIs configured.</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -436,11 +452,11 @@ function OAuthAppsContent() {
               </p>
               <div className="flex items-stretch border border-grey-300 bg-grey-50">
                 <code className="flex min-w-0 flex-1 items-center break-all px-3 py-2.5 font-mono text-xs leading-5 text-text-primary">
-                  {createdApp?.client_id}
+                  {getClientId(createdApp)}
                 </code>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(createdApp?.client_id || "", "id")}
+                  onClick={() => copyToClipboard(getClientId(createdApp), "id")}
                   aria-label="Copy Client ID"
                   className="flex w-12 shrink-0 items-center justify-center border-l border-grey-900 bg-grey-900 text-white transition-colors hover:bg-grey-800"
                 >
@@ -458,8 +474,8 @@ function OAuthAppsContent() {
                 <code className="flex min-w-0 flex-1 items-center break-all px-3 py-2.5 font-mono text-xs leading-5 text-text-primary">
                   {createdApp
                     ? masked
-                      ? maskKey(createdApp.raw_secret)
-                      : createdApp.raw_secret
+                      ? maskKey(getRawSecret(createdApp))
+                      : getRawSecret(createdApp)
                     : ""}
                 </code>
                 <button
@@ -472,7 +488,7 @@ function OAuthAppsContent() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(createdApp?.raw_secret || "", "secret")}
+                  onClick={() => copyToClipboard(getRawSecret(createdApp), "secret")}
                   aria-label="Copy secret"
                   className="flex w-12 shrink-0 items-center justify-center border-l border-grey-900 bg-grey-900 text-white transition-colors hover:bg-grey-800"
                 >
