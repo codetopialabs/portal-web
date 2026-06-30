@@ -177,7 +177,7 @@ function PeriodPicker({
   const [displayYear, setDisplayYear] = useState(defaultYear);
   const minYear = years[0] ?? displayYear;
   const maxYear = years[years.length - 1] ?? displayYear;
-  const label = value === "all" ? "All periods" : formatPeriod(value);
+  const label = value === "all" ? "All periods" : value ? formatPeriod(value) : "Select period";
 
   return (
     <Popover>
