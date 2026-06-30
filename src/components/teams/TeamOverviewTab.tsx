@@ -70,11 +70,11 @@ function FeedIcon({ item }: { item: ActivityItem }) {
   const base = "h-4 w-4 shrink-0";
   switch (item.type) {
     case "review_opened":
-      return <GitPullRequestArrow className={`${base} text-success-600`} />;
+      return <GitPullRequestArrow className={`${base} text-zinc-900`} />;
     case "status_changed":
-      if (item.context.to === "approved") return <Check className={`${base} text-info-600`} />;
+      if (item.context.to === "approved") return <Check className={`${base} text-zinc-600`} />;
       if (item.context.to === "closed") return <XCircle className={`${base} text-text-muted`} />;
-      if (item.context.to === "open") return <RotateCcw className={`${base} text-success-600`} />;
+      if (item.context.to === "open") return <RotateCcw className={`${base} text-zinc-900`} />;
       return <Pencil className={`${base} text-icon-tertiary`} />;
     case "commented":
       return <MessageSquare className={`${base} text-icon-tertiary`} />;
@@ -100,10 +100,10 @@ function InviteBanner({
   const { mutate: accept, isPending: accepting } = useAcceptInvite(teamSlug);
   const { mutate: decline, isPending: declining } = useDeclineInvite(teamSlug);
   return (
-    <div className="flex flex-col justify-between gap-4 border border-success-200 bg-success-50 p-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col justify-between gap-4 border border-emerald-600 bg-emerald-600 p-4 sm:flex-row sm:items-center">
       <div>
-        <h3 className="font-sans text-sm font-black text-success-900">You've been invited</h3>
-        <p className="mt-1 font-mono text-xs text-success-700">
+        <h3 className="font-sans text-sm font-black text-white">You've been invited</h3>
+        <p className="mt-1 font-mono text-xs text-emerald-100">
           {invite.invitedBy?.fullName} invited you to join {teamName}.
         </p>
       </div>
@@ -119,7 +119,7 @@ function InviteBanner({
             variant="outline"
             size="sm"
             disabled={accepting || declining}
-            className="h-9 rounded-none border-success-200 font-mono text-xs font-bold text-success-700 hover:bg-success-100"
+            className="h-9 rounded-none border-white bg-transparent font-mono text-xs font-bold text-white hover:bg-emerald-700 hover:border-emerald-700"
           >
             <X className="mr-1.5 h-3.5 w-3.5" />
             Decline
@@ -129,7 +129,7 @@ function InviteBanner({
           size="sm"
           onClick={() => accept(invite.id)}
           disabled={accepting || declining}
-          className="h-9 rounded-none bg-success-600 font-mono text-xs font-bold text-white hover:bg-success-700"
+          className="h-9 rounded-none bg-white font-mono text-xs font-bold text-emerald-700 hover:bg-emerald-50"
         >
           <Check className="mr-1.5 h-3.5 w-3.5" />
           Accept
@@ -155,7 +155,7 @@ export function TeamOverviewTab({ teamSlug, teamName, myInvite }: TeamOverviewTa
             </h2>
           </div>
           <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-text-muted">
-            <span className="h-1.5 w-1.5 animate-pulse bg-success-500" />
+            <span className="h-1.5 w-1.5 animate-pulse bg-zinc-900" />
             Live
           </span>
         </div>

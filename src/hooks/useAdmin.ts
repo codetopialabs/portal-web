@@ -205,6 +205,30 @@ export function useDeleteMember() {
   });
 }
 
+export function useFlagMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      UsersService.flagUser(id, reason),
+    onSuccess: (_result, { id }) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
+    },
+  });
+}
+
+export function useUnflagMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, resolutionNote }: { id: string; resolutionNote?: string }) =>
+      UsersService.unflagUser(id, resolutionNote),
+    onSuccess: (_result, { id }) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.user(id) });
+      queryClient.invalidateQueries({ queryKey: adminKeys.usersRoot });
+    },
+  });
+}
+
 // ─── Admin sessions ─────────────────────────────────────────────────────────
 
 export function useAdminUserSessions(id: string, enabled = true) {

@@ -126,44 +126,48 @@ function RoleRow({
   const detailHref = `/admin/roles/${role.name}`;
 
   return (
-    <div className="group relative border border-grey-200 bg-white p-4 transition-colors hover:border-grey-300 hover:bg-grey-50">
+    <div className="group relative border border-grey-200 bg-white transition-colors hover:border-grey-400 hover:bg-grey-50">
+      {/* Full-card link — sits behind everything else */}
       <Link
         href={detailHref}
+        className="absolute inset-0 z-0"
         aria-label={`Open ${role.displayName}`}
-        className="absolute right-3 top-3 text-grey-300 transition-colors group-hover:text-text-secondary"
-      >
-        <ArrowUpRight className="h-3.5 w-3.5" />
-      </Link>
+      />
 
-      {/* Identity */}
-      <div className="flex items-center gap-2 pr-6">
-        <Link
-          href={detailHref}
-          className="truncate font-sans text-sm font-bold text-text-primary hover:underline"
-        >
-          {role.displayName}
-        </Link>
-        {role.isSystem && (
-          <LockKeyhole className="h-3 w-3 shrink-0 text-icon-muted" aria-label="System role" />
-        )}
-        {highRisk && (
-          <AlertTriangle
-            className="h-3 w-3 shrink-0 text-error-500"
-            aria-label="Sensitive permissions"
-          />
-        )}
-      </div>
-      <p className="mt-0.5 font-mono text-[11px] text-text-muted">
-        {role.name} · rank {role.rank}
-      </p>
+      <div className="relative z-10 p-4 pointer-events-none">
+        {/* Arrow indicator */}
+        <ArrowUpRight className="absolute right-3 top-3 h-3.5 w-3.5 text-grey-300 transition-colors group-hover:text-text-secondary" />
 
-      {/* Footer */}
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-grey-100 pt-3">
-        <p className="font-mono text-[11px] text-text-tertiary">
-          <span className="font-bold text-text-secondary">{role.permissions.length}</span> perms ·{" "}
-          <span className="font-bold text-text-secondary">{role.memberCount}</span> members
+        {/* Identity */}
+        <div className="flex items-center gap-2 pr-6">
+          <span className="truncate font-sans text-sm font-bold text-text-primary">
+            {role.displayName}
+          </span>
+          {role.isSystem && (
+            <LockKeyhole className="h-3 w-3 shrink-0 text-icon-muted" aria-label="System role" />
+          )}
+          {highRisk && (
+            <AlertTriangle
+              className="h-3 w-3 shrink-0 text-error-500"
+              aria-label="Sensitive permissions"
+            />
+          )}
+        </div>
+        <p className="mt-0.5 font-mono text-[11px] text-text-muted">
+          {role.name} · rank {role.rank}
         </p>
-        {canDelete && !role.isSystem && <DeleteRoleButton slug={role.name} name={role.name} />}
+
+        {/* Footer */}
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-grey-100 pt-3">
+          <p className="font-mono text-[11px] text-text-tertiary">
+            <span className="font-bold text-text-secondary">{role.permissions.length}</span> perms ·{" "}
+            <span className="font-bold text-text-secondary">{role.memberCount}</span> members
+          </p>
+          {/* Delete button needs pointer-events back and a higher z-index to sit above the card link */}
+          <div className="pointer-events-auto relative z-20">
+            {canDelete && !role.isSystem && <DeleteRoleButton slug={role.name} name={role.name} />}
+          </div>
+        </div>
       </div>
     </div>
   );

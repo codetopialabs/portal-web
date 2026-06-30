@@ -69,11 +69,6 @@ const COMING_SOON_SECTIONS = [
     name: "XP Management",
     description: "Award and manage community experience points.",
   },
-  {
-    icon: Code2,
-    name: "OAuth Client Management",
-    description: "Manage OAuth clients and application authorizations.",
-  },
 ];
 
 const MANAGEMENT_SECTIONS = [
@@ -100,6 +95,12 @@ const MANAGEMENT_SECTIONS = [
     icon: Key,
     name: "API Keys",
     description: "Issue and revoke keys for external integrations.",
+  },
+  {
+    href: "/admin/oauth-apps",
+    icon: Code2,
+    name: "OAuth Apps",
+    description: "Manage OAuth clients for SSO.",
   },
 ];
 

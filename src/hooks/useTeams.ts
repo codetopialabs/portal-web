@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: React Query cache ops (getQueryData/setQueryData) and Axios error handlers use `any` because the cache entry shapes and error response types have no shared generic at this layer
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {

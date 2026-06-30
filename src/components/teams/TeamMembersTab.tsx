@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: community search API response items are not generically typed at this component layer
 "use client";
 
 import { Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
@@ -254,7 +255,7 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                         variant="ghost"
                         size="icon"
                         disabled={removePending}
-                        className="h-8 w-8 text-text-muted hover:text-red-600 hover:bg-red-50"
+                        className="h-8 w-8 text-text-muted hover:text-white hover:bg-red-600"
                         title="Remove Member"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -273,12 +274,9 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
         <div>
           <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4 flex items-center gap-2">
             Pending Invites
-            <Badge
-              variant="secondary"
-              className="font-mono text-[9px] bg-grey-100 text-text-tertiary"
-            >
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 font-mono text-[9px] bg-zinc-800 text-white">
               {pendingInvites.length}
-            </Badge>
+            </span>
           </h3>
           <div className="border border-grey-200 bg-white divide-y divide-grey-100 overflow-hidden">
             {pendingInvites.map((invite) => (
@@ -319,7 +317,7 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                       variant="outline"
                       size="sm"
                       disabled={revokePending}
-                      className="h-8 font-mono text-[10px] uppercase tracking-widest text-red-600 border-red-200 hover:bg-red-50"
+                      className="h-8 font-mono text-[10px] uppercase tracking-widest bg-red-600 text-white border-red-600 hover:bg-red-700"
                     >
                       Revoke
                     </Button>

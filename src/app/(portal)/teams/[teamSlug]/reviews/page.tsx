@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: assignee API response shapes not fully typed yet
 "use client";
 
 import { ArrowLeft, CheckCircle2, Circle, FileText, Plus, XCircle } from "lucide-react";
@@ -7,7 +8,6 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTeam, useTeamReviews } from "@/hooks/useTeams";
 import { getAvatarUrl } from "@/lib/utils";
@@ -89,7 +89,7 @@ function ReviewsListContent() {
               className={`px-4 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors rounded-none ${
                 filter === f
                   ? "bg-grey-900 text-white"
-                  : "bg-grey-100 text-text-tertiary hover:bg-grey-200 hover:text-text-primary"
+                  : "border border-grey-200 bg-white text-text-secondary hover:border-grey-400 hover:text-text-primary"
               }`}
             >
               {f}
@@ -142,9 +142,9 @@ function ReviewsListContent() {
               >
                 <div className="shrink-0">
                   {review.status === "open" ? (
-                    <Circle className="h-5 w-5 text-success-500" />
+                    <Circle className="h-5 w-5 text-zinc-900" />
                   ) : review.status === "approved" ? (
-                    <CheckCircle2 className="h-5 w-5 text-info-500" />
+                    <CheckCircle2 className="h-5 w-5 text-zinc-600" />
                   ) : (
                     <XCircle className="h-5 w-5 text-text-muted" />
                   )}
@@ -155,12 +155,9 @@ function ReviewsListContent() {
                       {review.title}
                     </h3>
                     {review.category && (
-                      <Badge
-                        variant="secondary"
-                        className="font-mono text-[9px] uppercase tracking-widest bg-grey-100 text-text-tertiary"
-                      >
+                      <span className="border border-grey-300 bg-white px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-text-secondary">
                         {review.category}
-                      </Badge>
+                      </span>
                     )}
                   </div>
                   <p className="font-mono text-[11px] text-text-muted mt-1">
@@ -184,7 +181,7 @@ function ReviewsListContent() {
                       ))}
                       {review.assignees.length > 3 && (
                         <span
-                          className="flex h-5 min-w-5 items-center justify-center bg-grey-100 border border-white font-mono text-[9px] font-bold text-text-secondary px-1"
+                          className="flex h-5 min-w-5 items-center justify-center bg-zinc-800 border border-white font-mono text-[9px] font-bold text-white px-1"
                           style={{ marginLeft: "-6px" }}
                         >
                           +{review.assignees.length - 3}
@@ -200,18 +197,17 @@ function ReviewsListContent() {
                       Comments
                     </span>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className={`shrink-0 font-mono text-[10px] uppercase tracking-widest ${
+                  <span
+                    className={`shrink-0 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest ${
                       review.status === "open"
-                        ? "border-success-200 text-success-700"
+                        ? "bg-zinc-900 text-white"
                         : review.status === "approved"
-                          ? "border-info-200 text-info-700"
-                          : "border-grey-200 text-text-muted"
+                          ? "bg-zinc-600 text-white"
+                          : "bg-zinc-400 text-white"
                     }`}
                   >
                     {review.status}
-                  </Badge>
+                  </span>
                 </div>
               </Link>
             ))

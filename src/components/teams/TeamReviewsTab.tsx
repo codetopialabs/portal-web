@@ -4,15 +4,42 @@ import { CheckCircle2, Circle, FileText, Plus, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 import type { Review } from "@/services/teams.service";
 
 interface TeamReviewsTabProps {
   teamSlug: string;
   reviews: Review[] | undefined;
   reviewsLoading: boolean;
+}
+
+function StatusPill({ status }: { status: string }) {
+  if (status === "open") {
+    return (
+      <span className="shrink-0 bg-zinc-900 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-white">
+        Open
+      </span>
+    );
+  }
+  if (status === "approved") {
+    return (
+      <span className="shrink-0 bg-zinc-600 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-white">
+        Approved
+      </span>
+    );
+  }
+  return (
+    <span className="shrink-0 bg-zinc-400 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-white">
+      Closed
+    </span>
+  );
+}
+
+function StatusIcon({ status }: { status: string }) {
+  if (status === "open") return <Circle className="h-5 w-5 shrink-0 text-zinc-900" />;
+  if (status === "approved") return <CheckCircle2 className="h-5 w-5 shrink-0 text-zinc-600" />;
+  return <XCircle className="h-5 w-5 shrink-0 text-zinc-400" />;
 }
 
 export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReviewsTabProps) {
@@ -23,21 +50,22 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-grey-200 pb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {(["all", "open", "approved", "closed"] as const).map((f) => (
             <button
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors rounded-none ${
+              className={cn(
+                "px-4 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors rounded-none",
                 filter === f
-                  ? "bg-grey-900 text-white"
-                  : "bg-grey-100 text-text-tertiary hover:bg-grey-200 hover:text-text-primary"
-              }`}
+                  ? "bg-zinc-900 text-white"
+                  : "border border-grey-200 bg-white text-text-secondary hover:border-grey-400 hover:text-text-primary"
+              )}
             >
               {f}
               {f !== "all" && reviews && (
-                <span className="ml-2 opacity-50">
+                <span className="ml-2 opacity-60">
                   ({reviews.filter((r) => r.status === f).length})
                 </span>
               )}
@@ -46,7 +74,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
         </div>
         <Link
           href={`/teams/${teamSlug}/reviews/new`}
-          className="inline-flex h-9 items-center justify-center bg-grey-900 px-5 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white hover:bg-grey-800 transition-colors"
+          className="inline-flex h-9 items-center justify-center bg-zinc-900 px-5 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white hover:bg-zinc-800 transition-colors"
         >
           <Plus className="mr-2 h-4 w-4" />
           Open Review
@@ -57,12 +85,12 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
         {reviewsLoading ? (
           <div className="p-6 space-y-4">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-16 w-full" />
+              <Skeleton key={i} className="h-16 w-full rounded-none" />
             ))}
           </div>
         ) : !filteredReviews || filteredReviews.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center px-6">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center border border-grey-200 bg-grey-50">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center border border-grey-200 bg-white">
               <FileText className="h-6 w-6 text-text-muted" />
             </div>
             <h3 className="font-sans font-black uppercase tracking-tight text-text-primary">
@@ -81,27 +109,16 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
               href={`/teams/${teamSlug}/reviews/${review.id}`}
               className="group flex items-center gap-4 px-6 py-5 hover:bg-grey-50 transition-colors"
             >
-              <div className="shrink-0">
-                {review.status === "open" ? (
-                  <Circle className="h-5 w-5 text-success-500" />
-                ) : review.status === "approved" ? (
-                  <CheckCircle2 className="h-5 w-5 text-info-500" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-text-muted" />
-                )}
-              </div>
+              <StatusIcon status={review.status} />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-sans font-black uppercase tracking-tight text-text-primary group-hover:text-text-secondary truncate">
                     {review.title}
                   </h3>
                   {review.category && (
-                    <Badge
-                      variant="secondary"
-                      className="font-mono text-[9px] uppercase tracking-widest bg-grey-100 text-text-tertiary"
-                    >
+                    <span className="border border-grey-300 bg-white px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-text-secondary">
                       {review.category}
-                    </Badge>
+                    </span>
                   )}
                   {review.labels?.map((label) => (
                     <span
@@ -135,7 +152,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
                       />
                     ))}
                     {review.assignees.length > 3 && (
-                      <span className="flex h-6 w-6 items-center justify-center border-2 border-white bg-grey-100 font-mono text-[9px] font-bold text-text-secondary">
+                      <span className="flex h-6 w-6 items-center justify-center border-2 border-white bg-zinc-800 font-mono text-[9px] font-bold text-white">
                         +{review.assignees.length - 3}
                       </span>
                     )}
@@ -149,18 +166,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
                     Comments
                   </span>
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`shrink-0 font-mono text-[10px] uppercase tracking-widest ${
-                    review.status === "open"
-                      ? "border-success-200 text-success-700"
-                      : review.status === "approved"
-                        ? "border-info-200 text-info-700"
-                        : "border-grey-200 text-text-muted"
-                  }`}
-                >
-                  {review.status}
-                </Badge>
+                <StatusPill status={review.status} />
               </div>
             </Link>
           ))

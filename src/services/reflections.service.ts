@@ -44,16 +44,31 @@ export const ReflectionsService = {
     return res.data.data;
   },
 
-  async submit(answers: Record<string, string>): Promise<{ detail: string; status: string }> {
+  async submit(
+    answers: Record<string, string>,
+    attachments: Record<string, string[]> = {}
+  ): Promise<{ detail: string; status: string }> {
     const res = await axiosInstance.post<ApiResponse<{ detail: string; status: string }>>(
       `${BASE}/current/`,
-      { answers }
+      { answers, attachments }
     );
+    return res.data.data;
+  },
+
+  async listOwn(): Promise<ReflectionRecord[]> {
+    const res = await axiosInstance.get<ApiResponse<ReflectionRecord[]>>(`${BASE}/history/`);
     return res.data.data;
   },
 
   async list(params?: { period?: string; status?: string }): Promise<ReflectionRecord[]> {
     const res = await axiosInstance.get<ApiResponse<ReflectionRecord[]>>(`${BASE}/`, { params });
+    return res.data.data;
+  },
+
+  async listByUser(username: string): Promise<ReflectionRecord[]> {
+    const res = await axiosInstance.get<ApiResponse<ReflectionRecord[]>>(`${BASE}/`, {
+      params: { username },
+    });
     return res.data.data;
   },
 
@@ -111,5 +126,37 @@ export const ReflectionsService = {
 
   async deleteQuestion(id: string): Promise<void> {
     await axiosInstance.delete(`${BASE}/questions/${id}/`);
+  },
+
+  async getSettings(): Promise<{ openDay: number; windowDays: number }> {
+    const res = await axiosInstance.get<ApiResponse<{ openDay: number; windowDays: number }>>(
+      `${BASE}/settings/`
+    );
+    return res.data.data;
+  },
+
+  async updateSettings(
+    data: Partial<{ openDay: number; windowDays: number }>
+  ): Promise<{ openDay: number; windowDays: number }> {
+    const payload: Record<string, number> = {};
+    if (data.openDay !== undefined) payload.open_day = data.openDay;
+    if (data.windowDays !== undefined) payload.window_days = data.windowDays;
+    const res = await axiosInstance.patch<ApiResponse<{ openDay: number; windowDays: number }>>(
+      `${BASE}/settings/`,
+      payload
+    );
+    return res.data.data;
+  },
+
+  async triggerCycle(): Promise<{
+    detail: string;
+    period: string;
+    opensOn: string;
+    dueOn: string;
+  }> {
+    const res = await axiosInstance.post<
+      ApiResponse<{ detail: string; period: string; opensOn: string; dueOn: string }>
+    >(`${BASE}/settings/trigger/`);
+    return res.data.data;
   },
 };

@@ -554,18 +554,45 @@ export default function SettingsProfilePage() {
                 <Label htmlFor="username" className={labelStyles}>
                   Username
                 </Label>
-                <Input
-                  id="username"
-                  className={inputStyles}
-                  {...register("username", {
-                    onChange: (e) => {
-                      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "");
-                    },
-                  })}
-                />
-                <p className="font-mono text-[10px] text-zinc-400">
-                  Lowercase letters, numbers, <code>_</code> and <code>-</code> only
-                </p>
+                {(() => {
+                  const lastChanged = profile?.usernameLastChanged
+                    ? new Date(profile.usernameLastChanged)
+                    : null;
+                  const threeMonthsMs = 90 * 24 * 60 * 60 * 1000;
+                  const cooldownRemaining = lastChanged
+                    ? threeMonthsMs - (Date.now() - lastChanged.getTime())
+                    : 0;
+                  const onCooldown = cooldownRemaining > 0;
+                  const daysLeft = onCooldown
+                    ? Math.ceil(cooldownRemaining / (24 * 60 * 60 * 1000))
+                    : 0;
+                  return (
+                    <>
+                      <Input
+                        id="username"
+                        className={inputStyles}
+                        disabled={onCooldown}
+                        {...register("username", {
+                          onChange: (e) => {
+                            e.target.value = e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9_-]/g, "");
+                          },
+                        })}
+                      />
+                      {onCooldown ? (
+                        <p className="font-mono text-[10px] text-amber-600 font-bold">
+                          Username can only be changed every 3 months. Available in {daysLeft} day
+                          {daysLeft !== 1 ? "s" : ""}.
+                        </p>
+                      ) : (
+                        <p className="font-mono text-[10px] text-zinc-400">
+                          Lowercase letters, numbers, <code>_</code> and <code>-</code> only
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
 

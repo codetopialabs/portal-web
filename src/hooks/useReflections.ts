@@ -22,7 +22,13 @@ export function useCurrentReflection(enabled = true) {
 export function useSubmitReflection() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (answers: Record<string, string>) => ReflectionsService.submit(answers),
+    mutationFn: ({
+      answers,
+      attachments,
+    }: {
+      answers: Record<string, string>;
+      attachments: Record<string, string[]>;
+    }) => ReflectionsService.submit(answers, attachments),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
     },
@@ -39,6 +45,21 @@ export function useReflections(params?: { period?: string; status?: string }) {
   return useQuery({
     queryKey: reflectionKeys.list(params),
     queryFn: () => ReflectionsService.list(params),
+  });
+}
+
+export function useMyReflections() {
+  return useQuery({
+    queryKey: ["reflections", "history", "me"] as const,
+    queryFn: () => ReflectionsService.listOwn(),
+  });
+}
+
+export function useReflectionsByMember(username: string) {
+  return useQuery({
+    queryKey: ["reflections", "member", username] as const,
+    queryFn: () => ReflectionsService.listByUser(username),
+    enabled: !!username,
   });
 }
 
@@ -89,5 +110,27 @@ export function useDeleteReflectionQuestion() {
   return useMutation({
     mutationFn: (id: string) => ReflectionsService.deleteQuestion(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: reflectionKeys.questions }),
+  });
+}
+
+export function useReflectionSettings() {
+  return useQuery({
+    queryKey: ["reflections", "settings"] as const,
+    queryFn: () => ReflectionsService.getSettings(),
+  });
+}
+
+export function useUpdateReflectionSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<{ openDay: number; windowDays: number }>) =>
+      ReflectionsService.updateSettings(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reflections", "settings"] }),
+  });
+}
+
+export function useTriggerReflectionCycle() {
+  return useMutation({
+    mutationFn: () => ReflectionsService.triggerCycle(),
   });
 }

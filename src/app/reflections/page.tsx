@@ -1,377 +1,319 @@
 "use client";
 
 import {
+  ArrowRight,
   CalendarClock,
   CheckCircle2,
+  CircleDashed,
+  ClipboardCheck,
   Clock,
-  FileText,
-  Loader2,
-  MessageSquareWarning,
-  Sparkles,
-  Upload,
-  X,
+  XCircle,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import Link from "next/link";
+import { useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useCurrentReflection,
-  useSubmitReflection,
-  useUploadReflectionAttachment,
-} from "@/hooks/useReflections";
-import type { ReflectionQuestionSnapshot } from "@/types/reflections.types";
+import { useCurrentReflection, useMyReflections } from "@/hooks/useReflections";
+import { cn } from "@/lib/utils";
+import type { ReflectionRecord, ReflectionStatus } from "@/types/reflections.types";
 
-function attachmentName(url: string) {
-  try {
-    const path = new URL(url).pathname;
-    return decodeURIComponent(path.split("/").pop() || "attachment");
-  } catch {
-    return "attachment";
-  }
-}
+/* ── Status config ───────────────────────────────────────────────────────── */
 
-function FileAnswer({
-  id,
-  value,
-  onChange,
-}: {
-  id: string;
-  value: string;
-  onChange: (url: string) => void;
-}) {
-  const { mutate: upload, isPending } = useUploadReflectionAttachment();
-  const inputRef = useRef<HTMLInputElement>(null);
+const STATUS: Record<
+  ReflectionStatus,
+  { label: string; icon: React.ElementType; text: string; bg: string; border: string; pill: string }
+> = {
+  not_started: {
+    label: "Not started",
+    icon: CircleDashed,
+    text: "text-text-muted",
+    bg: "bg-grey-50",
+    border: "border-grey-200",
+    pill: "border-grey-300 bg-grey-100 text-text-secondary",
+  },
+  submitted: {
+    label: "Submitted",
+    icon: Clock,
+    text: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    pill: "border-zinc-900 bg-zinc-900 text-white",
+  },
+  under_review: {
+    label: "Under review",
+    icon: Clock,
+    text: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    pill: "border-amber-500 bg-amber-500 text-white",
+  },
+  approved: {
+    label: "Approved",
+    icon: CheckCircle2,
+    text: "text-emerald-700",
+    bg: "bg-white",
+    border: "border-grey-200",
+    pill: "border-emerald-600 bg-emerald-600 text-white",
+  },
+  changes_requested: {
+    label: "Changes requested",
+    icon: XCircle,
+    text: "text-red-700",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    pill: "border-red-600 bg-red-600 text-white",
+  },
+};
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    upload(file, {
-      onSuccess: (url) => {
-        onChange(url);
-        toast.success("File uploaded.");
-      },
-      onError: () => toast.error("Upload failed. Please try again."),
-    });
-  }
+type FilterKey = "all" | "approved" | "pending" | "needs_action";
 
+const FILTER_TABS: { key: FilterKey; label: string; statuses: ReflectionStatus[] }[] = [
+  {
+    key: "all",
+    label: "All",
+    statuses: ["submitted", "under_review", "approved", "changes_requested"],
+  },
+  { key: "approved", label: "Approved", statuses: ["approved"] },
+  { key: "pending", label: "In review", statuses: ["submitted", "under_review"] },
+  { key: "needs_action", label: "Needs action", statuses: ["changes_requested"] },
+];
+
+function StatusPill({ status }: { status: ReflectionStatus }) {
+  const cfg = STATUS[status] ?? STATUS.submitted;
+  const Icon = cfg.icon;
   return (
-    <div>
-      <input ref={inputRef} id={id} type="file" className="hidden" onChange={handleFile} />
-      {value ? (
-        <div className="flex items-center justify-between gap-3 border border-grey-300 bg-grey-50 px-3 py-2.5">
-          <a
-            href={value}
-            target="_blank"
-            rel="noreferrer"
-            className="flex min-w-0 items-center gap-2 font-mono text-xs text-text-primary hover:underline"
-          >
-            <FileText className="h-4 w-4 shrink-0 text-icon-tertiary" />
-            <span className="truncate">{attachmentName(value)}</span>
-          </a>
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              className="font-mono text-[11px] font-bold text-text-muted transition-colors hover:text-text-primary"
-            >
-              Replace
-            </button>
-            <button
-              type="button"
-              onClick={() => onChange("")}
-              aria-label="Remove file"
-              className="text-error-600 transition-colors hover:text-error-800"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={isPending}
-          className="flex w-full items-center justify-center gap-2 border border-dashed border-grey-300 bg-white px-4 py-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:border-grey-900 hover:bg-grey-50 disabled:opacity-60"
-        >
-          {isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Upload className="h-4 w-4" />
-          )}
-          {isPending ? "Uploading..." : "Upload a file"}
-        </button>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide",
+        cfg.pill
       )}
-    </div>
+    >
+      <Icon className="h-3 w-3" />
+      {cfg.label}
+    </span>
   );
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return "";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("en", { month: "long", day: "numeric" }).format(d);
-}
-
-function StateCard({
-  icon: Icon,
-  title,
-  body,
-  tone = "neutral",
-}: {
-  icon: React.ElementType;
-  title: string;
-  body: string;
-  tone?: "neutral" | "green";
-}) {
-  const border = tone === "green" ? "border-success-200" : "border-grey-200";
-  const badge =
-    tone === "green"
-      ? "border-success-200 bg-success-50 text-success-600"
-      : "border-grey-200 bg-grey-50 text-icon-tertiary";
-  return (
-    <div className={`border ${border} bg-white p-8 text-center`}>
-      <div className={`mx-auto mb-5 flex h-14 w-14 items-center justify-center border ${badge}`}>
-        <Icon className="h-7 w-7" />
-      </div>
-      <h2 className="font-sans text-xl font-black uppercase tracking-tight text-text-primary">
-        {title}
-      </h2>
-      <p className="mx-auto mt-3 max-w-md font-mono text-xs leading-6 text-text-tertiary">{body}</p>
-    </div>
-  );
-}
-
-function ReflectionForm({
-  questions,
-  initialAnswers,
-  dueOn,
-  period,
-  daysRemaining,
-  reviewerNotes,
-}: {
-  questions: ReflectionQuestionSnapshot[];
-  initialAnswers: Record<string, string>;
-  dueOn?: string;
-  period?: string;
-  daysRemaining?: number;
-  reviewerNotes?: string;
-}) {
-  const { mutate: submit, isPending } = useSubmitReflection();
-  const [answers, setAnswers] = useState<Record<string, string>>(initialAnswers);
-
-  useEffect(() => {
-    setAnswers(initialAnswers);
-  }, [initialAnswers]);
-
-  const answeredCount = useMemo(
-    () => questions.filter((q) => (answers[q.id] || "").trim()).length,
-    [questions, answers]
-  );
-  const progress = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
-
-  function setAnswer(id: string, value: string) {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
-  }
-
-  function handleSubmit() {
-    const missing = questions.filter((q) => q.isRequired && !(answers[q.id] || "").trim());
-    if (missing.length > 0) {
-      toast.error("Please answer all required questions.");
-      return;
-    }
-    submit(answers, {
-      onSuccess: () => toast.success("Reflection submitted. Thank you!"),
-      onError: () => toast.error("Failed to submit. Please try again."),
-    });
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="border border-grey-200 bg-white p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <div className="mb-1 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-icon-tertiary" />
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
-                {period ? `${formatMonth(period)} · Monthly check-in` : "Monthly check-in"}
-              </p>
-            </div>
-            <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
-              Your reflection
-            </h1>
-            <p className="mt-2 font-mono text-xs text-text-tertiary">
-              Share what you learned this month. It only takes a few minutes.
-            </p>
-          </div>
-          {dueOn && (
-            <span className="inline-flex h-8 shrink-0 items-center gap-2 self-start border border-grey-200 bg-grey-50 px-3 font-mono text-xs font-bold text-text-secondary">
-              <CalendarClock className="h-3.5 w-3.5" />
-              Due {formatDate(dueOn)}
-              {typeof daysRemaining === "number" && ` · ${daysRemaining}d left`}
-            </span>
-          )}
-        </div>
-
-        {/* Progress */}
-        <div className="mt-5">
-          <div className="mb-1.5 flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            <span>Progress</span>
-            <span>
-              {answeredCount}/{questions.length}
-            </span>
-          </div>
-          <div className="h-1.5 w-full bg-grey-100">
-            <div className="h-full bg-grey-900 transition-all" style={{ width: `${progress}%` }} />
-          </div>
-        </div>
-      </header>
-
-      {reviewerNotes && (
-        <div className="border border-warning-200 bg-warning-50 p-4">
-          <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-warning-700">
-            <MessageSquareWarning className="h-4 w-4" />
-            Changes requested
-          </div>
-          <p className="mt-2 font-mono text-xs leading-6 text-warning-700">{reviewerNotes}</p>
-        </div>
-      )}
-
-      {/* Questions */}
-      {questions.length === 0 ? (
-        <div className="border border-grey-200 bg-white p-8 text-center font-mono text-sm text-text-tertiary">
-          No questions have been configured for this reflection yet.
-        </div>
-      ) : (
-        questions.map((q, index) => (
-          <section key={q.id} className="border border-grey-200 bg-white">
-            <div className="flex items-center justify-between gap-3 border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <label
-                htmlFor={`reflection-q-${q.id}`}
-                className="font-mono text-sm font-bold text-text-primary"
-              >
-                {index + 1}. {q.prompt}
-                {q.isRequired && <span className="ml-1 text-error-600">*</span>}
-              </label>
-              {(answers[q.id] || "").trim() && (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-success-600" />
-              )}
-            </div>
-            <div className="p-5">
-              {q.helpText && <p className="mb-2 font-mono text-xs text-text-muted">{q.helpText}</p>}
-              {q.type === "file" ? (
-                <FileAnswer
-                  id={`reflection-q-${q.id}`}
-                  value={answers[q.id] || ""}
-                  onChange={(url) => setAnswer(q.id, url)}
-                />
-              ) : q.type === "short_text" ? (
-                <Input
-                  id={`reflection-q-${q.id}`}
-                  value={answers[q.id] || ""}
-                  onChange={(e) => setAnswer(q.id, e.target.value)}
-                  className="h-10 rounded-none border-grey-300 font-mono text-sm"
-                />
-              ) : (
-                <textarea
-                  id={`reflection-q-${q.id}`}
-                  value={answers[q.id] || ""}
-                  onChange={(e) => setAnswer(q.id, e.target.value)}
-                  rows={4}
-                  className="w-full resize-y rounded-none border border-grey-300 bg-white p-3 font-mono text-sm text-text-primary outline-none focus:border-grey-900"
-                />
-              )}
-            </div>
-          </section>
-        ))
-      )}
-
-      {/* Submit bar */}
-      <div className="flex items-center justify-between gap-4 border border-grey-200 bg-white p-4">
-        <p className="font-mono text-xs text-text-tertiary">
-          {answeredCount === questions.length
-            ? "All questions answered."
-            : `${questions.length - answeredCount} question(s) left.`}
-        </p>
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isPending || questions.length === 0}
-          className="h-10 rounded-none font-mono text-xs font-bold"
-        >
-          {isPending ? "Submitting..." : "Submit reflection"}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function formatMonth(period: string) {
+function formatPeriod(period: string) {
   const d = new Date(period);
-  if (Number.isNaN(d.getTime())) return "";
+  if (Number.isNaN(d.getTime())) return period;
   return new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(d);
 }
 
-function ReflectionsContent() {
+function formatDate(value: string | null) {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(
+    d
+  );
+}
+
+/* ── Current cycle banner ────────────────────────────────────────────────── */
+
+function CurrentCycleBanner() {
   const { data, isLoading } = useCurrentReflection();
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-32 w-full rounded-none" />
-        <Skeleton className="h-40 w-full rounded-none" />
-        <Skeleton className="h-40 w-full rounded-none" />
-      </div>
-    );
-  }
+  if (isLoading) return <Skeleton className="h-24 w-full rounded-none" />;
+  if (!data?.isOpen) return null;
 
-  if (!data?.isOpen) {
-    return (
-      <StateCard
-        icon={Clock}
-        title="No reflection due right now"
-        body="Monthly reflections open on the 25th. We'll prompt you here and by email when the next one is ready."
-      />
-    );
-  }
-
-  const canEdit = data.status === "not_started" || data.status === "changes_requested";
-
-  if (canEdit) {
-    return (
-      <ReflectionForm
-        questions={data.cycle?.questions ?? []}
-        initialAnswers={data.answers ?? {}}
-        dueOn={data.cycle?.dueOn}
-        period={data.cycle?.period}
-        daysRemaining={data.daysRemaining}
-        reviewerNotes={data.status === "changes_requested" ? data.reviewerNotes : undefined}
-      />
-    );
-  }
-
-  if (data.status === "approved") {
-    return (
-      <StateCard
-        icon={CheckCircle2}
-        tone="green"
-        title="Reflection approved"
-        body="Thanks for reflecting this month — your submission has been reviewed and approved."
-      />
-    );
-  }
+  const status = (data.status ?? "not_started") as ReflectionStatus;
+  const cfg = STATUS[status];
+  const needsAction = status === "not_started" || status === "changes_requested";
 
   return (
-    <StateCard
-      icon={CheckCircle2}
-      title="Reflection submitted"
-      body="Your reflection is in and awaiting review. We'll let you know if anything needs a second look."
-    />
+    <div className={cn("border-l-4 px-5 py-4", cfg.bg, cfg.border)}>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className={cn("flex h-9 w-9 shrink-0 items-center justify-center border", cfg.border)}
+          >
+            <cfg.icon className={cn("h-4 w-4", cfg.text)} />
+          </div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+                This month
+              </p>
+              <StatusPill status={status} />
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              {data.daysRemaining !== undefined && (
+                <span className="flex items-center gap-1 font-mono text-[10px] text-text-muted">
+                  <CalendarClock className="h-3 w-3" />
+                  {data.daysRemaining === 0 ? "Due today" : `${data.daysRemaining}d left`}
+                </span>
+              )}
+              {status === "changes_requested" && data.reviewerNotes && (
+                <span className="font-mono text-[10px] text-red-600 truncate max-w-xs">
+                  "{data.reviewerNotes}"
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        {needsAction && (
+          <Button asChild className="h-9 shrink-0 rounded-none font-mono text-xs font-bold gap-2">
+            <Link href="/reflections/submit">
+              {status === "changes_requested" ? "Update" : "Write now"}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── History card ────────────────────────────────────────────────────────── */
+
+function ReflectionCard({ r }: { r: ReflectionRecord }) {
+  const status = r.status as ReflectionStatus;
+  const _cfg = STATUS[status] ?? STATUS.submitted;
+  const submitted = formatDate(r.submittedAt);
+  const reviewed = formatDate(r.reviewedAt);
+
+  return (
+    <div className="group flex flex-col gap-0 border border-grey-200 bg-white transition-colors hover:border-grey-400">
+      <div className="flex items-start justify-between gap-4 px-5 py-4">
+        {/* Left */}
+        <div className="min-w-0 flex-1">
+          <p className="font-sans text-lg font-black uppercase tracking-tight text-text-primary leading-none">
+            {formatPeriod(r.period)}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {submitted && (
+              <span className="font-mono text-[10px] text-text-muted">
+                Submitted <span className="text-text-secondary font-bold">{submitted}</span>
+              </span>
+            )}
+            {reviewed && (
+              <span className="font-mono text-[10px] text-text-muted">
+                Reviewed <span className="text-text-secondary font-bold">{reviewed}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Right */}
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <StatusPill status={status} />
+          <span className="font-mono text-[10px] text-text-muted">
+            {Object.keys(r.answers ?? {}).length} answer
+            {Object.keys(r.answers ?? {}).length !== 1 ? "s" : ""}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── History list with filters ───────────────────────────────────────────── */
+
+function HistorySection() {
+  const { data: history, isLoading } = useMyReflections();
+  const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
+
+  const activeTab = FILTER_TABS.find((t) => t.key === activeFilter) ?? FILTER_TABS[0];
+  const filtered = (history ?? []).filter((r) =>
+    activeTab.statuses.includes(r.status as ReflectionStatus)
+  );
+
+  const countFor = (tab: (typeof FILTER_TABS)[0]) =>
+    (history ?? []).filter((r) => tab.statuses.includes(r.status as ReflectionStatus)).length;
+
+  return (
+    <div>
+      {/* Filter tabs */}
+      <div className="mb-5 flex border-b border-grey-200">
+        {FILTER_TABS.map((tab) => {
+          const isActive = activeFilter === tab.key;
+          const count = countFor(tab);
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveFilter(tab.key)}
+              className={cn(
+                "relative flex items-center gap-1.5 px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-wide transition-colors",
+                isActive
+                  ? "text-text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-zinc-900"
+                  : "text-text-muted hover:text-text-secondary"
+              )}
+            >
+              {tab.label}
+              <span
+                className={cn(
+                  "flex h-4 min-w-4 items-center justify-center px-1 font-mono text-[9px] font-black rounded-sm",
+                  isActive ? "bg-zinc-900 text-white" : "bg-grey-100 text-text-muted"
+                )}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* List */}
+      {isLoading ? (
+        <div className="flex flex-col gap-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-none" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="border border-dashed border-grey-300 py-14 text-center">
+          <p className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+            {activeFilter === "all"
+              ? "No reflections yet"
+              : `No ${STATUS[activeFilter as ReflectionStatus]?.label.toLowerCase()} reflections`}
+          </p>
+          <p className="mt-1 font-mono text-xs text-text-muted">
+            {activeFilter === "all"
+              ? "Your submitted reflections will show up here."
+              : "Try a different filter."}
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {filtered.map((r) => (
+            <ReflectionCard key={r.id} r={r} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+
+function ReflectionsContent() {
+  return (
+    <div className="w-full max-w-2xl">
+      {/* Header */}
+      <header className="mb-6">
+        <div className="mb-1 flex items-center gap-2">
+          <ClipboardCheck className="h-4 w-4 text-icon-tertiary" />
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
+            My space
+          </p>
+        </div>
+        <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
+          Reflections
+        </h1>
+      </header>
+
+      {/* Current cycle */}
+      <div className="mb-6">
+        <CurrentCycleBanner />
+      </div>
+
+      {/* History */}
+      <HistorySection />
+    </div>
   );
 }
 
@@ -379,9 +321,7 @@ export default function ReflectionsPage() {
   return (
     <RouteGuard permission="reflections.submit">
       <DashboardShell>
-        <div className="mx-auto max-w-3xl pb-20">
-          <ReflectionsContent />
-        </div>
+        <ReflectionsContent />
       </DashboardShell>
     </RouteGuard>
   );

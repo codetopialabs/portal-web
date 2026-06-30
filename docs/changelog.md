@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-06-27] OAuth App Management UI
+
+**What changed:** Added an admin dashboard section to create, view, edit, and delete OAuth Applications for SSO, replacing the need to use the `seed_oauth_app` backend CLI command.
+**Affected areas:** `/admin/oauth-apps`, backend `apps/authentication/views_admin_oauth.py`.
+**Permissions added:** `oauth_apps.view`, `oauth_apps.create`, `oauth_apps.edit`, `oauth_apps.delete`.
+**Breaking changes:** No.
+
 ## [2026-06-23] Single sign-on (portal as identity provider)
 
 **What changed:** The portal can now sign users into other systems via OAuth2 Authorization Code + PKCE. Added a token-authenticated `/api/v1/oauth/authorize/` (issues an authorization code for the logged-in user), an OIDC-style `/api/v1/oauth/userinfo/`, a portal `/authorize` consent screen, and a `seed_oauth_app` command to register consumer clients. The Community Admin Center's password login was replaced with "Continue with Community Portal" (PKCE start + callback that gates on `admin.panel.access`).

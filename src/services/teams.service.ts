@@ -99,6 +99,7 @@ export interface ReviewEvent {
     fullName: string;
     profilePictureUrl: string | null;
   };
+  // biome-ignore lint/suspicious/noExplicitAny: context is a flexible JSON blob from the API
   context: Record<string, any>;
   createdAt: string;
 }

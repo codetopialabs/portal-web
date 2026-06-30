@@ -5,6 +5,7 @@ export type ReflectionStatus =
   | "approved"
   | "changes_requested";
 
+// Kept for backward compat with snapshots of old reflections.
 export type ReflectionQuestionType = "short_text" | "long_text" | "file";
 
 // Snapshot lives inside a JSONField; the camelCase renderer rewrites its keys
@@ -13,7 +14,7 @@ export interface ReflectionQuestionSnapshot {
   id: string;
   prompt: string;
   helpText?: string;
-  type: ReflectionQuestionType;
+  type?: ReflectionQuestionType;
   isRequired?: boolean;
   order?: number;
 }
@@ -33,6 +34,7 @@ export interface CurrentReflection {
   daysRemaining?: number;
   reviewerNotes?: string;
   answers?: Record<string, string>;
+  attachments?: Record<string, string[]>;
   cycle: ReflectionCycleInfo | null;
 }
 
@@ -44,6 +46,7 @@ export interface ReflectionRecord {
   period: string;
   questions: ReflectionQuestionSnapshot[];
   answers: Record<string, string>;
+  attachments: Record<string, string[]>;
   status: ReflectionStatus;
   submittedAt: string | null;
   reviewerNotes: string;
@@ -68,7 +71,7 @@ export interface ReflectionQuestion {
 export interface ReflectionQuestionInput {
   prompt: string;
   helpText?: string;
-  type: ReflectionQuestionType;
+  type?: ReflectionQuestionType;
   order?: number;
   isRequired?: boolean;
   isActive?: boolean;

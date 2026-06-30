@@ -39,6 +39,10 @@ Permissions are served to the frontend via `GET /api/v1/auth/admin/permissions/`
 | `api_keys.view` | View API keys and their scopes | No |
 | `api_keys.create` | Create an API key for external integrations | No |
 | `api_keys.revoke` | Revoke an API key | No |
+| `oauth_apps.view` | View all registered OAuth applications | No |
+| `oauth_apps.create` | Create a new OAuth application | No |
+| `oauth_apps.edit` | Edit an OAuth application | No |
+| `oauth_apps.delete` | Delete an OAuth application | **Yes** |
 | `reflections.submit` | Submit your own monthly reflection | No |
 | `reflections.view_any` | View all members' collated reflections | No |
 | `reflections.review` | Approve or request changes on a reflection | No |

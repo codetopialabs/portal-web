@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: API response shapes for labels, assignees, and timeline items are not fully typed yet
 "use client";
 
 import {
@@ -182,7 +183,7 @@ function ReviewDetailContent() {
           <div className="flex flex-wrap items-center gap-3">
             <Badge
               variant="outline"
-              className={`font-mono text-[10px] uppercase tracking-widest ${review.status === "open" ? "border-success-200 text-success-700" : review.status === "approved" ? "border-info-200 text-info-700" : "border-grey-200 text-text-muted"}`}
+              className={`font-mono text-[10px] uppercase tracking-widest border-0 ${review.status === "open" ? "bg-zinc-900 text-white" : review.status === "approved" ? "bg-zinc-600 text-white" : "bg-zinc-400 text-white"}`}
             >
               {review.status}
             </Badge>
@@ -257,7 +258,7 @@ function ReviewDetailContent() {
                 ))}
                 {review.assignees.length > 3 && (
                   <span
-                    className="flex h-5 min-w-5 items-center justify-center bg-grey-100 border border-white font-mono text-[9px] font-bold text-text-secondary px-1"
+                    className="flex h-5 min-w-5 items-center justify-center bg-zinc-800 border border-white font-mono text-[9px] font-bold text-white px-1"
                     style={{ marginLeft: "-6px" }}
                   >
                     +{review.assignees.length - 3}
@@ -702,9 +703,9 @@ function ReviewDetailContent() {
               </h3>
               <div className="flex items-center gap-2 mb-4">
                 {review.status === "open" ? (
-                  <Circle className="h-4 w-4 text-success-500" />
+                  <Circle className="h-4 w-4 text-zinc-900" />
                 ) : review.status === "approved" ? (
-                  <CheckCircle2 className="h-4 w-4 text-info-500" />
+                  <CheckCircle2 className="h-4 w-4 text-zinc-600" />
                 ) : (
                   <XCircle className="h-4 w-4 text-text-muted" />
                 )}
@@ -719,7 +720,7 @@ function ReviewDetailContent() {
                       onClick={() => approveReview()}
                       disabled={approvePending}
                       variant="outline"
-                      className="w-full justify-start border-info-200 bg-info-50 font-mono text-[10px] uppercase tracking-widest text-info-700 hover:bg-info-100"
+                      className="w-full justify-start border-0 bg-zinc-900 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-zinc-800"
                     >
                       <ShieldCheck className="mr-2 h-3.5 w-3.5" /> Approve
                     </Button>

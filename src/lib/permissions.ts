@@ -10,6 +10,7 @@ export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
   "users.delete",
   "users.suspend",
   "roles.delete",
+  "oauth_apps.delete",
 ]);
 
 /**
@@ -29,6 +30,8 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/members/[username]": "users.view",
   "/admin/members/[username]/edit": "users.edit",
   "/admin/api-keys": "api_keys.view",
+  "/admin/oauth-apps": "oauth_apps.view",
+  "/admin/oauth-apps/new": "oauth_apps.create",
   "/admin/reflections": "reflections.view_any",
   "/admin/reflections/questions": "reflections.manage",
   "/reflections": "reflections.submit",
@@ -55,6 +58,8 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
   { pattern: /^\/admin\/members\/[^/]+\/edit$/, permission: "users.edit" },
   { pattern: /^\/admin\/members\/[^/]+$/, permission: "users.view" },
+  { pattern: /^\/admin\/oauth-apps\/[^/]+\/edit$/, permission: "oauth_apps.edit" },
+  { pattern: /^\/admin\/oauth-apps\/[^/]+$/, permission: "oauth_apps.view" },
   { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
 ];
 

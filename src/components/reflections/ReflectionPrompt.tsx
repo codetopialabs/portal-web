@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, PenLine, Sparkles, X } from "lucide-react";
+import { ArrowRight, PenLine, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -19,7 +19,7 @@ export function ReflectionPrompt() {
   const { data } = useCurrentReflection();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [bannerDismissed, setBannerDismissed] = useState(false);
+
   const [modalSeen, setModalSeen] = useState(false);
 
   const shouldPrompt = !!data?.shouldPrompt;
@@ -33,7 +33,7 @@ export function ReflectionPrompt() {
   }, [shouldPrompt, modalSeen]);
 
   // Don't nag on the reflection page itself.
-  if (!shouldPrompt || pathname === "/reflections") return null;
+  if (!shouldPrompt || pathname === "/reflections/submit") return null;
 
   const daysRemaining = data?.daysRemaining;
   const changesRequested = data?.status === "changes_requested";
@@ -46,32 +46,22 @@ export function ReflectionPrompt() {
 
   return (
     <>
-      {!bannerDismissed && (
-        <div className="flex items-center gap-3 border-b border-warning-200 bg-warning-50 px-4 py-2.5 sm:px-6">
-          <PenLine className="h-4 w-4 shrink-0 text-warning-700" />
-          <p className="min-w-0 flex-1 font-mono text-xs text-warning-700">
-            <span className="font-bold">{headline}.</span>{" "}
-            {typeof daysRemaining === "number" && daysRemaining > 0
-              ? `${daysRemaining} day(s) left to submit.`
-              : "Due today."}
-          </p>
-          <Link
-            href="/reflections"
-            className="hidden shrink-0 items-center gap-1.5 border border-warning-700 bg-warning-700 px-3 py-1 font-mono text-xs font-bold text-white transition-colors hover:bg-warning-600 sm:inline-flex"
-          >
-            Write reflection
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-          <button
-            type="button"
-            onClick={() => setBannerDismissed(true)}
-            aria-label="Dismiss"
-            className="shrink-0 text-warning-700 transition-colors hover:text-warning-900"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      <div className="flex items-center gap-3 border-b border-warning-200 bg-warning-50 px-4 py-2.5 sm:px-6">
+        <PenLine className="h-4 w-4 shrink-0 text-warning-700" />
+        <p className="min-w-0 flex-1 font-mono text-xs text-warning-700">
+          <span className="font-bold">{headline}.</span>{" "}
+          {typeof daysRemaining === "number" && daysRemaining > 0
+            ? `${daysRemaining} day(s) left to submit.`
+            : "Due today."}
+        </p>
+        <Link
+          href="/reflections/submit"
+          className="hidden shrink-0 items-center gap-1.5 border border-warning-700 bg-warning-700 px-3 py-1 font-mono text-xs font-bold text-white transition-colors hover:bg-warning-600 sm:inline-flex"
+        >
+          Write reflection
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </div>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
@@ -105,7 +95,7 @@ export function ReflectionPrompt() {
               Later
             </button>
             <Link
-              href="/reflections"
+              href="/reflections/submit"
               onClick={() => setModalOpen(false)}
               className="inline-flex h-10 items-center justify-center gap-2 border border-grey-900 bg-grey-900 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800"
             >
