@@ -15,7 +15,6 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -557,9 +556,7 @@ function OAuthAppsContent() {
 export default function OAuthAppsPage() {
   return (
     <RouteGuard permission="oauth_apps.view">
-      <DashboardShell>
-        <OAuthAppsContent />
-      </DashboardShell>
+      <OAuthAppsContent />
     </RouteGuard>
   );
 }

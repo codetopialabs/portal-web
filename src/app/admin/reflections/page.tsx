@@ -13,7 +13,6 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -659,9 +658,7 @@ function ReflectionsAdminContent() {
 export default function ReflectionsAdminPage() {
   return (
     <RouteGuard permission="reflections.view_any">
-      <DashboardShell>
-        <ReflectionsAdminContent />
-      </DashboardShell>
+      <ReflectionsAdminContent />
     </RouteGuard>
   );
 }

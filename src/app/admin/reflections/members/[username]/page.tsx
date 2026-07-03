@@ -4,7 +4,6 @@ import { ArrowLeft, Check, ClipboardCheck, Clock } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMember } from "@/hooks/useAdmin";
@@ -206,9 +205,7 @@ export default function MemberReflectionsPage() {
   const params = useParams<{ username: string }>();
   return (
     <RouteGuard permission="reflections.view_any">
-      <DashboardShell>
-        <MemberHistoryContent username={params.username} />
-      </DashboardShell>
+      <MemberHistoryContent username={params.username} />
     </RouteGuard>
   );
 }

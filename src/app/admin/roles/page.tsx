@@ -15,7 +15,6 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -345,9 +344,7 @@ function RolesPageContent() {
 export default function RolesPage() {
   return (
     <RouteGuard permission="roles.view">
-      <DashboardShell>
-        <RolesPageContent />
-      </DashboardShell>
+      <RolesPageContent />
     </RouteGuard>
   );
 }

@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -313,9 +312,7 @@ export default function EditRolePage() {
   const { slug } = useParams<{ slug: string }>();
   return (
     <RouteGuard permission="roles.edit">
-      <DashboardShell>
-        <EditRolePageContent slug={slug} />
-      </DashboardShell>
+      <EditRolePageContent slug={slug} />
     </RouteGuard>
   );
 }

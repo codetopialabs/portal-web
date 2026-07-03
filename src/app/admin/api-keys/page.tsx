@@ -16,7 +16,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -518,9 +517,7 @@ function ApiKeysContent() {
 export default function ApiKeysPage() {
   return (
     <RouteGuard permission="api_keys.view">
-      <DashboardShell>
-        <ApiKeysContent />
-      </DashboardShell>
+      <ApiKeysContent />
     </RouteGuard>
   );
 }

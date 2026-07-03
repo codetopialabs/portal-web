@@ -1,7 +1,11 @@
 import {
+  Activity,
   ClipboardCheck,
+  Code2,
   Globe,
   Home,
+  Key,
+  LayoutDashboard,
   Library,
   Settings,
   ShieldCheck,
@@ -28,8 +32,21 @@ const BASE_MENU_GROUPS: NavGroup[] = [
         href: "/reflections",
         activePrefix: "/reflections",
       },
-      { icon: UserCheck, label: "Mentorship", href: "/mentorship", activePrefix: "/mentorship" },
-      { icon: Library, label: "Resources", href: "/resources", activePrefix: "/resources" },
+      { icon: Activity, label: "Activity", href: "/activity", activePrefix: "/activity" },
+      {
+        icon: UserCheck,
+        label: "Mentorship",
+        href: "/mentorship",
+        activePrefix: "/mentorship",
+        comingSoon: true,
+      },
+      {
+        icon: Library,
+        label: "Resources",
+        href: "/resources",
+        activePrefix: "/resources",
+        comingSoon: true,
+      },
     ],
   },
   {
@@ -39,13 +56,23 @@ const BASE_MENU_GROUPS: NavGroup[] = [
 ];
 
 const ADMIN_MENU_GROUP: NavGroup = {
-  label: "Panels",
+  label: "Admin",
   items: [
+    { icon: LayoutDashboard, label: "Overview", href: "/admin", activePrefix: "/admin" },
+    { icon: Users, label: "Members", href: "/admin/members", activePrefix: "/admin/members" },
+    { icon: ShieldCheck, label: "Roles", href: "/admin/roles", activePrefix: "/admin/roles" },
     {
-      icon: ShieldCheck,
-      label: "Admin Panel",
-      href: "/admin",
-      activePrefix: "/admin",
+      icon: ClipboardCheck,
+      label: "Reflections",
+      href: "/admin/reflections",
+      activePrefix: "/admin/reflections",
+    },
+    { icon: Key, label: "API Keys", href: "/admin/api-keys", activePrefix: "/admin/api-keys" },
+    {
+      icon: Code2,
+      label: "OAuth Apps",
+      href: "/admin/oauth-apps",
+      activePrefix: "/admin/oauth-apps",
     },
   ],
 };

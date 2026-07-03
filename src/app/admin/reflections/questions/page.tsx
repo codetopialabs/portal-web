@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -220,9 +219,7 @@ function ReflectionQuestionsContent() {
 export default function ReflectionQuestionsPage() {
   return (
     <RouteGuard permission="reflections.manage">
-      <DashboardShell>
-        <ReflectionQuestionsContent />
-      </DashboardShell>
+      <ReflectionQuestionsContent />
     </RouteGuard>
   );
 }

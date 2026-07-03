@@ -21,7 +21,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -1460,9 +1459,7 @@ function RolePermissionSummary({
 function MemberDetailPageContent({ username }: { username: string }) {
   return (
     <RouteGuard permission="users.view">
-      <DashboardShell>
-        <MemberDetailContent username={username} />
-      </DashboardShell>
+      <MemberDetailContent username={username} />
     </RouteGuard>
   );
 }

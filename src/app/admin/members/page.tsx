@@ -13,9 +13,9 @@ import {
   UserX,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -117,9 +117,23 @@ function MembersTableSkeleton() {
   );
 }
 
+const VALID_STATUS_FILTERS: readonly string[] = [
+  "all",
+  "active",
+  "suspended",
+  "flagged",
+  "unverified",
+];
+
 function MembersPageContent() {
+  const searchParams = useSearchParams();
+  const initialStatus = searchParams.get("status");
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
+    initialStatus && VALID_STATUS_FILTERS.includes(initialStatus)
+      ? (initialStatus as StatusFilter)
+      : "all"
+  );
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
@@ -434,9 +448,9 @@ function MembersPageContent() {
 export default function MembersPage() {
   return (
     <RouteGuard permission="users.view">
-      <DashboardShell>
+      <Suspense>
         <MembersPageContent />
-      </DashboardShell>
+      </Suspense>
     </RouteGuard>
   );
 }

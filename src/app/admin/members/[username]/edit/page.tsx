@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -370,9 +369,7 @@ export default function EditMemberPage() {
 
   return (
     <RouteGuard permission="users.edit">
-      <DashboardShell>
-        <EditMemberPageContent username={username} />
-      </DashboardShell>
+      <EditMemberPageContent username={username} />
     </RouteGuard>
   );
 }
