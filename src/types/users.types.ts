@@ -40,6 +40,7 @@ export interface AdminMember {
   discipline: string | null;
   experienceLevel: string | null;
   discordUsername: string | null;
+  discordId: string | null;
   primaryGoal: string | null;
   communityGoals: string[];
   referralSource: string | null;
