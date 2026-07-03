@@ -186,11 +186,18 @@ function ReviewPageContent({ id }: { id: string }) {
                 {age > 0 && <span className="ml-1.5 text-text-muted">({age}d ago)</span>}
               </span>
             </div>
-            {reflection.reviewedByEmail && (
+            {reflection.reviewedByUsername && (
               <div className="flex items-center gap-2">
                 <Check className="h-3.5 w-3.5 text-icon-muted" />
                 <span className="font-mono text-xs text-text-secondary">
-                  Reviewed by {reflection.reviewedByEmail} on {formatDate(reflection.reviewedAt)}
+                  Reviewed by{" "}
+                  <Link
+                    href={`/admin/members/${reflection.reviewedByUsername}`}
+                    className="font-bold text-text-primary hover:underline"
+                  >
+                    {reflection.reviewedByFullName || reflection.reviewedByUsername}
+                  </Link>{" "}
+                  on {formatDate(reflection.reviewedAt)}
                 </span>
               </div>
             )}
@@ -206,7 +213,17 @@ function ReviewPageContent({ id }: { id: string }) {
               >
                 <MessageSquareWarning className="h-3.5 w-3.5" />
                 {isApproved ? "Reviewer note" : "Changes were requested"}
-                {reflection.reviewedByEmail && ` · ${reflection.reviewedByEmail}`}
+                {reflection.reviewedByUsername && (
+                  <>
+                    {" · "}
+                    <Link
+                      href={`/admin/members/${reflection.reviewedByUsername}`}
+                      className="hover:underline"
+                    >
+                      {reflection.reviewedByFullName || reflection.reviewedByUsername}
+                    </Link>
+                  </>
+                )}
               </div>
               <p
                 className={`font-mono text-sm leading-6 ${isApproved ? "text-success-700" : "text-warning-700"}`}
