@@ -1,0 +1,55 @@
+﻿"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CareerProgressionsService } from "@/services/career-progressions.service";
+import type {
+  CareerProgressionInput,
+  CareerProgressionStatus,
+} from "@/types/career-progressions.types";
+
+export const careerProgressionKeys = {
+  mine: ["career-progressions", "mine"] as const,
+  admin: (params?: { status?: CareerProgressionStatus | ""; search?: string }) =>
+    ["career-progressions", "admin", params] as const,
+};
+
+export function useMyCareerProgressions() {
+  return useQuery({
+    queryKey: careerProgressionKeys.mine,
+    queryFn: () => CareerProgressionsService.listMine(),
+  });
+}
+
+export function useSubmitCareerProgression() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CareerProgressionInput) => CareerProgressionsService.submit(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: careerProgressionKeys.mine }),
+  });
+}
+
+export function useCareerProgressionsForReview(params?: {
+  status?: CareerProgressionStatus | "";
+  search?: string;
+}) {
+  return useQuery({
+    queryKey: careerProgressionKeys.admin(params),
+    queryFn: () => CareerProgressionsService.listForReview(params),
+  });
+}
+
+export function useReviewCareerProgression() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      action,
+      reviewNote,
+    }: {
+      id: number;
+      action: "approve" | "reject";
+      reviewNote?: string;
+    }) => CareerProgressionsService.review(id, action, reviewNote),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["career-progressions"] }),
+  });
+}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -108,6 +108,7 @@ export function PublicProfileContent() {
       })
     : null;
   const skills = profile.skills ?? [];
+  const careerProgressions = profile.careerProgressions ?? [];
   const firstName = profile.fullName?.split(" ")[0] || "This member";
 
   const isOwnProfile = currentUser?.username === username;
@@ -154,7 +155,7 @@ export function PublicProfileContent() {
       <PublicProfileHeader />
 
       <main className="flex-grow">
-        {/* ── Hero ── */}
+        {/* â”€â”€ Hero â”€â”€ */}
         <section className="relative bg-zinc-950">
           {/* Cover image */}
           <div className="absolute inset-0 h-80">
@@ -272,9 +273,9 @@ export function PublicProfileContent() {
           </div>
         </section>
 
-        {/* ── Main body ── */}
+        {/* â”€â”€ Main body â”€â”€ */}
         <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-16 sm:px-6 lg:grid-cols-[1fr_320px]">
-          {/* Left — bio + skills */}
+          {/* Left â€” bio + skills */}
           <div className="space-y-6">
             {/* Bio */}
             <div className="border border-zinc-200 bg-white">
@@ -296,6 +297,90 @@ export function PublicProfileContent() {
               </div>
             </div>
 
+            {/* Career Progression */}
+            <div className="border border-zinc-200 bg-white">
+              <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
+                <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-zinc-400">
+                  Career Progression
+                </h2>
+                {careerProgressions.length > 0 && (
+                  <span className="font-mono text-[10px] text-zinc-400">
+                    {careerProgressions.length}{" "}
+                    {careerProgressions.length === 1 ? "entry" : "entries"}
+                  </span>
+                )}
+              </div>
+              <div className="p-6">
+                {careerProgressions.length > 0 ? (
+                  <div className="relative space-y-0 before:absolute before:left-[7px] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-zinc-200">
+                    {careerProgressions.map((item, index) => {
+                      const isLast = index === careerProgressions.length - 1;
+                      const isCurrent = !item.endDate;
+                      const totalMonths = (() => {
+                        const start = new Date(item.startDate);
+                        const end = item.endDate ? new Date(item.endDate) : new Date();
+                        return (
+                          (end.getFullYear() - start.getFullYear()) * 12 +
+                          (end.getMonth() - start.getMonth())
+                        );
+                      })();
+                      const years = Math.floor(totalMonths / 12);
+                      const months = totalMonths % 12;
+                      const durationParts: string[] = [];
+                      if (years > 0) durationParts.push(`${years} yr${years > 1 ? "s" : ""}`);
+                      if (months > 0) durationParts.push(`${months} mo${months > 1 ? "s" : ""}`);
+                      const duration = totalMonths < 1 ? "< 1 mo" : durationParts.join(" ");
+                      const fmt = (d: string) =>
+                        new Intl.DateTimeFormat("en", { month: "short", year: "numeric" }).format(
+                          new Date(d)
+                        );
+
+                      return (
+                        <article key={item.id} className={`relative pl-7 ${isLast ? "" : "pb-7"}`}>
+                          {/* Timeline dot */}
+                          <span
+                            className={`absolute left-0 top-[5px] h-[15px] w-[15px] border-2 ${isCurrent ? "border-zinc-950 bg-zinc-950" : "border-zinc-400 bg-white"}`}
+                          />
+
+                          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0">
+                              <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
+                                {item.title}
+                              </h3>
+                              {item.organization && (
+                                <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
+                                  {item.organization}
+                                </p>
+                              )}
+                              <p className="mt-1 font-mono text-[11px] text-zinc-400">
+                                {fmt(item.startDate)} <span className="text-zinc-300">–</span>{" "}
+                                {isCurrent ? (
+                                  <span className="font-bold text-zinc-950">Present</span>
+                                ) : (
+                                  fmt(item.endDate as string)
+                                )}
+                                <span className="mx-1.5 text-zinc-200">·</span>
+                                {duration}
+                              </p>
+                            </div>
+                          </div>
+
+                          {item.description && (
+                            <p className="mt-2.5 whitespace-pre-wrap font-sans text-sm leading-6 text-zinc-600">
+                              {item.description}
+                            </p>
+                          )}
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="font-mono text-sm text-zinc-400 italic">
+                    {firstName} hasn't added any progression entries yet.
+                  </p>
+                )}
+              </div>
+            </div>
             {/* Skills */}
             <div className="border border-zinc-200 bg-white">
               <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
@@ -419,7 +504,7 @@ export function PublicProfileContent() {
           </aside>
         </section>
 
-        {/* ── Contributions ── */}
+        {/* â”€â”€ Contributions â”€â”€ */}
         <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
           <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} />
         </section>
