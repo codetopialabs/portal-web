@@ -159,11 +159,18 @@ function MemberHistoryContent({ username }: { username: string }) {
                   <Clock className="h-3.5 w-3.5 text-icon-muted shrink-0" />
                   {formatDate(r.submittedAt)}
                 </div>
-                <div className="flex items-center gap-1.5 font-mono text-xs text-text-tertiary">
+                <div className="font-mono text-xs text-text-tertiary">
                   {r.reviewedAt ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-icon-muted shrink-0" />
-                      {formatDate(r.reviewedAt)}
+                      <div className="flex items-center gap-1.5">
+                        <Check className="h-3.5 w-3.5 text-icon-muted shrink-0" />
+                        {formatDate(r.reviewedAt)}
+                      </div>
+                      {r.reviewedByEmail && (
+                        <p className="mt-0.5 truncate text-[10px] text-text-muted">
+                          {r.reviewedByEmail}
+                        </p>
+                      )}
                     </>
                   ) : (
                     "—"
