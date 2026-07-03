@@ -118,6 +118,10 @@ export const AuthService = {
       new_password: newPassword,
     });
   },
+
+  async deleteAccount(password: string): Promise<void> {
+    await axiosInstance.delete("/auth/me/", { data: { password } });
+  },
 };
 
 // ─── Sessions ─────────────────────────────────────────────────────────────────

@@ -13,13 +13,24 @@ import {
   Tablet,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthService, SessionService, type UserSession } from "@/services/auth.service";
+import { useAuthStore } from "@/store/auth.store";
+import { useUserStore } from "@/store/user.store";
 
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-base placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
@@ -366,6 +377,106 @@ function ActiveSessionsSection() {
   );
 }
 
+// ─── Delete Account ────────────────────────────────────────────────────────────
+
+function DeleteAccountModal() {
+  const router = useRouter();
+  const clearSession = useAuthStore((s) => s.clearSession);
+  const resetUser = useUserStore((s) => s.reset);
+
+  const [open, setOpen] = React.useState(false);
+  const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) {
+      setPassword("");
+      setError(null);
+    }
+  }
+
+  async function handleDelete() {
+    setError(null);
+    setIsDeleting(true);
+    try {
+      await AuthService.deleteAccount(password);
+      clearSession();
+      resetUser();
+      router.replace("/login?reason=account_deleted");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <Button
+        variant="outline"
+        onClick={() => setOpen(true)}
+        className="h-9 rounded-none border-red-300 text-red-600 font-mono text-xs px-5 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shrink-0"
+      >
+        Delete Account
+      </Button>
+      <DialogContent className="sm:max-w-md rounded-none">
+        <DialogHeader>
+          <DialogTitle className="font-sans text-lg font-bold text-red-700">
+            Delete your account?
+          </DialogTitle>
+          <DialogDescription className="font-mono text-sm text-zinc-500 leading-relaxed">
+            This permanently deletes your account and all associated data. This cannot be undone.
+            Enter your password to confirm.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-2">
+          <Label className={labelStyles}>Password</Label>
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`${inputStyles} pr-10`}
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+          {error && <p className="text-red-500 text-xs font-mono">{error}</p>}
+        </div>
+
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button
+            variant="outline"
+            onClick={() => handleOpenChange(false)}
+            disabled={isDeleting}
+            className="rounded-none"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            disabled={isDeleting || !password}
+            className="rounded-none bg-red-600 hover:bg-red-700 text-white"
+          >
+            {isDeleting ? "Deleting…" : "Delete My Account"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsSecurityPage() {
@@ -406,12 +517,7 @@ export default function SettingsSecurityPage() {
               Permanently removes all your data. This cannot be undone.
             </p>
           </div>
-          <Button
-            variant="outline"
-            className="h-9 rounded-none border-red-300 text-red-600 font-mono text-xs px-5 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shrink-0"
-          >
-            Delete Account
-          </Button>
+          <DeleteAccountModal />
         </div>
       </section>
     </div>
