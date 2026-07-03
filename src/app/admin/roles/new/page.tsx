@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -285,9 +284,7 @@ function NewRolePageContent() {
 export default function NewRolePage() {
   return (
     <RouteGuard permission="roles.create">
-      <DashboardShell>
-        <NewRolePageContent />
-      </DashboardShell>
+      <NewRolePageContent />
     </RouteGuard>
   );
 }

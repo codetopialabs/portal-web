@@ -8,7 +8,7 @@ const STEPS = [
   { label: "Core Values", description: "What we stand for" },
   { label: "Code of Conduct", description: "How we behave & enforce" },
   { label: "Intro Video", description: "Meet Codetopia Community" },
-  { label: "Join Us", description: "Discord & WhatsApp" },
+  { label: "Connect", description: "Community Socials" },
   { label: "Your Background", description: "Discipline & experience" },
   { label: "Your Goals", description: "What you're here for" },
   { label: "Your Profile", description: "Set up your account" },

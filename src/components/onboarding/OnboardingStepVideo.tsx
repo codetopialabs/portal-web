@@ -8,11 +8,11 @@ interface StepProps {
 export function OnboardingStepVideo({ onNext, onBack }: StepProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Intro Video
       </span>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Meet Codetopia Community
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-8">

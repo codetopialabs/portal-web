@@ -15,7 +15,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMember } from "@/hooks/useAdmin";
@@ -362,9 +361,7 @@ export default function ReviewPage() {
   const params = useParams<{ id: string }>();
   return (
     <RouteGuard permission="reflections.view_any">
-      <DashboardShell>
-        <ReviewPageContent id={params.id} />
-      </DashboardShell>
+      <ReviewPageContent id={params.id} />
     </RouteGuard>
   );
 }

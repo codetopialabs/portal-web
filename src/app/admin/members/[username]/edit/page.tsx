@@ -3,43 +3,65 @@
 import { CheckCircle2, Mail, MapPin, Shield } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMember, useUpdateAdminMember } from "@/hooks/useAdmin";
 import { getAvatarUrl } from "@/lib/utils";
+import type { AdminMemberDetail } from "@/types/users.types";
 
 function MemberEditForm({ identifier }: { identifier: string }) {
-  const router = useRouter();
   const { data: member, isLoading, isError } = useAdminMember(identifier);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-5">
+        <Skeleton className="h-36 w-full rounded-none" />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <Skeleton className="h-96 w-full rounded-none" />
+          <Skeleton className="h-64 w-full rounded-none" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !member) {
+    return (
+      <div className="border border-error-200 bg-error-50 p-8">
+        <p className="font-sans text-base font-black text-error-700">
+          Member details could not be loaded.
+        </p>
+        <p className="mt-2 font-mono text-xs text-error-600">
+          Please refresh the page and try again.
+        </p>
+      </div>
+    );
+  }
+
+  return <MemberEditFields key={member.id} identifier={identifier} member={member} />;
+}
+
+function MemberEditFields({
+  identifier,
+  member,
+}: {
+  identifier: string;
+  member: AdminMemberDetail;
+}) {
+  const router = useRouter();
   const { mutate: updateMember, isPending } = useUpdateAdminMember();
 
-  const [initialized, setInitialized] = useState(false);
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [bio, setBio] = useState("");
-  const [location, setLocation] = useState("");
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [memberStatus, setMemberStatus] = useState("");
-  const [currentRole, setCurrentRole] = useState("");
+  const [username, setUsername] = useState(member.username ?? "");
+  const [fullName, setFullName] = useState(member.fullName ?? "");
+  const [bio, setBio] = useState(member.bio ?? "");
+  const [location, setLocation] = useState(member.location ?? "");
+  const [isEmailVerified, setIsEmailVerified] = useState(Boolean(member.isEmailVerified));
+  const [memberStatus, setMemberStatus] = useState(member.memberStatus ?? "");
+  const [currentRole, setCurrentRole] = useState(member.currentRole ?? "");
   const [errors, setErrors] = useState<{ fullName?: string; username?: string; form?: string }>({});
-
-  useEffect(() => {
-    if (member && !initialized) {
-      setUsername(member.username ?? "");
-      setFullName(member.fullName ?? "");
-      setBio(member.bio ?? "");
-      setLocation(member.location ?? "");
-      setIsEmailVerified(Boolean(member.isEmailVerified));
-      setMemberStatus(member.memberStatus ?? "");
-      setCurrentRole(member.currentRole ?? "");
-      setInitialized(true);
-    }
-  }, [member, initialized]);
 
   function validate(): boolean {
     const next: typeof errors = {};
@@ -75,31 +97,6 @@ function MemberEditForm({ identifier }: { identifier: string }) {
           }));
         },
       }
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-5">
-        <Skeleton className="h-36 w-full rounded-none" />
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <Skeleton className="h-96 w-full rounded-none" />
-          <Skeleton className="h-64 w-full rounded-none" />
-        </div>
-      </div>
-    );
-  }
-
-  if (isError || !member) {
-    return (
-      <div className="border border-error-200 bg-error-50 p-8">
-        <p className="font-sans text-base font-black text-error-700">
-          Member details could not be loaded.
-        </p>
-        <p className="mt-2 font-mono text-xs text-error-600">
-          Please refresh the page and try again.
-        </p>
-      </div>
     );
   }
 
@@ -370,9 +367,7 @@ export default function EditMemberPage() {
 
   return (
     <RouteGuard permission="users.edit">
-      <DashboardShell>
-        <EditMemberPageContent username={username} />
-      </DashboardShell>
+      <EditMemberPageContent username={username} />
     </RouteGuard>
   );
 }

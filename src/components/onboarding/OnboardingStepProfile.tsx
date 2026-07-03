@@ -4,22 +4,7 @@ import { ArrowLeft, ArrowRight, Camera, Cpu, Globe, Loader2, Plus, User, X } fro
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  FaBehance,
-  FaCodepen,
-  FaDribbble,
-  FaFacebook,
-  FaGithub,
-  FaGitlab,
-  FaInstagram,
-  FaLinkedin,
-  FaMedium,
-  FaStackOverflow,
-  FaTelegram,
-  FaTiktok,
-  FaWhatsapp,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { NationalitySelect } from "@/components/ui/nationality-select";
 import {
   Select,
@@ -28,10 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAvatarUrl } from "@/lib/utils";
+import { LINK_PLATFORMS } from "@/lib/social-platforms";
+import {
+  getAvatarUrl,
+  getDateOfBirthBounds,
+  resolveSocialUrl,
+  sanitizeHandle,
+  validateDateOfBirth,
+} from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
+import { normalizeUrl } from "@/utils/url";
 
 interface OnboardingStepProfileProps {
   onBack: () => void;
@@ -39,8 +32,6 @@ interface OnboardingStepProfileProps {
 }
 
 interface ProfileFormValues {
-  full_name: string;
-  username: string;
   date_of_birth: string;
   gender: string;
   nationality: string;
@@ -51,91 +42,10 @@ interface ProfileFormValues {
   website_url: string;
 }
 
-const LINK_PLATFORMS = [
-  {
-    value: "gitlab",
-    label: "GitLab",
-    icon: FaGitlab,
-    color: "#FC6D26",
-    placeholder: "gitlab.com/username",
-  },
-  {
-    value: "stackoverflow",
-    label: "Stack Overflow",
-    icon: FaStackOverflow,
-    color: "#F58025",
-    placeholder: "stackoverflow.com/users/...",
-  },
-  {
-    value: "codepen",
-    label: "CodePen",
-    icon: FaCodepen,
-    color: "#000000",
-    placeholder: "codepen.io/username",
-  },
-  {
-    value: "dribbble",
-    label: "Dribbble",
-    icon: FaDribbble,
-    color: "#EA4C89",
-    placeholder: "dribbble.com/username",
-  },
-  {
-    value: "behance",
-    label: "Behance",
-    icon: FaBehance,
-    color: "#1769FF",
-    placeholder: "behance.net/username",
-  },
-  {
-    value: "instagram",
-    label: "Instagram",
-    icon: FaInstagram,
-    color: "#E1306C",
-    placeholder: "instagram.com/username",
-  },
-  {
-    value: "facebook",
-    label: "Facebook",
-    icon: FaFacebook,
-    color: "#1877F2",
-    placeholder: "facebook.com/username",
-  },
-  {
-    value: "tiktok",
-    label: "TikTok",
-    icon: FaTiktok,
-    color: "#000000",
-    placeholder: "tiktok.com/@username",
-  },
-  {
-    value: "telegram",
-    label: "Telegram",
-    icon: FaTelegram,
-    color: "#26A5E4",
-    placeholder: "t.me/username",
-  },
-  {
-    value: "whatsapp",
-    label: "WhatsApp",
-    icon: FaWhatsapp,
-    color: "#25D366",
-    placeholder: "wa.me/number",
-  },
-  {
-    value: "medium",
-    label: "Medium",
-    icon: FaMedium,
-    color: "#000000",
-    placeholder: "medium.com/@username",
-  },
-  { value: "custom", label: "Custom", icon: Globe, color: "#71717A", placeholder: "https://..." },
-];
-
 const inputStyles =
   "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all";
 
-const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold";
+const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
@@ -170,12 +80,18 @@ function BioCharCount({
   return (
     <p
       className={`text-right font-mono text-[10px] mt-1 ${
-        over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-400"
+        over ? "text-red-500" : near ? "text-amber-500" : "text-zinc-500"
       }`}
     >
       {count} / {max}
     </p>
   );
+}
+
+const dateOfBirthBounds = getDateOfBirthBounds();
+
+function generateLinkId(platform: string): string {
+  return `${platform}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
 
 export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileProps) {
@@ -197,7 +113,11 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [customLinks, setCustomLinks] = useState<
     { id: string; platform: string; label: string; url: string }[]
-  >([]);
+  >(() =>
+    (onboarding.socialLinks.length ? onboarding.socialLinks : (profile?.socialLinks ?? [])).map(
+      (link) => ({ id: generateLinkId(link.platform), ...link })
+    )
+  );
   const [showPicker, setShowPicker] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -234,7 +154,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     setCustomLinks((prev) => [
       ...prev,
       {
-        id: `${platform}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+        id: generateLinkId(platform),
         platform,
         label: p?.label ?? "",
         url: "",
@@ -263,8 +183,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     defaultValues: {
-      full_name: profile?.fullName || "",
-      username: profile?.username || "",
       date_of_birth: onboarding.dateOfBirth || profile?.dateOfBirth || "",
       gender: onboarding.gender || profile?.gender || "",
       nationality: onboarding.nationality || profile?.nationality || "",
@@ -278,13 +196,10 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
   // Populate the form from profile once it's available. We use the callback
   // form of reset() so we can read whatever the user has already typed
-  // (current.*) and only fill in blanks from profile. full_name and username
-  // always come from profile — the user cannot set them in a prior step.
+  // (current.*) and only fill in blanks from profile.
   useEffect(() => {
     if (!profile) return;
     reset((current) => ({
-      full_name: current.full_name || profile.fullName || "",
-      username: current.username || profile.username || "",
       date_of_birth: current.date_of_birth || profile.dateOfBirth || "",
       gender: current.gender || profile.gender || "",
       nationality: current.nationality || profile.nationality || "",
@@ -299,8 +214,8 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
   function saveToStore() {
     const v = getValues();
     onboarding.merge({
-      fullName: v.full_name,
-      username: v.username,
+      fullName: profile?.fullName ?? "",
+      username: profile?.username ?? "",
       dateOfBirth: v.date_of_birth,
       gender: v.gender,
       nationality: v.nationality,
@@ -309,6 +224,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       linkedinUrl: v.linkedin_url,
       twitterHandle: v.twitter_handle,
       websiteUrl: v.website_url,
+      socialLinks: customLinks.map(({ platform, label, url }) => ({ platform, label, url })),
       skills,
       avatarUrl,
     });
@@ -332,17 +248,29 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
     setSubmitError(null);
     try {
       await updateMe({
-        full_name: data.full_name.trim(),
-        username: data.username.trim(),
-        bio: data.bio || undefined,
+        bio: data.bio,
         skills,
-        github_handle: data.github_handle || undefined,
-        linkedin_url: data.linkedin_url || undefined,
-        twitter_handle: data.twitter_handle || undefined,
-        website_url: data.website_url || undefined,
-        date_of_birth: data.date_of_birth || undefined,
-        gender: data.gender || undefined,
-        nationality: data.nationality || undefined,
+        github_handle: sanitizeHandle(data.github_handle),
+        linkedin_url: data.linkedin_url
+          ? resolveSocialUrl(data.linkedin_url, "https://linkedin.com/in/")
+          : "",
+        twitter_handle: sanitizeHandle(data.twitter_handle),
+        website_url: data.website_url,
+        social_links: customLinks
+          .filter((link) => link.url.trim())
+          .map(({ platform, label, url }) => {
+            const platformDef = LINK_PLATFORMS.find((p) => p.value === platform);
+            return {
+              platform,
+              label,
+              url: platformDef?.prefix
+                ? resolveSocialUrl(url, platformDef.prefix)
+                : normalizeUrl(url),
+            };
+          }),
+        date_of_birth: data.date_of_birth || null,
+        gender: data.gender,
+        nationality: data.nationality,
         profile_picture_url: avatarUrl || undefined,
         is_onboarded: true,
       });
@@ -362,10 +290,10 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       onSubmit={handleSubmit(onSubmit)}
       className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl"
     >
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Final Step
       </span>
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Your Profile
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-6">
@@ -441,7 +369,8 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <div className="p-4 bg-white border border-zinc-200">
             <p className="font-mono text-xs text-zinc-500 leading-relaxed">
-              Your profile is visible across the Codetopia ecosystem once you complete setup.
+              Your profile is visible across the Codetopia Community ecosystem once you complete
+              setup.
             </p>
           </div>
         </div>
@@ -453,86 +382,36 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             <div className="bg-white border border-zinc-200 p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label htmlFor="full_name" className={labelStyles}>
-                    Display Name *
-                  </label>
-                  <input
-                    id="full_name"
-                    className={inputStyles}
-                    placeholder="Your display name"
-                    {...register("full_name", {
-                      required: "Display name is required",
-                      validate: (v) => {
-                        const trimmed = v.trim();
-                        if (trimmed === "") return "Display name is required";
-                        if (trimmed.length < 2) return "Min 2 characters";
-                        if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(trimmed)) {
-                          return "Letters, spaces, hyphens and apostrophes only";
-                        }
-                        return true;
-                      },
-                    })}
-                  />
-                  {errors.full_name && (
-                    <p className="text-red-500 text-xs font-mono">{errors.full_name.message}</p>
-                  )}
+                  <p className={labelStyles}>Display Name</p>
+                  <p className="h-11 flex items-center border border-zinc-200 bg-zinc-50 px-3 font-mono text-sm text-zinc-900">
+                    {profile?.fullName}
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="username" className={labelStyles}>
-                    Username *
-                  </label>
-                  <input
-                    id="username"
-                    className={inputStyles}
-                    placeholder="your_username"
-                    {...register("username", {
-                      required: "Username is required",
-                      validate: (v) => {
-                        const trimmed = v.trim();
-                        if (trimmed === "") return "Username is required";
-                        if (trimmed.length < 3) return "Min 3 characters";
-                        if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
-                          return "Letters, numbers and underscores only";
-                        }
-                        return true;
-                      },
-                    })}
-                  />
-                  {errors.username && (
-                    <p className="text-red-500 text-xs font-mono">{errors.username.message}</p>
-                  )}
+                  <p className={labelStyles}>Username</p>
+                  <p className="h-11 flex items-center border border-zinc-200 bg-zinc-50 px-3 font-mono text-sm text-zinc-900">
+                    @{profile?.username}
+                  </p>
                 </div>
               </div>
+              <p className="font-mono text-[11px] text-zinc-500 leading-relaxed -mt-3">
+                Set at sign up. You can change these later in Settings.
+              </p>
 
               <div className="space-y-2">
                 <label htmlFor="date-of-birth" className={labelStyles}>
                   Birthday
                 </label>
-                <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
+                <p className="font-mono text-[11px] text-zinc-500 leading-relaxed">
                   Only your day and month are visible to others. You must be at least 13 to join.
                 </p>
                 <input
                   id="date-of-birth"
                   type="date"
+                  min={dateOfBirthBounds.min}
+                  max={dateOfBirthBounds.max}
                   className={inputStyles}
-                  {...register("date_of_birth", {
-                    validate: (v) => {
-                      if (!v) return true;
-                      const dob = new Date(v);
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      if (dob >= today) return "Birthday can't be today or in the future.";
-                      const age =
-                        today.getFullYear() -
-                        dob.getFullYear() -
-                        (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate())
-                          ? 1
-                          : 0);
-                      if (age < 13) return "You must be at least 13 years old.";
-                      if (age > 120) return "Please enter a valid date of birth.";
-                      return true;
-                    },
-                  })}
+                  {...register("date_of_birth", { validate: validateDateOfBirth })}
                 />
                 {errors.date_of_birth && (
                   <p className="text-red-500 text-xs font-mono">{errors.date_of_birth.message}</p>
@@ -558,6 +437,8 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1">
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
+                        <SelectItem value="Non-binary">Non-binary</SelectItem>
+                        <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -569,12 +450,12 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
               <div className="space-y-2">
                 <label htmlFor="nationality" className={labelStyles}>
-                  Nationality *
+                  Country *
                 </label>
                 <Controller
                   name="nationality"
                   control={control}
-                  rules={{ required: "Nationality is required" }}
+                  rules={{ required: "Country is required" }}
                   render={({ field }) => (
                     <NationalitySelect
                       value={field.value}
@@ -615,7 +496,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <section className="space-y-4">
             <SectionHeader icon={Globe} title="Social Links" />
-            <p className="font-mono text-xs text-zinc-400">
+            <p className="font-mono text-xs text-zinc-500">
               All optional. Adding at least one helps the community connect with you.
             </p>
             <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
@@ -685,7 +566,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <button
                   type="button"
                   onClick={() => setShowPicker((v) => !v)}
-                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors"
                 >
                   <Plus className="w-3 h-3" /> Add link
                 </button>
@@ -694,7 +575,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
             {showPicker && (
               <div className="border border-zinc-200 bg-zinc-50 p-4">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-3">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
                   Choose platform
                 </p>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-1">
@@ -771,7 +652,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <button
                     type="button"
                     onClick={() => setIsAddingSkill(true)}
-                    className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:border-zinc-900 hover:text-zinc-900 transition-all"
+                    className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all"
                   >
                     <Plus className="w-3 h-3" /> Add
                   </button>
@@ -821,7 +702,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white w-full max-w-sm p-8 space-y-5 shadow-2xl">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-mono font-bold mb-2">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-mono font-bold mb-2">
                 One last thing
               </p>
               <h2 className="font-bold text-xl text-zinc-900 leading-snug">

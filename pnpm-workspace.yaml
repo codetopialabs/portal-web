@@ -1,3 +1,10 @@
+allowBuilds:
+  msw: true
+  sharp: true
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+overrides:
+  form-data: ^4.0.6
+  postcss: ^8.5.10
+  js-yaml: ^3.15.0

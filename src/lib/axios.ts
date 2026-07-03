@@ -150,9 +150,15 @@ axiosInstance.interceptors.response.use(
 
         rejectQueue(refreshError);
 
-        // Refresh failed (invalid token) — clear cookies, clear the in-memory stores,
-        // then redirect to login with a session-expired flag so the login
-        // page can show the right message.
+        // Refresh failed (invalid token) — clear cookies and the in-memory
+        // stores. We deliberately do NOT force-navigate here: this
+        // interceptor runs for every request on every page, including
+        // public ones (e.g. a member's public profile) that never
+        // required a session in the first place. Whether to redirect to
+        // /login is a per-route decision that belongs to RouteGuard,
+        // which already reacts to the session being cleared. We just
+        // leave a flag so the login page can explain *why* it landed
+        // there, for the pages where RouteGuard does redirect.
         clearAuthCookies();
 
         // Clear Zustand stores without importing them at module level
@@ -165,9 +171,9 @@ axiosInstance.interceptors.response.use(
             useUserStore.getState().reset();
           } catch {
             // If dynamic import fails for any reason, the cookie clear above
-            // is still sufficient — the user will land on /login cleanly.
+            // is still sufficient.
           }
-          window.location.href = "/login?reason=session_expired";
+          sessionStorage.setItem("sessionExpired", "1");
         }
         return Promise.reject(refreshError);
       }

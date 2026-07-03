@@ -1,27 +1,11 @@
 "use client";
 
 import type { DriveStep } from "driver.js";
-import { Camera, Cpu, Globe, Loader2, MapPin, Plus, User, X } from "lucide-react";
+import { Camera, Cpu, Globe, Loader2, MapPin, Pencil, Plus, User, X } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  FaBehance,
-  FaCodepen,
-  FaDiscord,
-  FaDribbble,
-  FaFacebook,
-  FaGithub,
-  FaGitlab,
-  FaInstagram,
-  FaLinkedin,
-  FaMedium,
-  FaStackOverflow,
-  FaTelegram,
-  FaTiktok,
-  FaWhatsapp,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
@@ -36,90 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
-import { getAvatarUrl, toTitleCase } from "@/lib/utils";
+import { LINK_PLATFORMS } from "@/lib/social-platforms";
+import {
+  getAvatarUrl,
+  getDateOfBirthBounds,
+  resolveSocialUrl,
+  sanitizeHandle,
+  toTitleCase,
+  validateDateOfBirth,
+} from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
-
-const LINK_PLATFORMS = [
-  {
-    value: "gitlab",
-    label: "GitLab",
-    icon: FaGitlab,
-    color: "#FC6D26",
-    placeholder: "gitlab.com/username",
-  },
-  {
-    value: "stackoverflow",
-    label: "Stack Overflow",
-    icon: FaStackOverflow,
-    color: "#F58025",
-    placeholder: "stackoverflow.com/users/...",
-  },
-  {
-    value: "codepen",
-    label: "CodePen",
-    icon: FaCodepen,
-    color: "#000000",
-    placeholder: "codepen.io/username",
-  },
-  {
-    value: "dribbble",
-    label: "Dribbble",
-    icon: FaDribbble,
-    color: "#EA4C89",
-    placeholder: "dribbble.com/username",
-  },
-  {
-    value: "behance",
-    label: "Behance",
-    icon: FaBehance,
-    color: "#1769FF",
-    placeholder: "behance.net/username",
-  },
-  {
-    value: "instagram",
-    label: "Instagram",
-    icon: FaInstagram,
-    color: "#E1306C",
-    placeholder: "instagram.com/username",
-  },
-  {
-    value: "facebook",
-    label: "Facebook",
-    icon: FaFacebook,
-    color: "#1877F2",
-    placeholder: "facebook.com/username",
-  },
-  {
-    value: "tiktok",
-    label: "TikTok",
-    icon: FaTiktok,
-    color: "#000000",
-    placeholder: "tiktok.com/@username",
-  },
-  {
-    value: "telegram",
-    label: "Telegram",
-    icon: FaTelegram,
-    color: "#26A5E4",
-    placeholder: "t.me/username",
-  },
-  {
-    value: "whatsapp",
-    label: "WhatsApp",
-    icon: FaWhatsapp,
-    color: "#25D366",
-    placeholder: "wa.me/number",
-  },
-  {
-    value: "medium",
-    label: "Medium",
-    icon: FaMedium,
-    color: "#000000",
-    placeholder: "medium.com/@username",
-  },
-  { value: "custom", label: "Custom", icon: Globe, color: "#71717A", placeholder: "https://..." },
-];
+import { normalizeUrl } from "@/utils/url";
 
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
@@ -178,6 +90,14 @@ function BioCharCount({ watch }: { watch: (name: string) => string }) {
   );
 }
 
+const dateOfBirthBounds = getDateOfBirthBounds();
+
+function generateLinkId(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 export default function SettingsProfilePage() {
   const profile = useUserStore((s) => s.profile);
   const updateMe = useUserStore((s) => s.updateMe);
@@ -187,8 +107,9 @@ export default function SettingsProfilePage() {
   const [isAdding, setIsAdding] = useState(false);
   const [customLinks, setCustomLinks] = useState<
     { id: string; platform: string; label: string; url: string }[]
-  >([]);
+  >(() => (profile?.socialLinks ?? []).map((link) => ({ id: generateLinkId(), ...link })));
   const [showPicker, setShowPicker] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -310,10 +231,7 @@ export default function SettingsProfilePage() {
 
   function addCustomLink(platform: string) {
     const p = LINK_PLATFORMS.find((pl) => pl.value === platform);
-    const id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const id = generateLinkId();
     setCustomLinks((prev) => [...prev, { id, platform, label: p?.label ?? "", url: "" }]);
     setShowPicker(false);
   }
@@ -379,18 +297,32 @@ export default function SettingsProfilePage() {
       await updateMe({
         full_name: data.full_name.trim(),
         username: data.username.trim(),
-        location: data.location.trim() || undefined,
-        current_role: data.current_role.trim() ? toTitleCase(data.current_role) : undefined,
+        location: data.location.trim(),
+        current_role: data.current_role.trim() ? toTitleCase(data.current_role) : "",
         primary_role: data.primary_role,
-        date_of_birth: data.date_of_birth || undefined,
-        gender: data.gender || undefined,
-        nationality: data.nationality || undefined,
-        bio: data.bio.trim() || undefined,
-        discord_username: data.discord_username.trim().replace(/^@/, "") || undefined,
-        github_handle: data.github_handle.trim() || undefined,
-        linkedin_url: data.linkedin_url.trim() || undefined,
-        twitter_handle: data.twitter_handle.trim() || undefined,
-        website_url: data.website_url.trim() || undefined,
+        date_of_birth: data.date_of_birth || null,
+        gender: data.gender,
+        nationality: data.nationality,
+        bio: data.bio.trim(),
+        discord_username: data.discord_username.trim().replace(/^@/, ""),
+        github_handle: sanitizeHandle(data.github_handle),
+        linkedin_url: data.linkedin_url
+          ? resolveSocialUrl(data.linkedin_url, "https://linkedin.com/in/")
+          : "",
+        twitter_handle: sanitizeHandle(data.twitter_handle),
+        website_url: data.website_url.trim(),
+        social_links: customLinks
+          .filter((link) => link.url.trim())
+          .map(({ platform, label, url }) => {
+            const platformDef = LINK_PLATFORMS.find((p) => p.value === platform);
+            return {
+              platform,
+              label,
+              url: platformDef?.prefix
+                ? resolveSocialUrl(url, platformDef.prefix)
+                : normalizeUrl(url),
+            };
+          }),
         skills,
         cover_image_url: newCoverUrl ?? undefined,
         profile_picture_url: newAvatarUrl ?? undefined,
@@ -398,6 +330,7 @@ export default function SettingsProfilePage() {
 
       toast.success("Profile updated.");
       reset(data);
+      setIsEditingUsername(false);
       if (coverFile) {
         setCoverFile(null);
         if (coverPreview) URL.revokeObjectURL(coverPreview);
@@ -532,7 +465,7 @@ export default function SettingsProfilePage() {
 
         <div className="p-4 bg-zinc-50 border border-zinc-200">
           <p className="font-mono text-xs text-zinc-500 leading-relaxed">
-            Changes are visible across the Codetopia ecosystem once saved.
+            Changes are visible across the Codetopia Community ecosystem once saved.
           </p>
         </div>
       </div>
@@ -566,20 +499,38 @@ export default function SettingsProfilePage() {
                   const daysLeft = onCooldown
                     ? Math.ceil(cooldownRemaining / (24 * 60 * 60 * 1000))
                     : 0;
+                  const canEdit = isEditingUsername && !onCooldown;
                   return (
                     <>
-                      <Input
-                        id="username"
-                        className={inputStyles}
-                        disabled={onCooldown}
-                        {...register("username", {
-                          onChange: (e) => {
-                            e.target.value = e.target.value
-                              .toLowerCase()
-                              .replace(/[^a-z0-9_-]/g, "");
-                          },
-                        })}
-                      />
+                      <div className="relative">
+                        <Input
+                          id="username"
+                          className={`${inputStyles} pr-9 ${!canEdit ? "bg-zinc-50 text-zinc-500" : ""}`}
+                          readOnly={!canEdit}
+                          {...register("username", {
+                            onChange: (e) => {
+                              e.target.value = e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9_-]/g, "");
+                            },
+                          })}
+                        />
+                        {!onCooldown && !isEditingUsername && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditingUsername(true);
+                              requestAnimationFrame(() =>
+                                document.getElementById("username")?.focus()
+                              );
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 transition-colors"
+                            aria-label="Edit username"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
                       {onCooldown ? (
                         <p className="font-mono text-[10px] text-amber-600 font-bold">
                           Username can only be changed every 3 months. Available in {daysLeft} day
@@ -704,9 +655,14 @@ export default function SettingsProfilePage() {
               <Input
                 id="date-of-birth"
                 type="date"
+                min={dateOfBirthBounds.min}
+                max={dateOfBirthBounds.max}
                 className={inputStyles}
-                {...register("date_of_birth")}
+                {...register("date_of_birth", { validate: validateDateOfBirth })}
               />
+              {errors.date_of_birth && (
+                <p className="font-mono text-xs text-red-500">{errors.date_of_birth.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -738,6 +694,18 @@ export default function SettingsProfilePage() {
                       >
                         Female
                       </SelectItem>
+                      <SelectItem
+                        value="Non-binary"
+                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                      >
+                        Non-binary
+                      </SelectItem>
+                      <SelectItem
+                        value="Prefer not to say"
+                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
+                      >
+                        Prefer not to say
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -749,7 +717,7 @@ export default function SettingsProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="nationality" className={labelStyles}>
-                Nationality
+                Country
               </Label>
               <Controller
                 name="nationality"

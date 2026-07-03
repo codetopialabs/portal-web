@@ -85,15 +85,28 @@ export function DashboardSidebar() {
                     <SidebarMenuItem key={item.label}>
                       <SidebarMenuButton
                         asChild
-                        tooltip={item.label}
+                        tooltip={item.comingSoon ? `${item.label} (Coming Soon)` : item.label}
                         isActive={active}
-                        className={itemClass(active)}
+                        className={
+                          item.comingSoon
+                            ? "h-9 rounded-none text-zinc-600 hover:text-zinc-400 hover:bg-transparent"
+                            : itemClass(active)
+                        }
                       >
                         <Link href={item.href} className="flex items-center gap-3 px-3">
-                          <item.icon className={iconClass(active)} />
+                          <item.icon
+                            className={
+                              item.comingSoon ? "w-4 h-4 shrink-0 text-zinc-700" : iconClass(active)
+                            }
+                          />
                           <span className="font-mono text-[11px] uppercase tracking-wider">
                             {item.label}
                           </span>
+                          {item.comingSoon && (
+                            <span className="ml-auto font-mono text-[8px] uppercase tracking-wider text-zinc-600 border border-zinc-800 px-1 py-0.5">
+                              Soon
+                            </span>
+                          )}
                           {item.label === "Teams" && pendingInviteCount > 0 && (
                             <span className="ml-auto flex h-4 min-w-4 items-center justify-center bg-white text-black font-mono text-[9px] font-bold px-1">
                               {pendingInviteCount > 9 ? "9+" : pendingInviteCount}

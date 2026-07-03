@@ -31,3 +31,68 @@ export function toTitleCase(value: string): string {
   if (!trimmed) return trimmed;
   return trimmed.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }
+
+/**
+ * Strips protocol, domain, leading "@", and trailing slash from a pasted
+ * profile URL/handle, leaving just the bare handle — e.g.
+ * "https://github.com/octocat/" or "@octocat" both become "octocat".
+ */
+export function sanitizeHandle(value: string): string {
+  return value
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+\//i, "")
+    .replace(/^@/, "")
+    .replace(/\/+$/, "");
+}
+
+const DOMAIN_LIKE = /^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i;
+
+/**
+ * Resolves a social-profile field into a complete URL, accepting whichever
+ * shape the user typed: a bare handle ("octocat"), a domain/path with no
+ * protocol ("linkedin.com/in/octocat"), or a full pasted URL
+ * ("https://linkedin.com/in/octocat"). `prefix` is the platform's canonical
+ * "https://domain/path-segment" used only when the input is a bare handle.
+ */
+export function resolveSocialUrl(rawInput: string, prefix: string): string {
+  const trimmed = rawInput.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (DOMAIN_LIKE.test(trimmed)) return `https://${trimmed}`;
+  return `${prefix}${trimmed.replace(/^@/, "")}`;
+}
+
+const MIN_AGE = 13;
+const MAX_AGE = 120;
+
+function formatLocalISODate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/** Bounds for a date-of-birth `<input type="date">`, so the native picker can't select an invalid age. */
+export function getDateOfBirthBounds(): { min: string; max: string } {
+  const today = new Date();
+  const maxDate = new Date(today.getFullYear() - MIN_AGE, today.getMonth(), today.getDate());
+  const minDate = new Date(today.getFullYear() - MAX_AGE, today.getMonth(), today.getDate());
+  return { min: formatLocalISODate(minDate), max: formatLocalISODate(maxDate) };
+}
+
+/** react-hook-form `validate` for a date-of-birth field: rejects future dates and ages outside 13-120. */
+export function validateDateOfBirth(value: string): string | true {
+  if (!value) return true;
+  const dob = new Date(value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (dob >= today) return "Birthday can't be today or in the future.";
+  const age =
+    today.getFullYear() -
+    dob.getFullYear() -
+    (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate()) ? 1 : 0);
+  if (age < MIN_AGE) return `You must be at least ${MIN_AGE} years old.`;
+  if (age > MAX_AGE) return "Please enter a valid date of birth.";
+  return true;
+}

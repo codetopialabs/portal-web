@@ -137,11 +137,11 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Code of Conduct
       </span>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         How We Behave
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-8">
@@ -156,7 +156,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
           className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
             activeTab === "encouraged"
               ? "border-emerald-500 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
+              : "border-transparent text-zinc-500 hover:text-zinc-600"
           }`}
         >
           <span className="w-1.5 h-1.5 bg-emerald-500 shrink-0" />
@@ -168,7 +168,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
           className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
             activeTab === "restricted"
               ? "border-red-500 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
+              : "border-transparent text-zinc-500 hover:text-zinc-600"
           }`}
         >
           <span className="w-1.5 h-1.5 bg-red-500 shrink-0" />
@@ -180,7 +180,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
           className={`flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-[0.2em] font-mono font-bold transition-colors border-b-2 -mb-px ${
             activeTab === "enforcement"
               ? "border-zinc-900 text-zinc-900"
-              : "border-transparent text-zinc-400 hover:text-zinc-600"
+              : "border-transparent text-zinc-500 hover:text-zinc-600"
           }`}
         >
           <span className="w-1.5 h-1.5 bg-zinc-900 shrink-0" />
@@ -189,39 +189,51 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
       </div>
 
       {/* Tab content */}
-      <div className="space-y-5 mb-8">
-        {activeTab === "encouraged" &&
-          ENCOURAGED.map((item) => (
-            <div key={item.label} className="flex gap-3 animate-in fade-in duration-300">
-              <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-1" />
-              <div>
-                <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
-                <p className="text-sm font-mono text-zinc-500 leading-relaxed mt-0.5">
-                  {item.detail}
-                </p>
+      <div className="mb-8">
+        {activeTab === "encouraged" && (
+          <div className="divide-y divide-zinc-200">
+            {ENCOURAGED.map((item) => (
+              <div
+                key={item.label}
+                className="flex gap-3 py-4 first:pt-0 last:pb-0 animate-in fade-in duration-300"
+              >
+                <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
+                  <p className="text-sm font-mono text-zinc-500 leading-relaxed mt-0.5">
+                    {item.detail}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
 
-        {activeTab === "restricted" &&
-          RESTRICTED.map((item) => (
-            <div key={item.label} className="flex gap-3 animate-in fade-in duration-300">
-              <X className="w-3.5 h-3.5 text-red-400 shrink-0 mt-1" />
-              <div>
-                <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
-                <p className="text-sm font-mono text-zinc-500 leading-relaxed mt-0.5">
-                  {item.detail}
-                </p>
+        {activeTab === "restricted" && (
+          <div className="divide-y divide-zinc-200">
+            {RESTRICTED.map((item) => (
+              <div
+                key={item.label}
+                className="flex gap-3 py-4 first:pt-0 last:pb-0 animate-in fade-in duration-300"
+              >
+                <X className="w-3.5 h-3.5 text-red-400 shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm font-mono font-semibold text-zinc-800">{item.label}</p>
+                  <p className="text-sm font-mono text-zinc-500 leading-relaxed mt-0.5">
+                    {item.detail}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
 
         {activeTab === "enforcement" && (
           <div className="animate-in fade-in duration-300 space-y-6">
             <div className="border border-zinc-200 bg-white p-5 flex gap-4 items-start">
               <Mail className="w-4 h-4 text-zinc-400 shrink-0 mt-1" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-400 mb-2">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-500 mb-2">
                   Report an Issue
                 </p>
                 <p className="text-sm font-mono text-zinc-600 leading-relaxed mb-3">
@@ -234,7 +246,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
                 >
                   codetopiancommunity@gmail.com
                 </a>
-                <p className="text-xs font-mono text-zinc-400 mt-3">
+                <p className="text-xs font-mono text-zinc-500 mt-3">
                   All reports are taken seriously and handled with confidentiality.
                 </p>
               </div>
@@ -243,7 +255,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
             <div>
               <div className="flex items-center gap-2 mb-5">
                 <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
-                <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-400">
+                <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-500">
                   Enforcement Ladder
                 </p>
               </div>
@@ -261,7 +273,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
                     <div className="pb-4 flex flex-col gap-3">
                       <p className="text-sm font-mono font-semibold text-zinc-900">{step.level}</p>
                       <div>
-                        <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-500 block mb-1">
                           Event
                         </span>
                         <p className="text-sm font-mono text-zinc-600 leading-relaxed">
@@ -269,7 +281,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
                         </p>
                       </div>
                       <div>
-                        <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-400 block mb-1">
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-mono font-bold text-zinc-500 block mb-1">
                           Consequence
                         </span>
                         <p className="text-sm font-mono text-zinc-600 leading-relaxed">
@@ -329,7 +341,7 @@ export function OnboardingStepConduct({ onNext, onBack }: StepProps) {
             disabled={!agreed}
             className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Check className="w-3.5 h-3.5" /> I Agree — Continue
+            <Check className="w-3.5 h-3.5" /> I Agree, Continue
           </button>
         )}
       </div>

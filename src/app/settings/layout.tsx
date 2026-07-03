@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, User } from "lucide-react";
+import { AppWindow, Shield, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
@@ -10,6 +10,7 @@ import { DashboardShell } from "@/components/dashboard/Shell";
 const tabs = [
   { label: "Profile", href: "/settings/profile", icon: User },
   { label: "Security", href: "/settings/security", icon: Shield },
+  { label: "Apps", href: "/settings/apps", icon: AppWindow },
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

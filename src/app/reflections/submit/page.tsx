@@ -46,7 +46,7 @@ function questionNeedsText(question: ReflectionQuestionSnapshot) {
 
 function SubmitSkeleton() {
   return (
-    <div className="w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-4xl">
       <Skeleton className="mb-4 h-5 w-40 rounded-none" />
       <Skeleton className="mb-8 h-12 w-80 rounded-none" />
       <div className="space-y-4">
@@ -68,7 +68,7 @@ function EmptyState({
   actionLabel?: string;
 }) {
   return (
-    <div className="w-full max-w-2xl border border-dashed border-grey-300 bg-white px-6 py-12 text-center">
+    <div className="mx-auto w-full max-w-3xl border border-dashed border-grey-300 bg-white px-6 py-12 text-center">
       <CheckCircle2 className="mx-auto h-9 w-9 text-icon-tertiary" />
       <h1 className="mt-4 font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
         {title}
@@ -185,7 +185,7 @@ function ReflectionSubmitContent() {
   };
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-4xl">
       <div className="mb-6">
         <Button asChild variant="ghost" className="mb-4 rounded-none px-0 font-mono text-xs">
           <Link href="/reflections">

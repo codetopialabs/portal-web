@@ -3,45 +3,79 @@
 import { AlertTriangle, ChevronLeft, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRole as useAdminRole, usePermissionList, useUpdateRole } from "@/hooks/useAdmin";
 import { buildPermissionVocab, compressScopes } from "@/lib/scopes";
+import type { RoleDetail } from "@/types/roles.types";
 
 function RoleEditForm({ slug }: { slug: string }) {
-  const router = useRouter();
   const { data: role, isLoading, isError } = useAdminRole(slug);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-48 w-full rounded-none" />
+        <Skeleton className="h-40 w-full rounded-none" />
+      </div>
+    );
+  }
+
+  if (isError || !role) {
+    return (
+      <div className="border border-error-200 bg-error-50 p-8 text-center">
+        <p className="font-sans text-base font-black text-error-700">Role could not be loaded.</p>
+      </div>
+    );
+  }
+
+  if (role.isSystem) {
+    return (
+      <div className="border border-warning-200 bg-warning-50 p-8">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-700" />
+          <div>
+            <p className="font-sans text-base font-black text-warning-800">
+              System roles are locked
+            </p>
+            <p className="mt-2 font-mono text-xs leading-6 text-warning-700">
+              The {role.displayName} role is part of the platform's core access model. Its
+              permissions are managed by the backend seed/configuration so member access stays
+              consistent.
+            </p>
+            <Button asChild className="mt-5 h-10 rounded-none font-mono text-xs font-bold">
+              <Link href={`/admin/roles/${role.name}`}>Back to role</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <RoleEditFields key={role.name} slug={slug} role={role} />;
+}
+
+function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
+  const router = useRouter();
   const { mutate: updateRole, isPending } = useUpdateRole();
   const { data: allPermissions } = usePermissionList();
 
-  const [initialized, setInitialized] = useState(false);
-  const [displayName, setDisplayName] = useState("");
-  const [description, setDescription] = useState("");
-  const [rank, setRank] = useState("");
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [displayName, setDisplayName] = useState(role.displayName ?? "");
+  const [description, setDescription] = useState(role.description ?? "");
+  const [rank, setRank] = useState(String(role.rank ?? ""));
+  const [permissions, setPermissions] = useState<string[]>(role.permissions ?? []);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [errors, setErrors] = useState<{ displayName?: string; rank?: string; form?: string }>({});
 
   const vocab = useMemo(() => buildPermissionVocab(allPermissions ?? []), [allPermissions]);
   const compressed = useMemo(() => compressScopes(permissions, vocab), [permissions, vocab]);
-
-  useEffect(() => {
-    if (role && !initialized) {
-      setDisplayName(role.displayName ?? "");
-      setDescription(role.description ?? "");
-      setRank(String(role.rank ?? ""));
-      setPermissions(role.permissions ?? []);
-      setInitialized(true);
-    }
-  }, [role, initialized]);
 
   function validate(): boolean {
     const next: typeof errors = {};
@@ -84,45 +118,6 @@ function RoleEditForm({ slug }: { slug: string }) {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-48 w-full rounded-none" />
-        <Skeleton className="h-40 w-full rounded-none" />
-      </div>
-    );
-  }
-
-  if (isError || !role) {
-    return (
-      <div className="border border-error-200 bg-error-50 p-8 text-center">
-        <p className="font-sans text-base font-black text-error-700">Role could not be loaded.</p>
-      </div>
-    );
-  }
-
-  if (role.isSystem) {
-    return (
-      <div className="border border-warning-200 bg-warning-50 p-8">
-        <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-700" />
-          <div>
-            <p className="font-sans text-base font-black text-warning-800">
-              System roles are locked
-            </p>
-            <p className="mt-2 font-mono text-xs leading-6 text-warning-700">
-              The {role.displayName} role is part of the platform's core access model. Its
-              permissions are managed by the backend seed/configuration so member access stays
-              consistent.
-            </p>
-            <Button asChild className="mt-5 h-10 rounded-none font-mono text-xs font-bold">
-              <Link href={`/admin/roles/${role.name}`}>Back to role</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="border border-grey-200 bg-white">
@@ -313,9 +308,7 @@ export default function EditRolePage() {
   const { slug } = useParams<{ slug: string }>();
   return (
     <RouteGuard permission="roles.edit">
-      <DashboardShell>
-        <EditRolePageContent slug={slug} />
-      </DashboardShell>
+      <EditRolePageContent slug={slug} />
     </RouteGuard>
   );
 }

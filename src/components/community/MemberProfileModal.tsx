@@ -24,7 +24,7 @@ import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { ComponentType } from "react";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
-import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
+import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
 import type { CommunityMember } from "@/services/user.service";
 import { normalizeUrl } from "@/utils/url";
 
@@ -72,14 +72,14 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
     member.githubHandle
       ? {
           label: "GitHub",
-          href: `https://github.com/${member.githubHandle.replace(/^@/, "")}`,
+          href: `https://github.com/${sanitizeHandle(member.githubHandle)}`,
           Icon: FaGithub,
         }
       : null,
     member.twitterHandle
       ? {
           label: "X / Twitter",
-          href: `https://x.com/${member.twitterHandle.replace(/^@/, "")}`,
+          href: `https://x.com/${sanitizeHandle(member.twitterHandle)}`,
           Icon: FaXTwitter,
         }
       : null,

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { SocialLink } from "@/services/user.service";
 
 export interface OnboardingData {
   step: number;
@@ -7,8 +8,6 @@ export interface OnboardingData {
   termsAccepted: boolean;
   // Conduct
   conductAgreed: boolean;
-  // Community
-  communityFollowed: Record<string, boolean>;
   // Background
   discipline: string | null;
   otherDiscipline: string;
@@ -33,6 +32,7 @@ export interface OnboardingData {
   linkedinUrl: string;
   twitterHandle: string;
   websiteUrl: string;
+  socialLinks: SocialLink[];
   skills: string[];
   avatarUrl: string | null;
 }
@@ -47,7 +47,6 @@ const INITIAL: OnboardingData = {
   step: 0,
   termsAccepted: false,
   conductAgreed: false,
-  communityFollowed: {},
   discipline: null,
   otherDiscipline: "",
   experienceLevel: null,
@@ -69,6 +68,7 @@ const INITIAL: OnboardingData = {
   linkedinUrl: "",
   twitterHandle: "",
   websiteUrl: "",
+  socialLinks: [],
   skills: [],
   avatarUrl: null,
 };

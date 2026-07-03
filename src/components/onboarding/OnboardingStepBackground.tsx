@@ -74,8 +74,8 @@ const MEMBER_STATUSES = [
   { value: "other", label: "Other" },
 ];
 
-const hintStyles = "font-mono text-[11px] text-zinc-400 leading-relaxed mb-3";
-const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold";
+const hintStyles = "font-mono text-[11px] text-zinc-500 leading-relaxed mb-3";
+const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
@@ -150,8 +150,8 @@ function RadioItem({
         </p>
         {description && (
           <p
-            className={`font-mono text-[11px] mt-1 leading-relaxed transition-colors ${
-              selected ? "text-zinc-400" : "text-zinc-400"
+            className={`font-mono text-[11px] mt-1 leading-relaxed ${
+              selected ? "text-zinc-400" : "text-zinc-500"
             }`}
           >
             {description}
@@ -245,7 +245,9 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
       <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
         Your Background
       </span>
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">About You</h1>
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+        About You
+      </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
         Help us understand what you do and where you are in your journey.
       </p>

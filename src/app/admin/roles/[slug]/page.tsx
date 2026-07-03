@@ -16,7 +16,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -557,9 +556,7 @@ export default function RoleDetailPage() {
 
   return (
     <RouteGuard permission="roles.view">
-      <DashboardShell>
-        <RoleDetailPageContent slug={slug} />
-      </DashboardShell>
+      <RoleDetailPageContent slug={slug} />
     </RouteGuard>
   );
 }

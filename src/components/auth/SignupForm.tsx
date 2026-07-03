@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,14 +44,19 @@ export function SignupForm() {
   if (mutation.isSuccess) {
     return (
       <div className="w-full max-w-[420px]">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-sans font-bold text-white">Check your email</h2>
-          <p className="font-mono text-sm text-zinc-400">{mutation.data.detail}</p>
+        <div className="space-y-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <Mail className="w-6 h-6 text-emerald-400" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-sans font-bold text-white">Check your email</h2>
+            <p className="font-mono text-sm text-zinc-400">{mutation.data.detail}</p>
+          </div>
           <Link
             href="/login"
-            className="flex items-center gap-1 font-mono text-sm text-white hover:text-zinc-300 transition-colors"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-white/10 bg-white/5 font-mono text-sm font-medium text-white py-2.5 px-4 hover:bg-white/10 hover:border-white/20 transition-colors"
           >
-            Back to sign in <ArrowRight className="w-3.5 h-3.5 mt-px" />
+            Back to sign in <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

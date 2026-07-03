@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ME_QUERY_KEY } from "@/hooks/useMe";
 import { ActivityService } from "@/services/activity.service";
+import { AdminOverviewService } from "@/services/admin-overview.service";
 import { PermissionsService } from "@/services/permissions.service";
 import { RolesService } from "@/services/roles.service";
 import { UsersService } from "@/services/users.service";
@@ -21,6 +22,7 @@ export const adminKeys = {
   activity: (params?: { userId?: string; page?: number; limit?: number }) =>
     ["admin", "activity", params] as const,
   permissions: ["admin", "permissions"] as const,
+  overview: ["admin", "overview"] as const,
 };
 
 // ─── Roles ────────────────────────────────────────────────────────────────────
@@ -274,6 +276,16 @@ export function useAdminActivity(
     }),
     queryFn: () => ActivityService.getAllActivity(params.limit, params.offset, params.userId),
     enabled,
+  });
+}
+
+// ─── Community overview ─────────────────────────────────────────────────────
+
+export function useAdminOverview() {
+  return useQuery({
+    queryKey: adminKeys.overview,
+    queryFn: () => AdminOverviewService.getOverview(),
+    staleTime: 60_000,
   });
 }
 

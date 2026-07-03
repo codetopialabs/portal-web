@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { AdminOverview } from "@/components/admin/AdminOverview";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Badge } from "@/components/ui/badge";
 
 // ─── Coming Soon card ─────────────────────────────────────────────────────────
@@ -107,6 +107,13 @@ const MANAGEMENT_SECTIONS = [
 function AdminPageContent() {
   return (
     <div className="max-w-6xl mx-auto pb-20">
+      {/* Overview */}
+      <div className="mb-8">
+        <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
+          Overview
+        </h2>
+        <AdminOverview />
+      </div>
       {/* Coming Soon sections */}
       <div>
         <h2 className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
@@ -156,11 +163,9 @@ function AdminPageContent() {
 export default function AdminPage() {
   return (
     <RouteGuard permission="admin.panel.access">
-      <DashboardShell>
-        <Suspense>
-          <AdminPageContent />
-        </Suspense>
-      </DashboardShell>
+      <Suspense>
+        <AdminPageContent />
+      </Suspense>
     </RouteGuard>
   );
 }

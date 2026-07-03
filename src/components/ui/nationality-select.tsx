@@ -1,213 +1,60 @@
 "use client";
 
+import { getData } from "country-list";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// Nationality demonyms — common ones first, then alphabetical
-// Format: { label: display name, value: stored value }
-const NATIONALITIES: { label: string; value: string }[] = [
-  // Africa
-  { label: "Algerian", value: "Algerian" },
-  { label: "Angolan", value: "Angolan" },
-  { label: "Beninese", value: "Beninese" },
-  { label: "Botswanan", value: "Botswanan" },
-  { label: "Burkinabé", value: "Burkinabé" },
-  { label: "Burundian", value: "Burundian" },
-  { label: "Cameroonian", value: "Cameroonian" },
-  { label: "Cape Verdean", value: "Cape Verdean" },
-  { label: "Central African", value: "Central African" },
-  { label: "Chadian", value: "Chadian" },
-  { label: "Comorian", value: "Comorian" },
-  { label: "Congolese (DRC)", value: "Congolese (DRC)" },
-  { label: "Congolese (Republic)", value: "Congolese (Republic)" },
-  { label: "Djiboutian", value: "Djiboutian" },
-  { label: "Egyptian", value: "Egyptian" },
-  { label: "Equatorial Guinean", value: "Equatorial Guinean" },
-  { label: "Eritrean", value: "Eritrean" },
-  { label: "Eswatini", value: "Eswatini" },
-  { label: "Ethiopian", value: "Ethiopian" },
-  { label: "Gabonese", value: "Gabonese" },
-  { label: "Gambian", value: "Gambian" },
-  { label: "Ghanaian", value: "Ghanaian" },
-  { label: "Guinean", value: "Guinean" },
-  { label: "Guinea-Bissauan", value: "Guinea-Bissauan" },
-  { label: "Ivorian", value: "Ivorian" },
-  { label: "Kenyan", value: "Kenyan" },
-  { label: "Lesothan", value: "Lesothan" },
-  { label: "Liberian", value: "Liberian" },
-  { label: "Libyan", value: "Libyan" },
-  { label: "Malagasy", value: "Malagasy" },
-  { label: "Malawian", value: "Malawian" },
-  { label: "Malian", value: "Malian" },
-  { label: "Mauritanian", value: "Mauritanian" },
-  { label: "Mauritian", value: "Mauritian" },
-  { label: "Moroccan", value: "Moroccan" },
-  { label: "Mozambican", value: "Mozambican" },
-  { label: "Namibian", value: "Namibian" },
-  { label: "Nigerien", value: "Nigerien" },
-  { label: "Nigerian", value: "Nigerian" },
-  { label: "Rwandan", value: "Rwandan" },
-  { label: "Sahrawi", value: "Sahrawi" },
-  { label: "São Toméan", value: "São Toméan" },
-  { label: "Senegalese", value: "Senegalese" },
-  { label: "Seychellois", value: "Seychellois" },
-  { label: "Sierra Leonean", value: "Sierra Leonean" },
-  { label: "Somali", value: "Somali" },
-  { label: "South African", value: "South African" },
-  { label: "South Sudanese", value: "South Sudanese" },
-  { label: "Sudanese", value: "Sudanese" },
-  { label: "Tanzanian", value: "Tanzanian" },
-  { label: "Togolese", value: "Togolese" },
-  { label: "Tunisian", value: "Tunisian" },
-  { label: "Ugandan", value: "Ugandan" },
-  { label: "Zambian", value: "Zambian" },
-  { label: "Zimbabwean", value: "Zimbabwean" },
-  // Americas
-  { label: "American", value: "American" },
-  { label: "Antiguan", value: "Antiguan" },
-  { label: "Argentine", value: "Argentine" },
-  { label: "Bahamian", value: "Bahamian" },
-  { label: "Barbadian", value: "Barbadian" },
-  { label: "Belizean", value: "Belizean" },
-  { label: "Bolivian", value: "Bolivian" },
-  { label: "Brazilian", value: "Brazilian" },
-  { label: "Canadian", value: "Canadian" },
-  { label: "Chilean", value: "Chilean" },
-  { label: "Colombian", value: "Colombian" },
-  { label: "Costa Rican", value: "Costa Rican" },
-  { label: "Cuban", value: "Cuban" },
-  { label: "Dominican", value: "Dominican" },
-  { label: "Ecuadorian", value: "Ecuadorian" },
-  { label: "Grenadian", value: "Grenadian" },
-  { label: "Guatemalan", value: "Guatemalan" },
-  { label: "Guyanese", value: "Guyanese" },
-  { label: "Haitian", value: "Haitian" },
-  { label: "Honduran", value: "Honduran" },
-  { label: "Jamaican", value: "Jamaican" },
-  { label: "Mexican", value: "Mexican" },
-  { label: "Nicaraguan", value: "Nicaraguan" },
-  { label: "Panamanian", value: "Panamanian" },
-  { label: "Paraguayan", value: "Paraguayan" },
-  { label: "Peruvian", value: "Peruvian" },
-  { label: "Puerto Rican", value: "Puerto Rican" },
-  { label: "Saint Lucian", value: "Saint Lucian" },
-  { label: "Surinamese", value: "Surinamese" },
-  { label: "Trinidadian", value: "Trinidadian" },
-  { label: "Uruguayan", value: "Uruguayan" },
-  { label: "Venezuelan", value: "Venezuelan" },
-  // Asia
-  { label: "Afghan", value: "Afghan" },
-  { label: "Armenian", value: "Armenian" },
-  { label: "Azerbaijani", value: "Azerbaijani" },
-  { label: "Bahraini", value: "Bahraini" },
-  { label: "Bangladeshi", value: "Bangladeshi" },
-  { label: "Bhutanese", value: "Bhutanese" },
-  { label: "Bruneian", value: "Bruneian" },
-  { label: "Cambodian", value: "Cambodian" },
-  { label: "Chinese", value: "Chinese" },
-  { label: "Cypriot", value: "Cypriot" },
-  { label: "Filipino", value: "Filipino" },
-  { label: "Georgian", value: "Georgian" },
-  { label: "Indian", value: "Indian" },
-  { label: "Indonesian", value: "Indonesian" },
-  { label: "Iranian", value: "Iranian" },
-  { label: "Iraqi", value: "Iraqi" },
-  { label: "Israeli", value: "Israeli" },
-  { label: "Japanese", value: "Japanese" },
-  { label: "Jordanian", value: "Jordanian" },
-  { label: "Kazakhstani", value: "Kazakhstani" },
-  { label: "Kuwaiti", value: "Kuwaiti" },
-  { label: "Kyrgyzstani", value: "Kyrgyzstani" },
-  { label: "Laotian", value: "Laotian" },
-  { label: "Lebanese", value: "Lebanese" },
-  { label: "Malaysian", value: "Malaysian" },
-  { label: "Maldivian", value: "Maldivian" },
-  { label: "Mongolian", value: "Mongolian" },
-  { label: "Myanmarese", value: "Myanmarese" },
-  { label: "Nepalese", value: "Nepalese" },
-  { label: "North Korean", value: "North Korean" },
-  { label: "Omani", value: "Omani" },
-  { label: "Pakistani", value: "Pakistani" },
-  { label: "Palestinian", value: "Palestinian" },
-  { label: "Qatari", value: "Qatari" },
-  { label: "Saudi Arabian", value: "Saudi Arabian" },
-  { label: "Singaporean", value: "Singaporean" },
-  { label: "South Korean", value: "South Korean" },
-  { label: "Sri Lankan", value: "Sri Lankan" },
-  { label: "Syrian", value: "Syrian" },
-  { label: "Taiwanese", value: "Taiwanese" },
-  { label: "Tajik", value: "Tajik" },
-  { label: "Thai", value: "Thai" },
-  { label: "Timorese", value: "Timorese" },
-  { label: "Turkmenistani", value: "Turkmenistani" },
-  { label: "Emirati", value: "Emirati" },
-  { label: "Uzbekistani", value: "Uzbekistani" },
-  { label: "Vietnamese", value: "Vietnamese" },
-  { label: "Yemeni", value: "Yemeni" },
-  // Europe
-  { label: "Albanian", value: "Albanian" },
-  { label: "Andorran", value: "Andorran" },
-  { label: "Austrian", value: "Austrian" },
-  { label: "Belarusian", value: "Belarusian" },
-  { label: "Belgian", value: "Belgian" },
-  { label: "Bosnian", value: "Bosnian" },
-  { label: "British", value: "British" },
-  { label: "Bulgarian", value: "Bulgarian" },
-  { label: "Croatian", value: "Croatian" },
-  { label: "Czech", value: "Czech" },
-  { label: "Danish", value: "Danish" },
-  { label: "Dutch", value: "Dutch" },
-  { label: "Estonian", value: "Estonian" },
-  { label: "Finnish", value: "Finnish" },
-  { label: "French", value: "French" },
-  { label: "German", value: "German" },
-  { label: "Greek", value: "Greek" },
-  { label: "Hungarian", value: "Hungarian" },
-  { label: "Icelandic", value: "Icelandic" },
-  { label: "Irish", value: "Irish" },
-  { label: "Italian", value: "Italian" },
-  { label: "Kosovar", value: "Kosovar" },
-  { label: "Latvian", value: "Latvian" },
-  { label: "Liechtensteiner", value: "Liechtensteiner" },
-  { label: "Lithuanian", value: "Lithuanian" },
-  { label: "Luxembourger", value: "Luxembourger" },
-  { label: "Macedonian", value: "Macedonian" },
-  { label: "Maltese", value: "Maltese" },
-  { label: "Moldovan", value: "Moldovan" },
-  { label: "Monégasque", value: "Monégasque" },
-  { label: "Montenegrin", value: "Montenegrin" },
-  { label: "Norwegian", value: "Norwegian" },
-  { label: "Polish", value: "Polish" },
-  { label: "Portuguese", value: "Portuguese" },
-  { label: "Romanian", value: "Romanian" },
-  { label: "Russian", value: "Russian" },
-  { label: "San Marinese", value: "San Marinese" },
-  { label: "Serbian", value: "Serbian" },
-  { label: "Slovak", value: "Slovak" },
-  { label: "Slovenian", value: "Slovenian" },
-  { label: "Spanish", value: "Spanish" },
-  { label: "Swedish", value: "Swedish" },
-  { label: "Swiss", value: "Swiss" },
-  { label: "Turkish", value: "Turkish" },
-  { label: "Ukrainian", value: "Ukrainian" },
-  { label: "Vatican", value: "Vatican" },
-  // Oceania
-  { label: "Australian", value: "Australian" },
-  { label: "Fijian", value: "Fijian" },
-  { label: "Kiribatian", value: "Kiribatian" },
-  { label: "Marshallese", value: "Marshallese" },
-  { label: "Micronesian", value: "Micronesian" },
-  { label: "Nauruan", value: "Nauruan" },
-  { label: "New Zealander", value: "New Zealander" },
-  { label: "Ni-Vanuatu", value: "Ni-Vanuatu" },
-  { label: "Palauan", value: "Palauan" },
-  { label: "Papua New Guinean", value: "Papua New Guinean" },
-  { label: "Samoan", value: "Samoan" },
-  { label: "Solomon Islander", value: "Solomon Islander" },
-  { label: "Tongan", value: "Tongan" },
-  { label: "Tuvaluan", value: "Tuvaluan" },
-  // Other / prefer not to say
+// country-list ships official ISO 3166-1 names, some of which read awkwardly
+// in a casual UI (e.g. "United States of America (the)"). Override those with
+// the commonly-used short form; everything else uses the package's name as-is.
+const COUNTRY_NAME_OVERRIDES: Record<string, string> = {
+  AE: "United Arab Emirates",
+  BO: "Bolivia",
+  CC: "Cocos (Keeling) Islands",
+  CD: "Congo (DRC)",
+  CF: "Central African Republic",
+  CG: "Congo (Republic)",
+  CK: "Cook Islands",
+  DO: "Dominican Republic",
+  FK: "Falkland Islands",
+  FM: "Micronesia",
+  FO: "Faroe Islands",
+  GB: "United Kingdom",
+  GM: "Gambia",
+  IO: "British Indian Ocean Territory",
+  IR: "Iran",
+  KM: "Comoros",
+  KP: "North Korea",
+  KR: "South Korea",
+  KY: "Cayman Islands",
+  LA: "Laos",
+  MD: "Moldova",
+  MH: "Marshall Islands",
+  MP: "Northern Mariana Islands",
+  NE: "Niger",
+  PH: "Philippines",
+  PS: "Palestine",
+  RU: "Russia",
+  SD: "Sudan",
+  SY: "Syria",
+  TC: "Turks and Caicos Islands",
+  TF: "French Southern Territories",
+  TW: "Taiwan",
+  TZ: "Tanzania",
+  UM: "United States Minor Outlying Islands",
+  US: "United States",
+  VA: "Vatican City",
+  VE: "Venezuela",
+  VN: "Vietnam",
+  EH: "Western Sahara",
+};
+
+const COUNTRIES: { label: string; value: string }[] = [
+  ...getData()
+    .map((c) => COUNTRY_NAME_OVERRIDES[c.code] ?? c.name)
+    .sort((a, b) => a.localeCompare(b))
+    .map((name) => ({ label: name, value: name })),
   { label: "Prefer not to say", value: "Prefer not to say" },
 ];
 
@@ -233,16 +80,16 @@ export function NationalitySelect({
   const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = search.trim()
-    ? NATIONALITIES.filter((n) => n.label.toLowerCase().includes(search.toLowerCase()))
-    : NATIONALITIES;
+    ? COUNTRIES.filter((n) => n.label.toLowerCase().includes(search.toLowerCase()))
+    : COUNTRIES;
 
   // Focus search input when popover opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => searchRef.current?.focus(), 50);
-    } else {
-      setSearch("");
+      const timeout = setTimeout(() => searchRef.current?.focus(), 50);
+      return () => clearTimeout(timeout);
     }
+    setSearch("");
   }, [open]);
 
   const triggerBase =
@@ -272,7 +119,7 @@ export function NationalitySelect({
           aria-expanded={open}
         >
           <span className={value ? "text-zinc-900" : "text-zinc-300"}>
-            {value || "Select nationality"}
+            {value || "Select country"}
           </span>
           <ChevronDown
             className={`w-3.5 h-3.5 shrink-0 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
@@ -292,7 +139,7 @@ export function NationalitySelect({
             ref={searchRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search nationality..."
+            placeholder="Search country..."
             className="flex-1 h-10 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
           />
           {search && (

@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
 interface StepProps {
@@ -20,29 +20,30 @@ export function OnboardingStepWelcome({ onNext, onBack }: StepProps) {
         />
       </div>
 
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Welcome
       </span>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-8 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-8 leading-[1.1]">
         A Utopia for
         <br />
         Tech Enthusiasts
       </h1>
 
-      <div className="space-y-4 font-mono text-zinc-600 text-sm leading-relaxed pl-5 border-l-2 border-zinc-200 mb-8">
+      <div className="space-y-4 font-mono text-zinc-600 text-sm leading-relaxed pl-5 border-l-4 border-zinc-900 mb-8">
         <p>
           Codetopia Community is an inclusive and collaborative initiative of the mother company{" "}
           <a
             href="https://codetopia.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 transition-colors"
+            className="font-bold text-zinc-900 underline underline-offset-2 hover:text-zinc-600 transition-colors inline-flex items-center gap-0.5"
           >
             Codetopia
+            <ExternalLink className="w-3 h-3" />
           </a>
           . It was created to empower aspiring and practicing technologists. We believe technology
-          is more than a tool — it is the foundation of innovation, creativity, and problem-solving.
+          is more than a tool: it is the foundation of innovation, creativity, and problem-solving.
         </p>
         <p>
           Whether you are writing your first line of code or exploring the edges of tech, the
@@ -50,12 +51,12 @@ export function OnboardingStepWelcome({ onNext, onBack }: StepProps) {
         </p>
       </div>
 
-      <div className="bg-white border border-zinc-200 p-6 mb-10">
-        <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-400 mb-3">
+      <div className="bg-white border border-zinc-300 p-6 mb-10">
+        <p className="text-[10px] uppercase tracking-[0.25em] font-mono font-bold text-zinc-500 mb-3">
           Our Pledge
         </p>
         <p className="font-mono text-zinc-600 text-sm leading-relaxed">
-          We pledge to make our community welcoming, safe, and equitable for all — regardless of
+          We pledge to make our community welcoming, safe, and equitable for all, regardless of
           race, ethnicity, age, disability, gender identity, sexual orientation, language, religion,
           national origin, socio-economic position, or any other status.
         </p>
