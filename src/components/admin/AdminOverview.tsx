@@ -249,7 +249,7 @@ export function AdminOverview() {
           icon={MoonStar}
           label="Dormant Members"
           value={engagement.dormantMembers.toLocaleString()}
-          sub="No login in 30+ days"
+          sub="No login in 15+ days"
           tone={engagement.dormantMembers > 0 ? "warning" : "default"}
           href="/admin/members?status=dormant"
         />

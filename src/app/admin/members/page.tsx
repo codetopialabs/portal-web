@@ -41,9 +41,9 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: "dormant", label: "Dormant" },
 ];
 
-// Mirrors the backend's dormancy rule in AdminOverviewView: no login in 30+
-// days, or never logged in and joined 30+ days ago.
-const DORMANT_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000;
+// Mirrors the backend's dormancy rule in AdminOverviewView: no login in 15+
+// days, or never logged in and joined 15+ days ago.
+const DORMANT_THRESHOLD_MS = 15 * 24 * 60 * 60 * 1000;
 
 function isDormant(member: AdminMember): boolean {
   if (!member.isActive) return false;
