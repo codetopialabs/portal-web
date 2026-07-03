@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Permission system utilities.
  *
  * Mirrors the backend wildcard resolver in apps/common/permissions.py.
- * The frontend check is UX-only — the backend enforces the same logic independently.
+ * The frontend check is UX-only â€” the backend enforces the same logic independently.
  */
 
-// Permissions that must be explicitly listed in a role — wildcards never grant them.
+// Permissions that must be explicitly listed in a role â€” wildcards never grant them.
 export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
   "users.delete",
   "users.suspend",
@@ -14,7 +14,7 @@ export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
 ]);
 
 /**
- * Route → Permission map.
+ * Route â†’ Permission map.
  * Every protected Next.js route declares its required permission.
  * "authenticated" means any verified, onboarded member can access it.
  * RouteGuard reads this map and redirects to "/" if the check fails.
@@ -33,10 +33,12 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/oauth-apps": "oauth_apps.view",
   "/admin/oauth-apps/new": "oauth_apps.create",
   "/admin/reflections": "reflections.view_any",
+  "/admin/career-progressions": "career_progressions.review",
   "/admin/reflections/questions": "reflections.manage",
   "/reflections": "reflections.submit",
   "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",
+  "/settings/career": "career_progressions.submit",
   "/settings/security": "security.view",
   "/settings/apps": "authenticated",
   "/community": "authenticated",
@@ -75,11 +77,11 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
  * Resolve whether a permission is granted given a permission set.
  *
  * Wildcard resolution order (mirrors backend):
- * 1. Destructive permission → exact match only, no wildcards
- * 2. "*" in set → true
- * 3. Exact match → true
- * 4. "resource.*" in set → true
- * 5. "*.action" in set → true
+ * 1. Destructive permission â†’ exact match only, no wildcards
+ * 2. "*" in set â†’ true
+ * 3. Exact match â†’ true
+ * 4. "resource.*" in set â†’ true
+ * 5. "*.action" in set â†’ true
  * 6. false
  */
 export function resolvePermission(permission: string, permissionSet: string[]): boolean {
@@ -88,7 +90,7 @@ export function resolvePermission(permission: string, permissionSet: string[]): 
   // 1. Exact match always wins (even for destructive)
   if (set.has(permission)) return true;
 
-  // 2. Destructive permissions require exact match — no wildcard expansion
+  // 2. Destructive permissions require exact match â€” no wildcard expansion
   if (DESTRUCTIVE_PERMISSIONS.has(permission)) {
     return false;
   }

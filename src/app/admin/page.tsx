@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import {
   ArrowUpRight,
   BookOpen,
+  BriefcaseBusiness,
   Calendar,
   ClipboardCheck,
   Code2,
@@ -18,7 +19,7 @@ import { AdminOverview } from "@/components/admin/AdminOverview";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { Badge } from "@/components/ui/badge";
 
-// ─── Coming Soon card ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Coming Soon card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ComingSoonCard({
   icon: Icon,
@@ -91,6 +92,12 @@ const MANAGEMENT_SECTIONS = [
     description: "Review members' monthly reflections.",
   },
   {
+    href: "/admin/career-progressions",
+    icon: BriefcaseBusiness,
+    name: "Career Progressions",
+    description: "Approve member milestones for public profiles.",
+  },
+  {
     href: "/admin/api-keys",
     icon: Key,
     name: "API Keys",
@@ -158,7 +165,7 @@ function AdminPageContent() {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function AdminPage() {
   return (

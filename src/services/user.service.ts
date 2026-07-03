@@ -1,4 +1,5 @@
-import axiosInstance from "@/lib/axios";
+﻿import axiosInstance from "@/lib/axios";
+import type { CareerProgression } from "@/types/career-progressions.types";
 
 export interface SocialLink {
   platform: string;
@@ -41,6 +42,7 @@ export interface UserProfile {
   completedWalkthroughs: string[];
   nationality: string | null;
   joinedAt: string | null;
+  careerProgressions: CareerProgression[];
   usernameLastChanged: string | null;
   isFlagged: boolean;
   activeFlag: {
@@ -79,6 +81,7 @@ export interface CommunityMember {
   isEmailVerified: boolean;
   isOnboarded: boolean;
   joinedAt: string;
+  careerProgressions: CareerProgression[];
 }
 
 export interface UpdateMeRequest {
