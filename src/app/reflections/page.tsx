@@ -4,9 +4,11 @@ import {
   ArrowRight,
   CalendarClock,
   CheckCircle2,
+  ChevronDown,
   CircleDashed,
   ClipboardCheck,
   Clock,
+  MessageSquareText,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
@@ -170,14 +172,20 @@ function CurrentCycleBanner() {
 /* ── History card ────────────────────────────────────────────────────────── */
 
 function ReflectionCard({ r }: { r: ReflectionRecord }) {
+  const [expanded, setExpanded] = useState(false);
   const status = r.status as ReflectionStatus;
-  const _cfg = STATUS[status] ?? STATUS.submitted;
   const submitted = formatDate(r.submittedAt);
   const reviewed = formatDate(r.reviewedAt);
+  const answerCount = Object.keys(r.answers ?? {}).length;
 
   return (
     <div className="group flex flex-col gap-0 border border-grey-200 bg-white transition-colors hover:border-grey-400">
-      <div className="flex items-start justify-between gap-4 px-5 py-4">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="flex w-full items-start justify-between gap-4 px-5 py-4 text-left"
+      >
         {/* Left */}
         <div className="min-w-0 flex-1">
           <p className="font-sans text-lg font-black uppercase tracking-tight text-text-primary leading-none">
@@ -198,14 +206,46 @@ function ReflectionCard({ r }: { r: ReflectionRecord }) {
         </div>
 
         {/* Right */}
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <StatusPill status={status} />
-          <span className="font-mono text-[10px] text-text-muted">
-            {Object.keys(r.answers ?? {}).length} answer
-            {Object.keys(r.answers ?? {}).length !== 1 ? "s" : ""}
-          </span>
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="flex flex-col items-end gap-2">
+            <StatusPill status={status} />
+            <span className="font-mono text-[10px] text-text-muted">
+              {answerCount} answer{answerCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 shrink-0 text-icon-muted transition-transform",
+              expanded && "rotate-180"
+            )}
+          />
         </div>
-      </div>
+      </button>
+
+      {expanded && (
+        <div className="space-y-4 border-t border-grey-200 bg-grey-50/60 px-5 py-4">
+          {r.reviewerNotes && (
+            <div className="border border-grey-200 bg-white p-4">
+              <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-wide text-text-muted">
+                <MessageSquareText className="h-3.5 w-3.5" />
+                Reviewer feedback
+              </div>
+              <p className="whitespace-pre-wrap font-mono text-sm text-text-secondary">
+                {r.reviewerNotes}
+              </p>
+            </div>
+          )}
+
+          {r.questions.map((q) => (
+            <div key={q.id}>
+              <p className="font-mono text-xs font-bold text-text-primary">{q.prompt}</p>
+              <p className="mt-1 whitespace-pre-wrap font-mono text-sm text-text-tertiary">
+                {r.answers?.[q.id] || "—"}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
