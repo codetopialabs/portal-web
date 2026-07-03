@@ -1,7 +1,20 @@
 "use client";
 
 import type { DriveStep } from "driver.js";
-import { Camera, Cpu, Globe, Loader2, MapPin, Pencil, Plus, User, X } from "lucide-react";
+import {
+  Briefcase,
+  Camera,
+  Check,
+  Cpu,
+  Globe,
+  Loader2,
+  MapPin,
+  Pencil,
+  Plus,
+  Target,
+  User,
+  X,
+} from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +33,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
+import {
+  COMMUNITY_GOALS,
+  DISCIPLINES,
+  EXPERIENCE_LEVELS,
+  MEMBER_STATUSES,
+  REFERRAL_SOURCES,
+  resolvePresetOrOther,
+} from "@/lib/profile-options";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
 import {
   getAvatarUrl,
@@ -53,6 +74,11 @@ interface ProfileFormValues {
   linkedin_url: string;
   twitter_handle: string;
   website_url: string;
+  discipline: string;
+  experience_level: string;
+  member_status: string;
+  primary_goal: string;
+  referral_source: string;
 }
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
@@ -70,6 +96,70 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
 
 function Divider() {
   return <div className="border-t border-zinc-100" />;
+}
+
+const selectItemStyles =
+  "rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none";
+
+/**
+ * discipline/member_status/referral_source are free text on the backend —
+ * "other" lets a member type a value not in the preset list. Shared here
+ * since the same select-or-type-your-own UI is used for all three.
+ */
+function PresetOrOtherSelect({
+  id,
+  value,
+  onChange,
+  options,
+  placeholder,
+  otherValue,
+  onOtherChange,
+  otherPlaceholder,
+  otherLabel,
+}: {
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder: string;
+  otherValue: string;
+  onOtherChange: (v: string) => void;
+  otherPlaceholder: string;
+  otherLabel: string;
+}) {
+  return (
+    <>
+      <Select value={value || "none"} onValueChange={(v) => onChange(v === "none" ? "" : v)}>
+        <SelectTrigger
+          id={id}
+          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72">
+          <SelectItem value="none" className={selectItemStyles}>
+            None
+          </SelectItem>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value} className={selectItemStyles}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {value === "other" && (
+        <div className="space-y-2 pt-2">
+          <Label className={labelStyles}>{otherLabel}</Label>
+          <Input
+            value={otherValue}
+            onChange={(e) => onOtherChange(e.target.value)}
+            placeholder={otherPlaceholder}
+            className={inputStyles}
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
 const BIO_MAX = 1000;
@@ -108,6 +198,19 @@ export default function SettingsProfilePage() {
   const [customLinks, setCustomLinks] = useState<
     { id: string; platform: string; label: string; url: string }[]
   >(() => (profile?.socialLinks ?? []).map((link) => ({ id: generateLinkId(), ...link })));
+
+  // discipline/member_status/referral_source are free text on the backend —
+  // onboarding lets members pick "other" and type a custom value that's
+  // saved directly, so a stored value that doesn't match any preset option
+  // needs to resolve into the "other" state with that value pre-filled.
+  const disciplineResolved = resolvePresetOrOther(profile?.discipline ?? "", DISCIPLINES);
+  const memberStatusResolved = resolvePresetOrOther(profile?.memberStatus ?? "", MEMBER_STATUSES);
+  const referralResolved = resolvePresetOrOther(profile?.referralSource ?? "", REFERRAL_SOURCES);
+
+  const [otherDiscipline, setOtherDiscipline] = useState(disciplineResolved.otherText);
+  const [otherMemberStatus, setOtherMemberStatus] = useState(memberStatusResolved.otherText);
+  const [otherReferralSource, setOtherReferralSource] = useState(referralResolved.otherText);
+  const [communityGoals, setCommunityGoals] = useState<string[]>(profile?.communityGoals ?? []);
   const [showPicker, setShowPicker] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -246,6 +349,12 @@ export default function SettingsProfilePage() {
     setCustomLinks((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function toggleCommunityGoal(value: string) {
+    setCommunityGoals((prev) =>
+      prev.includes(value) ? prev.filter((g) => g !== value) : [...prev, value]
+    );
+  }
+
   const {
     register,
     handleSubmit,
@@ -270,6 +379,11 @@ export default function SettingsProfilePage() {
       linkedin_url: profile?.linkedinUrl ?? "",
       twitter_handle: profile?.twitterHandle ?? "",
       website_url: profile?.websiteUrl ?? "",
+      discipline: disciplineResolved.selected ?? "",
+      experience_level: profile?.experienceLevel ?? "",
+      member_status: memberStatusResolved.selected ?? "",
+      primary_goal: profile?.primaryGoal ?? "",
+      referral_source: referralResolved.selected ?? "",
     },
   });
 
@@ -293,6 +407,13 @@ export default function SettingsProfilePage() {
       if (avatarFile) {
         newAvatarUrl = await UserService.uploadAvatar(avatarFile);
       }
+
+      const resolvedDiscipline =
+        data.discipline === "other" ? otherDiscipline.trim() : data.discipline;
+      const resolvedMemberStatus =
+        data.member_status === "other" ? otherMemberStatus.trim() : data.member_status;
+      const resolvedReferralSource =
+        data.referral_source === "other" ? otherReferralSource.trim() : data.referral_source;
 
       await updateMe({
         full_name: data.full_name.trim(),
@@ -326,6 +447,12 @@ export default function SettingsProfilePage() {
         skills,
         cover_image_url: newCoverUrl ?? undefined,
         profile_picture_url: newAvatarUrl ?? undefined,
+        discipline: resolvedDiscipline,
+        experience_level: data.experience_level,
+        member_status: resolvedMemberStatus,
+        primary_goal: data.primary_goal.trim(),
+        community_goals: communityGoals,
+        referral_source: resolvedReferralSource,
       });
 
       toast.success("Profile updated.");
@@ -746,6 +873,177 @@ export default function SettingsProfilePage() {
               />
               <BioCharCount watch={watch} />
               {errors.bio && <p className="font-mono text-xs text-red-500">{errors.bio.message}</p>}
+            </div>
+          </div>
+        </section>
+
+        <Divider />
+
+        {/* Background */}
+        <section id="settings-background" className="space-y-5">
+          <SectionHeader icon={Briefcase} title="Background" />
+          <div className="bg-white border border-zinc-200 p-6 space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="discipline" className={labelStyles}>
+                Primary Discipline
+              </Label>
+              <Controller
+                control={control}
+                name="discipline"
+                render={({ field }) => (
+                  <PresetOrOtherSelect
+                    id="discipline"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={DISCIPLINES}
+                    placeholder="Select your discipline"
+                    otherValue={otherDiscipline}
+                    onOtherChange={setOtherDiscipline}
+                    otherPlaceholder="e.g. Game Development, Blockchain, AR/VR"
+                    otherLabel="Please specify"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="experience-level" className={labelStyles}>
+                Experience Level
+              </Label>
+              <Controller
+                control={control}
+                name="experience_level"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger
+                      id="experience-level"
+                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                    >
+                      <SelectValue placeholder="Select your experience level" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
+                      <SelectItem value="none" className={selectItemStyles}>
+                        None
+                      </SelectItem>
+                      {EXPERIENCE_LEVELS.map((lvl) => (
+                        <SelectItem key={lvl.value} value={lvl.value} className={selectItemStyles}>
+                          {lvl.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="member-status" className={labelStyles}>
+                Current Status
+              </Label>
+              <Controller
+                control={control}
+                name="member_status"
+                render={({ field }) => (
+                  <PresetOrOtherSelect
+                    id="member-status"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={MEMBER_STATUSES}
+                    placeholder="Select your current status"
+                    otherValue={otherMemberStatus}
+                    onOtherChange={setOtherMemberStatus}
+                    otherPlaceholder="e.g. National Service, Intern, Bootcamp student"
+                    otherLabel="Please describe"
+                  />
+                )}
+              />
+            </div>
+          </div>
+        </section>
+
+        <Divider />
+
+        {/* Goals */}
+        <section id="settings-goals" className="space-y-5">
+          <SectionHeader icon={Target} title="Goals" />
+          <div className="bg-white border border-zinc-200 p-6 space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="primary-goal" className={labelStyles}>
+                Primary Goal
+              </Label>
+              <textarea
+                id="primary-goal"
+                placeholder="What is your primary goal as a Codetopia member?"
+                className="min-h-[80px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                {...register("primary_goal", {
+                  maxLength: { value: 500, message: "Must be 500 characters or less" },
+                })}
+              />
+              {errors.primary_goal && (
+                <p className="font-mono text-xs text-red-500">{errors.primary_goal.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label className={labelStyles}>What Do You Want From This Community?</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {COMMUNITY_GOALS.map((goal) => {
+                  const checked = communityGoals.includes(goal.value);
+                  return (
+                    <button
+                      key={goal.value}
+                      type="button"
+                      onClick={() => toggleCommunityGoal(goal.value)}
+                      className={`flex items-center gap-3 border px-3 h-11 text-left transition-colors ${
+                        checked
+                          ? "border-zinc-900 bg-zinc-900"
+                          : "border-zinc-200 bg-white hover:border-zinc-400"
+                      }`}
+                    >
+                      <div
+                        className={`w-4 h-4 shrink-0 border flex items-center justify-center ${
+                          checked ? "bg-white border-white" : "border-zinc-300"
+                        }`}
+                      >
+                        {checked && <Check className="w-3 h-3 text-zinc-900" />}
+                      </div>
+                      <span
+                        className={`font-mono text-xs uppercase tracking-wide truncate ${
+                          checked ? "text-white font-bold" : "text-zinc-600"
+                        }`}
+                      >
+                        {goal.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="referral-source" className={labelStyles}>
+                How Did You Find Us?
+              </Label>
+              <Controller
+                control={control}
+                name="referral_source"
+                render={({ field }) => (
+                  <PresetOrOtherSelect
+                    id="referral-source"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={REFERRAL_SOURCES}
+                    placeholder="Select how you found us"
+                    otherValue={otherReferralSource}
+                    onOtherChange={setOtherReferralSource}
+                    otherPlaceholder="e.g. A YouTube video, a university notice board..."
+                    otherLabel="Please tell us how"
+                  />
+                )}
+              />
             </div>
           </div>
         </section>
