@@ -38,7 +38,6 @@ import {
   DISCIPLINES,
   EXPERIENCE_LEVELS,
   MEMBER_STATUSES,
-  REFERRAL_SOURCES,
   resolvePresetOrOther,
 } from "@/lib/profile-options";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
@@ -77,8 +76,6 @@ interface ProfileFormValues {
   discipline: string;
   experience_level: string;
   member_status: string;
-  primary_goal: string;
-  referral_source: string;
 }
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
@@ -199,17 +196,15 @@ export default function SettingsProfilePage() {
     { id: string; platform: string; label: string; url: string }[]
   >(() => (profile?.socialLinks ?? []).map((link) => ({ id: generateLinkId(), ...link })));
 
-  // discipline/member_status/referral_source are free text on the backend —
-  // onboarding lets members pick "other" and type a custom value that's
-  // saved directly, so a stored value that doesn't match any preset option
-  // needs to resolve into the "other" state with that value pre-filled.
+  // discipline/member_status are free text on the backend — onboarding lets
+  // members pick "other" and type a custom value that's saved directly, so
+  // a stored value that doesn't match any preset option needs to resolve
+  // into the "other" state with that value pre-filled.
   const disciplineResolved = resolvePresetOrOther(profile?.discipline ?? "", DISCIPLINES);
   const memberStatusResolved = resolvePresetOrOther(profile?.memberStatus ?? "", MEMBER_STATUSES);
-  const referralResolved = resolvePresetOrOther(profile?.referralSource ?? "", REFERRAL_SOURCES);
 
   const [otherDiscipline, setOtherDiscipline] = useState(disciplineResolved.otherText);
   const [otherMemberStatus, setOtherMemberStatus] = useState(memberStatusResolved.otherText);
-  const [otherReferralSource, setOtherReferralSource] = useState(referralResolved.otherText);
   const [communityGoals, setCommunityGoals] = useState<string[]>(profile?.communityGoals ?? []);
   const [showPicker, setShowPicker] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -382,8 +377,6 @@ export default function SettingsProfilePage() {
       discipline: disciplineResolved.selected ?? "",
       experience_level: profile?.experienceLevel ?? "",
       member_status: memberStatusResolved.selected ?? "",
-      primary_goal: profile?.primaryGoal ?? "",
-      referral_source: referralResolved.selected ?? "",
     },
   });
 
@@ -412,8 +405,6 @@ export default function SettingsProfilePage() {
         data.discipline === "other" ? otherDiscipline.trim() : data.discipline;
       const resolvedMemberStatus =
         data.member_status === "other" ? otherMemberStatus.trim() : data.member_status;
-      const resolvedReferralSource =
-        data.referral_source === "other" ? otherReferralSource.trim() : data.referral_source;
 
       await updateMe({
         full_name: data.full_name.trim(),
@@ -450,9 +441,7 @@ export default function SettingsProfilePage() {
         discipline: resolvedDiscipline,
         experience_level: data.experience_level,
         member_status: resolvedMemberStatus,
-        primary_goal: data.primary_goal.trim(),
         community_goals: communityGoals,
-        referral_source: resolvedReferralSource,
       });
 
       toast.success("Profile updated.");
@@ -971,23 +960,6 @@ export default function SettingsProfilePage() {
           <SectionHeader icon={Target} title="Goals" />
           <div className="bg-white border border-zinc-200 p-6 space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="primary-goal" className={labelStyles}>
-                Primary Goal
-              </Label>
-              <textarea
-                id="primary-goal"
-                placeholder="What is your primary goal as a Codetopia member?"
-                className="min-h-[80px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
-                {...register("primary_goal", {
-                  maxLength: { value: 500, message: "Must be 500 characters or less" },
-                })}
-              />
-              {errors.primary_goal && (
-                <p className="font-mono text-xs text-red-500">{errors.primary_goal.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
               <Label className={labelStyles}>What Do You Want From This Community?</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {COMMUNITY_GOALS.map((goal) => {
@@ -1021,29 +993,6 @@ export default function SettingsProfilePage() {
                   );
                 })}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="referral-source" className={labelStyles}>
-                How Did You Find Us?
-              </Label>
-              <Controller
-                control={control}
-                name="referral_source"
-                render={({ field }) => (
-                  <PresetOrOtherSelect
-                    id="referral-source"
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={REFERRAL_SOURCES}
-                    placeholder="Select how you found us"
-                    otherValue={otherReferralSource}
-                    onOtherChange={setOtherReferralSource}
-                    otherPlaceholder="e.g. A YouTube video, a university notice board..."
-                    otherLabel="Please tell us how"
-                  />
-                )}
-              />
             </div>
           </div>
         </section>

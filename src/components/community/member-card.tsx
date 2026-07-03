@@ -81,7 +81,19 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
 
         {/* Username + role badge */}
         <div className="mt-0.5 flex items-center gap-1.5">
-          <span className="font-mono text-[11px] text-zinc-400">@{member.username}</span>
+          {member.discordId ? (
+            <a
+              href={`https://discord.com/users/${member.discordId}`}
+              target="_blank"
+              rel="noreferrer"
+              title={`Message ${member.fullName} on Discord`}
+              className="relative z-20 font-mono text-[11px] text-zinc-400 hover:text-zinc-900 hover:underline"
+            >
+              @{member.username}
+            </a>
+          ) : (
+            <span className="font-mono text-[11px] text-zinc-400">@{member.username}</span>
+          )}
           <span
             className={cn(
               "shrink-0 border px-1.5 py-0.5 font-mono text-[9px] uppercase leading-none tracking-wider",

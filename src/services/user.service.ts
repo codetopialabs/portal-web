@@ -69,6 +69,7 @@ export interface CommunityMember {
   currentRole: string;
   primaryRole: string;
   discordUsername: string;
+  discordId: string;
   githubHandle: string;
   twitterHandle: string;
   linkedinUrl: string;
