@@ -37,14 +37,22 @@ export function RouteGuard({ children, permission }: RouteGuardProps) {
 
   useEffect(() => {
     if (!isAuthLoading && !session) {
-      router.replace("/login");
+      // axios's response interceptor sets this when a session died mid-flight
+      // (refresh failed) — it can't redirect itself, since it runs on public
+      // pages too, so RouteGuard (only mounted on pages that need auth) is
+      // the one place that turns it into a "your session expired" message.
+      const expired = sessionStorage.getItem("sessionExpired");
+      if (expired) sessionStorage.removeItem("sessionExpired");
+      router.replace(expired ? "/login?reason=session_expired" : "/login");
     }
   }, [isAuthLoading, session, router]);
 
   useEffect(() => {
     if (!isUserLoading && session && !profile && userError) {
       clearSession();
-      router.replace("/login");
+      const expired = sessionStorage.getItem("sessionExpired");
+      if (expired) sessionStorage.removeItem("sessionExpired");
+      router.replace(expired ? "/login?reason=session_expired" : "/login");
     }
   }, [isUserLoading, session, profile, userError, clearSession, router]);
 

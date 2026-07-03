@@ -53,7 +53,14 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   pattern: RegExp;
   permission: string | "authenticated";
 }> = [
-  { pattern: /^\/@[^/]+$/, permission: "profile.view" },
+  // Public member profiles live at /<username> (no "@" prefix — the previous
+  // pattern here never matched anything real). Exclude every reserved
+  // top-level route name so a real username can't collide with them.
+  {
+    pattern:
+      /^\/(?!admin|community|mentorship|resources|settings|teams|activity|docs|reflections|login|signup|forgot-password|reset-password|verify-email|onboarding|authorize|discord)[^/]+$/,
+    permission: "profile.view",
+  },
   { pattern: /^\/teams\/[^/]+(\/.*)?$/, permission: "authenticated" }, // Scoped checks handled in-page or by backend
   { pattern: /^\/admin\/roles\/[^/]+\/edit$/, permission: "roles.edit" },
   { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
