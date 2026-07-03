@@ -67,11 +67,10 @@ export function MemberDirectory({
     [members]
   );
 
-  useEffect(() => {
-    if (lastFeedKeyRef.current === feedKey) return;
+  if (lastFeedKeyRef.current !== feedKey) {
     lastFeedKeyRef.current = feedKey;
     setVisibleCount(INITIAL_VISIBLE_COUNT);
-  }, [feedKey]);
+  }
 
   useEffect(() => {
     if (isLoading || visibleMembers.length >= filteredMembers.length) return;

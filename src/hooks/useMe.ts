@@ -23,7 +23,12 @@ export function useMe() {
   const session = useAuthStore((s) => s.session);
   const { profile, isLoading } = useUserStore();
 
-  const query = useQuery({
+  const {
+    data,
+    isLoading: queryIsLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ME_QUERY_KEY,
     queryFn: async () => {
       const data = await UserService.getMe();
@@ -40,10 +45,10 @@ export function useMe() {
   });
 
   return {
-    profile: query.data ?? profile,
-    isLoading: query.isLoading && isLoading,
-    error: query.error,
-    refetch: query.refetch,
+    profile: data ?? profile,
+    isLoading: queryIsLoading && isLoading,
+    error,
+    refetch,
   };
 }
 

@@ -86,10 +86,10 @@ export function NationalitySelect({
   // Focus search input when popover opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => searchRef.current?.focus(), 50);
-    } else {
-      setSearch("");
+      const timeout = setTimeout(() => searchRef.current?.focus(), 50);
+      return () => clearTimeout(timeout);
     }
+    setSearch("");
   }, [open]);
 
   const triggerBase =

@@ -23,16 +23,22 @@ function VerifyEmailContent() {
       return;
     }
 
+    let redirectTimeout: ReturnType<typeof setTimeout> | undefined;
+
     AuthService.verifyEmail(token)
       .then((res) => {
         setState("success");
         setMessage(res.detail);
-        setTimeout(() => router.push("/login"), 3000);
+        redirectTimeout = setTimeout(() => router.push("/login"), 3000);
       })
       .catch((err: Error) => {
         setState("error");
         setMessage(err.message);
       });
+
+    return () => {
+      if (redirectTimeout) clearTimeout(redirectTimeout);
+    };
   }, [searchParams, router]);
 
   return (
