@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Heart, Megaphone, Target } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { COMMUNITY_GOALS, REFERRAL_SOURCES } from "@/lib/profile-options";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
@@ -10,55 +11,6 @@ interface OnboardingStepGoalsProps {
   onNext: () => void;
   onBack: () => void;
 }
-
-const COMMUNITY_GOALS = [
-  { value: "mentorship", label: "Mentorship", description: "I want a mentor to guide my growth." },
-  {
-    value: "peer_learning",
-    label: "Peer Learning",
-    description: "I want to learn alongside others at a similar level.",
-  },
-  {
-    value: "networking",
-    label: "Networking",
-    description: "I want to connect with people in the tech industry.",
-  },
-  {
-    value: "collaboration",
-    label: "Collaboration",
-    description: "I want to find people to build projects with.",
-  },
-  {
-    value: "career_support",
-    label: "Career Support",
-    description: "Help with job searching, CVs, and interviews.",
-  },
-  {
-    value: "skill_building",
-    label: "Skill Building",
-    description: "Access to resources, workshops, and learning content.",
-  },
-  {
-    value: "community",
-    label: "Community",
-    description: "I want to be part of a supportive tech community.",
-  },
-  {
-    value: "giving_back",
-    label: "Giving Back",
-    description: "I want to contribute by mentoring or sharing knowledge.",
-  },
-];
-
-const REFERRAL_SOURCES = [
-  { value: "friend_referral", label: "Referred by a friend or member" },
-  { value: "social_media", label: "Social media (Twitter/X, LinkedIn, etc.)" },
-  { value: "discord_discovery", label: "Discord server discovery" },
-  { value: "online_search", label: "Online search" },
-  { value: "event_hackathon", label: "Community event or hackathon" },
-  { value: "newsletter_blog", label: "Newsletter or blog" },
-  { value: "other", label: "Other" },
-];
 
 const hintStyles = "font-mono text-[11px] text-zinc-500 leading-relaxed mb-3";
 const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";

@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Briefcase, Code2, TrendingUp } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { DISCIPLINES, EXPERIENCE_LEVELS, MEMBER_STATUSES } from "@/lib/profile-options";
 import { toTitleCase } from "@/lib/utils";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
@@ -11,68 +12,6 @@ interface OnboardingStepBackgroundProps {
   onNext: () => void;
   onBack: () => void;
 }
-
-const DISCIPLINES = [
-  { value: "software_engineering", label: "Software Engineering" },
-  { value: "ux_ui_design", label: "UX / UI Design" },
-  { value: "data_science", label: "Data Science / Analytics" },
-  { value: "ml_ai", label: "Machine Learning / AI" },
-  { value: "cybersecurity", label: "Cybersecurity" },
-  { value: "cloud_devops", label: "Cloud / DevOps" },
-  { value: "product_management", label: "Product Management" },
-  { value: "hardware_embedded", label: "Hardware / Embedded" },
-  { value: "robotics_iot", label: "Robotics / IoT" },
-  { value: "mobile_development", label: "Mobile Development" },
-  { value: "qa_testing", label: "QA / Testing" },
-  { value: "technical_writing", label: "Technical Writing" },
-  { value: "other", label: "Other" },
-];
-
-const EXPERIENCE_LEVELS = [
-  {
-    value: "complete_beginner",
-    label: "Complete Beginner",
-    description: "No prior experience. Just starting out.",
-  },
-  {
-    value: "learner",
-    label: "Learner",
-    description: "Studying actively. Some foundational knowledge.",
-  },
-  {
-    value: "practitioner",
-    label: "Practitioner",
-    description: "Applying skills on personal projects.",
-  },
-  {
-    value: "intermediate",
-    label: "Intermediate",
-    description: "1–3 years of hands-on experience.",
-  },
-  {
-    value: "advanced",
-    label: "Advanced",
-    description: "3+ years. Confident and independent.",
-  },
-  {
-    value: "expert_senior",
-    label: "Expert / Senior",
-    description: "5+ years. Can lead teams or mentor.",
-  },
-];
-
-const MEMBER_STATUSES = [
-  { value: "student", label: "Student" },
-  { value: "recent_graduate", label: "Recent Graduate" },
-  { value: "job_seeker", label: "Job Seeker" },
-  { value: "employed_in_tech", label: "Employed in Tech" },
-  { value: "employed_non_tech", label: "Employed (Non-tech)" },
-  { value: "freelancer", label: "Freelancer / Contractor" },
-  { value: "founder", label: "Founder / Building my own" },
-  { value: "career_changer", label: "Career Changer" },
-  { value: "taking_a_break", label: "Taking a Break" },
-  { value: "other", label: "Other" },
-];
 
 const hintStyles = "font-mono text-[11px] text-zinc-500 leading-relaxed mb-3";
 const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";

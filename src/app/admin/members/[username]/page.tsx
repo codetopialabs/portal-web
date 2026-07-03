@@ -65,6 +65,12 @@ import {
   useUnflagMember,
 } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
+import {
+  DISCIPLINES,
+  EXPERIENCE_LEVELS,
+  labelForOption,
+  MEMBER_STATUSES,
+} from "@/lib/profile-options";
 import { getAvatarUrl } from "@/lib/utils";
 
 type DangerAction =
@@ -744,9 +750,18 @@ function MemberDetailContent({ username }: { username: string }) {
             <div className="grid grid-cols-1 gap-x-8 gap-y-6 p-5 md:grid-cols-2">
               <DetailItem label="Full name" value={member.fullName} />
               <DetailItem label="Current role" value={member.currentRole} />
-              <DetailItem label="Discipline" value={member.discipline} />
-              <DetailItem label="Experience level" value={member.experienceLevel} />
-              <DetailItem label="Member status" value={member.memberStatus} />
+              <DetailItem
+                label="Discipline"
+                value={labelForOption(member.discipline, DISCIPLINES)}
+              />
+              <DetailItem
+                label="Experience level"
+                value={labelForOption(member.experienceLevel, EXPERIENCE_LEVELS)}
+              />
+              <DetailItem
+                label="Member status"
+                value={labelForOption(member.memberStatus, MEMBER_STATUSES)}
+              />
               <DetailItem label="Location" value={member.location} />
               <DetailItem label="Discord" value={member.discordUsername} />
               <DetailItem label="Primary goal" value={member.primaryGoal} />
