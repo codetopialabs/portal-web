@@ -30,7 +30,7 @@ import { useAdminMembers } from "@/hooks/useAdmin";
 import { cn, getAvatarUrl } from "@/lib/utils";
 import type { AdminMember } from "@/types/users.types";
 
-type StatusFilter = "all" | "active" | "suspended" | "flagged" | "unverified";
+type StatusFilter = "all" | "active" | "suspended" | "flagged" | "unverified" | "dormant";
 
 const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: "all", label: "All" },
@@ -38,7 +38,19 @@ const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: "suspended", label: "Suspended" },
   { key: "flagged", label: "Flagged" },
   { key: "unverified", label: "Unverified" },
+  { key: "dormant", label: "Dormant" },
 ];
+
+// Mirrors the backend's dormancy rule in AdminOverviewView: no login in 30+
+// days, or never logged in and joined 30+ days ago.
+const DORMANT_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000;
+
+function isDormant(member: AdminMember): boolean {
+  if (!member.isActive) return false;
+  const reference = member.lastLoginAt ?? member.createdAt;
+  if (!reference) return false;
+  return Date.now() - new Date(reference).getTime() > DORMANT_THRESHOLD_MS;
+}
 
 function formatDate(value: string | null | undefined, fallback = "—") {
   if (!value) return fallback;
@@ -123,6 +135,7 @@ const VALID_STATUS_FILTERS: readonly string[] = [
   "suspended",
   "flagged",
   "unverified",
+  "dormant",
 ];
 
 function MembersPageContent() {
@@ -161,6 +174,7 @@ function MembersPageContent() {
     if (statusFilter === "suspended") return members.filter((m) => !m.isActive);
     if (statusFilter === "unverified")
       return members.filter((m) => m.isActive && !m.isEmailVerified);
+    if (statusFilter === "dormant") return members.filter(isDormant);
     if (statusFilter === "active") return members.filter((m) => m.isActive && m.isEmailVerified);
     return members;
   }, [members, statusFilter]);
@@ -177,6 +191,7 @@ function MembersPageContent() {
     if (tab === "flagged") return members.filter((m) => m.isFlagged).length;
     if (tab === "suspended") return members.filter((m) => !m.isActive).length;
     if (tab === "unverified") return members.filter((m) => m.isActive && !m.isEmailVerified).length;
+    if (tab === "dormant") return members.filter(isDormant).length;
     if (tab === "active") return members.filter((m) => m.isActive && m.isEmailVerified).length;
     return 0;
   };

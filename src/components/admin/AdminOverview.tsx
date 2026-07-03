@@ -240,7 +240,7 @@ export function AdminOverview() {
               : "All clear"
           }
           tone={pendingActions.total > 0 ? "warning" : "default"}
-          href={pendingActions.total > 0 ? "/admin/members?status=flagged" : undefined}
+          href={pendingActions.total > 0 ? "#pending-actions" : undefined}
         />
       </div>
 
@@ -251,7 +251,7 @@ export function AdminOverview() {
           value={engagement.dormantMembers.toLocaleString()}
           sub="No login in 30+ days"
           tone={engagement.dormantMembers > 0 ? "warning" : "default"}
-          href="/admin/members"
+          href="/admin/members?status=dormant"
         />
         <StatCard
           icon={Mail}
@@ -265,7 +265,7 @@ export function AdminOverview() {
 
       {(pendingActions.flaggedAccountsList.length > 0 ||
         pendingActions.reflectionsAwaitingReviewList.length > 0) && (
-        <div className="bg-red-50/40 border border-red-200 p-5">
+        <div id="pending-actions" className="bg-red-50/40 border border-red-200 p-5 scroll-mt-6">
           <p className="font-sans font-black uppercase tracking-widest text-sm text-red-700 mb-4">
             Awaiting Your Review
           </p>
