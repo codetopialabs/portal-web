@@ -292,7 +292,7 @@ function HistorySection() {
 
 function ReflectionsContent() {
   return (
-    <div className="w-full max-w-2xl">
+    <div className="mx-auto w-full max-w-4xl">
       {/* Header */}
       <header className="mb-6">
         <div className="mb-1 flex items-center gap-2">

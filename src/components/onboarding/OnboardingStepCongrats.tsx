@@ -10,11 +10,11 @@ export function OnboardingStepCongrats() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 flex flex-col items-center max-w-xl mx-auto text-center px-4">
-      <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-mono font-bold mb-4">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-mono font-bold mb-4">
         Welcome In
       </p>
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 leading-[1.1] mb-4">
-        You're in, <span className="text-zinc-400">@{username}</span>
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 leading-[1.1] mb-4">
+        You're in, <span className="text-zinc-500">@{username}</span>
       </h1>
       <p className="font-mono text-zinc-500 text-sm mb-10">
         You're officially a Codetopia Community member. Go build something great.

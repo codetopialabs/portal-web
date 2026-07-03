@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -49,37 +49,47 @@ function VerifyEmailContent() {
       </header>
 
       <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-[420px] space-y-4">
+        <div className="w-full max-w-[420px] space-y-6">
           {state === "loading" && (
-            <>
+            <div className="flex items-center gap-3">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               <p className="text-sm text-zinc-400">Verifying your email…</p>
-            </>
+            </div>
           )}
 
           {state === "success" && (
             <>
-              <h2 className="text-2xl font-sans font-bold text-white">Email verified</h2>
-              <p className="text-sm text-zinc-400">{message}</p>
-              <p className="text-xs text-zinc-500">Redirecting to sign in…</p>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <CheckCircle className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-sans font-bold text-white">Email verified</h2>
+                <p className="text-sm text-zinc-400">{message}</p>
+                <p className="text-xs text-zinc-500">Redirecting to sign in…</p>
+              </div>
               <Link
                 href="/login"
-                className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-white text-black text-sm font-semibold py-2.5 px-4 hover:bg-zinc-200 transition-colors"
               >
-                Sign in now <ArrowRight className="w-3.5 h-3.5 mt-px" />
+                Sign in now <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
           )}
 
           {state === "error" && (
             <>
-              <h2 className="text-2xl font-sans font-bold text-white">Verification failed</h2>
-              <p className="text-sm text-zinc-400">{message}</p>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20">
+                <XCircle className="w-6 h-6 text-red-400" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-sans font-bold text-white">Verification failed</h2>
+                <p className="text-sm text-zinc-400">{message}</p>
+              </div>
               <Link
                 href="/login"
-                className="flex items-center gap-1 text-sm text-white hover:text-zinc-300 transition-colors"
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-white/10 bg-white/5 text-sm font-medium text-white py-2.5 px-4 hover:bg-white/10 hover:border-white/20 transition-colors"
               >
-                Back to sign in <ArrowRight className="w-3.5 h-3.5 mt-px" />
+                Back to sign in <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </>
           )}

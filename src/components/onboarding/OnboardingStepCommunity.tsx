@@ -1,121 +1,113 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
-  FaBluesky,
-  FaDiscord,
+  FaFacebook,
+  FaGithub,
+  FaInstagram,
   FaLinkedinIn,
+  FaMastodon,
+  FaThreads,
   FaTiktok,
   FaWhatsapp,
   FaXTwitter,
   FaYoutube,
 } from "react-icons/fa6";
-import { useOnboardingStore } from "@/store/onboarding.store";
+import { SiBluesky } from "react-icons/si";
 
 interface StepProps {
   onNext: () => void;
   onBack: () => void;
 }
 
-const COMMUNITIES = [
-  {
-    id: "discord",
-    icon: FaDiscord,
-    iconColor: "text-indigo-500",
-    name: "Discord Server",
-    description:
-      "Our main hub for discussions, help channels, announcements, and real-time collaboration with the community.",
-    cta: "Join Discord",
-    href: "https://discord.gg/codetopia",
-    joinedBg: "bg-indigo-50 border-indigo-200",
-    joinedBtn: "bg-indigo-500",
-  },
-  {
-    id: "whatsapp",
-    icon: FaWhatsapp,
-    iconColor: "text-emerald-500",
-    name: "WhatsApp Community",
-    description:
-      "Stay in the loop with quick updates, community news, and casual conversations on the go.",
-    cta: "Join WhatsApp",
-    href: "https://chat.whatsapp.com/codetopia",
-    joinedBg: "bg-emerald-50 border-emerald-200",
-    joinedBtn: "bg-emerald-500",
-  },
-];
-
 const SOCIALS = [
   {
-    id: "whatsapp",
-    icon: FaWhatsapp,
-    iconColor: "text-emerald-500",
-    name: "WhatsApp",
-    href: "https://chat.whatsapp.com/codetopia",
-    followedBtn: "bg-emerald-500",
+    id: "youtube",
+    icon: FaYoutube,
+    iconColor: "text-red-500",
+    label: "YouTube",
+    href: "https://www.youtube.com/@codetopiacommunity",
   },
   {
     id: "linkedin",
     icon: FaLinkedinIn,
     iconColor: "text-blue-600",
-    name: "LinkedIn",
-    href: "https://linkedin.com/company/codetopia",
-    followedBtn: "bg-blue-600",
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/codetopiacommunity",
   },
   {
     id: "x",
     icon: FaXTwitter,
     iconColor: "text-zinc-900",
-    name: "X (Twitter)",
-    href: "https://x.com/codetopia",
-    followedBtn: "bg-zinc-900",
+    label: "X",
+    href: "https://x.com/codetopiacom",
   },
   {
-    id: "bluesky",
-    icon: FaBluesky,
-    iconColor: "text-sky-500",
-    name: "Bluesky",
-    href: "https://bsky.app/profile/codetopia.bsky.social",
-    followedBtn: "bg-sky-500",
+    id: "facebook",
+    icon: FaFacebook,
+    iconColor: "text-blue-700",
+    label: "Facebook",
+    href: "https://www.facebook.com/codetopiacommunity",
+  },
+  {
+    id: "instagram",
+    icon: FaInstagram,
+    iconColor: "text-pink-500",
+    label: "Instagram",
+    href: "https://www.instagram.com/codetopiacommunity/",
+  },
+  {
+    id: "threads",
+    icon: FaThreads,
+    iconColor: "text-zinc-900",
+    label: "Threads",
+    href: "http://www.threads.com/codetopiacommunity/",
   },
   {
     id: "tiktok",
     icon: FaTiktok,
     iconColor: "text-zinc-900",
-    name: "TikTok",
-    href: "https://tiktok.com/@codetopia",
-    followedBtn: "bg-zinc-900",
+    label: "TikTok",
+    href: "https://www.tiktok.com/@codetopiacommunity",
   },
   {
-    id: "youtube",
-    icon: FaYoutube,
-    iconColor: "text-red-500",
-    name: "YouTube",
-    href: "https://youtube.com/@codetopia",
-    followedBtn: "bg-red-500",
+    id: "bluesky",
+    icon: SiBluesky,
+    iconColor: "text-sky-500",
+    label: "Bluesky",
+    href: "https://bsky.app/profile/codetopiacommunity.bsky.social",
+  },
+  {
+    id: "mastodon",
+    icon: FaMastodon,
+    iconColor: "text-indigo-500",
+    label: "Mastodon",
+    href: "https://mastodon.social/@codetopiacommunity",
+  },
+  {
+    id: "whatsapp",
+    icon: FaWhatsapp,
+    iconColor: "text-emerald-500",
+    label: "WhatsApp",
+    href: "https://whatsapp.com/channel/0029VaFHtkR8KMqpEVu24v2o",
+  },
+  {
+    id: "github",
+    icon: FaGithub,
+    iconColor: "text-zinc-900",
+    label: "GitHub",
+    href: "https://github.com/codetopiacommunity",
   },
 ];
 
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
-  const communityFollowed = useOnboardingStore((s) => s.communityFollowed);
-  const merge = useOnboardingStore((s) => s.merge);
-
-  function handleJoin(_id: string, href: string) {
-    window.open(href, "_blank", "noopener,noreferrer");
-  }
-
-  function handleFollow(id: string, href: string) {
-    window.open(href, "_blank", "noopener,noreferrer");
-    const next = { ...communityFollowed, [id]: true };
-    merge({ communityFollowed: next });
-  }
-
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Join the Community
       </span>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Connect With Us
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
@@ -123,61 +115,28 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         community.
       </p>
 
-      <div className="space-y-4 mb-10">
-        {COMMUNITIES.map(({ id, icon: Icon, iconColor, name, description, cta, href }) => {
-          return (
-            <div key={id} className="border border-zinc-200 bg-white p-6">
-              <div className="flex items-start gap-5">
-                <Icon className={`w-9 h-9 shrink-0 mt-0.5 ${iconColor}`} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-mono font-semibold text-base text-zinc-900 mb-1">{name}</p>
-                  <p className="font-mono text-sm text-zinc-500 leading-relaxed mb-5">
-                    {description}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleJoin(id, href)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] border border-zinc-200 text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 transition-all"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> {cta}
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       {/* Socials */}
       <div className="mb-10">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-4">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-4">
           Also follow us on
         </p>
-        <div className="flex flex-wrap gap-3">
-          {SOCIALS.map(({ id, icon: Icon, iconColor, name, href, followedBtn }) => {
-            const isFollowed = communityFollowed[id];
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => handleFollow(id, href)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all border ${
-                  isFollowed
-                    ? `${followedBtn} text-white border-transparent`
-                    : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-900 hover:text-zinc-900"
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isFollowed ? "text-white" : iconColor}`} />
-                {isFollowed ? (
-                  <>
-                    <Check className="w-3 h-3" /> {name}
-                  </>
-                ) : (
-                  name
-                )}
-              </button>
-            );
-          })}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {SOCIALS.map(({ id, icon: Icon, iconColor, label, href }) => (
+            <a
+              key={id}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center gap-2 border border-zinc-200 bg-white p-4 text-center transition-all hover:border-zinc-400"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 transition-colors group-hover:border-zinc-300">
+                <Icon className={`w-4 h-4 ${iconColor}`} />
+              </div>
+              <p className="font-mono text-xs font-semibold truncate w-full text-zinc-900">
+                {label}
+              </p>
+            </a>
+          ))}
         </div>
       </div>
 
@@ -192,8 +151,7 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={onNext}
-          disabled={false}
-          className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+          className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2"
         >
           Continue <ArrowRight className="w-3.5 h-3.5" />
         </button>

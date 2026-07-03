@@ -38,11 +38,11 @@ const VALUES = [
 export function OnboardingStepValues({ onNext, onBack }: StepProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
         Our Foundation
       </span>
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
+      <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Core Values
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-8">
@@ -55,7 +55,7 @@ export function OnboardingStepValues({ onNext, onBack }: StepProps) {
             key={value.name}
             className="flex flex-col gap-2 border border-zinc-200 bg-white p-4 hover:border-zinc-400 transition-colors"
           >
-            <span className="text-sm font-mono text-zinc-400">
+            <span className="text-sm font-mono text-zinc-500">
               {String(i + 1).padStart(2, "0")}
             </span>
             <p className="text-sm font-mono font-semibold text-zinc-900">{value.name}</p>

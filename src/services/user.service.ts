@@ -1,5 +1,11 @@
 import axiosInstance from "@/lib/axios";
 
+export interface SocialLink {
+  platform: string;
+  label: string;
+  url: string;
+}
+
 export interface UserProfile {
   id: string;
   communityId: string;
@@ -20,6 +26,7 @@ export interface UserProfile {
   twitterHandle: string | null;
   linkedinUrl: string | null;
   websiteUrl: string | null;
+  socialLinks: SocialLink[];
   discipline: string | null;
   experienceLevel: string | null;
   memberStatus: string | null;
@@ -66,6 +73,7 @@ export interface CommunityMember {
   twitterHandle: string;
   linkedinUrl: string;
   websiteUrl: string;
+  socialLinks: SocialLink[];
   discipline: string;
   isEmailVerified: boolean;
   isOnboarded: boolean;
@@ -82,6 +90,7 @@ export interface UpdateMeRequest {
   twitter_handle?: string;
   linkedin_url?: string;
   website_url?: string;
+  social_links?: SocialLink[];
   discipline?: string;
   experience_level?: string;
   member_status?: string;
@@ -92,7 +101,7 @@ export interface UpdateMeRequest {
   community_goals?: string[];
   referral_source?: string;
   location?: string;
-  date_of_birth?: string;
+  date_of_birth?: string | null;
   nationality?: string;
   is_onboarded?: boolean;
   profile_picture_url?: string;

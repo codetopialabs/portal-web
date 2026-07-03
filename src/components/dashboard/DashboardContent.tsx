@@ -43,7 +43,8 @@ export function DashboardContent() {
     {
       popover: {
         title: "Welcome to your Dashboard",
-        description: "This is your central hub for Codetopia. Let's take a quick look around.",
+        description:
+          "This is your central hub for Codetopia Community. Let's take a quick look around.",
       },
     },
     {
