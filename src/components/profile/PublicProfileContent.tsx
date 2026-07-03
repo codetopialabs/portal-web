@@ -31,7 +31,8 @@ import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
 import { formatJoinedAt } from "@/components/profile/utils";
 import { usePermission } from "@/hooks/usePermission";
-import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
+import { LINK_PLATFORMS } from "@/lib/social-platforms";
+import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
 import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 import type { SocialLink } from "@/types/profile";
@@ -117,14 +118,14 @@ export function PublicProfileContent() {
   if (profile.githubHandle) {
     socialLinks.push({
       label: "GitHub",
-      href: `https://github.com/${profile.githubHandle.replace(/^@/, "")}`,
+      href: `https://github.com/${sanitizeHandle(profile.githubHandle)}`,
       icon: FaGithub,
     });
   }
   if (profile.twitterHandle) {
     socialLinks.push({
       label: "X / Twitter",
-      href: `https://x.com/${profile.twitterHandle.replace(/^@/, "")}`,
+      href: `https://x.com/${sanitizeHandle(profile.twitterHandle)}`,
       icon: FaXTwitter,
     });
   }
@@ -137,6 +138,15 @@ export function PublicProfileContent() {
   }
   if (profile.websiteUrl) {
     socialLinks.push({ label: "Website", href: normalizeUrl(profile.websiteUrl), icon: Globe });
+  }
+  for (const link of profile.socialLinks ?? []) {
+    if (!link.url.trim()) continue;
+    const platform = LINK_PLATFORMS.find((p) => p.value === link.platform);
+    socialLinks.push({
+      label: link.label || platform?.label || "Link",
+      href: normalizeUrl(link.url),
+      icon: platform?.icon ?? Globe,
+    });
   }
 
   return (
@@ -206,7 +216,7 @@ export function PublicProfileContent() {
                     const Icon = link.icon;
                     return (
                       <a
-                        key={link.label}
+                        key={`${link.label}-${link.href}`}
                         href={link.href}
                         target="_blank"
                         rel="noreferrer"
@@ -379,7 +389,7 @@ export function PublicProfileContent() {
                     const Icon = link.icon;
                     return (
                       <a
-                        key={link.label}
+                        key={`${link.label}-${link.href}`}
                         href={link.href}
                         target="_blank"
                         rel="noreferrer"

@@ -1,144 +1,150 @@
-import { Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaDiscord, FaLinkedinIn, FaTiktok, FaYoutube } from "react-icons/fa";
-import { FaBluesky, FaThreads, FaXTwitter } from "react-icons/fa6";
+import {
+  FaGithub,
+  FaInstagram,
+  FaLinkedinIn,
+  FaMastodon,
+  FaThreads,
+  FaTiktok,
+  FaWhatsapp,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
+import { SiBluesky } from "react-icons/si";
+
+const COMMUNITY_SITE_URL = "https://community.codetopia.org";
+
+const socialIcons = [
+  { icon: FaYoutube, href: "https://www.youtube.com/@codetopiacommunity", label: "YouTube" },
+  {
+    icon: FaLinkedinIn,
+    href: "https://www.linkedin.com/company/codetopiacommunity",
+    label: "LinkedIn",
+  },
+  { icon: FaXTwitter, href: "https://x.com/codetopiacom", label: "X" },
+  {
+    icon: FaInstagram,
+    href: "https://www.instagram.com/codetopiacommunity/",
+    label: "Instagram",
+  },
+  { icon: FaThreads, href: "http://www.threads.com/codetopiacommunity/", label: "Threads" },
+  { icon: FaTiktok, href: "https://www.tiktok.com/@codetopiacommunity", label: "TikTok" },
+  {
+    icon: SiBluesky,
+    href: "https://bsky.app/profile/codetopiacommunity.bsky.social",
+    label: "Bluesky",
+  },
+  { icon: FaMastodon, href: "https://mastodon.social/@codetopiacommunity", label: "Mastodon" },
+  {
+    icon: FaWhatsapp,
+    href: "https://whatsapp.com/channel/0029VaFHtkR8KMqpEVu24v2o",
+    label: "WhatsApp",
+  },
+  { icon: FaGithub, href: "https://github.com/codetopiacommunity", label: "GitHub" },
+];
 
 export function PublicProfileFooter() {
-  const communityLinks = [
-    { label: "Code of Conduct", href: "#" },
-    { label: "Become a Sponsor", href: "#" },
-    { label: "Become a Volunteer", href: "#" },
-    { label: "Join Our Discord Server", href: "https://discord.gg/3nBFMfdNmB" },
-    {
-      label: "Join Our WhatsApp Community",
-      href: "https://chat.whatsapp.com/LiiirOwOnPz0XQ3vupioi9",
-    },
-  ];
-
-  const socialLinks = [
-    { href: "https://discord.gg/3nBFMfdNmB", Icon: FaDiscord },
-    { href: "https://www.youtube.com/channel/UCJqs2xW7x-cs1V0bRG7ucXg", Icon: FaYoutube },
-    { href: "https://gh.linkedin.com/company/codetopia-community", Icon: FaLinkedinIn },
-    { href: "https://twitter.com/codetopiacom", Icon: FaXTwitter },
-    { href: "#", Icon: FaBluesky },
-    { href: "#", Icon: FaThreads },
-    { href: "https://www.tiktok.com/@codetopiacommunity", Icon: FaTiktok },
-  ];
-
-  const aboutLinks = [
-    { label: "About Us", href: "#" },
-    { label: "Events", href: "#" },
-    { label: "Articles", href: "#" },
-    { label: "Gallery", href: "#" },
-  ];
-
-  const legalLinks = [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "Cookies Policy", href: "#" },
-  ];
-
   return (
-    <footer className="relative w-full min-h-[400px] md:min-h-[344px] text-zinc-400 font-sans">
-      <Image
-        src="/codetopia-bg.jpg"
-        alt="Codetopia background"
-        fill
-        className="object-cover"
-        priority
-      />
-
-      <div className="absolute inset-0 bg-zinc-950/80" />
-
-      <div className="relative z-10 max-lg:px-4 py-12 md:py-16 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 xl:flex flex-wrap xl:justify-between">
-          <div className="flex flex-col items-start">
-            <div className="flex items-center gap-3 mb-4">
+    <footer className="w-full flex flex-col bg-black text-white border-t border-zinc-900">
+      <div className="max-w-7xl mx-auto w-full px-4 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-20 lg:gap-32">
+          {/* Brand */}
+          <div className="flex flex-col gap-12">
+            <Link href="/" className="inline-block">
               <Image
-                width={150}
-                height={72}
-                src="/codetopia-logo.png"
-                alt="Codetopia logo"
-                className="brightness-0 invert"
+                src="/logos/codetopia-community.png"
+                alt="Codetopia Community"
+                width={160}
+                height={90}
+                className="object-contain grayscale brightness-200"
               />
-            </div>
-
-            <p className="text-sm mb-6 text-zinc-400">A utopia for tech enthusiasts</p>
-
-            <div className="flex flex-wrap gap-6 text-white">
-              {socialLinks.map(({ href, Icon }, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: static social links
-                <Link key={index} href={href} target="_blank" rel="noreferrer">
-                  <Icon className="w-5 h-5 hover:text-emerald-400 transition-colors" />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">Community</h3>
-            <ul className="space-y-3 text-sm">
-              {communityLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="hover:text-emerald-400 transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">Contact</h3>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-zinc-500" />
-                <Link
-                  href="mailto:hello@codetopia.com"
-                  className="hover:text-emerald-400 transition-colors"
+            </Link>
+            <p className="font-mono text-sm text-zinc-600 max-w-xs leading-relaxed">
+              A community where developers learn together, collaborate, and grow. Based in Ghana,
+              open to the world.
+            </p>
+            <div className="flex flex-wrap gap-5">
+              {socialIcons.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={social.label}
+                  className="text-zinc-600 hover:text-white transition-colors"
                 >
-                  hello@codetopia.com
-                </Link>
-              </li>
-              <li className="flex items-center gap-3">
-                <MapPin className="w-4 h-4 text-zinc-500" />
-                <span>123 Tech Street, Innovation District</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-zinc-500" />
-                <span>(233) 55 555 5555</span>
-              </li>
-            </ul>
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">Quick Links</h3>
-            <ul className="space-y-3 text-sm">
-              {aboutLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="hover:text-emerald-400 transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Nav columns */}
+          <div className="grid grid-cols-2 gap-12 md:gap-16">
+            {/* Community */}
+            <div className="flex flex-col gap-6">
+              <p className="font-sans font-black text-white uppercase tracking-tighter text-sm">
+                Community
+              </p>
+              <nav className="flex flex-col gap-3">
+                <a
+                  href={`${COMMUNITY_SITE_URL}/code-of-conduct`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-sm text-zinc-500 hover:text-white transition-colors"
+                >
+                  Code of Conduct
+                </a>
+              </nav>
+            </div>
+
+            {/* Contact */}
+            <div className="flex flex-col gap-6">
+              <p className="font-sans font-black text-white uppercase tracking-tighter text-sm">
+                Contact
+              </p>
+              <div className="flex flex-col gap-3">
+                <a
+                  href="mailto:hello@codetopia.org"
+                  className="font-mono text-sm text-zinc-500 hover:text-white transition-colors"
+                >
+                  hello@codetopia.org
+                </a>
+                <span className="font-mono text-sm text-zinc-500">Accra, Ghana</span>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col md:flex-row justify-between items-center text-sm text-zinc-400">
-          <p>&copy; 2020 - {new Date().getFullYear()} Codetopia Community</p>
-
-          <div className="flex gap-6 mt-4 md:mt-0">
-            {legalLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="hover:text-emerald-400 transition-colors"
+      {/* Bottom bar */}
+      <div className="border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto w-full px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p suppressHydrationWarning className="font-mono text-xs text-zinc-700">
+            &copy; {new Date().getFullYear()} Codetopia. All rights reserved.
+          </p>
+          <div className="flex items-center gap-8">
+            <p className="font-sans font-black text-xs text-zinc-700 uppercase tracking-widest">
+              A{" "}
+              <a
+                href="https://codetopia.org"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white transition-colors"
               >
-                {link.label}
-              </Link>
-            ))}
+                Codetopia
+              </a>{" "}
+              Initiative
+            </p>
+            <a
+              href={`${COMMUNITY_SITE_URL}/privacy`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-xs text-zinc-700 hover:text-white transition-colors"
+            >
+              Privacy
+            </a>
           </div>
         </div>
       </div>

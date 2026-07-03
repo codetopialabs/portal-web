@@ -6,8 +6,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Input } from "@/components/ui/input";
-import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
+import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
 import type { CommunityMember } from "@/services/user.service";
+import { normalizeUrl } from "@/utils/url";
 import { MemberCard } from "./member-card";
 import {
   EMPTY_FILTERS,
@@ -319,7 +320,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
               <div className="flex items-center gap-3 shrink-0">
                 {member.githubHandle && (
                   <a
-                    href={`https://github.com/${member.githubHandle}`}
+                    href={`https://github.com/${sanitizeHandle(member.githubHandle)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex h-7 w-7 items-center justify-center border border-zinc-200 text-zinc-400 transition-colors hover:border-zinc-900 hover:text-zinc-900"
@@ -330,7 +331,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
                 )}
                 {member.linkedinUrl && (
                   <a
-                    href={member.linkedinUrl}
+                    href={normalizeUrl(member.linkedinUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex h-7 w-7 items-center justify-center border border-zinc-200 text-zinc-400 transition-colors hover:border-zinc-900 hover:text-zinc-900"
