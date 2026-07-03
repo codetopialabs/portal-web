@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!.next", "!out", "!build", "!next-env.d.ts", "!src/app/globals.css"]
+    "includes": [
+      "**",
+      "!.next",
+      "!out",
+      "!build",
+      "!next-env.d.ts",
+      "!src/app/globals.css",
+      "!src/app/radix-theme.css"
+    ]
   },
   "formatter": {
     "enabled": true,
