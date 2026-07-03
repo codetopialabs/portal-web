@@ -117,21 +117,34 @@ function DetailItem({
   label,
   value,
   isLongText,
+  href,
 }: {
   label: string;
   value: string | null | undefined;
   isLongText?: boolean;
+  href?: string;
 }) {
   return (
     <div className="min-w-0">
       <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
         {label}
       </p>
-      <p
-        className={`font-mono text-sm text-text-secondary ${isLongText ? "leading-6" : "truncate"}`}
-      >
-        {formatValue(value)}
-      </p>
+      {href && value ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className="truncate font-mono text-sm text-text-secondary hover:text-text-primary hover:underline"
+        >
+          {value}
+        </a>
+      ) : (
+        <p
+          className={`font-mono text-sm text-text-secondary ${isLongText ? "leading-6" : "truncate"}`}
+        >
+          {formatValue(value)}
+        </p>
+      )}
     </div>
   );
 }
@@ -763,7 +776,13 @@ function MemberDetailContent({ username }: { username: string }) {
                 value={labelForOption(member.memberStatus, MEMBER_STATUSES)}
               />
               <DetailItem label="Location" value={member.location} />
-              <DetailItem label="Discord" value={member.discordUsername} />
+              <DetailItem
+                label="Discord"
+                value={member.discordUsername || member.discordId}
+                href={
+                  member.discordId ? `https://discord.com/users/${member.discordId}` : undefined
+                }
+              />
               <DetailItem label="Primary goal" value={member.primaryGoal} />
               <div className="md:col-span-2">
                 <DetailItem label="Bio" value={member.bio} isLongText />
