@@ -51,6 +51,8 @@ export interface ReflectionRecord {
   submittedAt: string | null;
   reviewerNotes: string;
   reviewedByEmail: string;
+  reviewedByUsername: string;
+  reviewedByFullName: string;
   reviewedAt: string | null;
   createdAt: string;
   updatedAt: string;
