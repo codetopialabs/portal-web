@@ -52,11 +52,13 @@ function formatPeriod(value: string) {
 }
 
 function MemberHistoryContent({ username }: { username: string }) {
+  // Member profile lookup requires `users.view`, a broader permission than
+  // this page needs (`reflections.view_any`). Treat it as optional
+  // enrichment for the avatar/role, same as the review-detail page does,
+  // rather than gating the whole page on it.
   const { data: member, isLoading: isMemberLoading } = useAdminMember(username);
   const { data: reflections = [], isLoading: isReflectionsLoading } =
     useReflectionsByMember(username);
-
-  const _isLoading = isMemberLoading || isReflectionsLoading;
 
   // Sort newest first
   const sorted = [...reflections].sort((a, b) => b.period.localeCompare(a.period));
@@ -64,7 +66,7 @@ function MemberHistoryContent({ username }: { username: string }) {
   const approvedCount = reflections.filter((r) => r.status === "approved").length;
   const totalSubmitted = reflections.filter((r) => r.submittedAt).length;
 
-  if (isMemberLoading) {
+  if (isMemberLoading && isReflectionsLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-24 w-full rounded-none" />
@@ -73,18 +75,8 @@ function MemberHistoryContent({ username }: { username: string }) {
     );
   }
 
-  if (!member) {
-    return (
-      <div className="border border-dashed border-grey-300 bg-white p-14 text-center">
-        <p className="font-sans text-base font-black text-text-primary">Member not found</p>
-        <Button asChild variant="outline" className="mt-6 rounded-none font-mono text-xs">
-          <Link href="/admin/reflections">← Back to reflections</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  const avatarUrl = getAvatarUrl(member.profilePictureUrl ?? null, member.fullName);
+  const fullName = member?.fullName ?? sorted[0]?.fullName ?? username;
+  const avatarUrl = getAvatarUrl(member?.profilePictureUrl ?? null, fullName);
 
   return (
     <div className="w-full pb-20">
@@ -101,13 +93,13 @@ function MemberHistoryContent({ username }: { username: string }) {
       {/* Member card */}
       <div className="mb-8 flex items-center gap-5 border border-grey-200 bg-white p-6">
         {/* biome-ignore lint/performance/noImgElement: avatar URL from API, next/image domain config not set up yet */}
-        <img src={avatarUrl} alt={member.fullName} className="h-16 w-16 object-cover shrink-0" />
+        <img src={avatarUrl} alt={fullName} className="h-16 w-16 object-cover shrink-0" />
         <div className="min-w-0 flex-1">
           <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary leading-none">
-            {member.fullName}
+            {fullName}
           </h1>
-          <p className="mt-1 font-mono text-xs text-text-muted">@{member.username}</p>
-          {member.primaryRole && (
+          <p className="mt-1 font-mono text-xs text-text-muted">@{username}</p>
+          {member?.primaryRole && (
             <p className="mt-1 font-mono text-xs text-text-secondary">{member.primaryRole}</p>
           )}
         </div>
