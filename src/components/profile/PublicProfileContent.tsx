@@ -306,7 +306,7 @@ export function PublicProfileContent() {
               </div>
               <div className="p-6">
                 {careerProgressions.length > 0 ? (
-                  <div className="relative space-y-0 before:absolute before:left-[4px] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-zinc-200">
+                  <div className={`relative space-y-0 ${careerProgressions.length > 1 ? "before:absolute before:left-[4px] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-zinc-200" : ""}`}>
                     {careerProgressions.map((item, index) => {
                       const isLast = index === careerProgressions.length - 1;
                       const isCurrent = !item.endDate;
