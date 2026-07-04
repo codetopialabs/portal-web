@@ -134,9 +134,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 <h3 className="font-sans text-sm font-black uppercase tracking-tight text-zinc-950 leading-snug">
                   {item.title}
                 </h3>
-                {item.organization && (
-                  <p className="font-mono text-[11px] text-zinc-500">{item.organization}</p>
-                )}
+                <p className="font-mono text-[11px] text-zinc-500">Codetopia Community</p>
               </div>
               <StatusPill status={item.status} />
             </div>

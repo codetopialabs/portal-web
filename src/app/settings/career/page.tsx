@@ -99,7 +99,6 @@ function StatusPill({ status }: { status: CareerProgressionStatus }) {
 
 interface FormValues {
   title: string;
-  organization: string;
   startDate: string;
   endDate: string;
   isCurrent: boolean;
@@ -131,7 +130,6 @@ function ProgressionSheet({
   } = useForm<FormValues>({
     defaultValues: {
       title: "",
-      organization: "",
       startDate: "",
       endDate: "",
       isCurrent: false,
@@ -144,7 +142,6 @@ function ProgressionSheet({
     if (editing) {
       reset({
         title: editing.title,
-        organization: editing.organization ?? "",
         startDate: editing.startDate,
         endDate: editing.endDate ?? "",
         isCurrent: !editing.endDate,
@@ -153,7 +150,6 @@ function ProgressionSheet({
     } else {
       reset({
         title: "",
-        organization: "",
         startDate: "",
         endDate: "",
         isCurrent: false,
@@ -172,7 +168,6 @@ function ProgressionSheet({
   async function onSubmit(data: FormValues) {
     const payload = {
       title: data.title.trim(),
-      organization: data.organization.trim(),
       startDate: data.startDate,
       endDate: data.isCurrent ? null : data.endDate.trim() || null,
       description: data.description.trim(),
@@ -233,20 +228,6 @@ function ProgressionSheet({
             {errors.title && (
               <p className="font-mono text-xs text-red-500">{errors.title.message}</p>
             )}
-          </div>
-
-          {/* Organization */}
-          <div className="space-y-2">
-            <Label htmlFor="organization" className={labelStyles}>
-              Company / Community
-              <span className="ml-1 normal-case text-zinc-300">(optional)</span>
-            </Label>
-            <Input
-              id="organization"
-              placeholder="e.g. Google, Codetopia"
-              className={inputStyles}
-              {...register("organization")}
-            />
           </div>
 
           {/* Date range */}
@@ -376,9 +357,7 @@ function ProgressionCard({
           <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950">
             {item.title}
           </h3>
-          {item.organization && (
-            <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">{item.organization}</p>
-          )}
+          <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">Codetopia Community</p>
           <p className="mt-1 font-mono text-xs text-zinc-400">
             {formatDateRange(item.startDate, item.endDate)}
             <span className="ml-2 text-zinc-300">·</span>

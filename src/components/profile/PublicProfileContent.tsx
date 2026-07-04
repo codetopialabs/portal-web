@@ -345,11 +345,9 @@ export function PublicProfileContent() {
                               <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
                                 {item.title}
                               </h3>
-                              {item.organization && (
-                                <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
-                                  {item.organization}
-                                </p>
-                              )}
+                              <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
+                                Codetopia Community
+                              </p>
                               <p className="mt-1 font-mono text-[11px] text-zinc-400">
                                 {fmt(item.startDate)} <span className="text-zinc-300">–</span>{" "}
                                 {isCurrent ? (
