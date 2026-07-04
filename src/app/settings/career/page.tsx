@@ -102,6 +102,7 @@ interface FormValues {
   organization: string;
   startDate: string;
   endDate: string;
+  isCurrent: boolean;
   description: string;
 }
 
@@ -125,9 +126,17 @@ function ProgressionSheet({
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
-    defaultValues: { title: "", organization: "", startDate: "", endDate: "", description: "" },
+    defaultValues: {
+      title: "",
+      organization: "",
+      startDate: "",
+      endDate: "",
+      isCurrent: false,
+      description: "",
+    },
   });
 
   // Populate form when editing
@@ -138,27 +147,40 @@ function ProgressionSheet({
         organization: editing.organization ?? "",
         startDate: editing.startDate,
         endDate: editing.endDate ?? "",
+        isCurrent: !editing.endDate,
         description: editing.description ?? "",
       });
     } else {
-      reset({ title: "", organization: "", startDate: "", endDate: "", description: "" });
+      reset({
+        title: "",
+        organization: "",
+        startDate: "",
+        endDate: "",
+        isCurrent: false,
+        description: "",
+      });
     }
   }, [editing, reset]);
 
-  const endDateValue = watch("endDate");
+  const isCurrent = watch("isCurrent");
+
+  function handleIsCurrentChange(checked: boolean) {
+    setValue("isCurrent", checked);
+    if (checked) setValue("endDate", "");
+  }
 
   async function onSubmit(data: FormValues) {
     const payload = {
       title: data.title.trim(),
       organization: data.organization.trim(),
       startDate: data.startDate,
-      endDate: data.endDate.trim() || null,
+      endDate: data.isCurrent ? null : data.endDate.trim() || null,
       description: data.description.trim(),
     };
     try {
       if (editing) {
         await updateMutation.mutateAsync({ id: editing.id, data: payload });
-        toast.success("Entry updated — back in review queue.");
+        toast.success("Entry updated, back in review queue.");
       } else {
         await submitMutation.mutateAsync(payload);
         toast.success("Career progression submitted for review.");
@@ -181,6 +203,9 @@ function ProgressionSheet({
               {editing ? "Edit Entry" : "Add Entry"}
             </SheetTitle>
           </div>
+          <p className="font-mono text-xs text-zinc-400">
+            This tracks your growth within the Codetopia community, the roles you've held here.
+          </p>
           {editing && (
             <p className="font-mono text-xs text-amber-600">
               Editing will reset this entry to pending review.
@@ -197,11 +222,11 @@ function ProgressionSheet({
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title" className={labelStyles}>
-              Role / Milestone <span className="text-red-400">*</span>
+              Role <span className="text-red-400">*</span>
             </Label>
             <Input
               id="title"
-              placeholder="e.g. Frontend Intern, First freelance client"
+              placeholder="e.g. Contributor, Team Lead, Frontend Engineer"
               className={inputStyles}
               {...register("title", { required: "This field is required." })}
             />
@@ -214,7 +239,7 @@ function ProgressionSheet({
           <div className="space-y-2">
             <Label htmlFor="organization" className={labelStyles}>
               Company / Community
-              <span className="ml-1 normal-case text-zinc-300">— optional</span>
+              <span className="ml-1 normal-case text-zinc-300">(optional)</span>
             </Label>
             <Input
               id="organization"
@@ -243,15 +268,16 @@ function ProgressionSheet({
             <div className="space-y-2">
               <Label htmlFor="endDate" className={labelStyles}>
                 End
-                <span className="ml-1 normal-case text-zinc-300">— optional</span>
+                <span className="ml-1 normal-case text-zinc-300">(optional)</span>
               </Label>
               <Input
                 id="endDate"
                 type="date"
-                className={inputStyles}
+                disabled={isCurrent}
+                className={`${inputStyles} disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-300`}
                 {...register("endDate", {
                   validate: (val) => {
-                    if (!val) return true;
+                    if (isCurrent || !val) return true;
                     const start = watch("startDate");
                     if (start && val < start) return "Must be after start.";
                     return true;
@@ -261,17 +287,31 @@ function ProgressionSheet({
               {errors.endDate && (
                 <p className="font-mono text-xs text-red-500">{errors.endDate.message}</p>
               )}
-              {!endDateValue && (
-                <p className="font-mono text-[10px] text-zinc-400">Blank = Present</p>
-              )}
             </div>
           </div>
+
+          {/* Current position toggle */}
+          <label
+            htmlFor="isCurrent"
+            className="flex cursor-pointer items-center gap-2.5 border border-zinc-200 px-3 py-2.5"
+          >
+            <input
+              id="isCurrent"
+              type="checkbox"
+              checked={isCurrent}
+              onChange={(e) => handleIsCurrentChange(e.target.checked)}
+              className="h-4 w-4 shrink-0 rounded-none border-zinc-300 text-zinc-950 focus:ring-0"
+            />
+            <span className="font-mono text-xs font-bold text-zinc-700">
+              I'm currently at this position
+            </span>
+          </label>
 
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description" className={labelStyles}>
-              What happened?
-              <span className="ml-1 normal-case text-zinc-300">— optional</span>
+              Description
+              <span className="ml-1 normal-case text-zinc-300">(optional)</span>
             </Label>
             <textarea
               id="description"
@@ -469,7 +509,7 @@ export default function SettingsCareerPage() {
               No entries yet
             </p>
             <p className="mt-2 font-mono text-xs text-zinc-400">
-              Add your first milestone using the button above.
+              Add your first role using the button above.
             </p>
           </div>
         ) : (
