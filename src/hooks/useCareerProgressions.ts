@@ -64,7 +64,7 @@ export function useReviewCareerProgression() {
       reviewNote,
     }: {
       id: number;
-      action: "approve" | "reject";
+      action: "approve" | "reject" | "revoke";
       reviewNote?: string;
     }) => CareerProgressionsService.review(id, action, reviewNote),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["career-progressions"] }),

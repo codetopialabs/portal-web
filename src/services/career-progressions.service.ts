@@ -52,7 +52,7 @@ export const CareerProgressionsService = {
 
   async review(
     id: number,
-    action: "approve" | "reject",
+    action: "approve" | "reject" | "revoke",
     reviewNote?: string
   ): Promise<CareerProgression> {
     const res = await axiosInstance.post<ApiResponse<CareerProgression>>(`${BASE}/admin/${id}/`, {

@@ -91,10 +91,16 @@ function ReviewCard({ item }: { item: CareerProgression }) {
   const [note, setNote] = useState("");
   const meta = STATUS_META[item.status];
 
-  async function submit(action: "approve" | "reject") {
+  async function submit(action: "approve" | "reject" | "revoke") {
     try {
       await review.mutateAsync({ id: item.id, action, reviewNote: note });
-      toast.success(action === "approve" ? "Progression approved." : "Progression rejected.");
+      toast.success(
+        action === "approve"
+          ? "Progression approved."
+          : action === "revoke"
+            ? "Approval revoked — entry back in review queue."
+            : "Progression rejected."
+      );
       setNote("");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Review failed.");
@@ -163,6 +169,26 @@ function ReviewCard({ item }: { item: CareerProgression }) {
               Review note
             </p>
             <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
+          </div>
+        )}
+
+        {/* Revoke approval */}
+        {item.status === "approved" && (
+          <div className="mt-5 border-t border-zinc-100 pt-4 flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={review.isPending}
+              onClick={() => submit("revoke")}
+              className="h-9 rounded-none border-zinc-200 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+            >
+              {review.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Clock3 className="h-3.5 w-3.5" />
+              )}
+              Revoke Approval
+            </Button>
           </div>
         )}
 
