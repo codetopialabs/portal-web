@@ -306,7 +306,7 @@ export function PublicProfileContent() {
               </div>
               <div className="p-6">
                 {careerProgressions.length > 0 ? (
-                  <div className="relative space-y-0">
+                  <div className="relative space-y-0 before:absolute before:left-[4px] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-zinc-200">
                     {careerProgressions.map((item, index) => {
                       const isLast = index === careerProgressions.length - 1;
                       const isCurrent = !item.endDate;
@@ -335,13 +335,6 @@ export function PublicProfileContent() {
                           <span
                             className={`absolute left-0 top-[6px] h-[10px] w-[10px] border-2 ${isCurrent ? "border-zinc-950 bg-zinc-950" : "border-zinc-300 bg-white"}`}
                           />
-                          {/* Two-dot connector — hidden on last entry */}
-                          {!isLast && (
-                            <span className="absolute left-[4px] top-[18px] flex flex-col gap-[5px]">
-                              <span className="h-[3px] w-[3px] rounded-full bg-zinc-200" />
-                              <span className="h-[3px] w-[3px] rounded-full bg-zinc-200" />
-                            </span>
-                          )}
 
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0">
