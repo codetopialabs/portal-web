@@ -1,4 +1,4 @@
-﻿export type CareerProgressionStatus = "pending" | "approved" | "rejected";
+﻿export type CareerProgressionStatus = "pending" | "approved" | "rejected" | "revoked";
 
 export interface CareerProgression {
   id: number;

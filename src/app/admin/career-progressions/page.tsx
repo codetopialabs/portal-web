@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Ban,
   BriefcaseBusiness,
   CheckCircle2,
   Clock3,
@@ -39,17 +40,24 @@ const STATUS_META: Record<
     bar: "bg-zinc-900",
   },
   rejected: {
-    label: "Rejected",
+    label: "Changes Requested",
     icon: XCircle,
     pill: "border-red-200 bg-red-50 text-red-600",
     bar: "bg-red-500",
+  },
+  revoked: {
+    label: "Revoked",
+    icon: Ban,
+    pill: "border-zinc-300 bg-zinc-100 text-zinc-600",
+    bar: "bg-zinc-500",
   },
 };
 
 const FILTERS = [
   { value: "pending" as const, label: "Pending" },
   { value: "approved" as const, label: "Approved" },
-  { value: "rejected" as const, label: "Rejected" },
+  { value: "rejected" as const, label: "Changes Requested" },
+  { value: "revoked" as const, label: "Revoked" },
   { value: "" as const, label: "All" },
 ];
 
@@ -98,8 +106,8 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         action === "approve"
           ? "Progression approved."
           : action === "revoke"
-            ? "Approval revoked — entry back in review queue."
-            : "Progression rejected."
+            ? "Entry revoked and removed from their public profile."
+            : "Changes requested."
       );
       setNote("");
     } catch (error) {
@@ -170,21 +178,37 @@ function ReviewCard({ item }: { item: CareerProgression }) {
 
         {/* Revoke approval */}
         {item.status === "approved" && (
-          <div className="mt-5 border-t border-zinc-100 pt-4 flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={review.isPending}
-              onClick={() => submit("revoke")}
-              className="h-9 rounded-none border-zinc-200 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700 transition-colors"
-            >
-              {review.isPending ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Clock3 className="h-3.5 w-3.5" />
-              )}
-              Revoke Approval
-            </Button>
+          <div className="mt-5 border-t border-zinc-100 pt-4 space-y-3">
+            <div>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+                Reason for revoking
+                <span className="ml-1.5 normal-case font-normal text-zinc-300">
+                  — required, shown to the member
+                </span>
+              </p>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Why is this entry being revoked?"
+                className="min-h-[60px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:border-zinc-900 focus:outline-none transition-colors"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={review.isPending || !note.trim()}
+                onClick={() => submit("revoke")}
+                className="h-9 rounded-none border-zinc-200 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-50"
+              >
+                {review.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Ban className="h-3.5 w-3.5" />
+                )}
+                Revoke
+              </Button>
+            </div>
           </div>
         )}
 
@@ -194,7 +218,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
                 Review note
-                <span className="ml-1.5 normal-case font-normal text-zinc-300">— optional, shown to member if rejected</span>
+                <span className="ml-1.5 normal-case font-normal text-zinc-300">
+                  — optional, shown to member if changes are requested
+                </span>
               </p>
               <textarea
                 value={note}
@@ -216,7 +242,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 ) : (
                   <XCircle className="h-3.5 w-3.5" />
                 )}
-                Reject
+                Request Changes
               </Button>
               <Button
                 type="button"

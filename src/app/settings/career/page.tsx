@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import {
+  Ban,
   BriefcaseBusiness,
   CheckCircle2,
   Clock3,
@@ -51,6 +52,11 @@ const STATUS_META: Record<
     label: "Changes needed",
     icon: XCircle,
     className: "border-red-200 bg-red-50 text-red-700",
+  },
+  revoked: {
+    label: "Revoked",
+    icon: Ban,
+    className: "border-zinc-300 bg-zinc-100 text-zinc-600",
   },
 };
 
@@ -376,12 +382,12 @@ function ProgressionCard({
         </p>
       )}
 
-      {item.status === "rejected" ? (
+      {item.status === "rejected" || item.status === "revoked" ? (
         <div className="mt-4 border-t border-red-100 pt-4 space-y-3">
           {item.reviewNote && (
             <div className="border-l-2 border-red-400 pl-3">
               <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-500 mb-1">
-                Reviewer feedback
+                {item.status === "revoked" ? "Reason for revoking" : "Reviewer feedback"}
               </p>
               <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
             </div>
