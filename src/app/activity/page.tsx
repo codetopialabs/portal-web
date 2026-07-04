@@ -3,6 +3,7 @@
 import type { DriveStep } from "driver.js";
 import {
   AppWindow,
+  Briefcase,
   Filter,
   Key,
   Laptop,
@@ -24,7 +25,7 @@ import { type ActivityLogEntry, SessionService } from "@/services/auth.service";
 
 // ─── event type config ────────────────────────────────────────────────────────
 
-type EventCategory = "auth" | "account" | "profile" | "session";
+type EventCategory = "auth" | "account" | "profile" | "session" | "career";
 
 const EVENT_CONFIG: Record<
   string,
@@ -55,6 +56,14 @@ const EVENT_CONFIG: Record<
   user_suspended: { icon: ShieldAlert, category: "account", color: "text-red-500" },
   user_reactivated: { icon: Shield, category: "account", color: "text-emerald-600" },
   user_deleted: { icon: ShieldAlert, category: "account", color: "text-red-700" },
+  career_progression_submitted: { icon: Briefcase, category: "career", color: "text-blue-600" },
+  career_progression_approved: { icon: Briefcase, category: "career", color: "text-emerald-600" },
+  career_progression_changes_requested: {
+    icon: Briefcase,
+    category: "career",
+    color: "text-amber-600",
+  },
+  career_progression_revoked: { icon: Briefcase, category: "career", color: "text-red-600" },
 };
 
 const CATEGORY_FILTERS: { label: string; value: EventCategory | "all" }[] = [
@@ -63,6 +72,7 @@ const CATEGORY_FILTERS: { label: string; value: EventCategory | "all" }[] = [
   { label: "Account", value: "account" },
   { label: "Profile", value: "profile" },
   { label: "Session", value: "session" },
+  { label: "Career", value: "career" },
 ];
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
