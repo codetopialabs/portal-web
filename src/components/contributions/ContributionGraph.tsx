@@ -1,13 +1,100 @@
 "use client";
 
+import { GitCommitHorizontal, GitPullRequest, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { ActivityCalendar, type ThemeInput } from "react-activity-calendar";
+import {
+  type Activity,
+  ActivityCalendar,
+  type BlockElement,
+  type ThemeInput,
+} from "react-activity-calendar";
 import { useContributions } from "@/hooks/useTeams";
-import type { ContributionDay } from "@/services/teams.service";
+import type { ContributionDay, ContributionItem } from "@/services/teams.service";
 
 interface ContributionGraphProps {
   username: string;
   joinedAt?: string;
+}
+
+const ITEM_TYPE_META: Record<ContributionItem["type"], { icon: React.ElementType; label: string }> =
+  {
+    review_approved: { icon: Sparkles, label: "Review approved" },
+    commit: { icon: GitCommitHorizontal, label: "Commit" },
+    pull_request_merged: { icon: GitPullRequest, label: "PR merged" },
+  };
+
+function formatDayLabel(dateStr: string): string {
+  const d = new Date(`${dateStr}T00:00:00`);
+  return new Intl.DateTimeFormat("en", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(d);
+}
+
+function DayDetailPanel({ day, onClose }: { day: ContributionDay; onClose: () => void }) {
+  return (
+    <div className="mt-4 border border-zinc-200 bg-zinc-50 p-4">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <p className="font-sans text-sm font-black text-zinc-950">{formatDayLabel(day.date)}</p>
+          <p className="font-mono text-[11px] text-zinc-500">
+            {day.count} contribution{day.count !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="shrink-0 text-zinc-400 hover:text-zinc-900"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="space-y-2">
+        {day.items.map((item, i) => {
+          const meta = ITEM_TYPE_META[item.type];
+          const Icon = meta.icon;
+          const content = (
+            <>
+              <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-mono text-xs text-zinc-800">{item.title}</p>
+                <p className="font-mono text-[10px] uppercase tracking-wide text-zinc-400">
+                  {meta.label}
+                </p>
+              </div>
+            </>
+          );
+          const linkClassName =
+            "flex items-center gap-2.5 border border-zinc-200 bg-white p-2.5 transition-colors hover:border-zinc-400";
+          return item.source === "github" ? (
+            <a
+              // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
+              key={i}
+              href={item.url}
+              target="_blank"
+              rel="noreferrer"
+              className={linkClassName}
+            >
+              {content}
+            </a>
+          ) : (
+            <Link
+              // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
+              key={i}
+              href={item.url}
+              className={linkClassName}
+            >
+              {content}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export function ContributionGraph({ username, joinedAt }: ContributionGraphProps) {
@@ -19,6 +106,7 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
   }
 
   const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
+  const [selectedDay, setSelectedDay] = useState<ContributionDay | null>(null);
   const { data, isLoading, isError } = useContributions(username, selectedYear);
 
   const explicitTheme: ThemeInput = {
@@ -49,7 +137,7 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
         const dayStr = String(d.getUTCDate()).padStart(2, "0");
         const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
 
-        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0 });
+        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0, items: [] });
       }
     } else {
       // Pad last 365 days
@@ -62,7 +150,7 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
         const dayStr = String(d.getDate()).padStart(2, "0");
         const dateStr = `${yearStr}-${monthStr}-${dayStr}`;
 
-        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0 });
+        result.push(map.get(dateStr) ?? { date: dateStr, count: 0, level: 0, items: [] });
       }
     }
     return result;
@@ -101,6 +189,25 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
                 colorScheme="light"
                 blockSize={15}
                 blockMargin={4}
+                renderBlock={(block: BlockElement, activity: Activity) => {
+                  const day = activity as ContributionDay;
+                  if (day.count === 0) return block;
+                  return (
+                    // biome-ignore lint/a11y/useSemanticElements: SVG content, <button> isn't valid here
+                    <g
+                      onClick={() => setSelectedDay(day)}
+                      style={{ cursor: "pointer" }}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${day.count} contribution${day.count !== 1 ? "s" : ""} on ${day.date}`}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setSelectedDay(day);
+                      }}
+                    >
+                      {block}
+                    </g>
+                  );
+                }}
                 labels={{
                   legend: {
                     less: "Less",
@@ -131,7 +238,10 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
           <div className="flex flex-row lg:flex-col gap-1 shrink-0 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 border-l border-zinc-100 pl-4 lg:min-w-24">
             <button
               type="button"
-              onClick={() => setSelectedYear(undefined)}
+              onClick={() => {
+                setSelectedYear(undefined);
+                setSelectedDay(null);
+              }}
               className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
                 selectedYear === undefined
                   ? "bg-zinc-950 text-white font-bold"
@@ -144,7 +254,10 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
               <button
                 key={year}
                 type="button"
-                onClick={() => setSelectedYear(year)}
+                onClick={() => {
+                  setSelectedYear(year);
+                  setSelectedDay(null);
+                }}
                 className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
                   selectedYear === year
                     ? "bg-zinc-950 text-white font-bold"
@@ -156,6 +269,8 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
             ))}
           </div>
         </div>
+
+        {selectedDay && <DayDetailPanel day={selectedDay} onClose={() => setSelectedDay(null)} />}
       </div>
     </div>
   );
