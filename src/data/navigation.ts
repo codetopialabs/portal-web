@@ -58,12 +58,13 @@ const BASE_MENU_GROUPS: NavGroup[] = [
   },
 ];
 
+// Community moderation/management — the day-to-day admin work.
 const ADMIN_MENU_GROUP: NavGroup = {
   label: "Admin",
   items: [
     { icon: LayoutDashboard, label: "Overview", href: "/admin", activePrefix: "/admin" },
     { icon: Users, label: "Members", href: "/admin/members", activePrefix: "/admin/members" },
-    { icon: Users2, label: "Teams", href: "/admin/teams", activePrefix: "/admin/teams" },
+    { icon: Users2, label: "All Teams", href: "/admin/teams", activePrefix: "/admin/teams" },
     { icon: ShieldCheck, label: "Roles", href: "/admin/roles", activePrefix: "/admin/roles" },
     {
       icon: ClipboardCheck,
@@ -71,18 +72,25 @@ const ADMIN_MENU_GROUP: NavGroup = {
       href: "/admin/reflections",
       activePrefix: "/admin/reflections",
     },
+    {
+      icon: BriefcaseBusiness,
+      label: "Career Progressions",
+      href: "/admin/career-progressions",
+      activePrefix: "/admin/career-progressions",
+    },
+  ],
+};
+
+// Platform/system configuration — one-time setup, not ongoing moderation.
+const INTEGRATIONS_MENU_GROUP: NavGroup = {
+  label: "Integrations",
+  items: [
     { icon: Key, label: "API Keys", href: "/admin/api-keys", activePrefix: "/admin/api-keys" },
     {
       icon: Code2,
       label: "OAuth Apps",
       href: "/admin/oauth-apps",
       activePrefix: "/admin/oauth-apps",
-    },
-    {
-      icon: BriefcaseBusiness,
-      label: "Career Progressions",
-      href: "/admin/career-progressions",
-      activePrefix: "/admin/career-progressions",
     },
     {
       icon: GitFork,
@@ -94,5 +102,7 @@ const ADMIN_MENU_GROUP: NavGroup = {
 };
 
 export function getDashboardMenuGroups(canAccessAdmin: boolean): NavGroup[] {
-  return canAccessAdmin ? [...BASE_MENU_GROUPS, ADMIN_MENU_GROUP] : BASE_MENU_GROUPS;
+  return canAccessAdmin
+    ? [...BASE_MENU_GROUPS, ADMIN_MENU_GROUP, INTEGRATIONS_MENU_GROUP]
+    : BASE_MENU_GROUPS;
 }

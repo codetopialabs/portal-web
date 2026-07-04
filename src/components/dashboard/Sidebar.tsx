@@ -1,8 +1,10 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +25,19 @@ import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  function toggleGroup(label: string) {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  }
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const canAccessAdmin = usePermission("admin.panel.access");
@@ -72,55 +87,74 @@ export function DashboardSidebar() {
 
       {/* Nav */}
       <SidebarContent className="px-3 py-6 no-scrollbar bg-black">
-        {menuGroups.map((group) => (
-          <SidebarGroup key={group.label} className="mb-8 p-0">
-            <SidebarGroupLabel className="px-2 mb-1 h-auto font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 font-bold">
-              {group.label}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-0">
-                {group.items.map((item) => {
-                  const active = isActive(item.activePrefix, item.href);
-                  return (
-                    <SidebarMenuItem key={item.label}>
-                      <SidebarMenuButton
-                        asChild
-                        tooltip={item.comingSoon ? `${item.label} (Coming Soon)` : item.label}
-                        isActive={active}
-                        className={
-                          item.comingSoon
-                            ? "h-9 rounded-none text-zinc-600 hover:text-zinc-400 hover:bg-transparent"
-                            : itemClass(active)
-                        }
-                      >
-                        <Link href={item.href} className="flex items-center gap-3 px-3">
-                          <item.icon
+        {menuGroups.map((group) => {
+          const isGroupCollapsed = collapsedGroups.has(group.label);
+          return (
+            <SidebarGroup key={group.label} className="mb-8 p-0">
+              <SidebarGroupLabel asChild className="px-2 mb-1 h-auto">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.label)}
+                  className="flex w-full items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400 font-black hover:text-zinc-200 transition-colors"
+                >
+                  {group.label}
+                  <ChevronDown
+                    className={cn(
+                      "h-3 w-3 shrink-0 transition-transform duration-150",
+                      isGroupCollapsed && "-rotate-90"
+                    )}
+                  />
+                </button>
+              </SidebarGroupLabel>
+              {!isGroupCollapsed && (
+                <SidebarGroupContent>
+                  <SidebarMenu className="gap-0">
+                    {group.items.map((item) => {
+                      const active = isActive(item.activePrefix, item.href);
+                      return (
+                        <SidebarMenuItem key={item.label}>
+                          <SidebarMenuButton
+                            asChild
+                            tooltip={item.comingSoon ? `${item.label} (Coming Soon)` : item.label}
+                            isActive={active}
                             className={
-                              item.comingSoon ? "w-4 h-4 shrink-0 text-zinc-700" : iconClass(active)
+                              item.comingSoon
+                                ? "h-9 rounded-none text-zinc-600 hover:text-zinc-400 hover:bg-transparent"
+                                : itemClass(active)
                             }
-                          />
-                          <span className="font-mono text-[11px] uppercase tracking-wider">
-                            {item.label}
-                          </span>
-                          {item.comingSoon && (
-                            <span className="ml-auto font-mono text-[8px] uppercase tracking-wider text-zinc-600 border border-zinc-800 px-1 py-0.5">
-                              Soon
-                            </span>
-                          )}
-                          {item.label === "Teams" && pendingInviteCount > 0 && (
-                            <span className="ml-auto flex h-4 min-w-4 items-center justify-center bg-white text-black font-mono text-[9px] font-bold px-1">
-                              {pendingInviteCount > 9 ? "9+" : pendingInviteCount}
-                            </span>
-                          )}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+                          >
+                            <Link href={item.href} className="flex items-center gap-3 px-3">
+                              <item.icon
+                                className={
+                                  item.comingSoon
+                                    ? "w-4 h-4 shrink-0 text-zinc-700"
+                                    : iconClass(active)
+                                }
+                              />
+                              <span className="font-mono text-[11px] uppercase tracking-wider">
+                                {item.label}
+                              </span>
+                              {item.comingSoon && (
+                                <span className="ml-auto font-mono text-[8px] uppercase tracking-wider text-zinc-600 border border-zinc-800 px-1 py-0.5">
+                                  Soon
+                                </span>
+                              )}
+                              {item.href === "/teams" && pendingInviteCount > 0 && (
+                                <span className="ml-auto flex h-4 min-w-4 items-center justify-center bg-white text-black font-mono text-[9px] font-bold px-1">
+                                  {pendingInviteCount > 9 ? "9+" : pendingInviteCount}
+                                </span>
+                              )}
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              )}
+            </SidebarGroup>
+          );
+        })}
       </SidebarContent>
 
       <SidebarRail />
