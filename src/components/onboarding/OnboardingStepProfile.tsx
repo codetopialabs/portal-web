@@ -43,7 +43,7 @@ interface ProfileFormValues {
 }
 
 const inputStyles =
-  "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all";
+  "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all";
 
 const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";
 
@@ -430,7 +430,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger
                         id="gender"
-                        className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                        className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
                       >
                         <SelectValue placeholder="Select your gender" />
                       </SelectTrigger>
@@ -478,7 +478,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                   <textarea
                     id="bio"
                     placeholder="Tell the community who you are..."
-                    className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                    className="min-h-[100px] w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all resize-none"
                     {...register("bio", {
                       maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
                     })}
@@ -504,7 +504,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
                 <input
                   placeholder="github.com/username"
-                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                   {...register("github_handle")}
                 />
               </div>
@@ -512,7 +512,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <FaLinkedin className="w-4 h-4 shrink-0" style={{ color: "#0A66C2" }} />
                 <input
                   placeholder="linkedin.com/in/username"
-                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                   {...register("linkedin_url")}
                 />
               </div>
@@ -520,7 +520,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <FaXTwitter className="w-4 h-4 shrink-0" style={{ color: "#000000" }} />
                 <input
                   placeholder="x.com/username"
-                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                   {...register("twitter_handle")}
                 />
               </div>
@@ -528,7 +528,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <Globe className="w-4 h-4 text-zinc-400 shrink-0" />
                 <input
                   placeholder="yoursite.com"
-                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                  className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                   {...register("website_url")}
                 />
               </div>
@@ -543,14 +543,14 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                         value={link.label}
                         onChange={(e) => updateCustomLink(i, "label", e.target.value)}
                         placeholder="Label"
-                        className="w-20 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900 border-r border-zinc-100 pr-3 shrink-0"
+                        className="w-20 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900 border-r border-zinc-100 pr-3 shrink-0"
                       />
                     )}
                     <input
                       value={link.url}
                       onChange={(e) => updateCustomLink(i, "url", e.target.value)}
                       placeholder={p?.placeholder ?? "https://..."}
-                      className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                      className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                     />
                     <button
                       type="button"

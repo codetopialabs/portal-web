@@ -29,7 +29,7 @@ import type { CareerProgression, CareerProgressionStatus } from "@/types/career-
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const inputStyles =
-  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900";
+  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900";
 const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
 
 // ── Status meta ───────────────────────────────────────────────────────────────
@@ -249,7 +249,7 @@ function ProgressionSheet({
             <div className="space-y-2">
               <Label htmlFor="endDate" className={labelStyles}>
                 End
-                <span className="ml-1 normal-case text-zinc-300">(optional)</span>
+                <span className="ml-1 normal-case text-zinc-400">(optional)</span>
               </Label>
               <Input
                 id="endDate"
@@ -292,12 +292,12 @@ function ProgressionSheet({
           <div className="space-y-2">
             <Label htmlFor="description" className={labelStyles}>
               Description
-              <span className="ml-1 normal-case text-zinc-300">(optional)</span>
+              <span className="ml-1 normal-case text-zinc-400">(optional)</span>
             </Label>
             <textarea
               id="description"
               placeholder="Describe your role and what you did."
-              className="min-h-28 w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:border-zinc-900 focus:outline-none"
+              className="min-h-28 w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
               {...register("description")}
             />
           </div>

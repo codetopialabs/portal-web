@@ -1,7 +1,18 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: community search API response items are not generically typed at this component layer
 "use client";
 
-import { Check, Crown, Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
+import {
+  Check,
+  Crown,
+  Loader2,
+  LogOut,
+  Mail,
+  Plus,
+  Trash2,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,6 +30,7 @@ import {
   useTeamInvites,
   useTeamJoinRequests,
   useTeamMembers,
+  useTransferOwnership,
   useUpdateMemberRole,
 } from "@/hooks/useTeams";
 import { getAvatarUrl } from "@/lib/utils";
@@ -34,9 +46,10 @@ interface TeamMembersTabProps {
   teamSlug: string;
   isLead: boolean;
   isOwner: boolean;
+  currentUserId?: string;
 }
 
-export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProps) {
+export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: TeamMembersTabProps) {
   // All data-fetching moved inside this component — it only runs when Members tab is visible
   const { data: members, isLoading: membersLoading } = useTeamMembers(teamSlug);
   const { data: pendingInvites } = useTeamInvites(teamSlug);
@@ -46,6 +59,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProp
   const { mutate: revokeInvite, isPending: revokePending } = useRevokeInvite(teamSlug);
   const { mutate: reviewJoinRequest, isPending: reviewPending } = useReviewJoinRequest(teamSlug);
   const { mutate: updateRole, isPending: roleUpdatePending } = useUpdateMemberRole(teamSlug);
+  const { mutate: transferOwnership, isPending: transferPending } = useTransferOwnership(teamSlug);
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -289,6 +303,44 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProp
                         title="Remove Member"
                       >
                         <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </ConfirmModal>
+                  )}
+                  {isOwner && member.user.id !== currentUserId && member.role !== "owner" && (
+                    <ConfirmModal
+                      title="Transfer Ownership"
+                      description={`Make ${member.user.fullName} the new Owner? You will become a Lead.`}
+                      confirmText="Transfer"
+                      onConfirm={() => transferOwnership(member.user.id)}
+                      isLoading={transferPending}
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={transferPending}
+                        className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                      >
+                        <Crown className="mr-1.5 h-3.5 w-3.5" />
+                        Make Owner
+                      </Button>
+                    </ConfirmModal>
+                  )}
+                  {member.user.id === currentUserId && member.role !== "owner" && (
+                    <ConfirmModal
+                      title="Leave Team"
+                      description="Are you sure you want to leave this team?"
+                      confirmText="Leave"
+                      onConfirm={() => removeMember(member.user.id)}
+                      isLoading={removePending}
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={removePending}
+                        className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none text-red-600 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <LogOut className="mr-1.5 h-3.5 w-3.5" />
+                        Leave Team
                       </Button>
                     </ConfirmModal>
                   )}

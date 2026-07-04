@@ -197,7 +197,7 @@ function MembersPageContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl pb-20">
+    <div className="pb-20">
       {/* Header */}
       <div className="mb-6">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">

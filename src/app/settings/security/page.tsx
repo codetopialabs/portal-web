@@ -33,7 +33,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useUserStore } from "@/store/user.store";
 
 const inputStyles =
-  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-base placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
+  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-base placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 const labelStyles = "font-mono text-sm text-zinc-500 font-medium";
 
 function SectionHeader({
@@ -135,7 +135,7 @@ function ChangePasswordSection() {
             <button
               type="button"
               onClick={() => setShowCurrent((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
             >
               {showCurrent ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
@@ -162,7 +162,7 @@ function ChangePasswordSection() {
               <button
                 type="button"
                 onClick={() => setShowNew((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
               >
                 {showNew ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
@@ -186,7 +186,7 @@ function ChangePasswordSection() {
               <button
                 type="button"
                 onClick={() => setShowConfirm((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
               >
                 {showConfirm ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
@@ -447,7 +447,7 @@ function DeleteAccountModal() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-300 hover:text-zinc-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
             >
               {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>

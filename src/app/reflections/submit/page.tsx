@@ -46,7 +46,7 @@ function questionNeedsText(question: ReflectionQuestionSnapshot) {
 
 function SubmitSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-6xl">
       <Skeleton className="mb-4 h-5 w-40 rounded-none" />
       <Skeleton className="mb-8 h-12 w-80 rounded-none" />
       <div className="space-y-4">
@@ -185,7 +185,7 @@ function ReflectionSubmitContent() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-6xl">
       <div className="mb-6">
         <Button asChild variant="ghost" className="mb-4 rounded-none px-0 font-mono text-xs">
           <Link href="/reflections">

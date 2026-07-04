@@ -120,6 +120,21 @@ export function useUpdateMemberRole(teamId: string) {
   });
 }
 
+export function useTransferOwnership(teamId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => TeamsService.transferOwnership(teamId, userId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members", "me"] });
+      toast.success("Ownership transferred.");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to transfer ownership.");
+    },
+  });
+}
+
 // ─── Invites ──────────────────────────────────────────────────────────────────
 
 export function useTeamInvites(teamId: string) {

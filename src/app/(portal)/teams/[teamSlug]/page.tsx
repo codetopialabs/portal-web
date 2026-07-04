@@ -162,7 +162,12 @@ function TeamWorkspaceContent() {
             <TeamReviewsTab teamSlug={teamSlug} reviews={reviews} reviewsLoading={reviewsLoading} />
           )}
           {tab === "members" && (
-            <TeamMembersTab teamSlug={teamSlug} isLead={isLead} isOwner={isOwner} />
+            <TeamMembersTab
+              teamSlug={teamSlug}
+              isLead={isLead}
+              isOwner={isOwner}
+              currentUserId={membership?.user.id}
+            />
           )}
         </div>
       </div>

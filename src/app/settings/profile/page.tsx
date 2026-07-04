@@ -54,7 +54,7 @@ import { useUserStore } from "@/store/user.store";
 import { normalizeUrl } from "@/utils/url";
 
 const inputStyles =
-  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-300 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
+  "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 
 const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
 
@@ -129,7 +129,7 @@ function PresetOrOtherSelect({
       <Select value={value || "none"} onValueChange={(v) => onChange(v === "none" ? "" : v)}>
         <SelectTrigger
           id={id}
-          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -793,7 +793,7 @@ export default function SettingsProfilePage() {
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
                       id="gender"
-                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
                     >
                       <SelectValue placeholder="Select your gender" />
                     </SelectTrigger>
@@ -855,7 +855,7 @@ export default function SettingsProfilePage() {
               <textarea
                 id="bio"
                 placeholder="Tell the community who you are..."
-                className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                className="min-h-[100px] w-full rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all resize-none"
                 {...register("bio", {
                   maxLength: { value: 1000, message: "Bio must be 1000 characters or less" },
                 })}
@@ -909,7 +909,7 @@ export default function SettingsProfilePage() {
                   >
                     <SelectTrigger
                       id="experience-level"
-                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-300"
+                      className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
                     >
                       <SelectValue placeholder="Select your experience level" />
                     </SelectTrigger>
@@ -1007,7 +1007,7 @@ export default function SettingsProfilePage() {
               <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
               <input
                 placeholder="Discord username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                 {...register("discord_username")}
               />
             </div>
@@ -1015,7 +1015,7 @@ export default function SettingsProfilePage() {
               <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
               <input
                 placeholder="github.com/username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                 {...register("github_handle")}
               />
             </div>
@@ -1023,7 +1023,7 @@ export default function SettingsProfilePage() {
               <FaLinkedin className="w-4 h-4 shrink-0" style={{ color: "#0A66C2" }} />
               <input
                 placeholder="linkedin.com/in/username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                 {...register("linkedin_url")}
               />
             </div>
@@ -1031,7 +1031,7 @@ export default function SettingsProfilePage() {
               <FaXTwitter className="w-4 h-4 shrink-0" style={{ color: "#000000" }} />
               <input
                 placeholder="x.com/username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                 {...register("twitter_handle")}
               />
             </div>
@@ -1039,7 +1039,7 @@ export default function SettingsProfilePage() {
               <Globe className="w-4 h-4 text-zinc-400 shrink-0" />
               <input
                 placeholder="yoursite.com"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                 {...register("website_url")}
               />
             </div>
@@ -1054,14 +1054,14 @@ export default function SettingsProfilePage() {
                       value={link.label}
                       onChange={(e) => updateCustomLink(i, "label", e.target.value)}
                       placeholder="Label"
-                      className="w-20 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900 border-r border-zinc-100 pr-3 shrink-0"
+                      className="w-20 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900 border-r border-zinc-100 pr-3 shrink-0"
                     />
                   )}
                   <input
                     value={link.url}
                     onChange={(e) => updateCustomLink(i, "url", e.target.value)}
                     placeholder={p?.placeholder ?? "https://..."}
-                    className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-300 focus:outline-none text-zinc-900"
+                    className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
                   />
                   <button
                     type="button"
