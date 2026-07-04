@@ -208,10 +208,11 @@ function AdminCareerProgressionsContent() {
             key={value || "all"}
             type="button"
             onClick={() => setStatus(value)}
-            className={`h-9 border px-3 font-mono text-xs font-black uppercase tracking-widest ${status === value
-              ? "border-zinc-950 bg-zinc-950 text-white"
-              : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-500"
-              }`}
+            className={`h-9 border px-3 font-mono text-xs font-black uppercase tracking-widest ${
+              status === value
+                ? "border-zinc-950 bg-zinc-950 text-white"
+                : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-500"
+            }`}
           >
             {value || "All"}
           </button>

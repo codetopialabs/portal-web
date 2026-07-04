@@ -354,10 +354,11 @@ function ProgressionCard({
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
             title={confirmDelete ? "Click again to confirm delete" : "Delete entry"}
-            className={`flex h-7 items-center gap-1 border px-2 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors ${confirmDelete
+            className={`flex h-7 items-center gap-1 border px-2 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors ${
+              confirmDelete
                 ? "border-red-300 bg-red-50 text-red-700 hover:bg-red-100"
                 : "border-zinc-200 text-zinc-400 hover:border-red-300 hover:text-red-600"
-              }`}
+            }`}
           >
             {deleteMutation.isPending ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
