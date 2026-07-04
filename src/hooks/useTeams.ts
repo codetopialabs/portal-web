@@ -201,6 +201,80 @@ export function useRevokeInvite(teamId: string) {
   });
 }
 
+// ─── Browse teams / join requests ──────────────────────────────────────────────
+
+export function useBrowseTeams() {
+  return useQuery({
+    queryKey: ["teams", "browse"],
+    queryFn: () => TeamsService.browseTeams(),
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useMyJoinRequests() {
+  return useQuery({
+    queryKey: ["teams", "join-requests", "mine"],
+    queryFn: () => TeamsService.getMyJoinRequests(),
+    staleTime: 1000 * 15,
+  });
+}
+
+export function useRequestToJoin(teamSlug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => TeamsService.requestToJoin(teamSlug),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["teams", "browse"] });
+      qc.invalidateQueries({ queryKey: ["teams", "join-requests", "mine"] });
+      toast.success("Request sent. A team lead will review it.");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.detail || "Failed to request to join.");
+    },
+  });
+}
+
+export function useWithdrawJoinRequest(teamSlug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (requestId: string) => TeamsService.withdrawJoinRequest(teamSlug, requestId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["teams", "browse"] });
+      qc.invalidateQueries({ queryKey: ["teams", "join-requests", "mine"] });
+      toast.success("Request withdrawn.");
+    },
+    onError: () => {
+      toast.error("Failed to withdraw request.");
+    },
+  });
+}
+
+export function useTeamJoinRequests(teamId: string) {
+  return useQuery({
+    queryKey: ["teams", teamId, "join-requests"],
+    queryFn: () => TeamsService.getJoinRequests(teamId),
+    enabled: Boolean(teamId),
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+}
+
+export function useReviewJoinRequest(teamId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ requestId, action }: { requestId: string; action: "approve" | "decline" }) =>
+      TeamsService.reviewJoinRequest(teamId, requestId, action),
+    onSuccess: (_data, { action }) => {
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "join-requests"] });
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
+      toast.success(action === "approve" ? "Request approved." : "Request declined.");
+    },
+    onError: () => {
+      toast.error("Failed to update the request.");
+    },
+  });
+}
+
 // ─── Reviews ─────────────────────────────────────────────────────────────────
 
 export function useTeamReviews(teamId: string) {

@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: community search API response items are not generically typed at this component layer
 "use client";
 
-import { Crown, Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
+import { Check, Crown, Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -13,9 +13,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCommunityMembers } from "@/hooks/useCommunityMembers";
 import {
   useRemoveMember,
+  useReviewJoinRequest,
   useRevokeInvite,
   useSendInvite,
   useTeamInvites,
+  useTeamJoinRequests,
   useTeamMembers,
   useUpdateMemberRole,
 } from "@/hooks/useTeams";
@@ -38,9 +40,11 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProp
   // All data-fetching moved inside this component — it only runs when Members tab is visible
   const { data: members, isLoading: membersLoading } = useTeamMembers(teamSlug);
   const { data: pendingInvites } = useTeamInvites(teamSlug);
+  const { data: joinRequests } = useTeamJoinRequests(teamSlug);
   const { mutate: sendInvite, isPending: invitePending } = useSendInvite(teamSlug);
   const { mutate: removeMember, isPending: removePending } = useRemoveMember(teamSlug);
   const { mutate: revokeInvite, isPending: revokePending } = useRevokeInvite(teamSlug);
+  const { mutate: reviewJoinRequest, isPending: reviewPending } = useReviewJoinRequest(teamSlug);
   const { mutate: updateRole, isPending: roleUpdatePending } = useUpdateMemberRole(teamSlug);
 
   const [searchInput, setSearchInput] = useState("");
@@ -294,6 +298,65 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProp
           )}
         </div>
       </div>
+
+      {/* Join requests — leads only */}
+      {isLead && joinRequests && joinRequests.length > 0 && (
+        <div>
+          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4 flex items-center gap-2">
+            Join Requests
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 font-mono text-[9px] bg-zinc-800 text-white">
+              {joinRequests.length}
+            </span>
+          </h3>
+          <div className="border border-grey-200 bg-white divide-y divide-grey-100 overflow-hidden">
+            {joinRequests.map((request) => (
+              <div
+                key={request.id}
+                className="flex items-center justify-between px-5 py-4 bg-grey-50/50"
+              >
+                <div className="flex items-center gap-4">
+                  <Image
+                    src={getAvatarUrl(request.user.profilePictureUrl, request.user.fullName)}
+                    alt={request.user.fullName}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 border border-grey-200 object-cover rounded-none"
+                  />
+                  <div className="min-w-0">
+                    <p className="font-sans text-sm font-black text-text-primary truncate">
+                      {request.user.fullName}
+                    </p>
+                    <p className="font-mono text-[10px] text-text-tertiary mt-0.5">
+                      @{request.user.username}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    disabled={reviewPending}
+                    onClick={() => reviewJoinRequest({ requestId: request.id, action: "approve" })}
+                    className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none bg-grey-900 text-white hover:bg-grey-800"
+                  >
+                    <Check className="mr-1.5 h-3.5 w-3.5" />
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={reviewPending}
+                    onClick={() => reviewJoinRequest({ requestId: request.id, action: "decline" })}
+                    className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                  >
+                    <X className="mr-1.5 h-3.5 w-3.5" />
+                    Decline
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Pending invites — leads only */}
       {isLead && pendingInvites && pendingInvites.length > 0 && (

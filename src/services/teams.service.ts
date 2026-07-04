@@ -12,6 +12,32 @@ export interface Team {
   memberCount?: number;
 }
 
+export interface BrowseTeam extends Team {
+  isMember: boolean;
+  hasPendingRequest: boolean;
+}
+
+export interface TeamJoinRequest {
+  id: string;
+  team: string;
+  teamSlug: string;
+  teamName: string;
+  status: "pending" | "approved" | "declined";
+  createdAt: string;
+  user: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  };
+  reviewedBy: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  } | null;
+}
+
 export interface ActivityActor {
   id: string;
   username: string;
@@ -189,6 +215,51 @@ export const TeamsService = {
   /** Admin-only: every team platform-wide, regardless of membership. */
   async getAllTeams(): Promise<Team[]> {
     const res = await axiosInstance.get<ApiResponse<Team[]>>("/admin/teams/");
+    return res.data.data;
+  },
+
+  /** Every team platform-wide, for any member to browse and request to
+   * join. Annotated with the caller's own membership/request state. */
+  async browseTeams(): Promise<BrowseTeam[]> {
+    const res = await axiosInstance.get<ApiResponse<BrowseTeam[]>>("/teams/browse/");
+    return res.data.data;
+  },
+
+  /** Request to join a team. */
+  async requestToJoin(teamSlug: string): Promise<TeamJoinRequest> {
+    const res = await axiosInstance.post<ApiResponse<TeamJoinRequest>>(
+      `/teams/${teamSlug}/join-requests/`
+    );
+    return res.data.data;
+  },
+
+  /** List pending join requests for a team (Owner/Lead only). */
+  async getJoinRequests(teamSlug: string): Promise<TeamJoinRequest[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamJoinRequest[]>>(
+      `/teams/${teamSlug}/join-requests/`
+    );
+    return res.data.data;
+  },
+
+  /** Approve or decline a join request (Owner/Lead only). */
+  async reviewJoinRequest(
+    teamSlug: string,
+    requestId: string,
+    action: "approve" | "decline"
+  ): Promise<void> {
+    await axiosInstance.post(`/teams/${teamSlug}/join-requests/${requestId}/${action}/`);
+  },
+
+  /** Withdraw your own pending join request. */
+  async withdrawJoinRequest(teamSlug: string, requestId: string): Promise<void> {
+    await axiosInstance.delete(`/teams/${teamSlug}/join-requests/${requestId}/withdraw/`);
+  },
+
+  /** All of the current user's own pending join requests, across all teams. */
+  async getMyJoinRequests(): Promise<TeamJoinRequest[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamJoinRequest[]>>(
+      "/teams/join-requests/mine/"
+    );
     return res.data.data;
   },
 

@@ -116,14 +116,22 @@ function TeamsDirectoryContent() {
               Collaborate, open contribution reviews, and track your team's progress together.
             </p>
           </div>
-          {canCreate && (
+          <div className="flex items-center gap-3">
             <Link
-              href="/teams/new"
-              className="inline-flex h-10 w-fit items-center bg-grey-900 px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-grey-800 rounded-none"
+              href="/teams/browse"
+              className="inline-flex h-10 w-fit items-center border border-grey-200 bg-white px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-text-primary transition-colors hover:border-grey-400 rounded-none"
             >
-              New Team
+              Browse Teams
             </Link>
-          )}
+            {canCreate && (
+              <Link
+                href="/teams/new"
+                className="inline-flex h-10 w-fit items-center bg-grey-900 px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-grey-800 rounded-none"
+              >
+                New Team
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Loading */}

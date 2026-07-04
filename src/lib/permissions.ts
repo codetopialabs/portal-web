@@ -49,6 +49,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/resources": "authenticated",
   "/teams": "teams.view",
   "/teams/new": "teams.create",
+  "/teams/browse": "authenticated",
   "/activity": "activity.view",
   "/docs": "docs.view",
 };
