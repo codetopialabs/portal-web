@@ -43,10 +43,8 @@ export default function ResourcesPage() {
           {/* Header */}
           <div className="flex flex-col gap-4 border-b border-zinc-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
-                Knowledge base
-              </p>
-              <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+              <p className="font-mono text-xs font-medium text-zinc-400">Knowledge base</p>
+              <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-zinc-950">
                 Resources
               </h1>
               <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
@@ -56,7 +54,7 @@ export default function ResourcesPage() {
             </div>
             <Link
               href="/community"
-              className="inline-flex h-10 w-fit items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
+              className="inline-flex h-10 w-fit items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
             >
               Community
               <ArrowRight className="h-3.5 w-3.5" />

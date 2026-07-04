@@ -121,7 +121,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
                   {review.labels?.map((label) => (
                     <span
                       key={label.id}
-                      className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border text-text-secondary"
+                      className="font-mono text-xs px-1.5 py-0.5 border text-text-secondary"
                       style={{
                         borderColor: label.color,
                         backgroundColor: `${label.color}15`,

@@ -72,7 +72,7 @@ export function PermissionSelectSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full flex-col gap-0 border-grey-200 bg-white p-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-grey-200 p-5 pr-12">
-          <SheetTitle className="font-sans text-xl font-black uppercase tracking-tight text-text-primary">
+          <SheetTitle className="font-sans text-2xl font-bold text-text-primary">
             {title}
           </SheetTitle>
           <SheetDescription className="pt-1 font-mono text-xs leading-6 text-text-secondary">
@@ -111,13 +111,13 @@ export function PermissionSelectSheet({
               return (
                 <div key={service} className="border-b border-grey-200 last:border-b-0">
                   <div className="sticky top-0 flex items-center justify-between bg-grey-50 px-4 py-2">
-                    <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-text-secondary">
+                    <span className="font-mono text-xs font-bold text-text-secondary">
                       {service}
                     </span>
                     <button
                       type="button"
                       onClick={() => toggleGroup(codenames, allSelected)}
-                      className="font-mono text-[10px] font-bold uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+                      className="font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
                     >
                       {allSelected ? "Clear" : "Select all"}
                     </button>

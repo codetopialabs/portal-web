@@ -31,7 +31,7 @@ export function PermissionDenied({ permission }: PermissionDeniedProps) {
         <p className="text-muted-foreground text-lg leading-relaxed">
           You don't have the necessary clearance to view this resource.
           <br />
-          <span className="mt-2 block font-mono text-xs uppercase tracking-widest text-destructive/70">
+          <span className="mt-2 block font-mono text-xs font-medium text-destructive/70">
             Required: {permission || "Higher Privilege"}
           </span>
         </p>

@@ -45,7 +45,7 @@ interface ProfileFormValues {
 const inputStyles =
   "h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all";
 
-const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";
+const labelStyles = "font-mono text-sm font-medium text-zinc-600";
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
@@ -53,9 +53,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-6 h-6 bg-zinc-900 text-white flex items-center justify-center shrink-0">
         <Icon className="w-3 h-3" />
       </div>
-      <h2 className="font-mono font-bold text-sm uppercase tracking-[0.2em] text-zinc-900">
-        {title}
-      </h2>
+      <h2 className="font-sans text-xl font-bold text-zinc-900">{title}</h2>
     </div>
   );
 }
@@ -290,9 +288,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       onSubmit={handleSubmit(onSubmit)}
       className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl"
     >
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
-        Final Step
-      </span>
+      <span className="text-xs font-mono font-medium text-zinc-500 mb-6 block">Final Step</span>
       <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
         Your Profile
       </h1>
@@ -301,9 +297,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
       </p>
 
       <div className="border-l-2 border-zinc-900 bg-white px-5 py-4 mb-10">
-        <p className="font-mono text-xs font-bold uppercase tracking-[0.15em] text-zinc-900 mb-2">
-          Honesty matters here
-        </p>
+        <p className="font-mono text-sm font-bold text-zinc-900 mb-2">Honesty matters here</p>
         <p className="font-mono text-xs text-zinc-500 leading-relaxed">
           Codetopia Community is built on trust. Every member is expected to represent themselves
           honestly and accurately. We do not tolerate impersonation, false identities, or any form
@@ -353,7 +347,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               type="button"
               disabled={avatarUploading}
               onClick={() => avatarInputRef.current?.click()}
-              className="w-full h-9 border border-zinc-200 font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-9 border border-zinc-200 font-mono text-xs font-medium text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {avatarUploading ? (
                 <>
@@ -379,7 +373,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         <div className="lg:col-span-2 space-y-8">
           <section className="space-y-4">
             <SectionHeader icon={User} title="Personal Info" />
-            <div className="bg-white border border-zinc-200 p-6 space-y-5">
+            <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <p className={labelStyles}>Display Name</p>
@@ -566,7 +560,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 <button
                   type="button"
                   onClick={() => setShowPicker((v) => !v)}
-                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
                 >
                   <Plus className="w-3 h-3" /> Add link
                 </button>
@@ -575,9 +569,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
             {showPicker && (
               <div className="border border-zinc-200 bg-zinc-50 p-4">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-3">
-                  Choose platform
-                </p>
+                <p className="font-mono text-xs text-zinc-500 mb-3">Choose platform</p>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-1">
                   {LINK_PLATFORMS.map((p) => {
                     const Icon = p.icon;
@@ -589,7 +581,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                         className="flex flex-col items-center gap-1.5 p-2.5 border border-transparent hover:bg-white hover:border-zinc-200 transition-all"
                       >
                         <Icon className="w-5 h-5" style={{ color: p.color }} />
-                        <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 text-center leading-tight">
+                        <span className="font-mono text-xs text-zinc-500 text-center leading-tight">
                           {p.label}
                         </span>
                       </button>
@@ -604,60 +596,58 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
 
           <section className="space-y-4">
             <SectionHeader icon={Cpu} title="Skills" />
-            <div className="bg-white border border-zinc-200 p-5">
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="inline-flex items-center gap-1.5 px-3 h-8 bg-zinc-50 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-700"
-                  >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => setSkills((prev) => prev.filter((s) => s !== skill))}
-                      className="text-zinc-400 hover:text-zinc-900 transition-colors"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-
-                {isAddingSkill ? (
-                  <div className="inline-flex items-center gap-1.5">
-                    <input
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addSkill();
-                        }
-                        if (e.key === "Escape") {
-                          setIsAddingSkill(false);
-                          setNewSkill("");
-                        }
-                      }}
-                      className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-xs uppercase tracking-widest outline-none"
-                      placeholder="Skill..."
-                    />
-                    <button
-                      type="button"
-                      onClick={addSkill}
-                      className="h-8 w-8 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-700 transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
-                  </div>
-                ) : (
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center gap-1.5 px-3 h-8 bg-zinc-50 border border-zinc-200 font-mono text-sm text-zinc-700"
+                >
+                  {skill}
                   <button
                     type="button"
-                    onClick={() => setIsAddingSkill(true)}
-                    className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all"
+                    onClick={() => setSkills((prev) => prev.filter((s) => s !== skill))}
+                    className="text-zinc-400 hover:text-zinc-900 transition-colors"
                   >
-                    <Plus className="w-3 h-3" /> Add
+                    <X className="w-3 h-3" />
                   </button>
-                )}
-              </div>
+                </span>
+              ))}
+
+              {isAddingSkill ? (
+                <div className="inline-flex items-center gap-1.5">
+                  <input
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addSkill();
+                      }
+                      if (e.key === "Escape") {
+                        setIsAddingSkill(false);
+                        setNewSkill("");
+                      }
+                    }}
+                    className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-sm outline-none"
+                    placeholder="Skill..."
+                  />
+                  <button
+                    type="button"
+                    onClick={addSkill}
+                    className="h-8 w-8 bg-zinc-900 text-white flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAddingSkill(true)}
+                  className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-sm text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all"
+                >
+                  <Plus className="w-3 h-3" /> Add
+                </button>
+              )}
             </div>
           </section>
 
@@ -667,7 +657,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
             <button
               type="button"
               onClick={handleBack}
-              className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
+              className="border border-zinc-200 bg-white px-6 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back
             </button>
@@ -675,7 +665,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               type="button"
               onClick={() => setShowConfirm(true)}
               disabled={isSubmitting}
-              className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-zinc-900 text-white px-8 py-3 text-sm font-medium hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-1">
@@ -702,9 +692,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white w-full max-w-sm p-8 space-y-5 shadow-2xl">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-mono font-bold mb-2">
-                One last thing
-              </p>
+              <p className="text-xs font-mono font-medium text-zinc-500 mb-2">One last thing</p>
               <h2 className="font-bold text-xl text-zinc-900 leading-snug">
                 Ready to join Codetopia Community?
               </h2>
@@ -717,7 +705,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
               <button
                 type="button"
                 onClick={() => setShowConfirm(false)}
-                className="border border-zinc-200 px-5 py-3 text-[11px] uppercase tracking-widest text-zinc-600 hover:bg-zinc-50 transition-colors font-mono"
+                className="border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors font-mono"
               >
                 Go Back
               </button>
@@ -725,7 +713,7 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleSubmit(onSubmit, () => setShowConfirm(false))}
-                className="flex-1 bg-zinc-900 text-white px-5 py-3 text-[11px] uppercase tracking-widest hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-zinc-900 text-white px-5 py-3 text-sm font-medium hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   [0, 1, 2].map((i) => (

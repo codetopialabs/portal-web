@@ -86,7 +86,7 @@ function FilterTab({
     <button
       type="button"
       onClick={onClick}
-      className={`-mb-px flex items-center gap-2 border-b-2 px-1 pb-3 font-mono text-xs font-bold uppercase tracking-wide transition-colors ${
+      className={`-mb-px flex items-center gap-2 border-b-2 px-1 pb-3 font-mono text-sm font-medium transition-colors ${
         active
           ? "border-grey-900 text-text-primary"
           : "border-transparent text-text-muted hover:text-text-primary"
@@ -211,9 +211,7 @@ function RolesListContent() {
     return (
       <div className="border border-error-200 bg-error-50 p-10 text-center">
         <ShieldAlert className="mx-auto mb-3 h-8 w-8 text-error-500" />
-        <p className="font-sans text-base font-black uppercase text-error-700">
-          Roles could not be loaded
-        </p>
+        <p className="font-sans text-base font-bold text-error-700">Roles could not be loaded</p>
         <p className="mt-2 font-mono text-xs text-error-600">Refresh the page and try again.</p>
       </div>
     );
@@ -223,7 +221,7 @@ function RolesListContent() {
     return (
       <div className="border border-grey-200 bg-white p-14 text-center">
         <Shield className="mx-auto mb-3 h-8 w-8 text-icon-muted" />
-        <p className="font-sans text-base font-black uppercase text-text-primary">No roles found</p>
+        <p className="font-sans text-base font-bold text-text-primary">No roles found</p>
         <p className="mt-2 font-mono text-xs text-text-tertiary">
           Create the first role to start assigning permissions.
         </p>
@@ -280,9 +278,7 @@ function RolesListContent() {
       {/* Roles List */}
       {filteredRoles.length === 0 ? (
         <div className="border border-grey-200 bg-grey-50 p-10 text-center">
-          <p className="font-sans text-base font-black uppercase text-text-primary">
-            No matching roles
-          </p>
+          <p className="font-sans text-base font-bold text-text-primary">No matching roles</p>
           <p className="mt-2 font-mono text-xs text-text-tertiary">
             Try another search term or filter.
           </p>
@@ -309,13 +305,11 @@ function RolesPageContent() {
           <div className="max-w-2xl">
             <div className="mb-1 flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-icon-tertiary" />
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
+              <p className="font-mono text-xs font-medium text-text-muted">
                 Admin · Access Control
               </p>
             </div>
-            <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
-              Roles
-            </h1>
+            <h1 className="font-sans text-4xl font-bold tracking-tight text-text-primary">Roles</h1>
             <p className="mt-3 font-mono text-sm leading-relaxed text-text-tertiary">
               Manage permission bundles, review sensitive access, and configure which members can
               use admin tools.

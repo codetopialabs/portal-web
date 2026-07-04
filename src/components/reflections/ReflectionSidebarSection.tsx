@@ -70,9 +70,7 @@ export function ReflectionSidebarSection() {
   return (
     <div className="mb-8 px-3">
       {/* Section label */}
-      <p className="px-2 mb-2 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600 font-bold">
-        Reflections
-      </p>
+      <p className="px-2 mb-2 font-mono text-xs font-semibold text-zinc-600">Reflections</p>
 
       {/* Current cycle card */}
       <Link
@@ -82,7 +80,7 @@ export function ReflectionSidebarSection() {
         <div className="flex min-w-0 items-center gap-2">
           <ClipboardCheck className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
           <div className="min-w-0">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wide text-zinc-300 truncate">
+            <p className="font-mono text-xs font-semibold text-zinc-300 truncate">
               {isOpen ? "This month" : "No cycle open"}
             </p>
             {isOpen && (

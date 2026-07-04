@@ -123,7 +123,7 @@ export function MemberCard({ member, compact = false }: MemberCardProps) {
                 {visibleSkills.map((skill) => (
                   <span
                     key={skill}
-                    className="max-w-[9rem] truncate border border-zinc-100 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-500"
+                    className="max-w-[9rem] truncate border border-zinc-100 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-zinc-500"
                   >
                     {skill}
                   </span>

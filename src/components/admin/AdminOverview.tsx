@@ -162,9 +162,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="flex h-7 w-7 shrink-0 items-center justify-center bg-zinc-950 text-white">
         <Icon className="h-3.5 w-3.5" />
       </div>
-      <p className="font-sans text-sm font-black uppercase tracking-widest text-zinc-900">
-        {title}
-      </p>
+      <p className="font-sans text-base font-bold text-zinc-900">{title}</p>
     </div>
   );
 }
@@ -212,9 +210,7 @@ function StatCard({
   const content = (
     <>
       <div className="flex items-center justify-between">
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-          {label}
-        </p>
+        <p className="font-mono text-xs font-medium text-zinc-400">{label}</p>
         <Icon className={`w-4 h-4 ${tone === "warning" ? "text-red-500" : "text-zinc-300"}`} />
       </div>
       <p
@@ -377,9 +373,7 @@ function CompositionList({
 }) {
   return (
     <div>
-      <p className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-2">
-        {title}
-      </p>
+      <p className="font-mono text-xs font-medium text-zinc-400 mb-2">{title}</p>
       <BarList
         items={buckets.map((b) => ({
           key: b.value ?? "unspecified",
@@ -475,12 +469,8 @@ export function AdminOverview() {
     return (
       <div className="space-y-6">
         <div>
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            Admin Panel
-          </p>
-          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
-            Overview
-          </h1>
+          <p className="font-mono text-xs font-medium text-zinc-400">Admin Panel</p>
+          <h1 className="font-sans text-4xl font-bold tracking-tight text-zinc-950">Overview</h1>
         </div>
         <OverviewSkeleton />
       </div>
@@ -514,12 +504,8 @@ export function AdminOverview() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            Admin Panel
-          </p>
-          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
-            Overview
-          </h1>
+          <p className="font-mono text-xs font-medium text-zinc-400">Admin Panel</p>
+          <h1 className="font-sans text-4xl font-bold tracking-tight text-zinc-950">Overview</h1>
         </div>
         <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <span className="relative flex h-1.5 w-1.5">
@@ -598,15 +584,11 @@ export function AdminOverview() {
       {(pendingActions.flaggedAccountsList.length > 0 ||
         pendingActions.reflectionsAwaitingReviewList.length > 0) && (
         <div id="pending-actions" className="bg-red-50/40 border border-red-200 p-5 scroll-mt-6">
-          <p className="font-sans font-black uppercase tracking-widest text-sm text-red-700 mb-4">
-            Awaiting Your Review
-          </p>
+          <p className="font-sans font-bold text-base text-red-700 mb-4">Awaiting Your Review</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {pendingActions.flaggedAccountsList.length > 0 && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
-                  Flagged Accounts
-                </p>
+                <p className="font-mono text-xs font-medium text-zinc-500 mb-2">Flagged Accounts</p>
                 <div className="space-y-1.5">
                   {pendingActions.flaggedAccountsList.map((f) => (
                     <Link
@@ -623,7 +605,7 @@ export function AdminOverview() {
             )}
             {pendingActions.reflectionsAwaitingReviewList.length > 0 && (
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                <p className="font-mono text-xs font-medium text-zinc-500 mb-2">
                   Reflections To Review
                 </p>
                 <div className="space-y-1.5">
@@ -668,7 +650,7 @@ export function AdminOverview() {
           <SectionHeader icon={ActivityIcon} title="Recent Activity" />
           <Link
             href="/activity"
-            className="font-mono text-[10px] uppercase tracking-wider text-zinc-400 hover:text-zinc-900 transition-colors"
+            className="font-mono text-xs font-medium text-zinc-400 hover:text-zinc-900 transition-colors"
           >
             View All
           </Link>

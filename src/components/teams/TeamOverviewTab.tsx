@@ -150,9 +150,7 @@ export function TeamOverviewTab({ teamSlug, teamName, myInvite }: TeamOverviewTa
         <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-icon-tertiary" />
-            <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-              Activity
-            </h2>
+            <h2 className="font-sans text-base font-bold text-text-primary">Activity</h2>
           </div>
           <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-text-muted">
             <span className="h-1.5 w-1.5 animate-pulse bg-zinc-900" />

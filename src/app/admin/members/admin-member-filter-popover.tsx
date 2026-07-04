@@ -47,9 +47,7 @@ export function AdminMemberFilterPopover({
         className="flex w-full flex-col rounded-none border border-grey-200 bg-white p-0 sm:w-[340px]"
       >
         <div className="border-b border-grey-200 p-4">
-          <h3 className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
-            Filter Members
-          </h3>
+          <h3 className="font-sans text-base font-bold text-text-primary">Filter Members</h3>
           <p className="mt-1 font-mono text-xs text-text-tertiary">
             Refine by role and verification status.
           </p>
@@ -57,9 +55,7 @@ export function AdminMemberFilterPopover({
 
         <div className="space-y-5 p-4">
           <div className="space-y-2">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-              Role
-            </p>
+            <p className="font-mono text-xs font-medium text-text-muted">Role</p>
             <Select value={filters.role} onValueChange={(role) => onChange({ ...filters, role })}>
               <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm focus:border-grey-900 focus:ring-2 focus:ring-grey-900/10">
                 <SelectValue placeholder="All roles" />
@@ -83,9 +79,7 @@ export function AdminMemberFilterPopover({
           </div>
 
           <div className="space-y-2">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-              Verification
-            </p>
+            <p className="font-mono text-xs font-medium text-text-muted">Verification</p>
             <Select
               value={filters.verification}
               onValueChange={(verification) => onChange({ ...filters, verification })}

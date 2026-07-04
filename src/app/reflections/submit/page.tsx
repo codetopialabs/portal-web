@@ -70,9 +70,7 @@ function EmptyState({
   return (
     <div className="mx-auto w-full max-w-3xl border border-dashed border-grey-300 bg-white px-6 py-12 text-center">
       <CheckCircle2 className="mx-auto h-9 w-9 text-icon-tertiary" />
-      <h1 className="mt-4 font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
-        {title}
-      </h1>
+      <h1 className="mt-4 font-sans text-2xl font-bold text-text-primary">{title}</h1>
       <p className="mx-auto mt-2 max-w-md font-mono text-xs leading-6 text-text-muted">{body}</p>
       <Button asChild className="mt-6 rounded-none font-mono text-xs font-bold">
         <Link href="/reflections">{actionLabel}</Link>
@@ -196,15 +194,13 @@ function ReflectionSubmitContent() {
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
-              Monthly reflection
-            </p>
-            <h1 className="mt-1 font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
+            <p className="font-mono text-xs font-medium text-text-muted">Monthly reflection</p>
+            <h1 className="mt-1 font-sans text-4xl font-bold tracking-tight text-text-primary">
               {formatPeriod(data.cycle.period)}
             </h1>
           </div>
           <div className="shrink-0 border border-grey-200 bg-white px-3 py-2 text-right">
-            <p className="flex items-center justify-end gap-1 font-mono text-[10px] font-bold uppercase tracking-wide text-text-muted">
+            <p className="flex items-center justify-end gap-1 font-mono text-xs font-medium text-text-muted">
               <CalendarClock className="h-3.5 w-3.5" />
               Due
             </p>
@@ -216,9 +212,7 @@ function ReflectionSubmitContent() {
 
         {data.status === "changes_requested" && data.reviewerNotes?.trim() && (
           <div className="mt-5 border-l-4 border-red-500 bg-red-50 px-4 py-3">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wide text-red-700">
-              Changes requested
-            </p>
+            <p className="font-mono text-xs font-semibold text-red-700">Changes requested</p>
             <p className="mt-1 font-mono text-xs leading-6 text-red-700">{data.reviewerNotes}</p>
           </div>
         )}
@@ -239,7 +233,7 @@ function ReflectionSubmitContent() {
                 <div className="min-w-0">
                   <Label
                     htmlFor={`reflection-${question.id}`}
-                    className="font-sans text-base font-black uppercase tracking-tight text-text-primary"
+                    className="font-sans text-base font-bold text-text-primary"
                   >
                     {question.prompt}
                     {(question.isRequired ?? true) && (
@@ -324,7 +318,7 @@ function ReflectionSubmitContent() {
                         type="button"
                         onClick={() => removeAttachment(question.id, url)}
                         disabled={submit.isPending}
-                        className="font-mono text-[10px] font-bold uppercase tracking-wide text-red-600 disabled:opacity-50"
+                        className="font-mono text-xs font-medium text-red-600 disabled:opacity-50"
                       >
                         Remove
                       </button>

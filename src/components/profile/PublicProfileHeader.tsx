@@ -30,14 +30,14 @@ export function PublicProfileHeader() {
           {mounted && session ? (
             <Link
               href="/community"
-              className="hidden h-9 items-center gap-2 border border-white/15 px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-300 transition-colors hover:bg-white hover:text-zinc-950 sm:inline-flex"
+              className="hidden h-9 items-center gap-2 border border-white/15 px-3 font-mono text-sm font-medium text-zinc-300 transition-colors hover:bg-white hover:text-zinc-950 sm:inline-flex"
             >
               Community
             </Link>
           ) : mounted && !session ? (
             <Link
               href="/login"
-              className="inline-flex h-9 items-center border border-white/15 bg-white px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-950 transition-colors hover:bg-emerald-100"
+              className="inline-flex h-9 items-center border border-white/15 bg-white px-3 font-mono text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-100"
             >
               Sign in
             </Link>

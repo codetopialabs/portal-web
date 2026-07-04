@@ -222,9 +222,7 @@ function MemberEditFields({
             <div className="space-y-4 p-5">
               <label className="flex cursor-pointer items-start justify-between gap-4 border border-grey-200 p-4">
                 <div>
-                  <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-text-primary">
-                    Email verified
-                  </p>
+                  <p className="font-mono text-sm font-medium text-text-primary">Email verified</p>
                   <p className="mt-1 font-mono text-xs leading-5 text-text-tertiary">
                     Mark whether this member has verified their email address.
                   </p>
@@ -254,9 +252,7 @@ function MemberEditFields({
           </section>
 
           <section className="border border-grey-200 bg-grey-50 p-5">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-              Editing scope
-            </p>
+            <p className="font-mono text-xs font-medium text-text-muted">Editing scope</p>
             <p className="mt-2 font-mono text-xs leading-6 text-text-tertiary">
               This page updates profile metadata only. Role assignment, sessions, suspension, and
               deletion stay on the member detail page.
@@ -300,9 +296,7 @@ function MemberEditFields({
 function SectionHeader({ title }: { title: string }) {
   return (
     <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-      <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-        {title}
-      </h2>
+      <h2 className="font-sans text-base font-bold text-text-primary">{title}</h2>
     </div>
   );
 }
@@ -320,10 +314,7 @@ function Field({
 }) {
   return (
     <div className="space-y-2">
-      <Label
-        htmlFor={htmlFor}
-        className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-      >
+      <Label htmlFor={htmlFor} className="font-mono text-xs font-medium text-text-muted">
         {label}
       </Label>
       {children}
@@ -345,9 +336,7 @@ function SideFact({
     <div className="flex items-center gap-3">
       <Icon className="h-4 w-4 shrink-0 text-icon-tertiary" />
       <div className="min-w-0">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-          {label}
-        </p>
+        <p className="font-mono text-xs font-medium text-text-muted">{label}</p>
         <p className="truncate font-mono text-xs text-text-secondary">{value}</p>
       </div>
     </div>

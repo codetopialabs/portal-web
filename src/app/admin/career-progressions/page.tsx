@@ -167,9 +167,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         {/* Review note (non-pending) */}
         {item.status !== "pending" && item.reviewNote && (
           <div className="mt-4 border border-zinc-100 bg-zinc-50 px-4 py-3">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">
-              Review note
-            </p>
+            <p className="font-mono text-xs font-medium text-zinc-400 mb-1">Review note</p>
             <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
           </div>
         )}
@@ -178,9 +176,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         {item.status === "approved" && (
           <div className="mt-5 border-t border-zinc-100 pt-4 space-y-3">
             <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+              <p className="font-mono text-xs font-medium text-zinc-400 mb-2">
                 Reason for revoking
-                <span className="ml-1.5 normal-case font-normal text-zinc-400">
+                <span className="ml-1.5 font-normal text-zinc-400">
                   — required, shown to the member
                 </span>
               </p>
@@ -197,7 +195,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 variant="outline"
                 disabled={review.isPending || !note.trim()}
                 onClick={() => submit("revoke")}
-                className="h-9 rounded-none border-zinc-200 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-50"
+                className="h-9 rounded-none border-zinc-200 font-mono text-sm font-medium text-zinc-500 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-50"
               >
                 {review.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -214,9 +212,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         {item.status === "pending" && (
           <div className="mt-5 border-t border-zinc-100 pt-5 space-y-3">
             <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+              <p className="font-mono text-xs font-medium text-zinc-400 mb-2">
                 Review note
-                <span className="ml-1.5 normal-case font-normal text-zinc-400">
+                <span className="ml-1.5 font-normal text-zinc-400">
                   — optional, shown to member if changes are requested
                 </span>
               </p>
@@ -233,7 +231,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 variant="outline"
                 disabled={review.isPending}
                 onClick={() => submit("reject")}
-                className="h-9 rounded-none border-zinc-200 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors"
+                className="h-9 rounded-none border-zinc-200 font-mono text-sm font-medium text-zinc-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors"
               >
                 {review.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -246,7 +244,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 type="button"
                 disabled={review.isPending}
                 onClick={() => submit("approve")}
-                className="h-9 rounded-none bg-zinc-950 font-mono text-[11px] font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition-colors"
+                className="h-9 rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
               >
                 {review.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -275,11 +273,9 @@ function AdminCareerProgressionsContent() {
       <header className="mb-6">
         <div className="mb-1 flex items-center gap-2">
           <BriefcaseBusiness className="h-3.5 w-3.5 text-zinc-400" />
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            Admin · Community
-          </p>
+          <p className="font-mono text-xs font-medium text-zinc-400">Admin · Community</p>
         </div>
-        <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+        <h1 className="font-sans text-4xl font-bold tracking-tight text-zinc-950">
           Career Progressions
         </h1>
         <p className="mt-1.5 font-mono text-xs text-zinc-400">
@@ -298,7 +294,7 @@ function AdminCareerProgressionsContent() {
                 key={value || "all"}
                 type="button"
                 onClick={() => setStatus(value)}
-                className={`relative px-4 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-colors ${
+                className={`relative px-4 py-2.5 font-mono text-sm font-medium transition-colors ${
                   isActive
                     ? "text-zinc-950 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-zinc-950"
                     : "text-zinc-400 hover:text-zinc-700"
@@ -341,9 +337,7 @@ function AdminCareerProgressionsContent() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-zinc-200">
             <BriefcaseBusiness className="h-5 w-5 text-zinc-300" />
           </div>
-          <p className="font-sans text-sm font-black uppercase tracking-widest text-zinc-900">
-            Nothing to review
-          </p>
+          <p className="font-sans text-sm font-bold text-zinc-900">Nothing to review</p>
           <p className="mt-1.5 font-mono text-xs text-zinc-400">
             No career progressions match this filter.
           </p>

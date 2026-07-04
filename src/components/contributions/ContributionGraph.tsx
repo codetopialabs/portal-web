@@ -106,9 +106,7 @@ function DayDetailPanel({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-mono text-xs text-zinc-800">{item.title}</p>
-                <p className="font-mono text-[10px] uppercase tracking-wide text-zinc-400">
-                  {meta.label}
-                </p>
+                <p className="font-mono text-[10px] font-medium text-zinc-400">{meta.label}</p>
               </div>
             </>
           );
@@ -233,7 +231,7 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
             </div>
             <div>
               <h3 className="font-sans text-xl font-black text-zinc-950">Contribution Activity</h3>
-              <p className="mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+              <p className="mt-0.5 font-mono text-xs font-medium text-zinc-500">
                 {isLoading ? "Loading" : `${totalCount} contribution${totalCount !== 1 ? "s" : ""}`}
                 {" · "}
                 {selectedYear ? selectedYear : "Last year"}

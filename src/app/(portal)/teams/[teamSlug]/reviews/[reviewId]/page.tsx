@@ -159,7 +159,7 @@ function ReviewDetailContent() {
           <p className="font-mono text-sm text-text-tertiary">Review not found.</p>
           <Link
             href={`/teams/${teamSlug}?tab=reviews`}
-            className="mt-4 font-mono text-xs uppercase tracking-widest text-text-muted hover:text-text-primary transition-colors"
+            className="mt-4 font-mono text-sm font-medium text-text-muted hover:text-text-primary transition-colors"
           >
             ← Back to Reviews
           </Link>
@@ -173,7 +173,7 @@ function ReviewDetailContent() {
       <div className="w-full max-w-none space-y-6 pb-20">
         <Link
           href={`/teams/${teamSlug}?tab=reviews`}
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-2 font-mono text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Reviews
         </Link>
@@ -190,7 +190,7 @@ function ReviewDetailContent() {
             {review.labels?.map((label: any) => (
               <span
                 key={label.id}
-                className="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 border text-text-secondary"
+                className="font-mono text-xs px-2 py-0.5 border text-text-secondary"
                 style={{ borderColor: label.color, backgroundColor: `${label.color}15` }}
               >
                 {label.name}
@@ -214,7 +214,7 @@ function ReviewDetailContent() {
                   setEditDescription(review.description);
                   setIsEditingReview(true);
                 }}
-                className="font-mono text-[10px] uppercase"
+                className="font-mono text-xs font-medium"
               >
                 <Pencil className="h-3 w-3 mr-2" /> Edit
               </Button>
@@ -240,9 +240,7 @@ function ReviewDetailContent() {
 
           {review.assignees && review.assignees.length > 0 && (
             <div className="hidden lg:flex items-center gap-2 mt-3">
-              <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
-                Reviewers
-              </span>
+              <span className="font-mono text-xs font-medium text-text-muted">Reviewers</span>
               <div className="flex items-center">
                 {review.assignees.slice(0, 3).map((assignee: any, i: number) => (
                   <Image
@@ -305,7 +303,7 @@ function ReviewDetailContent() {
             ) : (
               <div className="border border-grey-200 bg-white">
                 <div className="bg-grey-50 px-5 py-3 border-b border-grey-200 flex items-center justify-between">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-text-tertiary">
+                  <span className="font-mono text-sm font-bold text-text-tertiary">
                     Initial Contribution
                   </span>
                 </div>
@@ -409,7 +407,7 @@ function ReviewDetailContent() {
                             <span className="font-mono text-[10px] font-bold text-text-primary">
                               {isOptimistic ? "Sending…" : item.author?.fullName}
                             </span>
-                            <span className="font-mono text-[9px] uppercase tracking-widest text-text-muted">
+                            <span className="font-mono text-[9px] text-text-muted">
                               {new Date(item.createdAt).toLocaleDateString()}
                             </span>
                             {item.isEdited && (
@@ -523,7 +521,7 @@ function ReviewDetailContent() {
                       <Button
                         type="submit"
                         disabled={commentPending || !commentText.trim()}
-                        className="h-8 bg-grey-900 px-4 font-mono text-[10px] uppercase tracking-widest"
+                        className="h-8 bg-grey-900 px-4 font-mono text-xs font-medium"
                       >
                         {commentPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Comment"}
                       </Button>
@@ -539,9 +537,7 @@ function ReviewDetailContent() {
             {/* Assignees */}
             <div className="pb-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-sans font-black uppercase tracking-widest text-[10px] text-text-muted">
-                  Reviewers
-                </h3>
+                <h3 className="font-sans text-sm font-bold text-text-muted">Reviewers</h3>
                 {canEditReview && (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -550,7 +546,7 @@ function ReviewDetailContent() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-56 p-2">
-                      <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-text-tertiary mb-2 px-2">
+                      <div className="font-mono text-xs font-bold text-text-tertiary mb-2 px-2">
                         Assign members
                       </div>
                       {teamMembers?.map((m) => {
@@ -607,9 +603,7 @@ function ReviewDetailContent() {
             {/* Labels */}
             <div className="py-5">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-sans font-black uppercase tracking-widest text-[10px] text-text-muted">
-                  Labels
-                </h3>
+                <h3 className="font-sans text-sm font-bold text-text-muted">Labels</h3>
                 {canEditReview && (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -618,7 +612,7 @@ function ReviewDetailContent() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-56 p-2">
-                      <div className="font-mono text-[10px] font-bold uppercase tracking-widest text-text-tertiary mb-2 px-2">
+                      <div className="font-mono text-xs font-bold text-text-tertiary mb-2 px-2">
                         Apply labels
                       </div>
                       {teamLabels?.map((label) => {
@@ -680,7 +674,7 @@ function ReviewDetailContent() {
                   {review.labels.map((label: any) => (
                     <span
                       key={label.id}
-                      className="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 border text-text-secondary flex items-center gap-1"
+                      className="font-mono text-xs px-2 py-0.5 border text-text-secondary flex items-center gap-1"
                       style={{ borderColor: label.color, backgroundColor: `${label.color}15` }}
                     >
                       {label.name}
@@ -696,9 +690,7 @@ function ReviewDetailContent() {
 
             {/* Status */}
             <div className="pt-5">
-              <h3 className="font-sans font-black uppercase tracking-widest text-[10px] text-text-muted mb-3">
-                Status
-              </h3>
+              <h3 className="font-sans text-sm font-bold text-text-muted mb-3">Status</h3>
               <div className="flex items-center gap-2 mb-4">
                 {review.status === "open" ? (
                   <Circle className="h-4 w-4 text-zinc-900" />
@@ -718,7 +710,7 @@ function ReviewDetailContent() {
                       onClick={() => approveReview()}
                       disabled={approvePending}
                       variant="outline"
-                      className="w-full justify-start border-0 bg-zinc-900 font-mono text-[10px] uppercase tracking-widest text-white hover:bg-zinc-800"
+                      className="w-full justify-start border-0 bg-zinc-900 font-mono text-xs font-medium text-white hover:bg-zinc-800"
                     >
                       <ShieldCheck className="mr-2 h-3.5 w-3.5" /> Approve
                     </Button>
@@ -734,7 +726,7 @@ function ReviewDetailContent() {
                       <Button
                         disabled={closePending}
                         variant="ghost"
-                        className="w-full justify-start font-mono text-[10px] uppercase tracking-widest text-text-tertiary hover:text-red-600 hover:bg-red-50"
+                        className="w-full justify-start font-mono text-xs font-medium text-text-tertiary hover:text-red-600 hover:bg-red-50"
                       >
                         <XCircle className="mr-2 h-3.5 w-3.5" /> Close
                       </Button>
@@ -747,7 +739,7 @@ function ReviewDetailContent() {
                     onClick={() => reopenReview()}
                     disabled={reopenPending}
                     variant="outline"
-                    className="w-full justify-start font-mono text-[10px] uppercase tracking-widest"
+                    className="w-full justify-start font-mono text-xs font-medium"
                   >
                     <CheckCircle2 className="mr-2 h-3.5 w-3.5" /> Reopen Review
                   </Button>

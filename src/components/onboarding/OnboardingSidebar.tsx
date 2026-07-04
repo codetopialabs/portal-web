@@ -76,7 +76,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
                 </div>
                 <div className="pb-4 pt-0.5">
                   <p
-                    className={`text-xs font-mono font-semibold uppercase tracking-widest transition-colors duration-300 ${isActive ? "text-white" : isCompleted ? "text-zinc-400" : "text-zinc-600"}`}
+                    className={`text-sm font-mono font-semibold transition-colors duration-300 ${isActive ? "text-white" : isCompleted ? "text-zinc-400" : "text-zinc-600"}`}
                   >
                     {step.label}
                   </p>
@@ -107,7 +107,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
             className="object-contain h-5 w-auto brightness-0 invert"
             priority
           />
-          <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+          <span className="font-mono text-xs font-medium text-zinc-400">
             {currentStep + 1} / {STEPS.length}
           </span>
         </div>
@@ -119,7 +119,7 @@ export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
           />
         </div>
 
-        <p className="text-[10px] font-mono text-zinc-300 uppercase tracking-widest">
+        <p className="font-mono text-xs font-medium text-zinc-300">
           {STEPS[currentStep]?.label}
           <span className="text-zinc-600"> — {STEPS[currentStep]?.description}</span>
         </p>

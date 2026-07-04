@@ -125,7 +125,7 @@ export function DashboardContent() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-          <div className="absolute top-5 left-5 sm:left-7 lg:left-8 flex flex-wrap items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-zinc-300">
+          <div className="absolute top-5 left-5 sm:left-7 lg:left-8 flex flex-wrap items-center gap-2 font-mono text-xs font-medium text-zinc-300">
             <span className="inline-flex items-center gap-1.5 border border-white/15 bg-black/40 px-2.5 py-1 backdrop-blur-sm">
               <Sparkles className="h-3 w-3 text-amber-300" />
               Member dashboard
@@ -186,22 +186,20 @@ export function DashboardContent() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                   href={publicProfileHref}
-                  className="inline-flex h-9 items-center gap-2 border border-zinc-900 bg-zinc-950 px-4 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800"
+                  className="inline-flex h-9 items-center gap-2 border border-zinc-900 bg-zinc-950 px-4 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800"
                 >
                   View Public Profile
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
                 <Link
                   href="/settings/profile"
-                  className="inline-flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-800 transition-colors hover:border-zinc-950 hover:text-zinc-950 hover:bg-zinc-50"
+                  className="inline-flex h-9 items-center gap-2 border border-zinc-200 bg-white px-4 font-mono text-sm font-medium text-zinc-800 transition-colors hover:border-zinc-950 hover:text-zinc-950 hover:bg-zinc-50"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   Edit Profile
                 </Link>
                 <div className="inline-flex h-9 items-center gap-2 border border-zinc-200 bg-zinc-50 pl-2 pr-1">
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-500">
-                    ID
-                  </span>
+                  <span className="font-mono text-xs font-medium text-zinc-500">ID</span>
                   <span className="max-w-[9.5rem] truncate font-mono text-[11px] text-zinc-700">
                     {profile.communityId}
                   </span>
@@ -224,9 +222,7 @@ export function DashboardContent() {
               <div>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                      Profile strength
-                    </p>
+                    <p className="font-mono text-xs font-medium text-zinc-400">Profile strength</p>
                     <p className="mt-2 font-sans text-3xl font-black text-white">
                       {profileStrength}%
                     </p>
@@ -269,9 +265,7 @@ export function DashboardContent() {
               </div>
               <ArrowRight className="h-4 w-4 text-zinc-300 transition-transform group-hover:translate-x-1 group-hover:text-zinc-950" />
             </div>
-            <h2 className="mt-5 font-sans text-sm font-black uppercase tracking-wider text-zinc-950">
-              {action.title}
-            </h2>
+            <h2 className="mt-5 font-sans text-base font-bold text-zinc-950">{action.title}</h2>
             <p className="mt-2 font-mono text-xs leading-5 text-zinc-500">{action.description}</p>
           </Link>
         ))}
@@ -284,13 +278,11 @@ export function DashboardContent() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="font-sans text-xl font-black text-zinc-950">Portal Modules</h2>
-              <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                Core workspaces
-              </p>
+              <p className="mt-1 font-mono text-xs font-medium text-zinc-500">Core workspaces</p>
             </div>
             <Link
               href="/community"
-              className="inline-flex h-9 items-center gap-2 border border-zinc-200 px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
+              className="inline-flex h-9 items-center gap-2 border border-zinc-200 px-3 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
             >
               Explore
               <ArrowRight className="h-3.5 w-3.5" />
@@ -311,10 +303,10 @@ export function DashboardContent() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                      <p className="font-mono text-xs font-medium text-zinc-500">
                         {module.subtitle}
                       </p>
-                      <h3 className="mt-2 font-sans text-lg font-black uppercase tracking-tight text-zinc-950">
+                      <h3 className="mt-2 font-sans text-lg font-bold text-zinc-950">
                         {module.title}
                       </h3>
                     </div>
@@ -338,9 +330,7 @@ export function DashboardContent() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-sans text-xl font-black text-zinc-950">Security</h2>
-                <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-                  Latest session
-                </p>
+                <p className="mt-1 font-mono text-xs font-medium text-zinc-500">Latest session</p>
               </div>
               <ShieldCheck className="h-5 w-5 text-emerald-600" />
             </div>
@@ -375,7 +365,7 @@ export function DashboardContent() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-sans text-xl font-black text-zinc-950">Skills</h2>
-                <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+                <p className="mt-1 font-mono text-xs font-medium text-zinc-500">
                   Public profile tags
                 </p>
               </div>
@@ -392,7 +382,7 @@ export function DashboardContent() {
                 visibleSkills.map((skill) => (
                   <span
                     key={skill}
-                    className="border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-800"
+                    className="border border-zinc-200 bg-zinc-50 px-3 py-1.5 font-mono text-xs font-semibold text-zinc-800"
                   >
                     {skill}
                   </span>
@@ -403,7 +393,7 @@ export function DashboardContent() {
                 </p>
               )}
               {skills.length > visibleSkills.length ? (
-                <span className="border border-zinc-200 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500">
+                <span className="border border-zinc-200 px-3 py-1.5 font-mono text-xs font-semibold text-zinc-500">
                   +{skills.length - visibleSkills.length} more
                 </span>
               ) : null}

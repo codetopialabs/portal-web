@@ -45,7 +45,7 @@ function TokenCard({ canManage }: { canManage: boolean }) {
   return (
     <section className="mb-6 border border-grey-200 bg-white">
       <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-        <h2 className="flex items-center gap-2 font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+        <h2 className="flex items-center gap-2 font-sans text-base font-bold text-text-primary">
           <KeyRound className="h-4 w-4" />
           GitHub token
         </h2>
@@ -153,9 +153,7 @@ function RepoListSection({ canManage }: { canManage: boolean }) {
   return (
     <section className="border border-grey-200 bg-white">
       <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
-        <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-          Tracked repos
-        </h2>
+        <h2 className="font-sans text-base font-bold text-text-primary">Tracked repos</h2>
         <div className="relative w-56">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-icon-muted" />
           <Input

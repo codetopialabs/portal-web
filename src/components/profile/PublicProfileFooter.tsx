@@ -84,9 +84,7 @@ export function PublicProfileFooter() {
           <div className="grid grid-cols-2 gap-12 md:gap-16">
             {/* Community */}
             <div className="flex flex-col gap-6">
-              <p className="font-sans font-black text-white uppercase tracking-tighter text-sm">
-                Community
-              </p>
+              <p className="font-sans font-bold text-white text-sm">Community</p>
               <nav className="flex flex-col gap-3">
                 <a
                   href={`${COMMUNITY_SITE_URL}/code-of-conduct`}
@@ -101,9 +99,7 @@ export function PublicProfileFooter() {
 
             {/* Contact */}
             <div className="flex flex-col gap-6">
-              <p className="font-sans font-black text-white uppercase tracking-tighter text-sm">
-                Contact
-              </p>
+              <p className="font-sans font-bold text-white text-sm">Contact</p>
               <div className="flex flex-col gap-3">
                 <a
                   href="mailto:hello@codetopia.org"
@@ -125,7 +121,7 @@ export function PublicProfileFooter() {
             &copy; {new Date().getFullYear()} Codetopia. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
-            <p className="font-sans font-black text-xs text-zinc-700 uppercase tracking-widest">
+            <p className="font-sans font-medium text-xs text-zinc-700">
               A{" "}
               <a
                 href="https://codetopia.org"

@@ -195,10 +195,8 @@ function ActivityPageContent() {
       <div className="w-full max-w-none space-y-6 pb-20">
         <div className="flex flex-col gap-4 border-b border-zinc-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
-              Audit trail
-            </p>
-            <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+            <p className="font-mono text-xs font-medium text-zinc-400">Audit trail</p>
+            <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-zinc-950">
               Activity Log
             </h1>
             <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
@@ -215,7 +213,7 @@ function ActivityPageContent() {
                     key={option.value}
                     type="button"
                     onClick={() => setViewMode(option.value)}
-                    className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+                    className={`font-mono text-xs font-medium px-3 py-1.5 border transition-all ${
                       viewMode === option.value
                         ? "bg-zinc-900 text-white border-zinc-900"
                         : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
@@ -227,7 +225,7 @@ function ActivityPageContent() {
               </div>
             )}
           </div>
-          <span className="w-fit border border-zinc-200 bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500">
+          <span className="w-fit border border-zinc-200 bg-white px-3 py-1.5 font-mono text-xs font-medium text-zinc-500">
             {totalCount} events
           </span>
         </div>
@@ -242,7 +240,7 @@ function ActivityPageContent() {
                 setFilter(f.value);
                 setPage(1);
               }}
-              className={`font-mono text-xs px-3 py-1.5 border transition-all uppercase tracking-widest ${
+              className={`font-mono text-xs font-medium px-3 py-1.5 border transition-all ${
                 filter === f.value
                   ? "bg-zinc-900 text-white border-zinc-900"
                   : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
@@ -272,9 +270,7 @@ function ActivityPageContent() {
               <ShieldAlert className="w-6 h-6 text-red-600" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-sans font-black uppercase tracking-tight text-zinc-900 text-lg">
-                Access Denied
-              </h3>
+              <h3 className="font-sans font-bold text-zinc-900 text-xl">Access Denied</h3>
               <p className="font-mono text-sm text-zinc-500 max-w-sm mx-auto">
                 Security protocol CT-RBAC-01 prevents your account from auditing activity logs at
                 this privilege level.
@@ -349,7 +345,7 @@ function ActivityPageContent() {
                 type="button"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
-                className="h-8 px-4 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="h-8 px-4 border border-zinc-200 font-mono text-xs font-medium text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Prev
               </button>
@@ -357,7 +353,7 @@ function ActivityPageContent() {
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={page === totalPages || (filter !== "all" && filtered.length < PAGE_SIZE)}
-                className="h-8 px-4 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="h-8 px-4 border border-zinc-200 font-mono text-xs font-medium text-zinc-600 hover:border-zinc-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Next
               </button>

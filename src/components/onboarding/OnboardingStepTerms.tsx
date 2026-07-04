@@ -13,7 +13,7 @@ export function OnboardingStepTerms({ onNext }: StepProps) {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
+      <span className="font-mono text-xs font-medium text-zinc-500 mb-6 block">
         Terms of Service
       </span>
 
@@ -114,7 +114,7 @@ export function OnboardingStepTerms({ onNext }: StepProps) {
           type="button"
           onClick={onNext}
           disabled={!accepted}
-          className="bg-zinc-900 text-white px-8 py-3.5 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="bg-zinc-900 text-white px-8 py-3.5 text-sm font-medium hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Continue <ArrowRight className="w-3.5 h-3.5" />
         </button>

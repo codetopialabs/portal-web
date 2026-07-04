@@ -136,9 +136,7 @@ function CurrentCycleBanner() {
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
-                This month
-              </p>
+              <p className="font-sans text-base font-bold text-text-primary">This month</p>
               <StatusPill status={status} />
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-3">
@@ -188,7 +186,7 @@ function ReflectionCard({ r }: { r: ReflectionRecord }) {
       >
         {/* Left */}
         <div className="min-w-0 flex-1">
-          <p className="font-sans text-lg font-black uppercase tracking-tight text-text-primary leading-none">
+          <p className="font-sans text-lg font-bold text-text-primary leading-none">
             {formatPeriod(r.period)}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -226,7 +224,7 @@ function ReflectionCard({ r }: { r: ReflectionRecord }) {
         <div className="space-y-4 border-t border-grey-200 bg-grey-50/60 px-5 py-4">
           {r.reviewerNotes && (
             <div className="border border-grey-200 bg-white p-4">
-              <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-wide text-text-muted">
+              <div className="mb-1.5 flex items-center gap-1.5 font-mono text-xs font-semibold text-text-muted">
                 <MessageSquareText className="h-3.5 w-3.5" />
                 Reviewer feedback
               </div>
@@ -277,7 +275,7 @@ function HistorySection() {
               type="button"
               onClick={() => setActiveFilter(tab.key)}
               className={cn(
-                "relative flex items-center gap-1.5 px-4 py-2.5 font-mono text-[10px] font-bold uppercase tracking-wide transition-colors",
+                "relative flex items-center gap-1.5 px-4 py-2.5 font-mono text-xs font-semibold transition-colors",
                 isActive
                   ? "text-text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-zinc-900"
                   : "text-text-muted hover:text-text-secondary"
@@ -306,7 +304,7 @@ function HistorySection() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="border border-dashed border-grey-300 py-14 text-center">
-          <p className="font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+          <p className="font-sans text-base font-bold text-text-primary">
             {activeFilter === "all"
               ? "No reflections yet"
               : `No ${STATUS[activeFilter as ReflectionStatus]?.label.toLowerCase()} reflections`}
@@ -337,11 +335,9 @@ function ReflectionsContent() {
       <header className="mb-6">
         <div className="mb-1 flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4 text-icon-tertiary" />
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
-            My space
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">My space</p>
         </div>
-        <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
+        <h1 className="font-sans text-4xl font-bold tracking-tight text-text-primary">
           Reflections
         </h1>
       </header>

@@ -45,9 +45,7 @@ export function MemberFilterPopover({
         className="flex w-full flex-col rounded-none border border-zinc-200 bg-white p-0 shadow-xl sm:w-[360px]"
       >
         <div className="border-b border-zinc-100 p-4">
-          <h3 className="font-black font-sans text-zinc-900 uppercase tracking-tighter">
-            Advanced Filters
-          </h3>
+          <h3 className="font-bold font-sans text-lg text-zinc-900">Advanced Filters</h3>
           <p className="mt-0.5 font-mono text-xs text-zinc-500">
             Refine by roles, expertise, and interests.
           </p>
@@ -111,9 +109,7 @@ interface FilterSelectProps {
 function FilterSelect({ label, value, placeholder, options, onValueChange }: FilterSelectProps) {
   return (
     <div className="space-y-2">
-      <p className="font-semibold font-mono text-xs text-zinc-900 uppercase tracking-widest">
-        {label}
-      </p>
+      <p className="font-semibold font-mono text-sm text-zinc-900">{label}</p>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="h-10 w-full rounded-none border-zinc-200 bg-zinc-50 font-mono text-sm focus:border-zinc-900 focus:ring-0">
           <SelectValue placeholder={placeholder} />

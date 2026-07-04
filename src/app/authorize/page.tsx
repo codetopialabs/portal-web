@@ -113,9 +113,7 @@ function AuthorizeInner() {
         )}
 
         <div className="mb-6 border border-grey-200 p-4">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            This will share
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">This will share</p>
           <ul className="mt-2 space-y-1 font-mono text-xs text-text-secondary">
             <li>• Your name, username and email</li>
             <li>• Your community roles and permissions</li>
