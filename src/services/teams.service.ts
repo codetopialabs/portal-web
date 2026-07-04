@@ -147,10 +147,19 @@ export interface ReviewComment {
   };
 }
 
+export interface ContributionItem {
+  type: "review_approved" | "commit" | "pull_request_merged";
+  title: string;
+  url: string;
+  timestamp: string;
+  source: "internal" | "github";
+}
+
 export interface ContributionDay {
   date: string; // "YYYY-MM-DD"
   count: number;
   level: number; // 0–4
+  items: ContributionItem[];
 }
 
 export interface CreateTeamInput {

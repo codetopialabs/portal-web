@@ -3,6 +3,7 @@ import {
   BriefcaseBusiness,
   ClipboardCheck,
   Code2,
+  GitFork,
   Globe,
   Home,
   Key,
@@ -80,6 +81,12 @@ const ADMIN_MENU_GROUP: NavGroup = {
       label: "Career Progressions",
       href: "/admin/career-progressions",
       activePrefix: "/admin/career-progressions",
+    },
+    {
+      icon: GitFork,
+      label: "GitHub Repos",
+      href: "/admin/github-repos",
+      activePrefix: "/admin/github-repos",
     },
   ],
 };
