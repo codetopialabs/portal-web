@@ -314,7 +314,7 @@ export function DashboardContent() {
                       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
                         {module.subtitle}
                       </p>
-                      <h3 className="mt-2 font-sans text-lg font-black text-zinc-950">
+                      <h3 className="mt-2 font-sans text-lg font-black uppercase tracking-tight text-zinc-950">
                         {module.title}
                       </h3>
                     </div>

@@ -286,7 +286,7 @@ export function PublicProfileContent() {
               </div>
               <div className="p-6">
                 {profile.bio ? (
-                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600 sm:text-base">
+                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600">
                     {profile.bio}
                   </p>
                 ) : (
@@ -345,11 +345,9 @@ export function PublicProfileContent() {
                               <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
                                 {item.title}
                               </h3>
-                              {item.organization && (
-                                <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
-                                  {item.organization}
-                                </p>
-                              )}
+                              <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
+                                Codetopia Community
+                              </p>
                               <p className="mt-1 font-mono text-[11px] text-zinc-400">
                                 {fmt(item.startDate)} <span className="text-zinc-300">–</span>{" "}
                                 {isCurrent ? (
@@ -364,7 +362,7 @@ export function PublicProfileContent() {
                           </div>
 
                           {item.description && (
-                            <p className="mt-2.5 whitespace-pre-wrap font-sans text-sm leading-6 text-zinc-600">
+                            <p className="mt-2.5 whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500">
                               {item.description}
                             </p>
                           )}

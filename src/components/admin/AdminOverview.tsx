@@ -1,10 +1,37 @@
 "use client";
 
-import { AlertTriangle, ClipboardCheck, Mail, MoonStar, TrendingUp, Users } from "lucide-react";
+import {
+  Activity as ActivityIcon,
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  BriefcaseBusiness,
+  CheckCircle2,
+  ClipboardCheck,
+  GitPullRequest,
+  KeyRound,
+  Link2,
+  LogIn,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Minus,
+  MoonStar,
+  Pencil,
+  ShieldCheck,
+  TrendingUp,
+  UserCog,
+  Users,
+  Users2,
+} from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminOverview } from "@/hooks/useAdmin";
-import type { AdminOverviewCompositionBucket } from "@/types/admin-overview.types";
+import type {
+  AdminOverviewActivityEntry,
+  AdminOverviewCompositionBucket,
+  AdminOverviewRoleDistribution,
+} from "@/types/admin-overview.types";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -24,11 +51,153 @@ function titleCase(s: string): string {
     .join(" ");
 }
 
+function formatWeekLabel(iso: string): string {
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(iso));
+}
+
+// ─── Activity feed icon categorization ─────────────────────────────────────
+// Grouped by prefix/keyword rather than one branch per exact event type —
+// the enum has 40+ values, but they fall into a handful of visual buckets.
+const ACTIVITY_ICON_RULES: Array<{
+  test: (t: string) => boolean;
+  icon: React.ElementType;
+  badgeClassName: string;
+}> = [
+  {
+    test: (t) => t === "account_flagged",
+    icon: AlertTriangle,
+    badgeClassName: "bg-red-50 text-red-600",
+  },
+  {
+    test: (t) => t.includes("changes_requested") || t === "career_progression_revoked",
+    icon: AlertTriangle,
+    badgeClassName: "bg-amber-50 text-amber-600",
+  },
+  {
+    test: (t) => t.includes("approved") || t === "account_flag_resolved" || t === "email_verified",
+    icon: CheckCircle2,
+    badgeClassName: "bg-emerald-50 text-emerald-600",
+  },
+  {
+    test: (t) => t.startsWith("role_"),
+    icon: ShieldCheck,
+    badgeClassName: "bg-violet-50 text-violet-600",
+  },
+  {
+    test: (t) => t.startsWith("team_"),
+    icon: Users2,
+    badgeClassName: "bg-violet-50 text-violet-600",
+  },
+  {
+    test: (t) => t.startsWith("review_"),
+    icon: GitPullRequest,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t.startsWith("reflection_"),
+    icon: ClipboardCheck,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t.startsWith("career_progression_"),
+    icon: BriefcaseBusiness,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t.startsWith("user_suspended") || t === "user_deleted",
+    icon: UserCog,
+    badgeClassName: "bg-red-50 text-red-600",
+  },
+  {
+    test: (t) => t.startsWith("user_"),
+    icon: UserCog,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t === "profile_updated" || t === "avatar_updated" || t === "username_changed",
+    icon: Pencil,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t === "session_revoked" || t === "all_sessions_revoked" || t === "logout",
+    icon: LogOut,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t === "login" || t === "register" || t === "token_refresh",
+    icon: LogIn,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t.startsWith("password_") || t.startsWith("api_key_"),
+    icon: KeyRound,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t.startsWith("oauth_"),
+    icon: Link2,
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  {
+    test: (t) => t === "discord_linked",
+    icon: MessageCircle,
+    badgeClassName: "bg-violet-50 text-violet-600",
+  },
+];
+
+function activityIconFor(eventType: string) {
+  return (
+    ACTIVITY_ICON_RULES.find((rule) => rule.test(eventType)) ?? {
+      icon: ActivityIcon,
+      badgeClassName: "bg-zinc-100 text-zinc-600",
+    }
+  );
+}
+
+// ─── Small building blocks ──────────────────────────────────────────────────
+
+function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+  return (
+    <div className="mb-4 flex items-center gap-2.5">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center bg-zinc-950 text-white">
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+      <p className="font-sans text-sm font-black uppercase tracking-widest text-zinc-900">
+        {title}
+      </p>
+    </div>
+  );
+}
+
+function TrendBadge({ delta }: { delta: number | null }) {
+  if (delta === null) return null;
+  if (delta === 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 font-mono text-[10px] font-bold text-zinc-400">
+        <Minus className="h-2.5 w-2.5" />
+        0%
+      </span>
+    );
+  }
+  const isUp = delta > 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-0.5 font-mono text-[10px] font-bold ${
+        isUp ? "text-emerald-600" : "text-red-500"
+      }`}
+    >
+      {isUp ? <ArrowUp className="h-2.5 w-2.5" /> : <ArrowDown className="h-2.5 w-2.5" />}
+      {Math.abs(delta)}%
+    </span>
+  );
+}
+
 function StatCard({
   icon: Icon,
   label,
   value,
   sub,
+  trend,
   tone = "default",
   href,
 }: {
@@ -36,6 +205,7 @@ function StatCard({
   label: string;
   value: string;
   sub?: string;
+  trend?: number | null;
   tone?: "default" | "warning";
   href?: string;
 }) {
@@ -54,7 +224,12 @@ function StatCard({
       >
         {value}
       </p>
-      {sub && <p className="font-mono text-xs text-zinc-400">{sub}</p>}
+      {(sub || trend !== undefined) && (
+        <div className="flex items-center gap-2">
+          {sub && <p className="font-mono text-xs text-zinc-400">{sub}</p>}
+          {trend !== undefined && <TrendBadge delta={trend} />}
+        </div>
+      )}
     </>
   );
 
@@ -76,21 +251,33 @@ function StatCard({
 
 function GrowthChart({ growth }: { growth: { weekStart: string; count: number }[] }) {
   const max = Math.max(1, ...growth.map((g) => g.count));
+  const total = growth.reduce((sum, g) => sum + g.count, 0);
+
   return (
     <div className="bg-white border border-zinc-200 p-5 h-full">
-      <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
-        Member Growth — 12 Weeks
-      </p>
-      <div className="flex items-end gap-1.5 h-24">
-        {growth.map((point) => (
-          <div key={point.weekStart} className="flex-1 flex flex-col items-center gap-1 group">
-            <div className="w-full flex items-end h-20">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <SectionHeader icon={TrendingUp} title="Member Growth" />
+        <p className="font-mono text-[11px] text-zinc-400">
+          <span className="font-bold text-zinc-900">{total}</span> new in 12 weeks
+        </p>
+      </div>
+      <div className="flex items-end gap-1.5 h-28">
+        {growth.map((point, i) => (
+          <div key={point.weekStart} className="flex-1 flex flex-col items-center gap-1.5 group">
+            <div className="w-full flex items-end justify-center h-20 relative">
+              <span className="absolute -top-4 font-mono text-[9px] font-bold text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100">
+                {point.count}
+              </span>
               <div
-                className="w-full bg-zinc-900 group-hover:bg-zinc-700 transition-colors"
+                className="w-full rounded-t-sm bg-zinc-800 transition-colors group-hover:bg-zinc-950"
                 style={{ height: `${Math.max(4, (point.count / max) * 100)}%` }}
-                title={`${point.weekStart}: ${point.count} new`}
               />
             </div>
+            <span
+              className={`font-mono text-[8px] text-zinc-400 ${i % 2 === 1 ? "invisible sm:visible" : ""}`}
+            >
+              {formatWeekLabel(point.weekStart)}
+            </span>
           </div>
         ))}
       </div>
@@ -103,37 +290,80 @@ function ReflectionsTrendChart({
 }: {
   trend: { period: string; participationRate: number }[];
 }) {
-  if (trend.length === 0) {
-    return (
-      <div className="bg-white border border-zinc-200 p-5 h-full flex flex-col">
-        <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
-          Reflection Participation Trend
-        </p>
+  return (
+    <div className="bg-white border border-zinc-200 p-5 h-full flex flex-col">
+      <SectionHeader icon={ClipboardCheck} title="Reflection Participation Trend" />
+      {trend.length === 0 ? (
         <p className="font-mono text-xs text-zinc-400">No reflection cycles yet.</p>
-      </div>
-    );
+      ) : (
+        <div className="flex items-end gap-2 h-28">
+          {trend.map((point) => (
+            <div key={point.period} className="flex-1 flex flex-col items-center gap-1.5 group">
+              <div className="w-full flex items-end justify-center h-20 relative">
+                <span className="absolute -top-4 font-mono text-[9px] font-bold text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100">
+                  {Math.round(point.participationRate * 100)}%
+                </span>
+                <div
+                  className="w-full rounded-t-sm bg-emerald-500 transition-colors group-hover:bg-emerald-600"
+                  style={{ height: `${Math.max(4, point.participationRate * 100)}%` }}
+                />
+              </div>
+              <span className="font-mono text-[9px] text-zinc-400">
+                {new Date(point.period).toLocaleDateString("en-US", { month: "short" })}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BarList({
+  items,
+}: {
+  items: { key: string; label: string; count: number; href?: string }[];
+}) {
+  const max = Math.max(1, ...items.map((b) => b.count));
+  if (items.length === 0) {
+    return <p className="font-mono text-xs text-zinc-400">No data yet.</p>;
   }
   return (
-    <div className="bg-white border border-zinc-200 p-5 h-full">
-      <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
-        Reflection Participation Trend
-      </p>
-      <div className="flex items-end gap-2 h-24">
-        {trend.map((point) => (
-          <div key={point.period} className="flex-1 flex flex-col items-center gap-1 group">
-            <div className="w-full flex items-end h-20">
+    <div className="space-y-1.5">
+      {items.map((item) => {
+        const row = (
+          <>
+            <span className="font-mono text-[11px] text-zinc-600 w-28 truncate shrink-0">
+              {item.label}
+            </span>
+            <div className="flex-1 h-3 bg-zinc-100">
               <div
-                className="w-full bg-emerald-600 group-hover:bg-emerald-500 transition-colors"
-                style={{ height: `${Math.max(4, point.participationRate * 100)}%` }}
-                title={`${point.period}: ${Math.round(point.participationRate * 100)}%`}
+                className="h-full bg-zinc-900 transition-all"
+                style={{ width: `${(item.count / max) * 100}%` }}
               />
             </div>
-            <span className="font-mono text-[9px] text-zinc-400">
-              {new Date(point.period).toLocaleDateString("en-US", { month: "short" })}
+            <span className="font-mono text-[11px] font-bold text-zinc-900 w-6 text-right shrink-0">
+              {item.count}
             </span>
+          </>
+        );
+        if (item.href) {
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              className="flex items-center gap-2 -mx-1 px-1 rounded transition-colors hover:bg-zinc-50"
+            >
+              {row}
+            </Link>
+          );
+        }
+        return (
+          <div key={item.key} className="flex items-center gap-2">
+            {row}
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }
@@ -145,48 +375,114 @@ function CompositionList({
   title: string;
   buckets: AdminOverviewCompositionBucket[];
 }) {
-  const max = Math.max(1, ...buckets.map((b) => b.count));
   return (
     <div>
       <p className="font-mono text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-2">
         {title}
       </p>
-      {buckets.length === 0 ? (
-        <p className="font-mono text-xs text-zinc-400">No data yet.</p>
-      ) : (
-        <div className="space-y-1.5">
-          {buckets.map((bucket) => (
-            <div key={bucket.value ?? "unspecified"} className="flex items-center gap-2">
-              <span className="font-mono text-[11px] text-zinc-600 w-28 truncate shrink-0">
-                {bucket.label ?? (bucket.value ? titleCase(bucket.value) : "Unspecified")}
-              </span>
-              <div className="flex-1 h-3 bg-zinc-100">
-                <div
-                  className="h-full bg-zinc-900"
-                  style={{ width: `${(bucket.count / max) * 100}%` }}
-                />
-              </div>
-              <span className="font-mono text-[11px] font-bold text-zinc-900 w-6 text-right shrink-0">
-                {bucket.count}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <BarList
+        items={buckets.map((b) => ({
+          key: b.value ?? "unspecified",
+          label: b.label ?? (b.value ? titleCase(b.value) : "Unspecified"),
+          count: b.count,
+        }))}
+      />
     </div>
   );
 }
+
+function RoleDistributionCard({ roles }: { roles: AdminOverviewRoleDistribution[] }) {
+  const active = roles
+    .filter((r) => r.memberCount > 0)
+    .sort((a, b) => b.memberCount - a.memberCount);
+
+  return (
+    <div className="bg-white border border-zinc-200 p-5">
+      <SectionHeader icon={Users} title="Role Distribution" />
+      <BarList
+        items={active.map((role) => ({
+          key: role.name,
+          label: role.displayName || role.name,
+          count: role.memberCount,
+          href: `/admin/roles/${role.name}`,
+        }))}
+      />
+    </div>
+  );
+}
+
+function ActivityRow({ entry }: { entry: AdminOverviewActivityEntry }) {
+  const { icon: Icon, badgeClassName } = activityIconFor(entry.eventType);
+  return (
+    <Link
+      href={`/admin/members/${entry.user.username}`}
+      className="flex items-center gap-3 border-b border-zinc-100 last:border-0 pb-3 last:pb-0 -mx-1 px-1 rounded transition-colors hover:bg-zinc-50"
+    >
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center ${badgeClassName}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-mono text-xs text-zinc-900 truncate">
+          <span className="font-bold">{entry.user.username}</span> {entry.eventLabel}
+        </p>
+        {entry.detail && (
+          <p className="font-mono text-[11px] text-zinc-400 truncate">{entry.detail}</p>
+        )}
+      </div>
+      <span className="font-mono text-[10px] text-zinc-400 shrink-0">
+        {timeAgo(entry.createdAt)}
+      </span>
+    </Link>
+  );
+}
+
+// ─── Loading skeleton (roughly matches the real layout) ────────────────────
+
+function OverviewSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
+          <Skeleton key={i} className="h-28 w-full" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
+          <Skeleton key={i} className="h-24 w-full" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Skeleton className="h-52 w-full lg:col-span-2" />
+        <Skeleton className="h-52 w-full" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Skeleton className="h-52 w-full" />
+        <Skeleton className="h-52 w-full" />
+      </div>
+      <Skeleton className="h-80 w-full" />
+    </div>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export function AdminOverview() {
   const { data, isLoading } = useAdminOverview();
 
   if (isLoading || !data) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
-          <Skeleton key={i} className="h-28 w-full" />
-        ))}
+      <div className="space-y-6">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+            Admin Panel
+          </p>
+          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+            Overview
+          </h1>
+        </div>
+        <OverviewSkeleton />
       </div>
     );
   }
@@ -203,14 +499,44 @@ export function AdminOverview() {
     recentActivity,
   } = data;
 
+  // Week-over-week delta for the Total Members trend badge, derived from
+  // the same 12-week growth series already fetched — no extra backend call.
+  const lastWeek = members.growth.at(-1)?.count ?? 0;
+  const priorWeek = members.growth.at(-2)?.count ?? 0;
+  const weekOverWeek =
+    priorWeek > 0
+      ? Math.round(((lastWeek - priorWeek) / priorWeek) * 100)
+      : lastWeek > 0
+        ? 100
+        : null;
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+            Admin Panel
+          </p>
+          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+            Overview
+          </h1>
+        </div>
+        <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          </span>
+          Live
+        </span>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={Users}
           label="Total Members"
           value={members.total.toLocaleString()}
           sub={`+${members.new7d} this week`}
+          trend={weekOverWeek}
           href="/admin/members"
         />
         <StatCard
@@ -228,7 +554,7 @@ export function AdminOverview() {
           icon={TrendingUp}
           label="Active Teams"
           value={teams.active.toLocaleString()}
-          href="/teams"
+          href="/admin/teams"
         />
         <StatCard
           icon={AlertTriangle}
@@ -244,7 +570,13 @@ export function AdminOverview() {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          icon={ShieldCheck}
+          label="Onboarding Rate"
+          value={`${Math.round(members.onboardingRate * 100)}%`}
+          sub={`${members.new30d} joined in 30d`}
+        />
         <StatCard
           icon={MoonStar}
           label="Dormant Members"
@@ -318,37 +650,13 @@ export function AdminOverview() {
         <div className="lg:col-span-2">
           <GrowthChart growth={members.growth} />
         </div>
-        <div className="bg-white border border-zinc-200 p-5">
-          <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900 mb-4">
-            Role Distribution
-          </p>
-          <div className="space-y-2.5">
-            {roleDistribution
-              .filter((r) => r.memberCount > 0)
-              .map((role) => (
-                <Link
-                  key={role.name}
-                  href={`/admin/roles/${role.name}`}
-                  className="flex items-center justify-between hover:bg-zinc-50 -mx-1 px-1 rounded transition-colors"
-                >
-                  <span className="font-mono text-xs text-zinc-600 truncate">
-                    {role.displayName || role.name}
-                  </span>
-                  <span className="font-mono text-xs font-bold text-zinc-900">
-                    {role.memberCount}
-                  </span>
-                </Link>
-              ))}
-          </div>
-        </div>
+        <RoleDistributionCard roles={roleDistribution} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ReflectionsTrendChart trend={reflectionsTrend} />
         <div className="bg-white border border-zinc-200 p-5 space-y-4">
-          <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
-            Member Composition
-          </p>
+          <SectionHeader icon={Users2} title="Member Composition" />
           <CompositionList title="Experience Level" buckets={memberComposition.byExperienceLevel} />
           <CompositionList title="Discipline" buckets={memberComposition.byDiscipline} />
           <CompositionList title="Referral Source" buckets={memberComposition.byReferralSource} />
@@ -357,9 +665,7 @@ export function AdminOverview() {
 
       <div className="bg-white border border-zinc-200 p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="font-sans font-black uppercase tracking-widest text-sm text-zinc-900">
-            Recent Activity
-          </p>
+          <SectionHeader icon={ActivityIcon} title="Recent Activity" />
           <Link
             href="/activity"
             className="font-mono text-[10px] uppercase tracking-wider text-zinc-400 hover:text-zinc-900 transition-colors"
@@ -369,24 +675,8 @@ export function AdminOverview() {
         </div>
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {recentActivity.map((entry, i) => (
-            <Link
-              href={`/admin/members/${entry.user.username}`}
-              // biome-ignore lint/suspicious/noArrayIndexKey: feed entries have no stable id
-              key={i}
-              className="flex items-center justify-between gap-4 text-sm border-b border-zinc-100 last:border-0 pb-3 last:pb-0 hover:bg-zinc-50 -mx-1 px-1 rounded transition-colors"
-            >
-              <div className="min-w-0">
-                <p className="font-mono text-xs text-zinc-900 truncate">
-                  <span className="font-bold">{entry.user.username}</span> — {entry.eventLabel}
-                </p>
-                {entry.detail && (
-                  <p className="font-mono text-[11px] text-zinc-400 truncate">{entry.detail}</p>
-                )}
-              </div>
-              <span className="font-mono text-[10px] text-zinc-400 shrink-0">
-                {timeAgo(entry.createdAt)}
-              </span>
-            </Link>
+            // biome-ignore lint/suspicious/noArrayIndexKey: feed entries have no stable id
+            <ActivityRow key={i} entry={entry} />
           ))}
           {recentActivity.length === 0 && (
             <p className="font-mono text-xs text-zinc-400">No recent activity.</p>
