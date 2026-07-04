@@ -70,7 +70,7 @@ function AdminTeamsContent() {
           {filtered.map((team) => (
             <Link
               key={team.id}
-              href={`/teams/${team.slug}`}
+              href={`/admin/teams/${team.slug}`}
               className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-zinc-50"
             >
               <div className="min-w-0">
