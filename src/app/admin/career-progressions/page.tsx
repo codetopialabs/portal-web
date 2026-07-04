@@ -180,7 +180,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
                 Reason for revoking
-                <span className="ml-1.5 normal-case font-normal text-zinc-300">
+                <span className="ml-1.5 normal-case font-normal text-zinc-400">
                   — required, shown to the member
                 </span>
               </p>
@@ -188,7 +188,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Why is this entry being revoked?"
-                className="min-h-[60px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:border-zinc-900 focus:outline-none transition-colors"
+                className="min-h-[60px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none transition-colors"
               />
             </div>
             <div className="flex justify-end">
@@ -216,7 +216,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
                 Review note
-                <span className="ml-1.5 normal-case font-normal text-zinc-300">
+                <span className="ml-1.5 normal-case font-normal text-zinc-400">
                   — optional, shown to member if changes are requested
                 </span>
               </p>
@@ -224,7 +224,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Leave feedback for the member..."
-                className="min-h-[80px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:border-zinc-900 focus:outline-none transition-colors"
+                className="min-h-[80px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none transition-colors"
               />
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -270,7 +270,7 @@ function AdminCareerProgressionsContent() {
   const { data: progressions = [], isLoading } = useCareerProgressionsForReview(params);
 
   return (
-    <div className="w-full max-w-3xl pb-10">
+    <div className="mx-auto w-full max-w-5xl pb-10">
       {/* Header */}
       <header className="mb-6">
         <div className="mb-1 flex items-center gap-2">

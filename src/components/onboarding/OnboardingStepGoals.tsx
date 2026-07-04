@@ -202,7 +202,7 @@ export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps
             }}
             placeholder="e.g. Land my first UX role in 6 months, build and launch a personal project, transition from accounting into data analysis"
             rows={3}
-            className="w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+            className="w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all resize-none"
           />
           {errors.primaryGoal && (
             <p className="text-red-500 text-xs font-mono">{errors.primaryGoal}</p>
@@ -281,7 +281,7 @@ export function OnboardingStepGoals({ onNext, onBack }: OnboardingStepGoalsProps
                   setErrors((er) => ({ ...er, otherReferral: undefined }));
                 }}
                 placeholder="e.g. A YouTube video, a university notice board..."
-                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none transition-all"
+                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
               />
               {errors.otherReferral && (
                 <p className="text-red-500 text-xs font-mono">{errors.otherReferral}</p>

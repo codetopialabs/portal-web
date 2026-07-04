@@ -118,7 +118,7 @@ export function NationalitySelect({
           aria-haspopup="listbox"
           aria-expanded={open}
         >
-          <span className={value ? "text-zinc-900" : "text-zinc-300"}>
+          <span className={value ? "text-zinc-900" : "text-zinc-400"}>
             {value || "Select country"}
           </span>
           <ChevronDown
@@ -140,7 +140,7 @@ export function NationalitySelect({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search country..."
-            className="flex-1 h-10 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none"
+            className="flex-1 h-10 bg-transparent font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
           />
           {search && (
             <button

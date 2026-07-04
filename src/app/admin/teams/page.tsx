@@ -28,7 +28,7 @@ function AdminTeamsContent() {
   }, [teams, search]);
 
   return (
-    <div className="mx-auto max-w-4xl pb-20">
+    <div className="pb-20">
       <div className="mb-6">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
           Admin Panel

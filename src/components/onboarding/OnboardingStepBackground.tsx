@@ -235,7 +235,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
                   setErrors((er) => ({ ...er, otherDiscipline: undefined }));
                 }}
                 placeholder="e.g. Game Development, Blockchain, AR/VR"
-                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none transition-all"
+                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
               />
               {errors.otherDiscipline && (
                 <p className="text-red-500 text-xs font-mono">{errors.otherDiscipline}</p>
@@ -312,7 +312,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
                   setErrors((er) => ({ ...er, otherStatus: undefined }));
                 }}
                 placeholder="e.g. National Service, Intern, Bootcamp student"
-                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none transition-all"
+                className="h-11 w-full border border-zinc-900 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none transition-all"
               />
               {errors.otherStatus && (
                 <p className="text-red-500 text-xs font-mono">{errors.otherStatus}</p>
@@ -335,7 +335,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
               onChange={(e) => setCurrentRole(e.target.value)}
               onBlur={(e) => setCurrentRole(toTitleCase(e.target.value))}
               placeholder="e.g. Frontend Developer at Acme Ltd, CS student at UG, Freelance designer"
-              className="h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-300 focus:outline-none focus:border-zinc-900 transition-all"
+              className="h-11 w-full border border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all"
             />
             <p
               className={`text-right font-mono text-[10px] ${
