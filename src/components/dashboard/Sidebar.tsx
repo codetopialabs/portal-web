@@ -107,7 +107,7 @@ export function DashboardSidebar() {
                               Soon
                             </span>
                           )}
-                          {item.label === "Teams" && pendingInviteCount > 0 && (
+                          {item.href === "/teams" && pendingInviteCount > 0 && (
                             <span className="ml-auto flex h-4 min-w-4 items-center justify-center bg-white text-black font-mono text-[9px] font-bold px-1">
                               {pendingInviteCount > 9 ? "9+" : pendingInviteCount}
                             </span>
