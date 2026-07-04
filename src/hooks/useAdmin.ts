@@ -286,6 +286,9 @@ export function useAdminOverview() {
     queryKey: adminKeys.overview,
     queryFn: () => AdminOverviewService.getOverview(),
     staleTime: 60_000,
+    // Admins tend to leave this dashboard open while triaging — poll so
+    // Needs Attention / Dormant Members stay current without a manual refresh.
+    refetchInterval: 30_000,
   });
 }
 

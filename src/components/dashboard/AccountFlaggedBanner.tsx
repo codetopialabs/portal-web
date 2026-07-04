@@ -35,7 +35,7 @@ export function AccountFlaggedBanner() {
         <p className="font-mono text-xs font-bold text-white">
           Your account has been flagged for review.
         </p>
-        <p className="mt-0.5 font-mono text-[11px] text-red-100">
+        <p className="mt-0.5 whitespace-pre-wrap font-mono text-[11px] text-red-100">
           Reason: {profile.activeFlag.reason}
         </p>
       </div>

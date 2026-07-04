@@ -720,7 +720,7 @@ function MemberDetailContent({ username }: { username: string }) {
                   : "Account flagged"}
               </p>
               <p
-                className={`mt-1 font-mono text-sm ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-800" : "text-red-800"}`}
+                className={`mt-1 whitespace-pre-wrap font-mono text-sm ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-800" : "text-red-800"}`}
               >
                 {member.activeFlag.reason}
               </p>
