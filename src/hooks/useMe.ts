@@ -40,6 +40,9 @@ export function useMe() {
     // Treat data as fresh for 60 s — avoids redundant fetches on tab focus
     // while still picking up changes quickly after mutations.
     staleTime: 60_000,
+    // Poll so things like a new account flag or a role change show up while
+    // the tab stays open, not just on the next focus/navigation.
+    refetchInterval: 60_000,
     // Keep the previous data visible while a background refetch is in flight.
     placeholderData: (prev) => prev,
   });
