@@ -4,7 +4,6 @@ import { BriefcaseBusiness, CheckCircle2, Clock3, Loader2, Search, XCircle } fro
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { DashboardShell } from "@/components/dashboard/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -176,7 +175,7 @@ function AdminCareerProgressionsContent() {
   const { data: progressions = [], isLoading } = useCareerProgressionsForReview(params);
 
   return (
-    <div className="mx-auto max-w-6xl pb-20">
+    <div className="w-full pb-4">
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-1 flex items-center gap-2">
@@ -209,11 +208,10 @@ function AdminCareerProgressionsContent() {
             key={value || "all"}
             type="button"
             onClick={() => setStatus(value)}
-            className={`h-9 border px-3 font-mono text-xs font-black uppercase tracking-widest ${
-              status === value
-                ? "border-zinc-950 bg-zinc-950 text-white"
-                : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-500"
-            }`}
+            className={`h-9 border px-3 font-mono text-xs font-black uppercase tracking-widest ${status === value
+              ? "border-zinc-950 bg-zinc-950 text-white"
+              : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-500"
+              }`}
           >
             {value || "All"}
           </button>
@@ -248,9 +246,7 @@ function AdminCareerProgressionsContent() {
 export default function AdminCareerProgressionsPage() {
   return (
     <RouteGuard permission="career_progressions.review">
-      <DashboardShell>
-        <AdminCareerProgressionsContent />
-      </DashboardShell>
+      <AdminCareerProgressionsContent />
     </RouteGuard>
   );
 }
