@@ -105,6 +105,21 @@ export function useRemoveMember(teamId: string) {
   });
 }
 
+export function useUpdateMemberRole(teamId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, role }: { userId: string; role: "lead" | "member" }) =>
+      TeamsService.updateMemberRole(teamId, userId, role),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
+      toast.success("Role updated.");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to update role.");
+    },
+  });
+}
+
 // ─── Invites ──────────────────────────────────────────────────────────────────
 
 export function useTeamInvites(teamId: string) {

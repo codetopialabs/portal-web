@@ -39,7 +39,8 @@ function TeamWorkspaceContent() {
   // Invites are needed for the overview tab invite banner
   const { data: myInvites } = useMyInvites();
 
-  const isLead = membership?.role === "lead";
+  const isOwner = membership?.role === "owner";
+  const isLead = isOwner || membership?.role === "lead";
   const myInvite = myInvites?.find((invite) => invite.teamSlug === teamSlug);
 
   function setTab(newTab: string) {
@@ -104,7 +105,7 @@ function TeamWorkspaceContent() {
                 variant="outline"
                 className="font-mono text-[10px] uppercase tracking-widest rounded-none"
               >
-                {isLead ? "Lead" : "Member"}
+                {isOwner ? "Owner" : isLead ? "Lead" : "Member"}
               </Badge>
             )}
           </div>
@@ -160,7 +161,9 @@ function TeamWorkspaceContent() {
           {tab === "reviews" && (
             <TeamReviewsTab teamSlug={teamSlug} reviews={reviews} reviewsLoading={reviewsLoading} />
           )}
-          {tab === "members" && <TeamMembersTab teamSlug={teamSlug} isLead={isLead} />}
+          {tab === "members" && (
+            <TeamMembersTab teamSlug={teamSlug} isLead={isLead} isOwner={isOwner} />
+          )}
         </div>
       </div>
     </DashboardShell>

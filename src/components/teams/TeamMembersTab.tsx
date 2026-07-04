@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: community search API response items are not generically typed at this component layer
 "use client";
 
-import { Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
+import { Crown, Loader2, Mail, Plus, Trash2, UserPlus, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import {
   useSendInvite,
   useTeamInvites,
   useTeamMembers,
+  useUpdateMemberRole,
 } from "@/hooks/useTeams";
 import { getAvatarUrl } from "@/lib/utils";
 
@@ -30,15 +31,17 @@ interface InviteeUser {
 interface TeamMembersTabProps {
   teamSlug: string;
   isLead: boolean;
+  isOwner: boolean;
 }
 
-export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
+export function TeamMembersTab({ teamSlug, isLead, isOwner }: TeamMembersTabProps) {
   // All data-fetching moved inside this component — it only runs when Members tab is visible
   const { data: members, isLoading: membersLoading } = useTeamMembers(teamSlug);
   const { data: pendingInvites } = useTeamInvites(teamSlug);
   const { mutate: sendInvite, isPending: invitePending } = useSendInvite(teamSlug);
   const { mutate: removeMember, isPending: removePending } = useRemoveMember(teamSlug);
   const { mutate: revokeInvite, isPending: revokePending } = useRevokeInvite(teamSlug);
+  const { mutate: updateRole, isPending: roleUpdatePending } = useUpdateMemberRole(teamSlug);
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -237,13 +240,36 @@ export function TeamMembersTab({ teamSlug, isLead }: TeamMembersTabProps) {
                   </div>
                 </Link>
                 <div className="flex items-center gap-4">
-                  <Badge
-                    variant="outline"
-                    className="font-mono text-[10px] uppercase tracking-widest bg-white"
-                  >
-                    {member.role === "lead" ? "Lead" : "Member"}
-                  </Badge>
-                  {isLead && member.role !== "lead" && (
+                  {member.role === "owner" ? (
+                    <Badge className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest border-amber-300 bg-amber-50 text-amber-700">
+                      <Crown className="h-3 w-3" />
+                      Owner
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="font-mono text-[10px] uppercase tracking-widest bg-white"
+                    >
+                      {member.role === "lead" ? "Lead" : "Member"}
+                    </Badge>
+                  )}
+                  {isOwner && member.role !== "owner" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={roleUpdatePending}
+                      onClick={() =>
+                        updateRole({
+                          userId: member.user.id,
+                          role: member.role === "lead" ? "member" : "lead",
+                        })
+                      }
+                      className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                    >
+                      {member.role === "lead" ? "Demote" : "Promote to Lead"}
+                    </Button>
+                  )}
+                  {isLead && member.role !== "lead" && member.role !== "owner" && (
                     <ConfirmModal
                       title="Remove Member"
                       description={`Are you sure you want to remove ${member.user.fullName} from the team?`}

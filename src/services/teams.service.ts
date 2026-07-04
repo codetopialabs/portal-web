@@ -43,7 +43,7 @@ export interface TeamMember {
   id: string;
   userId: string;
   teamId: string;
-  role: "lead" | "member";
+  role: "owner" | "lead" | "member";
   joinedAt: string;
   user: {
     id: string;
@@ -230,6 +230,19 @@ export const TeamsService = {
   /** Remove a member from a team. */
   async removeMember(teamId: string, userId: string): Promise<void> {
     await axiosInstance.delete(`/teams/${teamId}/members/${userId}/`);
+  },
+
+  /** Promote a member to Lead, or demote a Lead back to Member. Owner only. */
+  async updateMemberRole(
+    teamId: string,
+    userId: string,
+    role: "lead" | "member"
+  ): Promise<TeamMember> {
+    const res = await axiosInstance.patch<ApiResponse<TeamMember>>(
+      `/teams/${teamId}/members/${userId}/`,
+      { role }
+    );
+    return res.data.data;
   },
 
   // ─── Invites ───────────────────────────────────────────────────────────────
