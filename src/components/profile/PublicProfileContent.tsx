@@ -504,7 +504,7 @@ export function PublicProfileContent() {
 
         {/* â”€â”€ Contributions â”€â”€ */}
         <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} />
+          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
         </section>
       </main>
 

@@ -15,6 +15,12 @@ import type { ContributionDay, ContributionItem } from "@/services/teams.service
 interface ContributionGraphProps {
   username: string;
   joinedAt?: string;
+  // True on the public profile page, which has no login wall. Internal
+  // review links point at /teams/{slug}/reviews/{id}, which requires both
+  // auth and team membership — for a logged-out (or unrelated) visitor
+  // that link is just a dead end at the login screen, so show the detail
+  // as plain text instead of a link there.
+  isPublicView?: boolean;
 }
 
 const ITEM_TYPE_META: Record<ContributionItem["type"], { icon: React.ElementType; label: string }> =
@@ -34,7 +40,15 @@ function formatDayLabel(dateStr: string): string {
   }).format(d);
 }
 
-function DayDetailPanel({ day, onClose }: { day: ContributionDay; onClose: () => void }) {
+function DayDetailPanel({
+  day,
+  onClose,
+  isPublicView,
+}: {
+  day: ContributionDay;
+  onClose: () => void;
+  isPublicView?: boolean;
+}) {
   return (
     <div className="mt-4 border border-zinc-200 bg-zinc-50 p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -70,18 +84,38 @@ function DayDetailPanel({ day, onClose }: { day: ContributionDay; onClose: () =>
           );
           const linkClassName =
             "flex items-center gap-2.5 border border-zinc-200 bg-white p-2.5 transition-colors hover:border-zinc-400";
-          return item.source === "github" ? (
-            <a
-              // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
-              key={i}
-              href={item.url}
-              target="_blank"
-              rel="noreferrer"
-              className={linkClassName}
-            >
-              {content}
-            </a>
-          ) : (
+
+          if (item.source === "github") {
+            return (
+              <a
+                // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
+                key={i}
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                className={linkClassName}
+              >
+                {content}
+              </a>
+            );
+          }
+
+          // Internal review links require auth + team membership to view —
+          // on the public profile that's just a login dead end, so show the
+          // brief detail without a link instead of sending visitors there.
+          if (isPublicView) {
+            return (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
+                key={i}
+                className="flex items-center gap-2.5 border border-zinc-200 bg-white p-2.5"
+              >
+                {content}
+              </div>
+            );
+          }
+
+          return (
             <Link
               // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
               key={i}
@@ -97,7 +131,7 @@ function DayDetailPanel({ day, onClose }: { day: ContributionDay; onClose: () =>
   );
 }
 
-export function ContributionGraph({ username, joinedAt }: ContributionGraphProps) {
+export function ContributionGraph({ username, joinedAt, isPublicView }: ContributionGraphProps) {
   const currentYear = new Date().getFullYear();
   const joinYear = joinedAt ? new Date(joinedAt).getFullYear() : currentYear;
   const years = [];
@@ -270,7 +304,13 @@ export function ContributionGraph({ username, joinedAt }: ContributionGraphProps
           </div>
         </div>
 
-        {selectedDay && <DayDetailPanel day={selectedDay} onClose={() => setSelectedDay(null)} />}
+        {selectedDay && (
+          <DayDetailPanel
+            day={selectedDay}
+            onClose={() => setSelectedDay(null)}
+            isPublicView={isPublicView}
+          />
+        )}
       </div>
     </div>
   );
