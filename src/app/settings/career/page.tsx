@@ -396,7 +396,7 @@ function ProgressionCard({
       </div>
 
       {item.description && (
-        <p className="mt-3 whitespace-pre-wrap font-sans text-sm leading-6 text-zinc-600">
+        <p className="mt-3 whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500">
           {item.description}
         </p>
       )}

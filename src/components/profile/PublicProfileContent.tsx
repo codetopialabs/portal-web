@@ -286,7 +286,7 @@ export function PublicProfileContent() {
               </div>
               <div className="p-6">
                 {profile.bio ? (
-                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600 sm:text-base">
+                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600">
                     {profile.bio}
                   </p>
                 ) : (
@@ -362,7 +362,7 @@ export function PublicProfileContent() {
                           </div>
 
                           {item.description && (
-                            <p className="mt-2.5 whitespace-pre-wrap font-sans text-sm leading-6 text-zinc-600">
+                            <p className="mt-2.5 whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500">
                               {item.description}
                             </p>
                           )}

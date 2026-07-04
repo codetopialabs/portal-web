@@ -494,7 +494,7 @@ export default function SettingsSecurityPage() {
           <History className="w-4 h-4 text-zinc-400" />
           <div>
             <p className="font-mono font-semibold text-sm text-zinc-900">Activity Log</p>
-            <p className="font-mono text-sm text-zinc-500">Full record of events on your account</p>
+            <p className="font-mono text-xs text-zinc-400">Full record of events on your account</p>
           </div>
         </div>
         <Link
@@ -512,8 +512,8 @@ export default function SettingsSecurityPage() {
         <SectionHeader icon={ShieldAlert} title="Danger Zone" danger />
         <div className="bg-red-50 border border-red-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p className="font-mono font-semibold text-base text-red-700">Delete Account</p>
-            <p className="font-mono text-sm text-red-500/80 mt-0.5 leading-relaxed">
+            <p className="font-mono font-semibold text-sm text-red-700">Delete Account</p>
+            <p className="font-mono text-xs text-red-500/80 mt-0.5 leading-relaxed">
               Permanently removes all your data. This cannot be undone.
             </p>
           </div>
