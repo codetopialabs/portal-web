@@ -108,36 +108,32 @@ function ReviewCard({ item }: { item: CareerProgression }) {
   }
 
   return (
-    <article className="overflow-hidden border border-zinc-200 bg-white">
-      {/* Status bar */}
-      <div className={`h-0.5 w-full ${meta.bar}`} />
-
-      <div className="p-6">
+    <article className="border border-zinc-200 bg-white overflow-hidden flex">
+      <div className={`w-1 shrink-0 ${meta.bar}`} />
+      <div className="p-5">
         {/* Top row — avatar + info + status */}
-        <div className="flex items-start gap-4">
+        <div className="flex items-center gap-4">
           {/* biome-ignore lint/performance/noImgElement: avatar URL from API */}
           <img
             src={getAvatarUrl(item.profilePictureUrl, item.fullName)}
             alt={item.fullName}
-            className="h-12 w-12 shrink-0 object-cover border border-zinc-100"
+            className="h-10 w-10 shrink-0 object-cover border border-zinc-100"
           />
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0">
-                <h3 className="font-sans text-lg font-black uppercase tracking-tight text-zinc-950 leading-tight">
+                <h3 className="font-sans text-sm font-black uppercase tracking-tight text-zinc-950 leading-snug">
                   {item.title}
                 </h3>
                 {item.organization && (
-                  <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">
-                    {item.organization}
-                  </p>
+                  <p className="font-mono text-[11px] text-zinc-500">{item.organization}</p>
                 )}
               </div>
               <StatusPill status={item.status} />
             </div>
 
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
               <span className="font-mono text-[11px] text-zinc-400">
                 {formatDateRange(item.startDate, item.endDate)}
                 <span className="mx-1.5 text-zinc-300">·</span>
@@ -145,9 +141,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
               </span>
               <Link
                 href={`/@${item.username}`}
-                className="flex items-center gap-1.5 font-mono text-[11px] text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="flex items-center gap-1 font-mono text-[11px] text-zinc-400 hover:text-zinc-900 transition-colors"
               >
-                <span className="font-bold text-zinc-700">{item.fullName}</span>
+                <span className="font-bold text-zinc-600">{item.fullName}</span>
                 <span className="text-zinc-300">·</span>
                 <span>@{item.username}</span>
               </Link>
@@ -250,51 +246,54 @@ function AdminCareerProgressionsContent() {
   const { data: progressions = [], isLoading } = useCareerProgressionsForReview(params);
 
   return (
-    <div className="w-full max-w-4xl pb-10">
+    <div className="w-full max-w-3xl pb-10">
       {/* Header */}
-      <header className="mb-8">
+      <header className="mb-6">
         <div className="mb-1 flex items-center gap-2">
           <BriefcaseBusiness className="h-3.5 w-3.5 text-zinc-400" />
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
             Admin · Community
           </p>
         </div>
-        <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-zinc-950">
+        <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
           Career Progressions
         </h1>
-        <p className="mt-2 font-mono text-sm text-zinc-400">
+        <p className="mt-1.5 font-mono text-xs text-zinc-400">
           Review milestones before they appear on public member profiles.
         </p>
       </header>
 
-      {/* Toolbar */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Filter tabs */}
-        <div className="flex items-center border border-zinc-200 bg-white divide-x divide-zinc-200 overflow-hidden w-fit">
-          {FILTERS.map(({ value, label }) => (
-            <button
-              key={value || "all"}
-              type="button"
-              onClick={() => setStatus(value)}
-              className={`h-9 px-4 font-mono text-[11px] font-black uppercase tracking-widest transition-colors ${
-                status === value
-                  ? "bg-zinc-950 text-white"
-                  : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+      {/* Tabs + search */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-zinc-200 pb-0 mb-6">
+        {/* Underline tabs */}
+        <div className="flex">
+          {FILTERS.map(({ value, label }) => {
+            const isActive = status === value;
+            return (
+              <button
+                key={value || "all"}
+                type="button"
+                onClick={() => setStatus(value)}
+                className={`relative px-4 py-2.5 font-mono text-[11px] font-bold uppercase tracking-widest transition-colors ${
+                  isActive
+                    ? "text-zinc-950 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-zinc-950"
+                    : "text-zinc-400 hover:text-zinc-700"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Search */}
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full sm:w-56 pb-px">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or role…"
-            className="h-9 rounded-none border-zinc-200 bg-white pl-9 font-mono text-xs"
+            placeholder="Search…"
+            className="h-8 rounded-none border-zinc-200 bg-transparent pl-9 font-mono text-xs shadow-none"
           />
         </div>
       </div>
