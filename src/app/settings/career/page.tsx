@@ -165,8 +165,8 @@ function ProgressionSheet({
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent className="w-full overflow-y-auto rounded-none border-l border-zinc-200 bg-white sm:max-w-md">
-        <SheetHeader className="mb-6">
+      <SheetContent className="w-full overflow-y-auto rounded-none border-l border-zinc-200 bg-white sm:max-w-md p-6">
+        <SheetHeader className="mb-6 p-0">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-zinc-950 text-white">
               <BriefcaseBusiness className="h-4 w-4" />
@@ -374,11 +374,31 @@ function ProgressionCard({
           {item.description}
         </p>
       )}
-      {item.reviewNote && (
+
+      {item.status === "rejected" ? (
+        <div className="mt-4 border-t border-red-100 pt-4 space-y-3">
+          {item.reviewNote && (
+            <div className="border-l-2 border-red-400 pl-3">
+              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-500 mb-1">
+                Reviewer feedback
+              </p>
+              <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => onEdit(item)}
+            className="inline-flex h-9 items-center gap-2 border border-zinc-900 bg-zinc-950 px-4 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition-colors"
+          >
+            <Pencil className="h-3 w-3" />
+            Edit &amp; Resubmit
+          </button>
+        </div>
+      ) : item.reviewNote ? (
         <p className="mt-4 border-l-2 border-zinc-900 pl-3 font-mono text-xs leading-5 text-zinc-500">
           {item.reviewNote}
         </p>
-      )}
+      ) : null}
     </article>
   );
 }

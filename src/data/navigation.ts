@@ -1,5 +1,6 @@
 import {
   Activity,
+  BriefcaseBusiness,
   ClipboardCheck,
   Code2,
   Globe,
@@ -73,6 +74,12 @@ const ADMIN_MENU_GROUP: NavGroup = {
       label: "OAuth Apps",
       href: "/admin/oauth-apps",
       activePrefix: "/admin/oauth-apps",
+    },
+    {
+      icon: BriefcaseBusiness,
+      label: "Career Progressions",
+      href: "/admin/career-progressions",
+      activePrefix: "/admin/career-progressions",
     },
   ],
 };

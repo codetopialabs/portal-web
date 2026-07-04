@@ -12,10 +12,10 @@ The Codetopia portal uses a role-based permission system where every action — 
 
 1. An admin creates a **Role** and attaches a list of permission codenames to it (e.g. `users.view`, `roles.assign`).
 2. The admin assigns that role to a member.
-3. When the member logs in, the portal fetches their full **Permission Set** — the combined list of all permissions from all their roles.
+3. When the member logs in, the portal fetches their full **Permission Set** — the combined list of all permissions from all their roles, plus any direct permissions granted individually.
 4. Every page, button, and API call checks that Permission Set before allowing the action.
 
-A member can hold multiple roles at once. Their Permission Set is the union of all permissions across all their roles.
+A member can hold multiple roles at once. Their Permission Set is the union of all permissions across all their roles plus any directly granted permissions.
 
 ## Permission codename format
 
@@ -24,8 +24,15 @@ All codenames follow `resource.action` format:
 ```
 users.view       → view the member list
 users.edit       → edit any member's profile
-roles.create       → create a new role
-admin.panel.access       → access the admin panel
+roles.create     → create a new role
+admin.panel.access → access the admin panel
+```
+
+Some team permissions use a scoped format with a team slug:
+
+```
+teams.view:backend-team    → view the backend-team workspace
+teams.manage:backend-team  → manage the backend-team (lead only)
 ```
 
 ## Wildcard permissions
@@ -45,6 +52,7 @@ Some actions are irreversible. These **must be listed explicitly** in a role —
 - `users.suspend` — suspend a member account
 - `users.delete` — permanently delete a member account
 - `roles.delete` — permanently delete a role
+- `oauth_apps.delete` — permanently delete an OAuth application
 
 ## Where permissions are enforced
 
@@ -52,6 +60,10 @@ Some actions are irreversible. These **must be listed explicitly** in a role —
 - **Frontend:** The `usePermission("codename")` hook returns `true` or `false`. UI elements that require a permission are hidden (not disabled) when the check fails.
 
 The backend is the real enforcer. The frontend check is purely for UX — hiding things the member can't use.
+
+## Direct permissions
+
+Admins can also grant permissions directly to a member without creating or assigning a role. Direct permissions work the same way — they are unioned into the member's Permission Set. Useful for one-off access without polluting role definitions.
 
 ## See also
 

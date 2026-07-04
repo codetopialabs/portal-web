@@ -8,7 +8,7 @@ order: 2
 
 Every permission codename in the system. This list is the source of truth for what actions exist.
 
-Permissions are served to the frontend via `GET /api/v1/auth/admin/permissions/` — the admin role builder reads from this endpoint.
+Permissions are served to the frontend via `GET /api/v1/permissions/` — the admin role builder reads from this endpoint.
 
 > **When adding a new permission:** add it here, in `AGENTS.md`, and in `apps/common/permissions.py` on the backend.
 
@@ -23,6 +23,8 @@ Permissions are served to the frontend via `GET /api/v1/auth/admin/permissions/`
 | `users.delete` | Delete a user permanently | **Yes** |
 | `users.suspend` | Suspend/deactivate a user account | **Yes** |
 | `users.reactivate` | Reactivate a suspended user account | No |
+| `users.flag` | Flag a member account for policy review | No |
+| `users.review_flag` | Review and resolve a flagged member account | No |
 | `roles.view` | View all roles | No |
 | `roles.create` | Create new roles | No |
 | `roles.edit` | Edit existing roles | No |
@@ -47,6 +49,20 @@ Permissions are served to the frontend via `GET /api/v1/auth/admin/permissions/`
 | `reflections.view_any` | View all members' collated reflections | No |
 | `reflections.review` | Approve or request changes on a reflection | No |
 | `reflections.manage` | Manage reflection questions and cycles | No |
+| `career_progressions.submit` | Submit your own career progression entries for review | No |
+| `career_progressions.view_any` | View all career progression submissions | No |
+| `career_progressions.review` | Approve or reject career progression submissions | No |
+| `teams.view` | View the teams directory | No |
+| `teams.create` | Create a new team | No |
+| `teams.manage` | Manage a team (leads only, global) | No |
+| `teams.invite` | Invite members to a team | No |
+| `teams.create_review` | Open a contribution review in a team | No |
+| `teams.approve_review` | Approve contribution reviews in a team | No |
+| `teams.close_review` | Close a review without approving | No |
+| `teams.view:[slug]` | View a specific team's dashboard (scoped) | No |
+| `teams.manage:[slug]` | Manage a specific team — leads only (scoped) | No |
+| `teams.create_review:[slug]` | Open a contribution review in a specific team (scoped) | No |
+| `teams.approve_review:[slug]` | Approve reviews in a specific team (scoped) | No |
 | `activity.view` | View own activity log | No |
 | `activity.view_any` | View activity logs for other users | No |
 | `security.view` | View own active sessions | No |
@@ -75,4 +91,3 @@ These will be added when the corresponding features are built:
 | `feed.moderate` | Activity feed |
 | `announcements.create` | Announcements |
 | `xp.award_manual` | XP system (destructive) |
-| `api_keys.manage` | API key management |

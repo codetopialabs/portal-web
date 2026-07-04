@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-07-04] Documentation catch-up
+
+**What changed:** Brought all docs up to date with current codebase. Added missing permissions (`career_progressions.*`, `users.flag`, `users.review_flag`, `teams.invite`, `teams.manage`, `teams.close_review`), filled in missing routes in the route map (career progressions, reflection admin sub-routes, `/authorize`, `/discord/link`, `/settings/career`), updated the admin overview to reflect API Keys, OAuth Apps, Reflections, and Career Progressions as live sections (no longer Coming Soon), moved API key and OAuth activity events out of the "Coming Soon" section in the activity log, added all team and reflection events, and created new doc files for Reflections and Career Progressions.
+**Affected areas:** `docs/permissions/`, `docs/admin/overview.md`, `docs/api/`, `docs/reflections/`, `docs/career-progressions/`.
+**Permissions added:** `career_progressions.submit`, `career_progressions.view_any`, `career_progressions.review`, `users.flag`, `users.review_flag`, `teams.invite`, `teams.manage`, `teams.close_review`.
+**Breaking changes:** No.
+
 ## [2026-06-30] Community profile navigation
 
 **What changed:** Community member cards now open the member's public profile page directly instead of showing the directory profile modal.
