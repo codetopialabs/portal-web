@@ -296,7 +296,7 @@ function ProgressionSheet({
             </Label>
             <textarea
               id="description"
-              placeholder="Share what changed, what you learned, and why it matters."
+              placeholder="Describe your role and what you did."
               className="min-h-28 w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-300 focus:border-zinc-900 focus:outline-none"
               {...register("description")}
             />
