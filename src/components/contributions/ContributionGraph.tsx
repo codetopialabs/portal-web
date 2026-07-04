@@ -276,7 +276,12 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
           </div>
         </div>
 
-        <div className="overflow-x-auto pb-1 min-h-56">
+        {/* react-activity-calendar renders its own internal horizontal
+            scroll container (overflow-x: auto) sized to the SVG's natural
+            width — wrapping it in another scrolling div here just nests
+            two independent scroll containers and fights the library's own
+            sizing, so this stays a plain block. */}
+        <div className="min-h-56">
           {isLoading ? (
             <div className="flex h-56 w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50">
               <p className="font-mono text-xs text-zinc-400 animate-pulse">
