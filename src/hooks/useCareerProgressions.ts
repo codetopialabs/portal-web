@@ -28,6 +28,23 @@ export function useSubmitCareerProgression() {
   });
 }
 
+export function useUpdateCareerProgression() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: CareerProgressionInput }) =>
+      CareerProgressionsService.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: careerProgressionKeys.mine }),
+  });
+}
+
+export function useDeleteCareerProgression() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => CareerProgressionsService.remove(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: careerProgressionKeys.mine }),
+  });
+}
+
 export function useCareerProgressionsForReview(params?: {
   status?: CareerProgressionStatus | "";
   search?: string;

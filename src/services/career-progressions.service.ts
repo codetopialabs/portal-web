@@ -25,6 +25,21 @@ export const CareerProgressionsService = {
     return res.data.data;
   },
 
+  async update(id: number, data: CareerProgressionInput): Promise<CareerProgression> {
+    const res = await axiosInstance.patch<ApiResponse<CareerProgression>>(`${BASE}/me/${id}/`, {
+      title: data.title,
+      organization: data.organization ?? "",
+      start_date: data.startDate,
+      end_date: data.endDate ?? null,
+      description: data.description ?? "",
+    });
+    return res.data.data;
+  },
+
+  async remove(id: number): Promise<void> {
+    await axiosInstance.delete(`${BASE}/me/${id}/`);
+  },
+
   async listForReview(params?: {
     status?: CareerProgressionStatus | "";
     search?: string;
