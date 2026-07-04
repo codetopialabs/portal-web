@@ -316,6 +316,16 @@ export const TeamsService = {
     return res.data.data;
   },
 
+  /** Hand ownership to another existing team member. The caller (current
+   * Owner) becomes a Lead. Owner only. */
+  async transferOwnership(teamId: string, userId: string): Promise<TeamMember> {
+    const res = await axiosInstance.post<ApiResponse<TeamMember>>(
+      `/teams/${teamId}/transfer-ownership/`,
+      { user_id: userId }
+    );
+    return res.data.data;
+  },
+
   // ─── Invites ───────────────────────────────────────────────────────────────
 
   /** Send an invite to a user by username or id (team leads only). */
