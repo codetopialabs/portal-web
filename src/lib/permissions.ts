@@ -36,6 +36,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/career-progressions": "career_progressions.review",
   "/admin/reflections/questions": "reflections.manage",
   "/admin/github-repos": "github_repos.manage",
+  "/admin/teams": "admin.panel.access",
   "/reflections": "reflections.submit",
   "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",

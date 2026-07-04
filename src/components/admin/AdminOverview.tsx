@@ -554,7 +554,7 @@ export function AdminOverview() {
           icon={TrendingUp}
           label="Active Teams"
           value={teams.active.toLocaleString()}
-          href="/teams"
+          href="/admin/teams"
         />
         <StatCard
           icon={AlertTriangle}

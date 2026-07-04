@@ -186,6 +186,12 @@ export const TeamsService = {
     return res.data.data;
   },
 
+  /** Admin-only: every team platform-wide, regardless of membership. */
+  async getAllTeams(): Promise<Team[]> {
+    const res = await axiosInstance.get<ApiResponse<Team[]>>("/admin/teams/");
+    return res.data.data;
+  },
+
   /** Fetch a single team's details. */
   async getTeam(teamId: string): Promise<Team> {
     const res = await axiosInstance.get<ApiResponse<Team>>(`/teams/${teamId}/`);

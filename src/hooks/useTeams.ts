@@ -18,6 +18,14 @@ export function useMyTeams() {
   });
 }
 
+export function useAdminTeams() {
+  return useQuery({
+    queryKey: ["admin", "teams"],
+    queryFn: () => TeamsService.getAllTeams(),
+    staleTime: 1000 * 30,
+  });
+}
+
 export function useTeam(teamId: string) {
   return useQuery({
     queryKey: ["teams", teamId],

@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   UserCheck,
   Users,
+  Users2,
 } from "lucide-react";
 import type { NavGroup } from "@/types/navigation";
 
@@ -62,6 +63,7 @@ const ADMIN_MENU_GROUP: NavGroup = {
   items: [
     { icon: LayoutDashboard, label: "Overview", href: "/admin", activePrefix: "/admin" },
     { icon: Users, label: "Members", href: "/admin/members", activePrefix: "/admin/members" },
+    { icon: Users2, label: "Teams", href: "/admin/teams", activePrefix: "/admin/teams" },
     { icon: ShieldCheck, label: "Roles", href: "/admin/roles", activePrefix: "/admin/roles" },
     {
       icon: ClipboardCheck,
