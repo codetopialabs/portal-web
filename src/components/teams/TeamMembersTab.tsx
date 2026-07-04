@@ -49,12 +49,7 @@ interface TeamMembersTabProps {
   currentUserId?: string;
 }
 
-export function TeamMembersTab({
-  teamSlug,
-  isLead,
-  isOwner,
-  currentUserId,
-}: TeamMembersTabProps) {
+export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: TeamMembersTabProps) {
   // All data-fetching moved inside this component — it only runs when Members tab is visible
   const { data: members, isLoading: membersLoading } = useTeamMembers(teamSlug);
   const { data: pendingInvites } = useTeamInvites(teamSlug);
@@ -64,8 +59,7 @@ export function TeamMembersTab({
   const { mutate: revokeInvite, isPending: revokePending } = useRevokeInvite(teamSlug);
   const { mutate: reviewJoinRequest, isPending: reviewPending } = useReviewJoinRequest(teamSlug);
   const { mutate: updateRole, isPending: roleUpdatePending } = useUpdateMemberRole(teamSlug);
-  const { mutate: transferOwnership, isPending: transferPending } =
-    useTransferOwnership(teamSlug);
+  const { mutate: transferOwnership, isPending: transferPending } = useTransferOwnership(teamSlug);
 
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
