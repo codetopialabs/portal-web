@@ -111,9 +111,7 @@ function TeamWorkspaceContent() {
           </div>
           <div className="flex items-end justify-between gap-4 mt-2">
             <div>
-              <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
-                {team.name}
-              </h1>
+              <h1 className="font-sans text-3xl font-bold text-text-primary">{team.name}</h1>
               {team.description && (
                 <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
                   {team.description}

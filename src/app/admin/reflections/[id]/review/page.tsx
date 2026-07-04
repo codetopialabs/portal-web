@@ -164,7 +164,7 @@ function ReviewPageContent({ id }: { id: string }) {
               className="h-14 w-14 object-cover shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary leading-none">
+              <h1 className="font-sans text-2xl font-bold text-text-primary leading-none">
                 {reflection.fullName}
               </h1>
               <p className="mt-1 font-mono text-xs text-text-muted">@{reflection.username}</p>

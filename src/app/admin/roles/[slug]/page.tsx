@@ -208,7 +208,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
+                <h1 className="font-sans text-2xl font-bold text-text-primary">
                   {role.displayName}
                 </h1>
                 {role.isSystem && (
@@ -468,7 +468,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
-            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-error-700">
+            <DialogTitle className="font-sans text-xl font-bold text-error-700">
               Delete role
             </DialogTitle>
             <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">

@@ -16,9 +16,7 @@ function TeamCard({ team }: { team: BrowseTeam }) {
   return (
     <div className="flex flex-col justify-between border border-grey-200 bg-white p-6">
       <div>
-        <h3 className="font-sans font-black uppercase tracking-tight text-text-primary">
-          {team.name}
-        </h3>
+        <h3 className="font-sans font-bold text-text-primary">{team.name}</h3>
         {team.description && (
           <p className="mt-1 font-mono text-xs leading-5 text-text-muted line-clamp-2">
             {team.description}
@@ -40,7 +38,7 @@ function TeamCard({ team }: { team: BrowseTeam }) {
             Open →
           </Link>
         ) : team.hasPendingRequest ? (
-          <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-black uppercase tracking-widest text-amber-600">
+          <span className="inline-flex items-center gap-1.5 font-mono text-xs font-medium text-amber-600">
             <Check className="h-3 w-3" />
             Requested
           </span>
@@ -49,7 +47,7 @@ function TeamCard({ team }: { team: BrowseTeam }) {
             type="button"
             disabled={isPending}
             onClick={() => requestToJoin()}
-            className="inline-flex h-8 items-center gap-1.5 bg-grey-900 px-3 font-mono text-[10px] font-black uppercase tracking-widest text-white transition-colors hover:bg-grey-800 disabled:opacity-50"
+            className="inline-flex h-8 items-center gap-1.5 bg-grey-900 px-3 font-mono text-xs font-medium text-white transition-colors hover:bg-grey-800 disabled:opacity-50"
           >
             {isPending && <Loader2 className="h-3 w-3 animate-spin" />}
             Request to Join
@@ -86,10 +84,8 @@ function BrowseTeamsContent() {
           </Link>
           <div className="mt-3 flex flex-col gap-4 border-b border-grey-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
-                Workspace
-              </p>
-              <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
+              <p className="font-mono text-xs font-medium text-text-muted">Workspace</p>
+              <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-text-primary">
                 Browse Teams
               </h1>
               <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">

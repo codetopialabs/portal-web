@@ -30,7 +30,7 @@ import type { CareerProgression, CareerProgressionStatus } from "@/types/career-
 
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900";
-const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
+const labelStyles = "font-mono text-sm font-medium text-zinc-600";
 
 // ── Status meta ───────────────────────────────────────────────────────────────
 
@@ -194,7 +194,7 @@ function ProgressionSheet({
             <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-zinc-950 text-white">
               <BriefcaseBusiness className="h-4 w-4" />
             </div>
-            <SheetTitle className="font-sans text-base font-black uppercase tracking-widest text-zinc-950">
+            <SheetTitle className="font-sans text-lg font-bold text-zinc-950">
               {editing ? "Edit Entry" : "Add Entry"}
             </SheetTitle>
           </div>
@@ -305,7 +305,7 @@ function ProgressionSheet({
           <Button
             type="submit"
             disabled={isPending}
-            className="h-11 w-full rounded-none bg-zinc-950 font-mono text-xs font-black uppercase tracking-widest text-white hover:bg-zinc-800"
+            className="h-11 w-full rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800"
           >
             {isPending ? (
               <>
@@ -354,9 +354,7 @@ function ProgressionCard({
     <article className="p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950">
-            {item.title}
-          </h3>
+          <h3 className="font-sans text-base font-bold text-zinc-950">{item.title}</h3>
           <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">Codetopia Community</p>
           <p className="mt-1 font-mono text-xs text-zinc-400">
             {formatDateRange(item.startDate, item.endDate)}
@@ -379,7 +377,7 @@ function ProgressionCard({
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
             title={confirmDelete ? "Click again to confirm delete" : "Delete entry"}
-            className={`flex h-7 items-center gap-1 border px-2 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors ${
+            className={`flex h-7 items-center gap-1 border px-2 font-mono text-xs font-medium transition-colors ${
               confirmDelete
                 ? "border-red-300 bg-red-50 text-red-700 hover:bg-red-100"
                 : "border-zinc-200 text-zinc-400 hover:border-red-300 hover:text-red-600"
@@ -405,7 +403,7 @@ function ProgressionCard({
         <div className="mt-4 border-t border-red-100 pt-4 space-y-3">
           {item.reviewNote && (
             <div className="border-l-2 border-red-400 pl-3">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-red-500 mb-1">
+              <p className="font-mono text-xs font-medium text-red-500 mb-1">
                 {item.status === "revoked" ? "Reason for revoking" : "Reviewer feedback"}
               </p>
               <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
@@ -414,7 +412,7 @@ function ProgressionCard({
           <button
             type="button"
             onClick={() => onEdit(item)}
-            className="inline-flex h-9 items-center gap-2 border border-zinc-900 bg-zinc-950 px-4 font-mono text-[10px] font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition-colors"
+            className="inline-flex h-9 items-center gap-2 border border-zinc-900 bg-zinc-950 px-4 font-mono text-xs font-medium text-white hover:bg-zinc-800 transition-colors"
           >
             <Pencil className="h-3 w-3" />
             Edit &amp; Resubmit
@@ -459,9 +457,7 @@ export default function SettingsCareerPage() {
         {/* ── Header ── */}
         <div className="flex items-end justify-between border-b border-zinc-200 pb-5">
           <div>
-            <h2 className="font-sans text-base font-black uppercase tracking-widest text-zinc-950">
-              Career Progression
-            </h2>
+            <h2 className="font-sans text-xl font-bold text-zinc-950">Career Progression</h2>
             <p className="mt-1 font-mono text-xs text-zinc-400">
               Approved entries appear on your public profile.
             </p>
@@ -469,7 +465,7 @@ export default function SettingsCareerPage() {
           <Button
             type="button"
             onClick={openAdd}
-            className="h-10 rounded-none bg-zinc-950 font-mono text-xs font-black uppercase tracking-widest text-white hover:bg-zinc-800"
+            className="h-10 rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800"
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add Entry
@@ -484,9 +480,7 @@ export default function SettingsCareerPage() {
         ) : progressions.length === 0 ? (
           <div className="border border-dashed border-zinc-300 bg-white p-12 text-center">
             <BriefcaseBusiness className="mx-auto mb-3 h-8 w-8 text-zinc-300" />
-            <p className="font-sans font-black uppercase tracking-widest text-zinc-900">
-              No entries yet
-            </p>
+            <p className="font-sans text-base font-bold text-zinc-900">No entries yet</p>
             <p className="mt-2 font-mono text-xs text-zinc-400">
               Add your first role using the button above.
             </p>

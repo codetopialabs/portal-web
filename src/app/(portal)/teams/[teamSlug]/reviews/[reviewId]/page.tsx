@@ -199,7 +199,7 @@ function ReviewDetailContent() {
           </div>
 
           <div className="mt-3 flex items-start justify-between">
-            <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
+            <h1 className="font-sans text-3xl font-bold text-text-primary">
               {review.title}{" "}
               <span className="font-mono text-text-muted font-normal">
                 #{review.id.slice(0, 8)}
@@ -325,9 +325,7 @@ function ReviewDetailContent() {
                 </div>
               ) : timeline.length === 0 ? (
                 <div className="pl-12 flex flex-col items-start gap-1 py-6">
-                  <p className="font-sans font-black uppercase tracking-tight text-text-primary text-sm">
-                    No activity yet
-                  </p>
+                  <p className="font-sans font-bold text-text-primary text-sm">No activity yet</p>
                   <p className="font-mono text-xs text-text-muted">
                     Comments and status changes will appear here.
                   </p>

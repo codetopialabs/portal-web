@@ -52,7 +52,7 @@ function SectionHeader({
       >
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className={`font-sans font-bold text-base ${danger ? "text-red-700" : "text-zinc-900"}`}>
+      <h2 className={`font-sans font-bold text-xl ${danger ? "text-red-700" : "text-zinc-900"}`}>
         {title}
       </h2>
     </div>
@@ -122,7 +122,7 @@ function ChangePasswordSection() {
   return (
     <section className="space-y-5">
       <SectionHeader icon={Lock} title="Change Password" />
-      <div className="bg-white border border-zinc-200 p-6 space-y-5">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label className={labelStyles}>Current Password</Label>
           <div className="relative">
@@ -202,7 +202,7 @@ function ChangePasswordSection() {
             type="button"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            className="h-10 px-6 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="h-10 px-6 bg-black text-white font-mono text-sm font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSubmitting
               ? [0, 1, 2].map((i) => (
@@ -303,9 +303,7 @@ function ActiveSessionsSection() {
               <Lock className="w-5 h-5 text-red-600" />
             </div>
             <div className="space-y-1">
-              <p className="font-mono font-bold text-sm text-zinc-900 uppercase tracking-tight">
-                Access Restricted
-              </p>
+              <p className="font-mono font-bold text-sm text-zinc-900">Access Restricted</p>
               <p className="font-mono text-xs text-zinc-500 max-w-60 mx-auto">
                 Your account does not have clearance to view active session telemetry.
               </p>
@@ -366,7 +364,7 @@ function ActiveSessionsSection() {
               type="button"
               onClick={revokeAll}
               disabled={revokingAll}
-              className="w-full h-9 border border-red-200 text-red-500 font-mono text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white hover:border-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-9 border border-red-200 text-red-500 font-mono text-sm font-medium hover:bg-red-600 hover:text-white hover:border-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {revokingAll ? "Signing out…" : "Sign Out All Other Sessions"}
             </button>

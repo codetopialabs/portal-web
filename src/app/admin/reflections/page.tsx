@@ -57,7 +57,7 @@ function Tab({ label, active, onClick }: { label: string; active: boolean; onCli
     <button
       type="button"
       onClick={onClick}
-      className={`-mb-px border-b-2 px-1 pb-3 font-mono text-xs font-bold uppercase tracking-wide transition-colors ${
+      className={`-mb-px border-b-2 px-1 pb-3 font-mono text-sm font-bold transition-colors ${
         active
           ? "border-grey-900 text-text-primary"
           : "border-transparent text-text-muted hover:text-text-primary"
@@ -195,7 +195,7 @@ function PeriodPicker({
           <button
             type="button"
             onClick={() => onChange("all")}
-            className={`flex w-full items-center justify-between border-b border-grey-200 px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wide transition-colors hover:bg-grey-50 ${value === "all" ? "text-text-primary" : "text-text-muted"}`}
+            className={`flex w-full items-center justify-between border-b border-grey-200 px-4 py-2.5 font-mono text-sm font-bold transition-colors hover:bg-grey-50 ${value === "all" ? "text-text-primary" : "text-text-muted"}`}
           >
             All periods
             {value === "all" && <span className="h-1.5 w-1.5 bg-grey-900" />}
@@ -380,7 +380,7 @@ function SubmittedTab({
                     className="h-8 w-8 shrink-0 object-cover"
                   />
                   <div className="min-w-0">
-                    <p className="truncate font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+                    <p className="truncate font-sans text-sm font-bold text-text-primary">
                       {r.fullName}
                     </p>
                     <p className="font-mono text-xs text-text-muted">@{r.username}</p>
@@ -535,7 +535,7 @@ function NotSubmittedTab({
                     className="h-8 w-8 shrink-0 object-cover"
                   />
                   <div className="min-w-0">
-                    <p className="truncate font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+                    <p className="truncate font-sans text-sm font-bold text-text-primary">
                       {m.fullName}
                     </p>
                     <p className="font-mono text-xs text-text-muted">@{m.username}</p>
@@ -593,11 +593,9 @@ function ReflectionsAdminContent() {
         <div>
           <div className="mb-1 flex items-center gap-2">
             <ClipboardCheck className="h-4 w-4 text-icon-tertiary" />
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
-              Admin · Engagement
-            </p>
+            <p className="font-mono text-xs font-medium text-text-muted">Admin · Engagement</p>
           </div>
-          <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
+          <h1 className="font-sans text-4xl font-bold tracking-tight text-text-primary">
             Reflections
           </h1>
           <p className="mt-3 font-mono text-sm leading-relaxed text-text-tertiary">

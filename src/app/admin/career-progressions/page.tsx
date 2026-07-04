@@ -131,7 +131,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0">
-                <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
+                <h3 className="font-sans text-base font-bold text-zinc-950 leading-snug">
                   {item.title}
                 </h3>
                 <p className="font-mono text-[11px] text-zinc-500">Codetopia Community</p>

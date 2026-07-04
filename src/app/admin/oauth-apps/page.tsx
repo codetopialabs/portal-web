@@ -137,7 +137,7 @@ function OAuthAppSheet({
     >
       <SheetContent className="flex w-full flex-col gap-0 border-grey-200 bg-white p-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-grey-200 p-5 pr-12">
-          <SheetTitle className="font-sans text-xl font-black uppercase tracking-tight text-text-primary">
+          <SheetTitle className="font-sans text-xl font-bold text-text-primary">
             {mode === "create" ? "Create OAuth App" : "Edit OAuth App"}
           </SheetTitle>
           <SheetDescription className="pt-1 font-mono text-xs leading-6 text-text-secondary">
@@ -295,9 +295,7 @@ function OAuthAppsContent() {
             <GlobeLock className="h-5 w-5 text-icon-tertiary" />
           </div>
           <div>
-            <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
-              OAuth Apps
-            </h1>
+            <h1 className="font-sans text-2xl font-bold text-text-primary">OAuth Apps</h1>
             <p className="mt-1 font-mono text-xs leading-6 text-text-tertiary">
               Manage SSO client applications integrated with the community portal.
             </p>
@@ -350,7 +348,7 @@ function OAuthAppsContent() {
                 className="grid grid-cols-1 gap-4 px-4 py-5 transition-colors hover:bg-grey-50/60 lg:grid-cols-[2fr_3fr_1.5fr_auto] lg:items-start lg:px-5"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-sans text-sm font-black uppercase tracking-tight text-text-primary">
+                  <p className="truncate font-sans text-sm font-bold text-text-primary">
                     {app.name}
                   </p>
                   <p className="mt-1 font-mono text-[11px] uppercase text-text-muted">
@@ -434,7 +432,7 @@ function OAuthAppsContent() {
             <div className="mb-1 flex h-12 w-12 items-center justify-center border border-success-200 bg-success-50">
               <ShieldCheck className="h-6 w-6 text-success-600" />
             </div>
-            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-text-primary">
+            <DialogTitle className="font-sans text-xl font-bold text-text-primary">
               OAuth App Created
             </DialogTitle>
             <DialogDescription className="font-mono text-xs leading-6 text-text-secondary">
@@ -518,7 +516,7 @@ function OAuthAppsContent() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-sans text-xl font-black uppercase tracking-tight text-error-700">
+            <DialogTitle className="flex items-center gap-2 font-sans text-xl font-bold text-error-700">
               <ShieldAlert className="h-5 w-5" />
               Delete App
             </DialogTitle>

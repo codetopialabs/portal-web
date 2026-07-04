@@ -30,12 +30,8 @@ function AdminTeamsContent() {
   return (
     <div className="pb-20">
       <div className="mb-6">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-          Admin Panel
-        </p>
-        <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
-          Teams
-        </h1>
+        <p className="font-mono text-xs font-medium text-zinc-400">Admin Panel</p>
+        <h1 className="font-sans text-4xl font-bold tracking-tight text-zinc-950">Teams</h1>
         <p className="mt-1 font-mono text-xs text-zinc-500">
           Every team platform-wide, regardless of whether you're a member.
         </p>
@@ -74,9 +70,7 @@ function AdminTeamsContent() {
               className="flex items-center justify-between gap-4 p-4 transition-colors hover:bg-zinc-50"
             >
               <div className="min-w-0">
-                <p className="font-sans text-sm font-black uppercase tracking-tight text-zinc-950">
-                  {team.name}
-                </p>
+                <p className="font-sans text-sm font-bold text-zinc-950">{team.name}</p>
                 {team.description && (
                   <p className="mt-0.5 truncate font-mono text-xs text-zinc-500">
                     {team.description}

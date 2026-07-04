@@ -324,7 +324,7 @@ function MembersPageContent() {
                   <div className="min-w-0">
                     <Link
                       href={`/admin/members/${member.username}`}
-                      className="block truncate font-sans text-sm font-black uppercase tracking-tight text-text-primary hover:underline"
+                      className="block truncate font-sans text-sm font-bold text-text-primary hover:underline"
                     >
                       {member.fullName || member.username}
                     </Link>

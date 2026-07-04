@@ -342,7 +342,7 @@ export function PublicProfileContent() {
 
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0">
-                              <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
+                              <h3 className="font-sans text-base font-bold text-zinc-950 leading-snug">
                                 {item.title}
                               </h3>
                               <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
