@@ -1,8 +1,15 @@
 "use client";
 
-import { GitCommitHorizontal, GitPullRequest, Sparkles, X } from "lucide-react";
+import {
+  Activity as ActivityIcon,
+  CalendarDays,
+  GitCommitHorizontal,
+  GitPullRequest,
+  Sparkles,
+  X,
+} from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { cloneElement, useState } from "react";
 import {
   type Activity,
   ActivityCalendar,
@@ -23,12 +30,26 @@ interface ContributionGraphProps {
   isPublicView?: boolean;
 }
 
-const ITEM_TYPE_META: Record<ContributionItem["type"], { icon: React.ElementType; label: string }> =
-  {
-    review_approved: { icon: Sparkles, label: "Review approved" },
-    commit: { icon: GitCommitHorizontal, label: "Commit" },
-    pull_request_merged: { icon: GitPullRequest, label: "PR merged" },
-  };
+const ITEM_TYPE_META: Record<
+  ContributionItem["type"],
+  { icon: React.ElementType; label: string; badgeClassName: string }
+> = {
+  review_approved: {
+    icon: Sparkles,
+    label: "Review approved",
+    badgeClassName: "bg-emerald-50 text-emerald-600",
+  },
+  commit: {
+    icon: GitCommitHorizontal,
+    label: "Commit",
+    badgeClassName: "bg-zinc-100 text-zinc-600",
+  },
+  pull_request_merged: {
+    icon: GitPullRequest,
+    label: "PR merged",
+    badgeClassName: "bg-violet-50 text-violet-600",
+  },
+};
 
 function formatDayLabel(dateStr: string): string {
   const d = new Date(`${dateStr}T00:00:00`);
@@ -50,30 +71,39 @@ function DayDetailPanel({
   isPublicView?: boolean;
 }) {
   return (
-    <div className="mt-4 border border-zinc-200 bg-zinc-50 p-4">
+    <div className="mt-5 animate-in fade-in-0 slide-in-from-top-1 border border-zinc-200 bg-zinc-50 p-4 duration-200">
       <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <p className="font-sans text-sm font-black text-zinc-950">{formatDayLabel(day.date)}</p>
-          <p className="font-mono text-[11px] text-zinc-500">
-            {day.count} contribution{day.count !== 1 ? "s" : ""}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-zinc-950 text-white">
+            <CalendarDays className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="font-sans text-sm font-black text-zinc-950">{formatDayLabel(day.date)}</p>
+            <p className="font-mono text-[11px] text-zinc-500">
+              {day.count} contribution{day.count !== 1 ? "s" : ""}
+            </p>
+          </div>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="shrink-0 text-zinc-400 hover:text-zinc-900"
+          className="shrink-0 text-zinc-400 transition-colors hover:text-zinc-900"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {day.items.map((item, i) => {
           const meta = ITEM_TYPE_META[item.type];
           const Icon = meta.icon;
           const content = (
             <>
-              <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+              <div
+                className={`flex h-7 w-7 shrink-0 items-center justify-center ${meta.badgeClassName}`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-mono text-xs text-zinc-800">{item.title}</p>
                 <p className="font-mono text-[10px] uppercase tracking-wide text-zinc-400">
@@ -83,7 +113,7 @@ function DayDetailPanel({
             </>
           );
           const linkClassName =
-            "flex items-center gap-2.5 border border-zinc-200 bg-white p-2.5 transition-colors hover:border-zinc-400";
+            "group flex items-center gap-3 border border-zinc-200 bg-white p-2.5 transition-all hover:border-zinc-900 hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.08)]";
 
           if (item.source === "github") {
             return (
@@ -108,7 +138,7 @@ function DayDetailPanel({
               <div
                 // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
                 key={i}
-                className="flex items-center gap-2.5 border border-zinc-200 bg-white p-2.5"
+                className="flex items-center gap-3 border border-zinc-200 bg-white p-2.5"
               >
                 {content}
               </div>
@@ -144,10 +174,11 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
   const { data, isLoading, isError } = useContributions(username, selectedYear);
 
   const explicitTheme: ThemeInput = {
-    light: ["#f0fdf4", "#86efac", "#4ade80", "#16a34a", "#14532d"],
+    light: ["#f4f4f5", "#a7f3d0", "#34d399", "#059669", "#065f46"],
   };
 
   const contributions = data ?? [];
+  const totalCount = contributions.reduce((sum, d) => sum + d.count, 0);
 
   if (isError || (!isLoading && !data)) {
     return (
@@ -194,89 +225,30 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
 
   return (
     <div className="border border-zinc-200 bg-white p-6">
-      <div className="flex flex-col gap-6">
-        <div>
-          <h3 className="font-sans text-xl font-black text-zinc-950">Contribution Activity</h3>
-          <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
-            Work reviews & approvals
-          </p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row">
-          <div className="flex-1 overflow-x-auto pb-2 min-h-56 pr-4">
-            {isLoading ? (
-              <div className="h-full w-full flex items-center justify-center border border-dashed border-zinc-200 bg-zinc-50">
-                <p className="font-mono text-xs text-zinc-400 animate-pulse">
-                  Loading contributions...
-                </p>
-              </div>
-            ) : emptyState ? (
-              <div className="flex h-full w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50 text-center min-h-40">
-                <p className="max-w-xs text-sm text-zinc-500">
-                  No contributions found for {selectedYear ? selectedYear : "the last year"}.
-                </p>
-              </div>
-            ) : (
-              <ActivityCalendar
-                data={paddedContributions}
-                theme={explicitTheme}
-                colorScheme="light"
-                blockSize={15}
-                blockMargin={4}
-                renderBlock={(block: BlockElement, activity: Activity) => {
-                  const day = activity as ContributionDay;
-                  if (day.count === 0) return block;
-                  return (
-                    // biome-ignore lint/a11y/useSemanticElements: SVG content, <button> isn't valid here
-                    <g
-                      onClick={() => setSelectedDay(day)}
-                      style={{ cursor: "pointer" }}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${day.count} contribution${day.count !== 1 ? "s" : ""} on ${day.date}`}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") setSelectedDay(day);
-                      }}
-                    >
-                      {block}
-                    </g>
-                  );
-                }}
-                labels={{
-                  legend: {
-                    less: "Less",
-                    more: "More",
-                  },
-                  months: [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ],
-                  totalCount: selectedYear
-                    ? `{{count}} contributions in ${selectedYear}`
-                    : "{{count}} contributions in the last year",
-                }}
-              />
-            )}
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-zinc-950 text-white">
+              <ActivityIcon className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="font-sans text-xl font-black text-zinc-950">Contribution Activity</h3>
+              <p className="mt-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+                {isLoading ? "Loading" : `${totalCount} contribution${totalCount !== 1 ? "s" : ""}`}
+                {" · "}
+                {selectedYear ? selectedYear : "Last year"}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-row lg:flex-col gap-1 shrink-0 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 border-l border-zinc-100 pl-4 lg:min-w-24">
+          <div className="flex flex-wrap gap-1 border border-zinc-200 p-1 self-start">
             <button
               type="button"
               onClick={() => {
                 setSelectedYear(undefined);
                 setSelectedDay(null);
               }}
-              className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 font-mono text-[11px] whitespace-nowrap transition-colors ${
                 selectedYear === undefined
                   ? "bg-zinc-950 text-white font-bold"
                   : "text-zinc-400 hover:text-zinc-950 hover:bg-zinc-100"
@@ -292,7 +264,7 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
                   setSelectedYear(year);
                   setSelectedDay(null);
                 }}
-                className={`px-3 py-1.5 font-mono text-[11px] text-left whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 font-mono text-[11px] whitespace-nowrap transition-colors ${
                   selectedYear === year
                     ? "bg-zinc-950 text-white font-bold"
                     : "text-zinc-400 hover:text-zinc-950 hover:bg-zinc-100"
@@ -302,6 +274,79 @@ export function ContributionGraph({ username, joinedAt, isPublicView }: Contribu
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="overflow-x-auto pb-1 min-h-56">
+          {isLoading ? (
+            <div className="flex h-56 w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50">
+              <p className="font-mono text-xs text-zinc-400 animate-pulse">
+                Loading contributions...
+              </p>
+            </div>
+          ) : emptyState ? (
+            <div className="flex h-40 w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50 text-center">
+              <p className="max-w-xs text-sm text-zinc-500">
+                No contributions found for {selectedYear ? selectedYear : "the last year"}.
+              </p>
+            </div>
+          ) : (
+            <ActivityCalendar
+              data={paddedContributions}
+              theme={explicitTheme}
+              colorScheme="light"
+              blockSize={13}
+              blockMargin={4}
+              blockRadius={3}
+              renderBlock={(block: BlockElement, activity: Activity) => {
+                const day = activity as ContributionDay;
+                if (day.count === 0) return block;
+                const isSelected = selectedDay?.date === day.date;
+                return (
+                  // biome-ignore lint/a11y/useSemanticElements: SVG content, <button> isn't valid here
+                  <g
+                    onClick={() => setSelectedDay(day)}
+                    className="cursor-pointer [&>rect]:transition-[opacity,stroke-width] [&>rect]:duration-150 [&>rect]:hover:opacity-70"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${day.count} contribution${day.count !== 1 ? "s" : ""} on ${day.date}`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") setSelectedDay(day);
+                    }}
+                  >
+                    {isSelected
+                      ? cloneElement(block, {
+                          stroke: "#09090b",
+                          strokeWidth: 1.5,
+                        })
+                      : block}
+                  </g>
+                );
+              }}
+              labels={{
+                legend: {
+                  less: "Less",
+                  more: "More",
+                },
+                months: [
+                  "Jan",
+                  "Feb",
+                  "Mar",
+                  "Apr",
+                  "May",
+                  "Jun",
+                  "Jul",
+                  "Aug",
+                  "Sep",
+                  "Oct",
+                  "Nov",
+                  "Dec",
+                ],
+                totalCount: selectedYear
+                  ? `{{count}} contributions in ${selectedYear}`
+                  : "{{count}} contributions in the last year",
+              }}
+            />
+          )}
         </div>
 
         {selectedDay && (
