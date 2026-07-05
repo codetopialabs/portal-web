@@ -38,10 +38,17 @@ export interface AdminOverviewCompositionBucket {
   label?: string;
 }
 
+export interface AdminOverviewOtherExample {
+  text: string;
+  count: number;
+}
+
 export interface AdminOverviewMemberComposition {
   byExperienceLevel: AdminOverviewCompositionBucket[];
   byDiscipline: AdminOverviewCompositionBucket[];
+  disciplineOtherExamples: AdminOverviewOtherExample[];
   byReferralSource: AdminOverviewCompositionBucket[];
+  referralSourceOtherExamples: AdminOverviewOtherExample[];
 }
 
 export interface AdminOverviewFlaggedAccount {
@@ -79,6 +86,43 @@ export interface AdminOverviewActivityEntry {
   createdAt: string;
 }
 
+export interface AdminOverviewTeamSizeBucket {
+  bucket: string;
+  count: number;
+}
+
+export interface AdminOverviewTeamHealth {
+  invites: {
+    pending: number;
+    accepted: number;
+    declined: number;
+    expired: number;
+    acceptanceRate: number;
+  };
+  joinRequests: {
+    pending: number;
+    approved: number;
+    declined: number;
+    approvalRate: number;
+  };
+  teamSizeDistribution: AdminOverviewTeamSizeBucket[];
+}
+
+export interface AdminOverviewContributionPipeline {
+  reviews: {
+    open: number;
+    approved: number;
+    closed: number;
+    avgTimeToApproveDays: number | null;
+  };
+  careerProgressions: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    revoked: number;
+  };
+}
+
 export interface AdminOverview {
   members: AdminOverviewMembers;
   engagement: AdminOverviewEngagement;
@@ -88,5 +132,7 @@ export interface AdminOverview {
   pendingActions: AdminOverviewPendingActions;
   teams: { active: number };
   roleDistribution: AdminOverviewRoleDistribution[];
+  teamHealth: AdminOverviewTeamHealth;
+  contributionPipeline: AdminOverviewContributionPipeline;
   recentActivity: AdminOverviewActivityEntry[];
 }
