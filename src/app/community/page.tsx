@@ -42,7 +42,7 @@ function CommunityContent() {
     data: members = [],
     isLoading,
     error,
-  } = useCommunityMembers(undefined, { onboardedOnly: true });
+  } = useCommunityMembers(undefined, { onboardedOnly: true, excludeFlagged: true });
 
   function handleTabChange(tab: CommunityTab) {
     setActiveTab(tab);

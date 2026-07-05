@@ -129,10 +129,14 @@ export const UserService = {
 
   async getCommunityMembers(
     search?: string,
-    options?: { onboardedOnly?: boolean }
+    options?: { onboardedOnly?: boolean; excludeFlagged?: boolean }
   ): Promise<CommunityMember[]> {
     const response = await axiosInstance.get<{ data: CommunityMember[] }>("/users/members/", {
-      params: { search, onboarded_only: options?.onboardedOnly },
+      params: {
+        search,
+        onboarded_only: options?.onboardedOnly,
+        exclude_flagged: options?.excludeFlagged,
+      },
     });
     return response.data.data;
   },
