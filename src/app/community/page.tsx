@@ -38,7 +38,11 @@ function CommunityContent() {
   const [activeTab, setActiveTab] = useState<CommunityTab>(() =>
     getCommunityTab(searchParams.get("tab"))
   );
-  const { data: members = [], isLoading, error } = useCommunityMembers();
+  const {
+    data: members = [],
+    isLoading,
+    error,
+  } = useCommunityMembers(undefined, { onboardedOnly: true });
 
   function handleTabChange(tab: CommunityTab) {
     setActiveTab(tab);

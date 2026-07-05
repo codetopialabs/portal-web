@@ -127,9 +127,12 @@ export const UserService = {
     return response.data.data;
   },
 
-  async getCommunityMembers(search?: string): Promise<CommunityMember[]> {
+  async getCommunityMembers(
+    search?: string,
+    options?: { onboardedOnly?: boolean }
+  ): Promise<CommunityMember[]> {
     const response = await axiosInstance.get<{ data: CommunityMember[] }>("/users/members/", {
-      params: { search },
+      params: { search, onboarded_only: options?.onboardedOnly },
     });
     return response.data.data;
   },
