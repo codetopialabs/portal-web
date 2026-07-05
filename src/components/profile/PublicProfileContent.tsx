@@ -22,18 +22,17 @@ import {
   TestTube2,
 } from "lucide-react";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
 import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
-import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
 import { formatJoinedAt } from "@/components/profile/utils";
 import { usePermission } from "@/hooks/usePermission";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
 import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
-import { UserService } from "@/services/user.service";
+import { type CommunityMember, UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 import type { SocialLink } from "@/types/profile";
 import { normalizeUrl } from "@/utils/url";
@@ -59,36 +58,18 @@ const DISCIPLINE_MAP: Record<string, DisciplineMeta> = {
   other: { label: "Other", icon: HelpCircle },
 };
 
-export function PublicProfileContent() {
-  const { username: paramUsername } = useParams<{ username: string }>();
-  let username = paramUsername ? decodeURIComponent(paramUsername) : "";
-  username = username.startsWith("@") ? username.substring(1) : username;
+export function PublicProfileContent({ initialProfile }: { initialProfile: CommunityMember }) {
+  const username = initialProfile.username;
 
   const currentUser = useUserStore((s) => s.profile);
   const canEditMembers = usePermission("users.edit");
   const canEditOwnProfile = usePermission("profile.edit");
 
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: profile, isError } = useQuery({
     queryKey: ["member-public-profile", username],
     queryFn: () => UserService.getMemberByUsername(username),
-    enabled: Boolean(username),
+    initialData: initialProfile,
   });
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white text-zinc-950">
-        <PublicProfileHeader />
-        <div className="flex-grow">
-          <ProfileSkeleton />
-        </div>
-        <PublicProfileFooter />
-      </div>
-    );
-  }
 
   if (!profile || isError) {
     notFound();
