@@ -14,7 +14,7 @@ export default function ProfileNotFound() {
           </div>
           <p className="font-mono text-sm font-bold text-zinc-900">This profile isn't available</p>
           <p className="mt-1 max-w-xs mx-auto font-mono text-sm text-zinc-500">
-            It may not exist, or the member hasn't finished setting up their account yet.
+            It may not exist, or the link may be incorrect.
           </p>
           <Link
             href="/community"
