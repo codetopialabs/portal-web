@@ -63,6 +63,7 @@ export type AdminMemberDetail = AdminMember;
 export interface UpdateMemberInput {
   username?: string;
   isEmailVerified?: boolean;
+  isOnboarded?: boolean;
   fullName?: string;
   bio?: string;
   location?: string;
