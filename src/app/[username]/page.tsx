@@ -7,7 +7,8 @@ interface PageProps {
 }
 
 async function fetchMemberProfile(username: string): Promise<CommunityMember | null> {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/users/members/${encodeURIComponent(username)}/`;
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+  const url = `${baseUrl}/users/members/${encodeURIComponent(username)}/`;
   try {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) {
