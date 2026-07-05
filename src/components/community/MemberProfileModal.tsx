@@ -188,9 +188,7 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
               {/* Bio */}
               {member.bio && (
                 <div>
-                  <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    Bio
-                  </p>
+                  <p className="mb-2 font-mono text-xs font-medium text-zinc-400">Bio</p>
                   <p className="font-sans text-sm leading-6 text-zinc-600 line-clamp-4">
                     {member.bio}
                   </p>
@@ -200,14 +198,12 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
               {/* Skills */}
               {skills.length > 0 && (
                 <div>
-                  <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    Skills
-                  </p>
+                  <p className="mb-2 font-mono text-xs font-medium text-zinc-400">Skills</p>
                   <div className="flex flex-wrap gap-1.5">
                     {skills.slice(0, 12).map((skill) => (
                       <span
                         key={skill}
-                        className="border border-zinc-200 bg-zinc-50 px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-zinc-700"
+                        className="border border-zinc-200 bg-zinc-50 px-2.5 py-1 font-mono text-xs font-semibold text-zinc-700"
                       >
                         {skill}
                       </span>
@@ -224,7 +220,7 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
               {/* Roles */}
               {roles.length > 0 && (
                 <div>
-                  <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                  <p className="mb-2 font-mono text-xs font-medium text-zinc-400">
                     Community Roles
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -243,9 +239,7 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
               {/* Socials */}
               {socials.length > 0 && (
                 <div>
-                  <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    Links
-                  </p>
+                  <p className="mb-2 font-mono text-xs font-medium text-zinc-400">Links</p>
                   <div className="flex gap-2">
                     {socials.map(({ label, href, Icon }) => (
                       <a
@@ -267,13 +261,13 @@ export function MemberProfileModal({ member, open, onClose }: MemberProfileModal
 
           {/* Footer */}
           <div className="shrink-0 border-t border-zinc-100 bg-zinc-50 px-6 py-4 flex items-center justify-between gap-4">
-            <p className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">
+            <p className="font-mono text-xs text-zinc-400">
               {skills.length} skills · {roles.length} {roles.length === 1 ? "role" : "roles"}
             </p>
             <Link
               href={`/@${member.username}`}
               onClick={onClose}
-              className="inline-flex h-9 items-center gap-2 bg-zinc-900 px-5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800"
+              className="inline-flex h-9 items-center gap-2 bg-zinc-900 px-5 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800"
             >
               View Full Profile
               <ExternalLink className="h-3.5 w-3.5" />

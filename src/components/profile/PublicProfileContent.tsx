@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import type { ComponentType } from "react";
-import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
@@ -116,6 +116,13 @@ export function PublicProfileContent() {
   const showAdminEdit = !isOwnProfile && canEditMembers;
 
   const socialLinks: SocialLink[] = [];
+  if (profile.discordId) {
+    socialLinks.push({
+      label: profile.discordUsername ? `@${profile.discordUsername}` : "Discord",
+      href: `https://discord.com/users/${profile.discordId}`,
+      icon: FaDiscord,
+    });
+  }
   if (profile.githubHandle) {
     socialLinks.push({
       label: "GitHub",
@@ -197,26 +204,12 @@ export function PublicProfileContent() {
 
               <div className="min-w-0 pb-6">
                 {jobTitle && (
-                  <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-white/50">
-                    {jobTitle}
-                  </p>
+                  <p className="mb-1 font-mono text-sm font-medium text-white/50">{jobTitle}</p>
                 )}
                 <h1 className="font-sans text-5xl font-black leading-none tracking-tight text-white sm:text-7xl">
                   {profile.fullName}
                 </h1>
-                {profile.discordId ? (
-                  <a
-                    href={`https://discord.com/users/${profile.discordId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={`Message ${firstName} on Discord`}
-                    className="mt-1.5 inline-block font-mono text-sm text-zinc-400 transition-colors hover:text-white hover:underline"
-                  >
-                    @{profile.username}
-                  </a>
-                ) : (
-                  <p className="mt-1.5 font-mono text-sm text-zinc-400">@{profile.username}</p>
-                )}
+                <p className="mt-1.5 font-mono text-sm text-zinc-400">@{profile.username}</p>
                 <div className="mt-4 flex flex-wrap items-center gap-4 font-mono text-[11px] text-zinc-400">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-zinc-500" />
@@ -249,13 +242,11 @@ export function PublicProfileContent() {
             <div className="mt-0 flex items-stretch border-t border-white/10">
               <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4 first:pl-0">
                 <span className="font-sans text-xl font-black text-white">{skills.length}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                  Skills
-                </span>
+                <span className="font-mono text-xs font-medium text-zinc-500">Skills</span>
               </div>
               <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4">
                 <span className="font-sans text-xl font-black text-white">{roleList.length}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                <span className="font-mono text-xs font-medium text-zinc-500">
                   {roleList.length === 1 ? "Role" : "Roles"}
                 </span>
               </div>
@@ -264,9 +255,7 @@ export function PublicProfileContent() {
                   <span className="font-sans text-xl font-black text-white">
                     {socialLinks.length}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                    Links
-                  </span>
+                  <span className="font-mono text-xs font-medium text-zinc-500">Links</span>
                 </div>
               )}
             </div>
@@ -280,9 +269,7 @@ export function PublicProfileContent() {
             {/* Bio */}
             <div className="border border-zinc-200 bg-white">
               <div className="border-b border-zinc-100 px-6 py-4">
-                <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-zinc-400">
-                  Bio
-                </h2>
+                <h2 className="font-sans text-lg font-bold text-zinc-900">Bio</h2>
               </div>
               <div className="p-6">
                 {profile.bio ? (
@@ -300,9 +287,7 @@ export function PublicProfileContent() {
             {/* Career Progression */}
             <div className="border border-zinc-200 bg-white">
               <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-zinc-400">
-                  Career Progression
-                </h2>
+                <h2 className="font-sans text-lg font-bold text-zinc-900">Career Progression</h2>
               </div>
               <div className="p-6">
                 {careerProgressions.length > 0 ? (
@@ -342,7 +327,7 @@ export function PublicProfileContent() {
 
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0">
-                              <h3 className="font-sans text-base font-black uppercase tracking-tight text-zinc-950 leading-snug">
+                              <h3 className="font-sans text-base font-bold text-zinc-950 leading-snug">
                                 {item.title}
                               </h3>
                               <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
@@ -380,9 +365,7 @@ export function PublicProfileContent() {
             {/* Skills */}
             <div className="border border-zinc-200 bg-white">
               <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-zinc-400">
-                  Skills
-                </h2>
+                <h2 className="font-sans text-lg font-bold text-zinc-900">Skills</h2>
                 {skills.length > 0 && (
                   <span className="font-mono text-[10px] text-zinc-400">{skills.length} total</span>
                 )}
@@ -393,7 +376,7 @@ export function PublicProfileContent() {
                     {skills.map((skill) => (
                       <span
                         key={skill}
-                        className="border border-zinc-200 bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-zinc-700 transition-colors hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
+                        className="border border-zinc-200 bg-white px-3 py-1.5 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
                       >
                         {skill}
                       </span>
@@ -412,7 +395,7 @@ export function PublicProfileContent() {
             {showOwnProfileEdit && (
               <Link
                 href="/settings/profile"
-                className="flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800"
+                className="flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800"
               >
                 Edit Your Profile
                 <Link2 className="h-4 w-4" />
@@ -421,7 +404,7 @@ export function PublicProfileContent() {
             {showAdminEdit && (
               <Link
                 href={`/admin/members/${profile.username}/edit`}
-                className="flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-950 transition-colors hover:bg-zinc-900 hover:text-white"
+                className="flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 font-mono text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-900 hover:text-white"
               >
                 <Pencil className="h-4 w-4" />
                 Edit Member
@@ -432,9 +415,7 @@ export function PublicProfileContent() {
             {discipline && (
               <div className="border border-zinc-200 bg-white">
                 <div className="border-b border-zinc-100 px-5 py-3">
-                  <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                    Discipline
-                  </h2>
+                  <h2 className="font-sans text-base font-bold text-zinc-900">Discipline</h2>
                 </div>
                 <div className="p-5">
                   <div className="flex items-center gap-3 border border-zinc-900 bg-zinc-900 px-4 py-3">
@@ -450,9 +431,7 @@ export function PublicProfileContent() {
             {/* Community roles */}
             <div className="border border-zinc-200 bg-white">
               <div className="border-b border-zinc-100 px-5 py-3">
-                <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
-                  Community Roles
-                </h2>
+                <h2 className="font-sans text-base font-bold text-zinc-900">Community Roles</h2>
               </div>
               <div className="divide-y divide-zinc-100">
                 {roleList.map((role, i) => (
@@ -474,7 +453,7 @@ export function PublicProfileContent() {
             {socialLinks.length > 0 && (
               <div className="border border-zinc-200 bg-white">
                 <div className="border-b border-zinc-100 px-5 py-3">
-                  <h2 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+                  <h2 className="font-sans text-base font-bold text-zinc-900">
                     Find {firstName} online
                   </h2>
                 </div>

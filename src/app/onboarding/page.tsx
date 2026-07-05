@@ -73,7 +73,7 @@ export default function OnboardingPage() {
                   />
                 ))}
               </div>
-              <p className="text-xs uppercase tracking-widest text-zinc-400 font-mono">Loading</p>
+              <p className="text-xs font-medium text-zinc-400 font-mono">Loading</p>
             </div>
           ) : (
             <>

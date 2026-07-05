@@ -3,6 +3,12 @@ import type { ApiResponse } from "@/types/api.types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export interface TeamMemberPreview {
+  id: string;
+  fullName: string;
+  profilePictureUrl: string | null;
+}
+
 export interface Team {
   id: string;
   slug: string;
@@ -10,6 +16,12 @@ export interface Team {
   description: string | null;
   createdAt: string;
   memberCount?: number;
+  membersPreview?: TeamMemberPreview[];
+  /** Only present on /teams/ (My Teams) -- the caller's own role on this team. */
+  role?: "owner" | "lead" | "member";
+  /** Only present for a Lead/Owner -- null for a plain Member, who can't act on either. */
+  pendingJoinRequests?: number | null;
+  openReviews?: number | null;
 }
 
 export interface BrowseTeam extends Team {

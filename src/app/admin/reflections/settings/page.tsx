@@ -64,9 +64,7 @@ function Section({
   return (
     <div className="border border-grey-200 bg-white">
       <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-        <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-          {title}
-        </h2>
+        <h2 className="font-sans text-base font-bold text-text-primary">{title}</h2>
         {description && (
           <p className="mt-0.5 font-mono text-[11px] text-text-muted">{description}</p>
         )}
@@ -114,9 +112,7 @@ function ScheduleSection() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Day picker */}
         <div className="space-y-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            Opens on — day of month
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">Opens on — day of month</p>
           <div className="flex flex-wrap gap-1.5">
             {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
               <button
@@ -141,9 +137,7 @@ function ScheduleSection() {
 
         {/* Window input */}
         <div className="space-y-2">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            Grace window — days open
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">Grace window — days open</p>
           <div className="flex items-center gap-3">
             <input
               type="number"
@@ -395,9 +389,7 @@ function QuestionsSection() {
 
       {canManage && (
         <div className="space-y-3 border border-dashed border-grey-300 p-4">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-            Add a question
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">Add a question</p>
           <Input
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -443,13 +435,9 @@ function ReflectionSettingsContent() {
       <header className="mb-8">
         <div className="mb-1 flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-icon-tertiary" />
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted">
-            Admin · Reflections
-          </p>
+          <p className="font-mono text-xs font-medium text-text-muted">Admin · Reflections</p>
         </div>
-        <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-text-primary">
-          Settings
-        </h1>
+        <h1 className="font-sans text-4xl font-bold tracking-tight text-text-primary">Settings</h1>
       </header>
 
       <div className="flex flex-col gap-6">

@@ -14,7 +14,7 @@ interface OnboardingStepBackgroundProps {
 }
 
 const hintStyles = "font-mono text-[11px] text-zinc-500 leading-relaxed mb-3";
-const labelStyles = "font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold";
+const labelStyles = "font-mono text-sm font-medium text-zinc-500";
 
 function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
   return (
@@ -22,9 +22,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-6 h-6 bg-zinc-900 text-white flex items-center justify-center shrink-0">
         <Icon className="w-3 h-3" />
       </div>
-      <h2 className="font-mono font-bold text-sm uppercase tracking-[0.2em] text-zinc-900">
-        {title}
-      </h2>
+      <h2 className="font-mono text-lg font-bold text-zinc-900">{title}</h2>
     </div>
   );
 }
@@ -81,7 +79,7 @@ function RadioItem({
       </div>
       <div className="min-w-0">
         <p
-          className={`font-mono text-xs uppercase tracking-widest leading-snug transition-colors ${
+          className={`font-mono text-sm leading-snug transition-colors ${
             selected ? "text-white font-bold" : "text-zinc-600 font-medium"
           }`}
         >
@@ -181,7 +179,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-mono font-bold mb-6 block">
+      <span className="font-mono text-xs font-medium text-zinc-400 mb-6 block">
         Your Background
       </span>
       <h1 className="font-sans text-4xl sm:text-5xl font-bold text-zinc-900 mb-3 leading-[1.1]">
@@ -358,7 +356,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
           <button
             type="button"
             onClick={handleBack}
-            className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
+            className="border border-zinc-200 bg-white px-6 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back
           </button>
@@ -366,7 +364,7 @@ export function OnboardingStepBackground({ onNext, onBack }: OnboardingStepBackg
             type="button"
             onClick={handleContinue}
             disabled={isSubmitting}
-            className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="bg-zinc-900 text-white px-8 py-3 text-sm font-medium hover:bg-zinc-700 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSubmitting ? (
               <div className="flex items-center gap-1">

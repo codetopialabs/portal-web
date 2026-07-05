@@ -103,7 +103,7 @@ const SOCIALS = [
 export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl">
-      <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-6 block">
+      <span className="font-mono text-xs font-medium text-zinc-500 mb-6 block">
         Join the Community
       </span>
 
@@ -117,9 +117,7 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
 
       {/* Socials */}
       <div className="mb-10">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 font-mono font-bold mb-4">
-          Also follow us on
-        </p>
+        <p className="font-mono text-xs font-medium text-zinc-500 mb-4">Also follow us on</p>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {SOCIALS.map(({ id, icon: Icon, iconColor, label, href }) => (
             <a
@@ -144,14 +142,14 @@ export function OnboardingStepCommunity({ onNext, onBack }: StepProps) {
         <button
           type="button"
           onClick={onBack}
-          className="border border-zinc-200 bg-white px-6 py-3 text-[11px] uppercase tracking-[0.2em] text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
+          className="border border-zinc-200 bg-white px-6 py-3 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors font-mono flex items-center gap-2"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back
         </button>
         <button
           type="button"
           onClick={onNext}
-          className="bg-zinc-900 text-white px-8 py-3 text-[11px] uppercase tracking-[0.2em] hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2"
+          className="bg-zinc-900 text-white px-8 py-3 text-sm font-medium hover:bg-zinc-700 transition-colors font-mono flex items-center gap-2"
         >
           Continue <ArrowRight className="w-3.5 h-3.5" />
         </button>

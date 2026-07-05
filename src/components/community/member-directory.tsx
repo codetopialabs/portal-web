@@ -111,11 +111,9 @@ export function MemberDirectory({
       {/* Search & filter toolbar */}
       <div className="border border-zinc-200 bg-white">
         <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-            Directory
-          </p>
+          <p className="font-mono text-xs font-medium text-zinc-400">Directory</p>
           {!isLoading && (
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
+            <p className="font-mono text-xs text-zinc-400">
               {filteredMembers.length} {filteredMembers.length === 1 ? "result" : "results"}
             </p>
           )}
@@ -140,28 +138,26 @@ export function MemberDirectory({
         {/* Active filter chips */}
         {(filters.role !== "all" || filters.skill !== "all" || filters.experience !== "all") && (
           <div className="flex flex-wrap items-center gap-2 border-t border-zinc-100 px-4 py-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
-              Active:
-            </span>
+            <span className="font-mono text-xs text-zinc-400">Active:</span>
             {filters.role !== "all" && (
-              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-600">
+              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-xs font-medium text-zinc-600">
                 Role: {filters.role}
               </span>
             )}
             {filters.skill !== "all" && (
-              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-600">
+              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-xs font-medium text-zinc-600">
                 Skill: {filters.skill}
               </span>
             )}
             {filters.experience !== "all" && (
-              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-600">
+              <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-xs font-medium text-zinc-600">
                 Level: {filters.experience}
               </span>
             )}
             <button
               type="button"
               onClick={resetFilters}
-              className="font-mono text-[10px] uppercase tracking-wider text-zinc-400 underline underline-offset-2 transition-colors hover:text-zinc-700"
+              className="font-mono text-xs text-zinc-400 underline underline-offset-2 transition-colors hover:text-zinc-700"
             >
               Clear all
             </button>
@@ -198,7 +194,7 @@ export function MemberDirectory({
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-4 inline-flex items-center gap-2 border border-zinc-200 bg-white px-4 py-2 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
+              className="mt-4 inline-flex items-center gap-2 border border-zinc-200 bg-white px-4 py-2 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
             >
               Clear filters
             </button>
@@ -208,7 +204,7 @@ export function MemberDirectory({
         {!isLoading && filteredMembers.length > visibleMembers.length && (
           <div
             ref={loadMoreRef}
-            className="flex items-center justify-between border border-zinc-200 bg-white px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 sm:col-span-2 lg:col-span-3"
+            className="flex items-center justify-between border border-zinc-200 bg-white px-4 py-3 font-mono text-xs text-zinc-400 sm:col-span-2 lg:col-span-3"
           >
             <span>
               Showing {visibleMembers.length} of {filteredMembers.length}
@@ -243,7 +239,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
           className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-multiply"
         />
 
-        <div className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 font-mono text-[10px] font-black uppercase tracking-[0.2em]">
+        <div className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 font-mono text-xs font-medium">
           <span className="inline-flex items-center gap-1.5 border border-zinc-900 bg-zinc-900 text-white px-2.5 py-1">
             <Sparkles className="h-3 w-3 text-amber-300" />
             Featured member
@@ -287,7 +283,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
 
                 <Link
                   href={`/@${member.username}`}
-                  className="mt-3 sm:mt-0 inline-flex h-9 w-fit shrink-0 items-center gap-2 border border-zinc-900 bg-zinc-900 px-3 font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white transition-colors hover:bg-zinc-800 hover:text-white"
+                  className="mt-3 sm:mt-0 inline-flex h-9 w-fit shrink-0 items-center gap-2 border border-zinc-900 bg-zinc-900 px-3 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800 hover:text-white"
                 >
                   View profile
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -307,7 +303,7 @@ function FeaturedMemberCard({ member }: { member: CommunityMember }) {
                   visibleSkills.map((skill) => (
                     <span
                       key={skill}
-                      className="border border-zinc-100 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-500"
+                      className="border border-zinc-100 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] font-medium text-zinc-500"
                     >
                       {skill}
                     </span>

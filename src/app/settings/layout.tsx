@@ -20,15 +20,11 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   return (
     <RouteGuard>
       <DashboardShell>
-        <div className="max-w-7xl mx-auto pb-20 space-y-8">
-          <div className="flex flex-col gap-1 border-b border-zinc-200 pb-6">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
-              Account
-            </p>
-            <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
-              Settings
-            </h1>
-            <p className="max-w-2xl font-mono text-sm leading-6 text-zinc-500">
+        <div className="max-w-7xl mx-auto pb-20 space-y-10">
+          <div className="flex flex-col gap-2 border-b border-zinc-100 pb-8">
+            <p className="font-mono text-xs font-medium text-zinc-400">Account</p>
+            <h1 className="font-sans text-4xl font-bold tracking-tight text-zinc-950">Settings</h1>
+            <p className="max-w-2xl font-mono text-base leading-7 text-zinc-500">
               Manage your profile, security, and connected app access.
             </p>
           </div>
@@ -43,7 +39,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className={`flex items-center gap-2 px-5 py-3 font-mono text-sm border-b-2 -mb-px transition-all ${
+                  className={`flex items-center gap-2 px-5 py-3.5 font-mono text-sm font-medium border-b-2 -mb-px transition-all ${
                     isActive
                       ? "border-zinc-900 text-zinc-900"
                       : "border-transparent text-zinc-400 hover:text-zinc-700 hover:border-zinc-300"

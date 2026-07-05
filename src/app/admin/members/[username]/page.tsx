@@ -126,9 +126,7 @@ function DetailItem({
 }) {
   return (
     <div className="min-w-0">
-      <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-        {label}
-      </p>
+      <p className="mb-1.5 font-mono text-xs font-medium text-text-muted">{label}</p>
       {href && value ? (
         <a
           href={href}
@@ -153,9 +151,7 @@ function HeaderStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="border-b border-grey-200 p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
       <p className="truncate font-sans text-xl font-black text-text-primary">{value}</p>
-      <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-        {label}
-      </p>
+      <p className="mt-1 font-mono text-xs font-medium text-text-muted">{label}</p>
     </div>
   );
 }
@@ -163,9 +159,7 @@ function HeaderStat({ label, value }: { label: string; value: string }) {
 function SideFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-3">
-      <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-text-muted">
-        {label}
-      </p>
+      <p className="font-mono text-xs font-medium text-text-muted">{label}</p>
       <p className="truncate text-right font-mono text-xs text-text-secondary">{value}</p>
     </div>
   );
@@ -604,7 +598,7 @@ function MemberDetailContent({ username }: { username: string }) {
       <div className="mb-6">
         <Link
           href="/admin/members"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-1.5 font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           Member Directory
@@ -713,7 +707,7 @@ function MemberDetailContent({ username }: { username: string }) {
             )}
             <div className="min-w-0 flex-1">
               <p
-                className={`font-mono text-xs font-bold uppercase tracking-[0.15em] ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-700" : "text-red-700"}`}
+                className={`font-sans text-sm font-bold ${member.activeFlag.profileUpdatedAfterFlag ? "text-amber-700" : "text-red-700"}`}
               >
                 {member.activeFlag.profileUpdatedAfterFlag
                   ? "Review submitted — awaiting resolution"
@@ -756,7 +750,7 @@ function MemberDetailContent({ username }: { username: string }) {
         <main className="space-y-6">
           <section className="border border-grey-200 bg-white">
             <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+              <h2 className="font-sans text-base font-bold text-text-primary">
                 Member information
               </h2>
             </div>
@@ -778,7 +772,13 @@ function MemberDetailContent({ username }: { username: string }) {
               <DetailItem label="Location" value={member.location} />
               <DetailItem
                 label="Discord"
-                value={member.discordId ? `@${member.username}` : member.discordUsername}
+                value={
+                  member.discordId
+                    ? member.discordUsername
+                      ? `@${member.discordUsername}`
+                      : "Linked"
+                    : null
+                }
                 href={
                   member.discordId ? `https://discord.com/users/${member.discordId}` : undefined
                 }
@@ -794,9 +794,7 @@ function MemberDetailContent({ username }: { username: string }) {
             <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-icon-tertiary" />
-                <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-                  Roles
-                </h2>
+                <h2 className="font-sans text-base font-bold text-text-primary">Roles</h2>
               </div>
               <span className="font-mono text-xs text-text-tertiary">
                 {member.roles.length} assigned
@@ -843,9 +841,7 @@ function MemberDetailContent({ username }: { username: string }) {
 
               {canAssign && (
                 <div className="border-t border-grey-200 pt-5">
-                  <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-                    Assign role
-                  </p>
+                  <p className="mb-3 font-mono text-xs font-medium text-text-muted">Assign role</p>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <Select value={selectedRoleName} onValueChange={setSelectedRoleName}>
                       <SelectTrigger className="h-10 w-full rounded-none border-grey-200 bg-white font-mono text-sm sm:w-80">
@@ -885,7 +881,7 @@ function MemberDetailContent({ username }: { username: string }) {
             <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
               <div className="flex items-center gap-2">
                 <KeyRound className="h-4 w-4 text-icon-tertiary" />
-                <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+                <h2 className="font-sans text-base font-bold text-text-primary">
                   Direct permissions
                 </h2>
               </div>
@@ -936,7 +932,7 @@ function MemberDetailContent({ username }: { username: string }) {
 
               {canAssignPermission && (
                 <div className="border-t border-grey-200 pt-5">
-                  <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                  <p className="mb-3 font-mono text-xs font-medium text-text-muted">
                     Grant permission
                   </p>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -980,9 +976,7 @@ function MemberDetailContent({ username }: { username: string }) {
         <aside className="space-y-6">
           <section className="border border-grey-200 bg-white">
             <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-                Account
-              </h2>
+              <h2 className="font-sans text-base font-bold text-text-primary">Account</h2>
             </div>
             <div className="divide-y divide-grey-200">
               <SideFact label="Status" value={member.isActive ? "Active" : "Suspended"} />
@@ -1000,9 +994,7 @@ function MemberDetailContent({ username }: { username: string }) {
               <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
                 <div className="flex items-center gap-2">
                   <Laptop className="h-4 w-4 text-icon-tertiary" />
-                  <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-                    Sessions
-                  </h2>
+                  <h2 className="font-sans text-base font-bold text-text-primary">Sessions</h2>
                 </div>
                 <span className="font-mono text-xs text-text-tertiary">
                   {activeSessions.length} active
@@ -1062,9 +1054,7 @@ function MemberDetailContent({ username }: { username: string }) {
           <div className="border-b border-error-300 px-5 py-4">
             <div className="flex items-center gap-2">
               <ShieldAlert className="h-4 w-4 text-error-700" />
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-error-700">
-                Danger zone
-              </h2>
+              <h2 className="font-sans text-base font-bold text-error-700">Danger zone</h2>
             </div>
           </div>
           <div className="divide-y divide-error-200">
@@ -1112,7 +1102,7 @@ function MemberDetailContent({ username }: { username: string }) {
       <Sheet open={confirmAssignRole} onOpenChange={setConfirmAssignRole}>
         <SheetContent className="w-full border-grey-200 bg-white p-0 sm:max-w-xl">
           <SheetHeader className="border-b border-grey-200 p-5 pr-12">
-            <SheetTitle className="font-sans text-xl font-black uppercase tracking-tight text-text-primary">
+            <SheetTitle className="font-sans text-2xl font-bold text-text-primary">
               Review role assignment
             </SheetTitle>
             <SheetDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
@@ -1122,9 +1112,7 @@ function MemberDetailContent({ username }: { username: string }) {
 
           <div className="min-h-0 flex-1 overflow-y-auto p-5">
             <div className="border border-grey-200 bg-grey-50 p-4">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-                Role
-              </p>
+              <p className="font-mono text-xs font-medium text-text-muted">Role</p>
               <h3 className="mt-2 font-sans text-2xl font-black text-text-primary">
                 {selectedRole?.displayName ?? selectedRoleName}
               </h3>
@@ -1140,9 +1128,7 @@ function MemberDetailContent({ username }: { username: string }) {
             </div>
 
             <div className="mt-5 border border-grey-200 bg-white p-4">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-                Member
-              </p>
+              <p className="font-mono text-xs font-medium text-text-muted">Member</p>
               <p className="mt-2 font-sans text-lg font-black text-text-primary">
                 {member.fullName || member.username}
               </p>
@@ -1183,7 +1169,7 @@ function MemberDetailContent({ username }: { username: string }) {
       >
         <SheetContent className="w-full border-grey-200 bg-white p-0 sm:max-w-xl">
           <SheetHeader className="border-b border-grey-200 p-5 pr-12">
-            <SheetTitle className="font-sans text-xl font-black uppercase tracking-tight text-error-700">
+            <SheetTitle className="font-sans text-2xl font-bold text-error-700">
               Revoke role
             </SheetTitle>
             <SheetDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
@@ -1260,7 +1246,7 @@ function MemberDetailContent({ username }: { username: string }) {
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
             <DialogTitle
-              className={`font-sans text-xl font-black uppercase tracking-tight ${
+              className={`font-sans text-xl font-bold ${
                 modalCopy.tone === "green" ? "text-success-700" : "text-error-700"
               }`}
             >
@@ -1324,7 +1310,7 @@ function MemberDetailContent({ username }: { username: string }) {
       <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
-            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-red-700">
+            <DialogTitle className="font-sans text-xl font-bold text-red-700">
               Flag account
             </DialogTitle>
             <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
@@ -1333,10 +1319,7 @@ function MemberDetailContent({ username }: { username: string }) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            <label
-              htmlFor="flag-reason"
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-            >
+            <label htmlFor="flag-reason" className="font-mono text-xs font-medium text-text-muted">
               Reason
             </label>
             <textarea
@@ -1376,7 +1359,7 @@ function MemberDetailContent({ username }: { username: string }) {
       <Dialog open={unflagDialogOpen} onOpenChange={setUnflagDialogOpen}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
-            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-emerald-700">
+            <DialogTitle className="font-sans text-xl font-bold text-emerald-700">
               Resolve flag
             </DialogTitle>
             <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
@@ -1464,9 +1447,7 @@ function RolePermissionSummary({
 
   return (
     <div className={`mt-4 border ${borderClass} p-4`}>
-      <p className={`font-mono text-xs font-bold uppercase tracking-[0.16em] ${textClass}`}>
-        {title}
-      </p>
+      <p className={`font-sans text-sm font-bold ${textClass}`}>{title}</p>
       {effects.length === 0 ? (
         <p className="mt-3 font-mono text-xs leading-6 text-text-tertiary">
           This role does not currently list any permissions.

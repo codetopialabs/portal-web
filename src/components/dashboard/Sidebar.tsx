@@ -95,7 +95,7 @@ export function DashboardSidebar() {
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.label)}
-                  className="flex w-full items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-400 font-black hover:text-zinc-200 transition-colors"
+                  className="flex w-full items-center justify-between font-mono text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition-colors"
                 >
                   {group.label}
                   <ChevronDown
@@ -131,9 +131,7 @@ export function DashboardSidebar() {
                                     : iconClass(active)
                                 }
                               />
-                              <span className="font-mono text-[11px] uppercase tracking-wider">
-                                {item.label}
-                              </span>
+                              <span className="font-mono text-sm font-medium">{item.label}</span>
                               {item.comingSoon && (
                                 <span className="ml-auto font-mono text-[8px] uppercase tracking-wider text-zinc-600 border border-zinc-800 px-1 py-0.5">
                                   Soon

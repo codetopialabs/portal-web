@@ -60,10 +60,8 @@ function ReviewsListContent() {
         {/* Header */}
         <div className="flex flex-col gap-4 border-b border-grey-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
-              {team?.name}
-            </p>
-            <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
+            <p className="font-mono text-xs font-medium text-text-muted">{team?.name}</p>
+            <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-text-primary">
               Contribution Reviews
             </h1>
             <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
@@ -72,7 +70,7 @@ function ReviewsListContent() {
           </div>
           <Link
             href={`/teams/${teamSlug}/reviews/new`}
-            className="inline-flex h-10 items-center justify-center bg-grey-900 px-5 font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white hover:bg-grey-800 transition-colors"
+            className="inline-flex h-10 items-center justify-center bg-grey-900 px-5 font-mono text-sm font-medium text-white hover:bg-grey-800 transition-colors"
           >
             <Plus className="mr-2 h-4 w-4" />
             Open Review
@@ -86,7 +84,7 @@ function ReviewsListContent() {
               type="button"
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors rounded-none ${
+              className={`px-4 py-1.5 font-mono text-sm font-medium capitalize transition-colors rounded-none ${
                 filter === f
                   ? "bg-grey-900 text-white"
                   : "border border-grey-200 bg-white text-text-secondary hover:border-grey-400 hover:text-text-primary"
@@ -115,7 +113,7 @@ function ReviewsListContent() {
               <div className="mb-4 flex h-14 w-14 items-center justify-center border border-grey-200 bg-grey-50">
                 <FileText className="h-6 w-6 text-text-muted" />
               </div>
-              <h3 className="font-sans font-black uppercase tracking-tight text-text-primary">
+              <h3 className="font-sans font-bold text-text-primary">
                 {filter === "all" ? "No reviews yet" : `No ${filter} reviews`}
               </h3>
               <p className="mt-1 font-mono text-xs text-text-muted">
@@ -126,7 +124,7 @@ function ReviewsListContent() {
               {filter === "all" && (
                 <Link
                   href={`/teams/${teamSlug}/reviews/new`}
-                  className="mt-6 inline-flex h-9 items-center justify-center border border-grey-200 bg-white px-4 font-mono text-[10px] uppercase tracking-widest text-text-primary hover:bg-grey-100 hover:text-text-primary transition-colors"
+                  className="mt-6 inline-flex h-9 items-center justify-center border border-grey-200 bg-white px-4 font-mono text-xs font-medium text-text-primary hover:bg-grey-100 hover:text-text-primary transition-colors"
                 >
                   <Plus className="mr-2 h-3.5 w-3.5" />
                   Open First Review
@@ -151,7 +149,7 @@ function ReviewsListContent() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-sans font-black uppercase tracking-tight text-text-primary group-hover:text-text-secondary truncate">
+                    <h3 className="font-sans font-bold text-text-primary group-hover:text-text-secondary truncate">
                       {review.title}
                     </h3>
                     {review.category && (

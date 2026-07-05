@@ -18,7 +18,7 @@ import {
 import type React from "react";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ import { normalizeUrl } from "@/utils/url";
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 
-const labelStyles = "font-mono text-xs uppercase tracking-widest text-zinc-400 font-bold";
+const labelStyles = "font-mono text-sm font-medium text-zinc-600";
 
 interface ProfileFormValues {
   full_name: string;
@@ -68,7 +68,6 @@ interface ProfileFormValues {
   gender: string;
   nationality: string;
   bio: string;
-  discord_username: string;
   github_handle: string;
   linkedin_url: string;
   twitter_handle: string;
@@ -84,9 +83,7 @@ function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: 
       <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
         <Icon className="w-3.5 h-3.5" />
       </div>
-      <h2 className="font-sans font-black uppercase text-base tracking-widest text-zinc-900">
-        {title}
-      </h2>
+      <h2 className="font-sans text-xl font-bold text-zinc-900">{title}</h2>
     </div>
   );
 }
@@ -369,7 +366,6 @@ export default function SettingsProfilePage() {
       gender: profile?.gender ?? "",
       nationality: profile?.nationality ?? "",
       bio: profile?.bio ?? "",
-      discord_username: profile?.discordUsername ?? "",
       github_handle: profile?.githubHandle ?? "",
       linkedin_url: profile?.linkedinUrl ?? "",
       twitter_handle: profile?.twitterHandle ?? "",
@@ -416,7 +412,6 @@ export default function SettingsProfilePage() {
         gender: data.gender,
         nationality: data.nationality,
         bio: data.bio.trim(),
-        discord_username: data.discord_username.trim().replace(/^@/, ""),
         github_handle: sanitizeHandle(data.github_handle),
         linkedin_url: data.linkedin_url
           ? resolveSocialUrl(data.linkedin_url, "https://linkedin.com/in/")
@@ -492,9 +487,7 @@ export default function SettingsProfilePage() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
-                No cover image
-              </span>
+              <span className="font-mono text-xs text-zinc-400">No cover image</span>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               {isSubmitting && coverFile ? (
@@ -508,7 +501,7 @@ export default function SettingsProfilePage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => coverInputRef.current?.click()}
-            className="w-full h-9 border-t border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-9 border-t border-zinc-200 font-mono text-xs font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting && coverFile ? (
               <>
@@ -556,16 +549,14 @@ export default function SettingsProfilePage() {
             </div>
           </button>
           <div className="text-center">
-            <p className="font-mono font-black text-base uppercase tracking-tight text-zinc-900">
-              {profile?.fullName ?? "—"}
-            </p>
+            <p className="font-sans text-lg font-bold text-zinc-900">{profile?.fullName ?? "—"}</p>
             <p className="font-mono text-xs text-zinc-500 mt-0.5">{profile?.email ?? ""}</p>
           </div>
           <button
             type="button"
             disabled={isSubmitting}
             onClick={() => avatarInputRef.current?.click()}
-            className="w-full h-9 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-9 border border-zinc-200 font-mono text-xs font-medium text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting && avatarFile ? (
               <>
@@ -587,11 +578,11 @@ export default function SettingsProfilePage() {
       </div>
 
       {/* RIGHT — form */}
-      <div className="lg:col-span-2 space-y-8">
+      <div className="lg:col-span-2 space-y-10">
         {/* Personal Info */}
-        <section id="settings-personal-info" className="space-y-5">
+        <section id="settings-personal-info" className="space-y-6">
           <SectionHeader icon={User} title="Personal Info" />
-          <div className="bg-white border border-zinc-200 p-6 space-y-5">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="full-name" className={labelStyles}>
@@ -869,9 +860,9 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Background */}
-        <section id="settings-background" className="space-y-5">
+        <section id="settings-background" className="space-y-6">
           <SectionHeader icon={Briefcase} title="Background" />
-          <div className="bg-white border border-zinc-200 p-6 space-y-5">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="discipline" className={labelStyles}>
                 Primary Discipline
@@ -956,9 +947,9 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Goals */}
-        <section id="settings-goals" className="space-y-5">
+        <section id="settings-goals" className="space-y-6">
           <SectionHeader icon={Target} title="Goals" />
-          <div className="bg-white border border-zinc-200 p-6 space-y-5">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label className={labelStyles}>What Do You Want From This Community?</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -983,8 +974,8 @@ export default function SettingsProfilePage() {
                         {checked && <Check className="w-3 h-3 text-zinc-900" />}
                       </div>
                       <span
-                        className={`font-mono text-xs uppercase tracking-wide truncate ${
-                          checked ? "text-white font-bold" : "text-zinc-600"
+                        className={`font-mono text-sm truncate ${
+                          checked ? "text-white font-medium" : "text-zinc-600"
                         }`}
                       >
                         {goal.label}
@@ -1000,17 +991,9 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Social Links */}
-        <section id="settings-social-links" className="space-y-5">
+        <section id="settings-social-links" className="space-y-6">
           <SectionHeader icon={Globe} title="Social Links" />
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
-            <div className="flex items-center gap-3 px-4">
-              <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
-              <input
-                placeholder="Discord username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
-                {...register("discord_username")}
-              />
-            </div>
             <div className="flex items-center gap-3 px-4">
               <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
               <input
@@ -1077,7 +1060,7 @@ export default function SettingsProfilePage() {
               <button
                 type="button"
                 onClick={() => setShowPicker((v) => !v)}
-                className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="inline-flex items-center gap-1.5 font-mono text-sm font-medium text-zinc-400 hover:text-zinc-900 transition-colors"
               >
                 <Plus className="w-3 h-3" /> Add link
               </button>
@@ -1086,9 +1069,7 @@ export default function SettingsProfilePage() {
 
           {showPicker && (
             <div className="border border-zinc-200 bg-zinc-50 p-4">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-3">
-                Choose platform
-              </p>
+              <p className="font-mono text-xs text-zinc-400 mb-3">Choose platform</p>
               <div className="grid grid-cols-4 sm:grid-cols-5 gap-1">
                 {LINK_PLATFORMS.map((p) => {
                   const Icon = p.icon;
@@ -1100,7 +1081,7 @@ export default function SettingsProfilePage() {
                       className="flex flex-col items-center gap-1.5 p-2.5 border border-transparent hover:bg-white hover:border-zinc-200 transition-all"
                     >
                       <Icon className="w-5 h-5" style={{ color: p.color }} />
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-zinc-500 text-center leading-tight">
+                      <span className="font-mono text-xs text-zinc-500 text-center leading-tight">
                         {p.label}
                       </span>
                     </button>
@@ -1114,62 +1095,60 @@ export default function SettingsProfilePage() {
         <Divider />
 
         {/* Skills */}
-        <section id="settings-skills" className="space-y-5">
+        <section id="settings-skills" className="space-y-6">
           <SectionHeader icon={Cpu} title="Skills" />
-          <div className="bg-white border border-zinc-200 p-5">
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="inline-flex items-center gap-1.5 px-3 h-8 bg-zinc-50 border border-zinc-200 font-mono text-xs uppercase tracking-widest text-zinc-700"
-                >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => setSkills((prev) => prev.filter((s) => s !== skill))}
-                    className="text-zinc-400 hover:text-zinc-900 transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-
-              {isAdding ? (
-                <div className="inline-flex items-center gap-1.5">
-                  <input
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addSkill();
-                      }
-                      if (e.key === "Escape") {
-                        setIsAdding(false);
-                        setNewSkill("");
-                      }
-                    }}
-                    className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-xs uppercase tracking-widest outline-none"
-                    placeholder="Skill..."
-                  />
-                  <button
-                    type="button"
-                    onClick={addSkill}
-                    className="h-8 w-8 bg-black text-white flex items-center justify-center hover:bg-zinc-800 transition-colors"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                </div>
-              ) : (
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="inline-flex items-center gap-1.5 px-3 h-8 bg-zinc-50 border border-zinc-200 font-mono text-sm text-zinc-700"
+              >
+                {skill}
                 <button
                   type="button"
-                  onClick={() => setIsAdding(true)}
-                  className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-xs uppercase tracking-widest text-zinc-400 hover:border-zinc-900 hover:text-zinc-900 transition-all"
+                  onClick={() => setSkills((prev) => prev.filter((s) => s !== skill))}
+                  className="text-zinc-400 hover:text-zinc-900 transition-colors"
                 >
-                  <Plus className="w-3 h-3" /> Add
+                  <X className="w-3 h-3" />
                 </button>
-              )}
-            </div>
+              </span>
+            ))}
+
+            {isAdding ? (
+              <div className="inline-flex items-center gap-1.5">
+                <input
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addSkill();
+                    }
+                    if (e.key === "Escape") {
+                      setIsAdding(false);
+                      setNewSkill("");
+                    }
+                  }}
+                  className="h-8 w-28 border border-zinc-900 bg-white px-2 font-mono text-sm outline-none"
+                  placeholder="Skill..."
+                />
+                <button
+                  type="button"
+                  onClick={addSkill}
+                  className="h-8 w-8 bg-black text-white flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAdding(true)}
+                className="inline-flex items-center gap-1.5 px-3 h-8 border border-dashed border-zinc-300 font-mono text-sm text-zinc-400 hover:border-zinc-900 hover:text-zinc-900 transition-all"
+              >
+                <Plus className="w-3 h-3" /> Add
+              </button>
+            )}
           </div>
         </section>
 
@@ -1193,14 +1172,14 @@ export default function SettingsProfilePage() {
               !avatarFile &&
               !coverFile
             }
-            className="h-10 rounded-none border-zinc-200 font-mono text-xs uppercase tracking-widest px-6 hover:border-zinc-400"
+            className="h-10 rounded-none border-zinc-200 font-mono text-sm font-medium px-6 hover:border-zinc-400"
           >
             Discard
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-10 rounded-none bg-black text-white font-mono text-xs uppercase tracking-widest px-6 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+            className="h-10 rounded-none bg-black text-white font-mono text-sm font-medium px-6 hover:bg-zinc-800 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>

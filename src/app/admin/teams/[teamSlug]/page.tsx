@@ -175,12 +175,8 @@ function AdminTeamDetailContent() {
       </Link>
 
       <div className="border border-zinc-200 bg-white p-6">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-          Admin Panel · Team
-        </p>
-        <h1 className="mt-1 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
-          {team.name}
-        </h1>
+        <p className="font-mono text-xs font-medium text-zinc-400">Admin Panel · Team</p>
+        <h1 className="mt-1 font-sans text-3xl font-bold text-zinc-950">{team.name}</h1>
         {team.description && (
           <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
             {team.description}

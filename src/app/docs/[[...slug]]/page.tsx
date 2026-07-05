@@ -28,7 +28,7 @@ export default async function DocPage({ params }: DocPageProps) {
   return (
     <article className="max-w-none">
       <div className="mb-10 border-b border-neutral-200 pb-10 md:mb-14 md:pb-12">
-        <div className="mb-5 flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-neutral-400">
+        <div className="mb-5 flex flex-wrap items-center gap-2 text-sm font-medium text-neutral-400">
           <span>Docs</span>
           {actualSlug.map((s) => (
             <React.Fragment key={s}>

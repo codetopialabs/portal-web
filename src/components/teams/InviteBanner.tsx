@@ -18,14 +18,12 @@ function InviteRow({ invite }: { invite: TeamInvite }) {
           {invite.invitedBy?.fullName ?? "Someone"}
         </span>
         {" invited you to join "}
-        <span className="font-bold text-text-primary uppercase tracking-wide">
-          {invite.teamName ?? invite.teamSlug}
-        </span>
+        <span className="font-bold text-text-primary">{invite.teamName ?? invite.teamSlug}</span>
       </p>
       <div className="flex items-center gap-2 shrink-0">
         <Button
           size="sm"
-          className="h-7 bg-grey-900 px-3 font-mono text-[10px] uppercase tracking-widest"
+          className="h-7 bg-grey-900 px-3 font-mono text-xs font-medium"
           disabled={accepting || declining}
           onClick={() => accept(invite.id)}
         >
@@ -34,7 +32,7 @@ function InviteRow({ invite }: { invite: TeamInvite }) {
         <Button
           size="sm"
           variant="outline"
-          className="h-7 px-3 font-mono text-[10px] uppercase tracking-widest"
+          className="h-7 px-3 font-mono text-xs font-medium"
           disabled={accepting || declining}
           onClick={() => decline(invite.id)}
         >
@@ -63,9 +61,7 @@ export function InviteBanner() {
       >
         <X className="h-4 w-4" />
       </button>
-      <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-text-muted mb-2">
-        Pending Invitations
-      </p>
+      <p className="font-mono text-xs font-semibold text-text-muted mb-2">Pending Invitations</p>
       <div className="divide-y divide-grey-100 pr-6">
         {pending.map((invite) => (
           <InviteRow key={invite.id} invite={invite} />

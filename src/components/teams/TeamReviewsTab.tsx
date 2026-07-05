@@ -93,9 +93,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
             <div className="mb-4 flex h-14 w-14 items-center justify-center border border-grey-200 bg-white">
               <FileText className="h-6 w-6 text-text-muted" />
             </div>
-            <h3 className="font-sans font-black uppercase tracking-tight text-text-primary">
-              No reviews found
-            </h3>
+            <h3 className="font-sans font-bold text-text-primary">No reviews found</h3>
             <p className="mt-1 font-mono text-xs text-text-muted">
               {filter === "all"
                 ? "Be the first to open a review in this team."
@@ -112,7 +110,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
               <StatusIcon status={review.status} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-sans font-black uppercase tracking-tight text-text-primary group-hover:text-text-secondary truncate">
+                  <h3 className="font-sans font-bold text-text-primary group-hover:text-text-secondary truncate">
                     {review.title}
                   </h3>
                   {review.category && (
@@ -123,7 +121,7 @@ export function TeamReviewsTab({ teamSlug, reviews, reviewsLoading }: TeamReview
                   {review.labels?.map((label) => (
                     <span
                       key={label.id}
-                      className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border text-text-secondary"
+                      className="font-mono text-xs px-1.5 py-0.5 border text-text-secondary"
                       style={{
                         borderColor: label.color,
                         backgroundColor: `${label.color}15`,

@@ -208,7 +208,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
+                <h1 className="font-sans text-2xl font-bold text-text-primary">
                   {role.displayName}
                 </h1>
                 {role.isSystem && (
@@ -271,7 +271,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
         <main className="space-y-6">
           <section className="border border-grey-200 bg-white">
             <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
+              <h2 className="font-sans text-lg font-bold text-text-primary">
                 Permissions by resource
               </h2>
               <p className="mt-1 font-mono text-xs text-text-tertiary">
@@ -384,9 +384,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
         <aside className="space-y-6">
           <section className="border border-grey-200 bg-white">
             <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-                Role summary
-              </h2>
+              <h2 className="font-sans text-lg font-bold text-text-primary">Role summary</h2>
             </div>
             <div className="divide-y divide-grey-200">
               <SideFact label="Identifier" value={role.name} />
@@ -436,9 +434,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
           <div className="border-b border-error-300 px-5 py-4">
             <div className="flex items-center gap-2">
               <ShieldAlert className="h-4 w-4 text-error-700" />
-              <h2 className="font-sans text-sm font-black uppercase tracking-widest text-error-700">
-                Danger zone
-              </h2>
+              <h2 className="font-sans text-lg font-bold text-error-700">Danger zone</h2>
             </div>
           </div>
           <div className="flex flex-col gap-4 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -468,7 +464,7 @@ function RoleDetailContent({ slug }: { slug: string }) {
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
           <DialogHeader>
-            <DialogTitle className="font-sans text-xl font-black uppercase tracking-tight text-error-700">
+            <DialogTitle className="font-sans text-xl font-bold text-error-700">
               Delete role
             </DialogTitle>
             <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
@@ -527,7 +523,7 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <span className="font-mono text-xs">
       <span className="font-bold text-text-primary">{value}</span>{" "}
-      <span className="uppercase tracking-wide text-text-muted">{label}</span>
+      <span className="text-text-muted">{label}</span>
     </span>
   );
 }
@@ -535,9 +531,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 function SideFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-3">
-      <p className="font-mono text-xs font-bold uppercase tracking-[0.16em] text-text-muted">
-        {label}
-      </p>
+      <p className="font-mono text-xs font-medium text-text-muted">{label}</p>
       <p className="truncate text-right font-mono text-xs text-text-secondary">{value}</p>
     </div>
   );

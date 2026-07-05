@@ -33,20 +33,14 @@ export function ComingSoonPanel({
           <div className="flex h-11 w-11 items-center justify-center border border-white/15 bg-white/10">
             <Icon className="h-5 w-5" />
           </div>
-          <p className="mt-8 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
-            Not available yet
-          </p>
-          <h2 className="mt-2 font-sans text-2xl font-black uppercase tracking-tight text-white">
-            {title}
-          </h2>
+          <p className="mt-8 font-mono text-xs font-medium text-zinc-400">Not available yet</p>
+          <h2 className="mt-2 font-sans text-2xl font-bold text-white">{title}</h2>
         </div>
 
         <div className="flex min-h-[16rem] flex-col justify-center p-6">
           <p className="max-w-2xl font-mono text-sm leading-6 text-zinc-500">{description}</p>
           <div className="mt-6 border border-zinc-200 bg-zinc-50 p-4">
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-              Current status
-            </p>
+            <p className="font-mono text-xs font-medium text-zinc-400">Current status</p>
             <p className="mt-2 font-mono text-sm leading-6 text-zinc-600">{displayStatus}</p>
           </div>
         </div>

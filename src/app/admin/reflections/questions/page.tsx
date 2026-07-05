@@ -73,7 +73,7 @@ function ReflectionQuestionsContent() {
       <div className="mb-6">
         <Link
           href="/admin/reflections"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-1.5 font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           Reflections
@@ -90,9 +90,7 @@ function ReflectionQuestionsContent() {
 
       <section className="mb-6 border border-grey-200 bg-white">
         <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-          <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-            Active questions
-          </h2>
+          <h2 className="font-sans text-base font-bold text-text-primary">Active questions</h2>
         </div>
         {isLoading ? (
           <div className="space-y-3 p-5">
@@ -164,14 +162,10 @@ function ReflectionQuestionsContent() {
 
       {canManage && (
         <section className="border border-grey-200 bg-white p-5">
-          <h2 className="mb-4 font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-            Add a question
-          </h2>
+          <h2 className="mb-4 font-sans text-base font-bold text-text-primary">Add a question</h2>
           <div className="space-y-4">
             <div>
-              <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
-                Prompt
-              </p>
+              <p className="mb-1.5 font-mono text-xs font-medium text-text-muted">Prompt</p>
               <Input
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -180,7 +174,7 @@ function ReflectionQuestionsContent() {
               />
             </div>
             <div>
-              <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+              <p className="mb-1.5 font-mono text-xs font-medium text-text-muted">
                 Help text (optional)
               </p>
               <Input

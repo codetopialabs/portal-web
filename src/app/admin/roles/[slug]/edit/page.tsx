@@ -122,17 +122,12 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <section className="border border-grey-200 bg-white">
         <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-          <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-            Role details
-          </h2>
+          <h2 className="font-sans text-base font-bold text-text-primary">Role details</h2>
         </div>
         <div className="space-y-6 p-5">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label
-                htmlFor="name"
-                className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-              >
+              <Label htmlFor="name" className="font-mono text-xs font-medium text-text-muted">
                 Identifier (slug)
               </Label>
               <Input
@@ -145,10 +140,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
             </div>
 
             <div className="space-y-1.5">
-              <Label
-                htmlFor="rank"
-                className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-              >
+              <Label htmlFor="rank" className="font-mono text-xs font-medium text-text-muted">
                 Rank
               </Label>
               <Input
@@ -173,10 +165,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
           </div>
 
           <div className="space-y-1.5">
-            <Label
-              htmlFor="displayName"
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-            >
+            <Label htmlFor="displayName" className="font-mono text-xs font-medium text-text-muted">
               Display name
             </Label>
             <Input
@@ -195,10 +184,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
           </div>
 
           <div className="space-y-1.5">
-            <Label
-              htmlFor="description"
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted"
-            >
+            <Label htmlFor="description" className="font-mono text-xs font-medium text-text-muted">
               Description
             </Label>
             <textarea
@@ -214,9 +200,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
 
       <section className="border border-grey-200 bg-white">
         <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
-          <h2 className="font-sans text-sm font-black uppercase tracking-widest text-text-primary">
-            Permissions
-          </h2>
+          <h2 className="font-sans text-base font-bold text-text-primary">Permissions</h2>
           <span className="font-mono text-xs text-text-tertiary">
             {permissions.length} selected
           </span>
@@ -256,7 +240,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
         </Button>
         <Link
           href={`/admin/roles/${role.name}`}
-          className="font-mono text-xs font-bold uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           Discard
         </Link>
@@ -280,7 +264,7 @@ function EditRolePageContent({ slug }: { slug: string }) {
       <div className="mb-6">
         <Link
           href={`/admin/roles/${slug}`}
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-1.5 font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           Role
@@ -291,7 +275,7 @@ function EditRolePageContent({ slug }: { slug: string }) {
           <ShieldCheck className="h-5 w-5 text-icon-tertiary" />
         </div>
         <div>
-          <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-text-primary">
+          <h1 className="font-sans text-3xl font-bold tracking-tight text-text-primary">
             Edit role
           </h1>
           <p className="mt-1 font-mono text-xs text-text-tertiary">

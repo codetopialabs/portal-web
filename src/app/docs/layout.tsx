@@ -17,7 +17,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
                 <BookOpen className="h-4 w-4" />
               </span>
               <span>
-                <span className="block font-[var(--font-space-grotesk)] text-sm font-bold uppercase leading-none tracking-[-0.02em]">
+                <span className="block font-[var(--font-space-grotesk)] text-sm font-bold leading-none">
                   Identity Docs
                 </span>
                 <span className="mt-1 block text-[11px] font-medium text-neutral-500">
@@ -54,10 +54,10 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
                   <BookOpen className="h-5 w-5" />
                 </span>
                 <span>
-                  <span className="block font-[var(--font-space-grotesk)] text-base font-bold uppercase leading-none tracking-[-0.03em]">
+                  <span className="block font-[var(--font-space-grotesk)] text-base font-bold leading-none">
                     Identity
                   </span>
-                  <span className="mt-1.5 block text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                  <span className="mt-1.5 block text-xs font-medium text-white/45">
                     Documentation
                   </span>
                 </span>
@@ -77,7 +77,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
 
             <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-6">
               <div className="mb-6 border border-white/10 bg-white/[0.04] p-4">
-                <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-white/45">
                   <Sparkles className="h-3.5 w-3.5" />
                   Portal Guide
                 </div>
@@ -94,9 +94,7 @@ export default async function DocsLayout({ children }: { children: React.ReactNo
                     id={`docs-${category.title.toLowerCase().replaceAll(" ", "-")}`}
                     className="scroll-mt-28"
                   >
-                    <h2 className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/35">
-                      {category.title}
-                    </h2>
+                    <h2 className="mb-2 px-2 text-xs font-bold text-white/35">{category.title}</h2>
                     <ul className="space-y-1">
                       {category.items.map((item) => (
                         <li key={item.href}>

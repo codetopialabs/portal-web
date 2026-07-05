@@ -95,7 +95,7 @@ function MemberHistoryContent({ username }: { username: string }) {
         {/* biome-ignore lint/performance/noImgElement: avatar URL from API, next/image domain config not set up yet */}
         <img src={avatarUrl} alt={fullName} className="h-16 w-16 object-cover shrink-0" />
         <div className="min-w-0 flex-1">
-          <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-text-primary leading-none">
+          <h1 className="font-sans text-3xl font-bold text-text-primary leading-none">
             {fullName}
           </h1>
           <p className="mt-1 font-mono text-xs text-text-muted">@{username}</p>

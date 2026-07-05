@@ -113,9 +113,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
       {/* Invite Form — leads only */}
       {isLead && (
         <div className="bg-grey-50 border border-grey-200 p-5">
-          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4">
-            Invite Members
-          </h3>
+          <h3 className="font-sans text-lg font-bold text-text-primary mb-4">Invite Members</h3>
           <form onSubmit={handleSendInvites} className="space-y-3">
             <div className="relative max-w-sm">
               <Input
@@ -203,7 +201,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
               <Button
                 type="submit"
                 disabled={isBusy || invitees.length === 0}
-                className="h-10 shrink-0 font-mono text-[11px] uppercase tracking-widest rounded-none bg-grey-900 text-white hover:bg-grey-800"
+                className="h-10 shrink-0 font-mono text-sm font-medium rounded-none bg-grey-900 text-white hover:bg-grey-800"
               >
                 {isBusy ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -219,9 +217,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
 
       {/* Roster */}
       <div>
-        <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4">
-          Team Roster
-        </h3>
+        <h3 className="font-sans text-lg font-bold text-text-primary mb-4">Team Roster</h3>
         <div className="border border-grey-200 bg-white divide-y divide-grey-100 overflow-hidden">
           {membersLoading ? (
             <div className="p-4 space-y-3">
@@ -259,14 +255,14 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                 </Link>
                 <div className="flex items-center gap-4">
                   {member.role === "owner" ? (
-                    <Badge className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest border-amber-300 bg-amber-50 text-amber-700">
+                    <Badge className="flex items-center gap-1 font-mono text-xs font-bold uppercase tracking-widest border-amber-300 bg-amber-50 text-amber-700">
                       <Crown className="h-3 w-3" />
                       Owner
                     </Badge>
                   ) : (
                     <Badge
                       variant="outline"
-                      className="font-mono text-[10px] uppercase tracking-widest bg-white"
+                      className="font-mono text-xs font-bold uppercase tracking-widest bg-white"
                     >
                       {member.role === "lead" ? "Lead" : "Member"}
                     </Badge>
@@ -282,7 +278,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                           role: member.role === "lead" ? "member" : "lead",
                         })
                       }
-                      className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                      className="h-8 font-mono text-xs font-medium rounded-none"
                     >
                       {member.role === "lead" ? "Demote" : "Promote to Lead"}
                     </Button>
@@ -318,7 +314,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                         variant="outline"
                         size="sm"
                         disabled={transferPending}
-                        className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                        className="h-8 font-mono text-xs font-medium rounded-none"
                       >
                         <Crown className="mr-1.5 h-3.5 w-3.5" />
                         Make Owner
@@ -337,7 +333,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                         variant="outline"
                         size="sm"
                         disabled={removePending}
-                        className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="h-8 font-mono text-xs font-medium rounded-none text-red-600 hover:bg-red-50 hover:text-red-700"
                       >
                         <LogOut className="mr-1.5 h-3.5 w-3.5" />
                         Leave Team
@@ -354,7 +350,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
       {/* Join requests — leads only */}
       {isLead && joinRequests && joinRequests.length > 0 && (
         <div>
-          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4 flex items-center gap-2">
+          <h3 className="font-sans text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
             Join Requests
             <span className="inline-flex items-center justify-center px-1.5 py-0.5 font-mono text-[9px] bg-zinc-800 text-white">
               {joinRequests.length}
@@ -388,7 +384,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                     size="sm"
                     disabled={reviewPending}
                     onClick={() => reviewJoinRequest({ requestId: request.id, action: "approve" })}
-                    className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none bg-grey-900 text-white hover:bg-grey-800"
+                    className="h-8 font-mono text-xs font-medium rounded-none bg-grey-900 text-white hover:bg-grey-800"
                   >
                     <Check className="mr-1.5 h-3.5 w-3.5" />
                     Approve
@@ -398,7 +394,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                     variant="outline"
                     disabled={reviewPending}
                     onClick={() => reviewJoinRequest({ requestId: request.id, action: "decline" })}
-                    className="h-8 font-mono text-[10px] uppercase tracking-widest rounded-none"
+                    className="h-8 font-mono text-xs font-medium rounded-none"
                   >
                     <X className="mr-1.5 h-3.5 w-3.5" />
                     Decline
@@ -413,7 +409,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
       {/* Pending invites — leads only */}
       {isLead && pendingInvites && pendingInvites.length > 0 && (
         <div>
-          <h3 className="font-sans font-black uppercase tracking-tight text-text-primary mb-4 flex items-center gap-2">
+          <h3 className="font-sans text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
             Pending Invites
             <span className="inline-flex items-center justify-center px-1.5 py-0.5 font-mono text-[9px] bg-zinc-800 text-white">
               {pendingInvites.length}
@@ -443,7 +439,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted flex items-center gap-1">
+                  <span className="font-mono text-xs font-medium text-text-muted flex items-center gap-1">
                     <Mail className="h-3 w-3" />
                     Sent
                   </span>
@@ -458,7 +454,7 @@ export function TeamMembersTab({ teamSlug, isLead, isOwner, currentUserId }: Tea
                       variant="outline"
                       size="sm"
                       disabled={revokePending}
-                      className="h-8 font-mono text-[10px] uppercase tracking-widest bg-red-600 text-white border-red-600 hover:bg-red-700"
+                      className="h-8 font-mono text-xs font-medium bg-red-600 text-white border-red-600 hover:bg-red-700"
                     >
                       Revoke
                     </Button>

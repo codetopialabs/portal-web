@@ -74,10 +74,8 @@ function CommunityContent() {
       <div className="mx-auto max-w-7xl space-y-8 pb-20">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">
-              Discover
-            </p>
-            <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-zinc-950">
+            <p className="font-mono text-xs font-medium text-zinc-400">Discover</p>
+            <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-zinc-950">
               Community
             </h1>
           </div>

@@ -34,9 +34,7 @@ function Breadcrumbs() {
     return (
       <div className="flex items-center gap-1.5">
         <Home className="w-3 h-3 text-zinc-400" />
-        <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900">
-          Dashboard
-        </span>
+        <span className="font-mono text-xs font-semibold text-zinc-900">Dashboard</span>
       </div>
     );
   }
@@ -57,13 +55,11 @@ function Breadcrumbs() {
         <span key={crumb.href} className="flex items-center gap-1.5">
           <ChevronRight className="w-3 h-3 text-zinc-300" />
           {crumb.isLast ? (
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-900">
-              {crumb.label}
-            </span>
+            <span className="font-mono text-xs font-semibold text-zinc-900">{crumb.label}</span>
           ) : (
             <Link
               href={crumb.href}
-              className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-colors"
+              className="font-mono text-xs font-medium text-zinc-400 hover:text-zinc-900 transition-colors"
             >
               {crumb.label}
             </Link>

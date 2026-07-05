@@ -63,7 +63,7 @@ function CreateTeamContent() {
         {/* Back nav */}
         <Link
           href="/teams"
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-2 font-mono text-xs font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Teams
@@ -71,10 +71,8 @@ function CreateTeamContent() {
 
         {/* Header */}
         <div className="mt-6 border-b border-grey-200 pb-6">
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
-            Workspace
-          </p>
-          <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
+          <p className="font-mono text-xs font-medium text-text-muted">Workspace</p>
+          <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-text-primary">
             Create a Team
           </h1>
           <p className="mt-2 font-mono text-sm leading-6 text-text-tertiary">
@@ -86,10 +84,7 @@ function CreateTeamContent() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {/* Team Name */}
           <div className="space-y-1.5">
-            <Label
-              htmlFor="name"
-              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-text-secondary"
-            >
+            <Label htmlFor="name" className="font-mono text-sm font-semibold text-text-secondary">
               Team Name
             </Label>
             <Input
@@ -107,7 +102,7 @@ function CreateTeamContent() {
           <div className="space-y-1.5">
             <Label
               htmlFor="description"
-              className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-text-secondary"
+              className="font-mono text-sm font-semibold text-text-secondary"
             >
               Description{" "}
               <span className="font-mono text-[10px] normal-case tracking-normal text-text-muted">
@@ -129,14 +124,14 @@ function CreateTeamContent() {
           <div className="flex items-center justify-end gap-3 border-t border-grey-100 pt-6">
             <Link
               href="/teams"
-              className="font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+              className="font-mono text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
             >
               Cancel
             </Link>
             <Button
               type="submit"
               disabled={isPending}
-              className="h-10 bg-grey-900 px-6 font-mono text-[11px] font-black uppercase tracking-[0.16em] hover:bg-grey-800 rounded-none"
+              className="h-10 bg-grey-900 px-6 font-mono text-sm font-medium hover:bg-grey-800 rounded-none"
             >
               {isPending ? (
                 <>

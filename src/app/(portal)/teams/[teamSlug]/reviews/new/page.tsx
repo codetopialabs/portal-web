@@ -66,7 +66,7 @@ ${formData.links.trim() || "None"}`;
         {/* Back */}
         <Link
           href={`/teams/${teamSlug}?tab=reviews`}
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-text-muted transition-colors hover:text-text-primary"
+          className="inline-flex items-center gap-2 font-mono text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Reviews
@@ -74,10 +74,8 @@ ${formData.links.trim() || "None"}`;
 
         {/* Header */}
         <div className="border-b border-grey-200 pb-6">
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-text-muted">
-            {team?.name}
-          </p>
-          <h1 className="mt-2 font-sans text-3xl font-black uppercase tracking-tight text-text-primary">
+          <p className="font-mono text-xs font-medium text-text-muted">{team?.name}</p>
+          <h1 className="mt-2 font-sans text-4xl font-bold tracking-tight text-text-primary">
             Open a Review
           </h1>
           <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
@@ -90,10 +88,7 @@ ${formData.links.trim() || "None"}`;
         <form onSubmit={handleCreate} className="space-y-8">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label
-                htmlFor="title"
-                className="font-mono text-xs font-bold uppercase tracking-widest text-text-primary"
-              >
+              <Label htmlFor="title" className="font-mono text-sm font-semibold text-text-primary">
                 Title <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -109,7 +104,7 @@ ${formData.links.trim() || "None"}`;
             <div className="space-y-2">
               <Label
                 htmlFor="category"
-                className="font-mono text-xs font-bold uppercase tracking-widest text-text-primary"
+                className="font-mono text-sm font-semibold text-text-primary"
               >
                 Category
               </Label>
@@ -127,7 +122,7 @@ ${formData.links.trim() || "None"}`;
                       key={cat}
                       type="button"
                       onClick={() => setFormData({ ...formData, category: cat })}
-                      className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border transition-colors ${
+                      className={`px-3 py-1.5 font-mono text-xs font-medium border transition-colors ${
                         formData.category === cat
                           ? "bg-grey-900 text-white border-grey-900"
                           : "bg-grey-50 text-text-tertiary border-grey-200 hover:bg-grey-100 hover:text-text-primary"
@@ -145,7 +140,7 @@ ${formData.links.trim() || "None"}`;
             <div className="space-y-2">
               <Label
                 htmlFor="workedOn"
-                className="font-mono text-xs font-bold uppercase tracking-widest text-text-primary"
+                className="font-mono text-sm font-semibold text-text-primary"
               >
                 What did you work on? <span className="text-red-500">*</span>
               </Label>
@@ -166,7 +161,7 @@ ${formData.links.trim() || "None"}`;
             <div className="space-y-2">
               <Label
                 htmlFor="challenges"
-                className="font-mono text-xs font-bold uppercase tracking-widest text-text-primary"
+                className="font-mono text-sm font-semibold text-text-primary"
               >
                 Challenges Faced
               </Label>
@@ -184,10 +179,7 @@ ${formData.links.trim() || "None"}`;
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="links"
-                className="font-mono text-xs font-bold uppercase tracking-widest text-text-primary"
-              >
+              <Label htmlFor="links" className="font-mono text-sm font-semibold text-text-primary">
                 References / Links
               </Label>
               <p className="font-mono text-[11px] text-text-tertiary mb-2">
@@ -209,14 +201,14 @@ ${formData.links.trim() || "None"}`;
               type="button"
               variant="ghost"
               onClick={() => router.push(`/teams/${teamSlug}?tab=reviews`)}
-              className="h-12 px-6 font-mono text-xs uppercase tracking-widest rounded-none"
+              className="h-12 px-6 font-mono text-sm font-medium rounded-none"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={createPending || !formData.title.trim() || !formData.workedOn.trim()}
-              className="h-12 bg-grey-900 px-8 font-mono text-xs uppercase tracking-widest hover:bg-grey-800 rounded-none shadow-sm"
+              className="h-12 bg-grey-900 px-8 font-mono text-sm font-medium hover:bg-grey-800 rounded-none shadow-sm"
             >
               {createPending ? (
                 <>
