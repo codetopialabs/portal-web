@@ -36,7 +36,12 @@ export function AvatarStack({
           width={size}
           height={size}
           className="border border-white object-cover shrink-0"
-          style={{ marginLeft: i > 0 ? -overlap : 0, zIndex: shown.length - i }}
+          style={{
+            width: size,
+            height: size,
+            marginLeft: i > 0 ? -overlap : 0,
+            zIndex: shown.length - i,
+          }}
         />
       ))}
       {overflow > 0 && (
