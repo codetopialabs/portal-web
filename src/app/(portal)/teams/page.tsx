@@ -1,10 +1,11 @@
 "use client";
 
-import { Check, Mail, Users, X } from "lucide-react";
+import { AlertCircle, Check, Crown, Mail, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { AvatarStack } from "@/components/ui/avatar-stack";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePermission } from "@/hooks/usePermission";
@@ -17,6 +18,43 @@ export default function TeamsDirectoryPage() {
     <RouteGuard permission="authenticated">
       <TeamsDirectoryContent />
     </RouteGuard>
+  );
+}
+
+function RoleBadge({ role }: { role?: "owner" | "lead" | "member" }) {
+  if (!role) return null;
+  if (role === "owner") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 border border-amber-300 bg-amber-50 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-amber-700">
+        <Crown className="h-3 w-3" />
+        Owner
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex shrink-0 items-center border border-grey-200 bg-white px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-text-secondary">
+      {role === "lead" ? "Lead" : "Member"}
+    </span>
+  );
+}
+
+function AttentionBadge({
+  pendingJoinRequests,
+  openReviews,
+}: {
+  pendingJoinRequests?: number | null;
+  openReviews?: number | null;
+}) {
+  const total = (pendingJoinRequests ?? 0) + (openReviews ?? 0);
+  if (total === 0) return null;
+  return (
+    <span
+      title={`${pendingJoinRequests ?? 0} join request(s) · ${openReviews ?? 0} open review(s)`}
+      className="inline-flex shrink-0 items-center gap-1 bg-red-600 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white"
+    >
+      <AlertCircle className="h-3 w-3" />
+      {total}
+    </span>
   );
 }
 
@@ -213,13 +251,27 @@ function TeamsDirectoryContent() {
                         </p>
                       )}
                     </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <AttentionBadge
+                        pendingJoinRequests={team.pendingJoinRequests}
+                        openReviews={team.openReviews}
+                      />
+                      <RoleBadge role={team.role} />
+                    </div>
                   </div>
 
                   <div className="mt-6 flex items-center justify-between border-t border-grey-100 pt-4">
-                    <div className="flex items-center gap-1.5 font-mono text-xs text-text-muted">
-                      <Users className="h-3.5 w-3.5" />
-                      <span>{team.memberCount ?? "—"} members</span>
-                    </div>
+                    {team.membersPreview && team.membersPreview.length > 0 ? (
+                      <AvatarStack
+                        members={team.membersPreview}
+                        totalCount={team.memberCount ?? team.membersPreview.length}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-1.5 font-mono text-xs text-text-muted">
+                        <Users className="h-3.5 w-3.5" />
+                        <span>{team.memberCount ?? "—"} members</span>
+                      </div>
+                    )}
                     <span className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-text-muted group-hover:text-text-primary transition-colors">
                       Open →
                     </span>

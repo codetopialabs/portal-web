@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { AvatarStack } from "@/components/ui/avatar-stack";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBrowseTeams, useRequestToJoin } from "@/hooks/useTeams";
@@ -25,10 +26,17 @@ function TeamCard({ team }: { team: BrowseTeam }) {
       </div>
 
       <div className="mt-6 flex items-center justify-between border-t border-grey-100 pt-4">
-        <div className="flex items-center gap-1.5 font-mono text-xs text-text-muted">
-          <Users className="h-3.5 w-3.5" />
-          <span>{team.memberCount ?? "—"} members</span>
-        </div>
+        {team.membersPreview && team.membersPreview.length > 0 ? (
+          <AvatarStack
+            members={team.membersPreview}
+            totalCount={team.memberCount ?? team.membersPreview.length}
+          />
+        ) : (
+          <div className="flex items-center gap-1.5 font-mono text-xs text-text-muted">
+            <Users className="h-3.5 w-3.5" />
+            <span>{team.memberCount ?? "—"} members</span>
+          </div>
+        )}
 
         {team.isMember ? (
           <Link
