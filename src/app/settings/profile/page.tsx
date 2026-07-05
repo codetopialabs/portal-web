@@ -18,7 +18,7 @@ import {
 import type React from "react";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,6 @@ interface ProfileFormValues {
   gender: string;
   nationality: string;
   bio: string;
-  discord_username: string;
   github_handle: string;
   linkedin_url: string;
   twitter_handle: string;
@@ -367,7 +366,6 @@ export default function SettingsProfilePage() {
       gender: profile?.gender ?? "",
       nationality: profile?.nationality ?? "",
       bio: profile?.bio ?? "",
-      discord_username: profile?.discordUsername ?? "",
       github_handle: profile?.githubHandle ?? "",
       linkedin_url: profile?.linkedinUrl ?? "",
       twitter_handle: profile?.twitterHandle ?? "",
@@ -414,7 +412,6 @@ export default function SettingsProfilePage() {
         gender: data.gender,
         nationality: data.nationality,
         bio: data.bio.trim(),
-        discord_username: data.discord_username.trim().replace(/^@/, ""),
         github_handle: sanitizeHandle(data.github_handle),
         linkedin_url: data.linkedin_url
           ? resolveSocialUrl(data.linkedin_url, "https://linkedin.com/in/")
@@ -997,14 +994,6 @@ export default function SettingsProfilePage() {
         <section id="settings-social-links" className="space-y-6">
           <SectionHeader icon={Globe} title="Social Links" />
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
-            <div className="flex items-center gap-3 px-4">
-              <FaDiscord className="w-4 h-4 shrink-0" style={{ color: "#5865F2" }} />
-              <input
-                placeholder="Discord username"
-                className="flex-1 h-11 bg-transparent font-mono text-sm placeholder:text-zinc-400 focus:outline-none text-zinc-900"
-                {...register("discord_username")}
-              />
-            </div>
             <div className="flex items-center gap-3 px-4">
               <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
               <input

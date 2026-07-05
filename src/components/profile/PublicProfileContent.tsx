@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import type { ComponentType } from "react";
-import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
@@ -116,6 +116,13 @@ export function PublicProfileContent() {
   const showAdminEdit = !isOwnProfile && canEditMembers;
 
   const socialLinks: SocialLink[] = [];
+  if (profile.discordId) {
+    socialLinks.push({
+      label: profile.discordUsername ? `@${profile.discordUsername}` : "Discord",
+      href: `https://discord.com/users/${profile.discordId}`,
+      icon: FaDiscord,
+    });
+  }
   if (profile.githubHandle) {
     socialLinks.push({
       label: "GitHub",
@@ -202,19 +209,7 @@ export function PublicProfileContent() {
                 <h1 className="font-sans text-5xl font-black leading-none tracking-tight text-white sm:text-7xl">
                   {profile.fullName}
                 </h1>
-                {profile.discordId ? (
-                  <a
-                    href={`https://discord.com/users/${profile.discordId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={`Message ${firstName} on Discord`}
-                    className="mt-1.5 inline-block font-mono text-sm text-zinc-400 transition-colors hover:text-white hover:underline"
-                  >
-                    @{profile.username}
-                  </a>
-                ) : (
-                  <p className="mt-1.5 font-mono text-sm text-zinc-400">@{profile.username}</p>
-                )}
+                <p className="mt-1.5 font-mono text-sm text-zinc-400">@{profile.username}</p>
                 <div className="mt-4 flex flex-wrap items-center gap-4 font-mono text-[11px] text-zinc-400">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-zinc-500" />

@@ -772,7 +772,13 @@ function MemberDetailContent({ username }: { username: string }) {
               <DetailItem label="Location" value={member.location} />
               <DetailItem
                 label="Discord"
-                value={member.discordId ? `@${member.username}` : member.discordUsername}
+                value={
+                  member.discordId
+                    ? member.discordUsername
+                      ? `@${member.discordUsername}`
+                      : "Linked"
+                    : null
+                }
                 href={
                   member.discordId ? `https://discord.com/users/${member.discordId}` : undefined
                 }
