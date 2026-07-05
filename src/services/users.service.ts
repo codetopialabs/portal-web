@@ -33,6 +33,7 @@ export const UsersService = {
     const payload: Record<string, unknown> = {};
     if (data.username !== undefined) payload.username = data.username;
     if (data.isEmailVerified !== undefined) payload.is_email_verified = data.isEmailVerified;
+    if (data.isOnboarded !== undefined) payload.is_onboarded = data.isOnboarded;
     if (data.fullName !== undefined) payload.full_name = data.fullName;
     if (data.bio !== undefined) payload.bio = data.bio;
     if (data.location !== undefined) payload.location = data.location;

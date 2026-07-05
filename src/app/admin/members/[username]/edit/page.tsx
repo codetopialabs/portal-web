@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Mail, MapPin, Shield } from "lucide-react";
+import { Mail, MapPin, Shield } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -59,6 +59,7 @@ function MemberEditFields({
   const [bio, setBio] = useState(member.bio ?? "");
   const [location, setLocation] = useState(member.location ?? "");
   const [isEmailVerified, setIsEmailVerified] = useState(Boolean(member.isEmailVerified));
+  const [isOnboarded, setIsOnboarded] = useState(Boolean(member.isOnboarded));
   const [memberStatus, setMemberStatus] = useState(member.memberStatus ?? "");
   const [currentRole, setCurrentRole] = useState(member.currentRole ?? "");
   const [errors, setErrors] = useState<{ fullName?: string; username?: string; form?: string }>({});
@@ -81,6 +82,7 @@ function MemberEditFields({
         data: {
           username: username.trim(),
           isEmailVerified,
+          isOnboarded,
           fullName: fullName.trim(),
           bio: bio.trim() || undefined,
           location: location.trim() || undefined,
@@ -235,12 +237,23 @@ function MemberEditFields({
                 />
               </label>
 
-              <div className="space-y-3 border border-grey-200 p-4 font-mono text-xs text-text-secondary">
-                <SideFact
-                  icon={CheckCircle2}
-                  label="Onboarded"
-                  value={member.isOnboarded ? "Yes" : "No"}
+              <label className="flex cursor-pointer items-start justify-between gap-4 border border-grey-200 p-4">
+                <div>
+                  <p className="font-mono text-sm font-medium text-text-primary">Onboarded</p>
+                  <p className="mt-1 font-mono text-xs leading-5 text-text-tertiary">
+                    Manually finish onboarding for a member who's stuck -- they'll show up in the
+                    community directory and their public profile once this is on.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={isOnboarded}
+                  onChange={(e) => setIsOnboarded(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 border-grey-300 accent-grey-900"
                 />
+              </label>
+
+              <div className="space-y-3 border border-grey-200 p-4 font-mono text-xs text-text-secondary">
                 <SideFact
                   icon={Mail}
                   label="Email"
