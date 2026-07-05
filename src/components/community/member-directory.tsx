@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Input } from "@/components/ui/input";
-import { usePermission } from "@/hooks/usePermission";
 import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
 import type { CommunityMember } from "@/services/user.service";
 import { normalizeUrl } from "@/utils/url";
@@ -38,7 +37,6 @@ export function MemberDirectory({
   initialRoleFilter = "all",
   onRoleFilterChange,
 }: MemberDirectoryProps) {
-  const canSeeMemberCounts = usePermission("users.edit");
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<MemberFilters>({
     ...EMPTY_FILTERS,
@@ -114,11 +112,6 @@ export function MemberDirectory({
       <div className="border border-zinc-200 bg-white">
         <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
           <p className="font-mono text-xs font-medium text-zinc-400">Directory</p>
-          {!isLoading && canSeeMemberCounts && (
-            <p className="font-mono text-xs text-zinc-400">
-              {filteredMembers.length} {filteredMembers.length === 1 ? "result" : "results"}
-            </p>
-          )}
         </div>
         <div className="flex flex-col gap-3 p-4 sm:flex-row">
           <div className="relative flex-1">
@@ -208,11 +201,7 @@ export function MemberDirectory({
             ref={loadMoreRef}
             className="flex items-center justify-between border border-zinc-200 bg-white px-4 py-3 font-mono text-xs text-zinc-400 sm:col-span-2 lg:col-span-3"
           >
-            <span>
-              {canSeeMemberCounts
-                ? `Showing ${visibleMembers.length} of ${filteredMembers.length}`
-                : `Showing ${visibleMembers.length}`}
-            </span>
+            <span>Showing {visibleMembers.length}</span>
             <span>Scroll for more</span>
           </div>
         )}
