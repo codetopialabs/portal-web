@@ -23,6 +23,7 @@ export const RolesService = {
       display_name: data.displayName,
       description: data.description ?? "",
       rank: data.rank,
+      is_public: data.isPublic ?? false,
       permissions: data.permissions,
     });
     return res.data.data;
@@ -33,6 +34,7 @@ export const RolesService = {
     if (data.displayName !== undefined) payload.display_name = data.displayName;
     if (data.description !== undefined) payload.description = data.description;
     if (data.rank !== undefined) payload.rank = data.rank;
+    if (data.isPublic !== undefined) payload.is_public = data.isPublic;
     if (data.permissions !== undefined) payload.permissions = data.permissions;
     const res = await axiosInstance.patch<ApiResponse<Role>>(`${ROLES_BASE}/${slug}/`, payload);
     return res.data.data;

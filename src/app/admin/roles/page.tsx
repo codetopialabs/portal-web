@@ -3,6 +3,7 @@
 import {
   AlertTriangle,
   ArrowUpRight,
+  Globe,
   LockKeyhole,
   Plus,
   Search,
@@ -116,6 +117,7 @@ function RoleRow({
     permissions: string[];
     memberCount: number;
     isSystem: boolean;
+    isPublic: boolean;
   };
   canDelete: boolean;
 }) {
@@ -144,6 +146,12 @@ function RoleRow({
           </span>
           {role.isSystem && (
             <LockKeyhole className="h-3 w-3 shrink-0 text-icon-muted" aria-label="System role" />
+          )}
+          {role.isPublic && (
+            <Globe
+              className="h-3 w-3 shrink-0 text-info-500"
+              aria-label="Public on the community directory"
+            />
           )}
           {highRisk && (
             <AlertTriangle

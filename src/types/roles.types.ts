@@ -6,6 +6,7 @@ export interface Role {
   rank: number;
   permissions: string[];
   isSystem: boolean;
+  isPublic: boolean;
   memberCount: number;
 }
 
@@ -16,6 +17,7 @@ export interface CreateRoleInput {
   displayName: string;
   description?: string;
   rank: number;
+  isPublic?: boolean;
   permissions: string[];
 }
 
@@ -23,5 +25,6 @@ export interface UpdateRoleInput {
   displayName?: string;
   description?: string;
   rank?: number;
+  isPublic?: boolean;
   permissions?: string[];
 }
