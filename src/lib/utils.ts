@@ -33,17 +33,20 @@ export function toTitleCase(value: string): string {
 }
 
 /**
- * Strips protocol, domain, leading "@", and trailing slash from a pasted
- * profile URL/handle, leaving just the bare handle — e.g.
- * "https://github.com/octocat/" or "@octocat" both become "octocat".
+ * Strips protocol, domain, leading "@", and any path/query/fragment after
+ * the handle from a pasted profile URL/handle, leaving just the bare
+ * handle — e.g. "https://github.com/octocat/repositories?tab=overview" and
+ * "@octocat" both become "octocat". A handle can never legitimately contain
+ * "/", "?", or "#", so anything from the first one onward is dropped rather
+ * than just trimming a single trailing slash.
  */
 export function sanitizeHandle(value: string): string {
-  return value
+  const withoutDomain = value
     .trim()
     .replace(/^https?:\/\//i, "")
     .replace(/^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+\//i, "")
-    .replace(/^@/, "")
-    .replace(/\/+$/, "");
+    .replace(/^@/, "");
+  return withoutDomain.split(/[/?#]/)[0];
 }
 
 const DOMAIN_LIKE = /^(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i;
