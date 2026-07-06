@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Globe,
   LockKeyhole,
   Shield,
   ShieldAlert,
@@ -213,6 +214,12 @@ function RoleDetailContent({ slug }: { slug: string }) {
                 </h1>
                 {role.isSystem && (
                   <LockKeyhole className="h-3.5 w-3.5 text-icon-muted" aria-label="System role" />
+                )}
+                {role.isPublic && (
+                  <span className="inline-flex items-center gap-1 border border-info-200 bg-info-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-info-700">
+                    <Globe className="h-3 w-3" />
+                    Public
+                  </span>
                 )}
                 {hasGlobalWildcard && (
                   <span className="inline-flex items-center gap-1 border border-error-200 bg-error-50 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-error-700">

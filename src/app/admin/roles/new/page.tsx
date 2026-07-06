@@ -25,6 +25,7 @@ function NewRoleForm() {
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
   const [rank, setRank] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [errors, setErrors] = useState<{
@@ -60,6 +61,7 @@ function NewRoleForm() {
         displayName: displayName.trim(),
         description: description.trim(),
         rank: Number(rank),
+        isPublic,
         permissions,
       },
       {
@@ -169,6 +171,24 @@ function NewRoleForm() {
               className="w-full resize-y rounded-none border border-grey-300 bg-white p-3 font-mono text-sm text-text-primary outline-none focus:border-grey-900"
             />
           </div>
+
+          <label className="flex cursor-pointer items-start gap-3 border border-grey-200 p-3 hover:bg-grey-50">
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="mt-0.5 h-3.5 w-3.5 shrink-0"
+            />
+            <div>
+              <p className="font-mono text-xs font-bold text-text-primary">
+                Public on the community directory
+              </p>
+              <p className="mt-1 font-mono text-[11px] leading-5 text-text-muted">
+                When on, this role's name is visible on member profiles and can be used to filter
+                the community directory. Leave off for internal/admin-only roles.
+              </p>
+            </div>
+          </label>
         </div>
       </section>
 
