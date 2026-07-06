@@ -186,7 +186,7 @@ export interface ReviewComment {
 }
 
 export interface ContributionItem {
-  type: "review_approved" | "commit" | "pull_request_merged";
+  type: "review_approved" | "pull_request_merged";
   title: string;
   url: string;
   timestamp: string;

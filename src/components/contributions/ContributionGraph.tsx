@@ -3,7 +3,7 @@
 import {
   Activity as ActivityIcon,
   CalendarDays,
-  GitCommitHorizontal,
+  ExternalLink,
   GitPullRequest,
   Sparkles,
   X,
@@ -16,6 +16,7 @@ import {
   type BlockElement,
   type ThemeInput,
 } from "react-activity-calendar";
+import { Badge } from "@/components/ui/badge";
 import { useContributions } from "@/hooks/useTeams";
 import type { ContributionDay, ContributionItem } from "@/services/teams.service";
 
@@ -39,11 +40,6 @@ const ITEM_TYPE_META: Record<
     label: "Review approved",
     badgeClassName: "bg-emerald-50 text-emerald-600",
   },
-  commit: {
-    icon: GitCommitHorizontal,
-    label: "Commit",
-    badgeClassName: "bg-zinc-100 text-zinc-600",
-  },
   pull_request_merged: {
     icon: GitPullRequest,
     label: "PR merged",
@@ -59,6 +55,12 @@ function formatDayLabel(dateStr: string): string {
     day: "numeric",
     year: "numeric",
   }).format(d);
+}
+
+function formatTime(timestamp: string): string {
+  return new Intl.DateTimeFormat("en", { hour: "numeric", minute: "2-digit" }).format(
+    new Date(timestamp)
+  );
 }
 
 function DayDetailPanel({
@@ -93,27 +95,40 @@ function DayDetailPanel({
           <X className="h-4 w-4" />
         </button>
       </div>
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {day.items.map((item, i) => {
           const meta = ITEM_TYPE_META[item.type];
           const Icon = meta.icon;
+          const isExternal = item.source === "github";
           const content = (
             <>
               <div
-                className={`flex h-7 w-7 shrink-0 items-center justify-center ${meta.badgeClassName}`}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${meta.badgeClassName}`}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-mono text-xs text-zinc-800">{item.title}</p>
-                <p className="font-mono text-[10px] font-medium text-zinc-400">{meta.label}</p>
+                <p className="truncate font-sans text-sm font-medium text-zinc-800">{item.title}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <Badge
+                    className={`h-[18px] rounded-none px-1.5 text-[9px] font-bold uppercase tracking-wide ${meta.badgeClassName}`}
+                  >
+                    {meta.label}
+                  </Badge>
+                  <span className="font-mono text-[10px] text-zinc-400">
+                    {formatTime(item.timestamp)}
+                  </span>
+                </div>
               </div>
+              {isExternal && (
+                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-zinc-300 transition-colors group-hover:text-zinc-500" />
+              )}
             </>
           );
-          const linkClassName =
-            "group flex items-center gap-3 border border-zinc-200 bg-white p-2.5 transition-all hover:border-zinc-900 hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.08)]";
+          const rowClassName =
+            "group flex items-center gap-3 border border-zinc-200 bg-white p-3 transition-colors hover:border-zinc-300 hover:bg-zinc-50";
 
-          if (item.source === "github") {
+          if (isExternal) {
             return (
               <a
                 // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
@@ -121,7 +136,7 @@ function DayDetailPanel({
                 href={item.url}
                 target="_blank"
                 rel="noreferrer"
-                className={linkClassName}
+                className={rowClassName}
               >
                 {content}
               </a>
@@ -136,7 +151,7 @@ function DayDetailPanel({
               <div
                 // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
                 key={i}
-                className="flex items-center gap-3 border border-zinc-200 bg-white p-2.5"
+                className="flex items-center gap-3 border border-zinc-200 bg-white p-3"
               >
                 {content}
               </div>
@@ -148,7 +163,7 @@ function DayDetailPanel({
               // biome-ignore lint/suspicious/noArrayIndexKey: items have no stable id
               key={i}
               href={item.url}
-              className={linkClassName}
+              className={rowClassName}
             >
               {content}
             </Link>
