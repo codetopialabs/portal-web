@@ -57,11 +57,10 @@ function Tab({ label, active, onClick }: { label: string; active: boolean; onCli
     <button
       type="button"
       onClick={onClick}
-      className={`-mb-px border-b-2 px-1 pb-3 font-mono text-sm font-bold transition-colors ${
-        active
-          ? "border-grey-900 text-text-primary"
-          : "border-transparent text-text-muted hover:text-text-primary"
-      }`}
+      className={`-mb-px border-b-2 px-1 pb-3 font-mono text-sm font-bold transition-colors ${active
+        ? "border-grey-900 text-text-primary"
+        : "border-transparent text-text-muted hover:text-text-primary"
+        }`}
     >
       {label}
     </button>
@@ -85,11 +84,10 @@ function SubFilter({
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-8 items-center gap-2 border px-3 font-mono text-xs font-bold transition-colors ${
-        active
-          ? "border-grey-900 bg-grey-900 text-white"
-          : "border-grey-200 bg-white text-text-secondary hover:border-grey-400"
-      }`}
+      className={`flex h-8 items-center gap-2 border px-3 font-mono text-xs font-bold transition-colors ${active
+        ? "border-grey-900 bg-grey-900 text-white"
+        : "border-grey-200 bg-white text-text-secondary hover:border-grey-400"
+        }`}
     >
       {label}
       <span
@@ -375,7 +373,7 @@ function SubmittedTab({
                 <div className="flex items-center gap-3 min-w-0">
                   {/* biome-ignore lint/performance/noImgElement: avatar URL from API, next/image domain config not set up yet */}
                   <img
-                    src={getAvatarUrl(null, r.fullName)}
+                    src={getAvatarUrl(r.profilePictureUrl || null, r.fullName)}
                     alt={r.fullName}
                     className="h-8 w-8 shrink-0 object-cover"
                   />
