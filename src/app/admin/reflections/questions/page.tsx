@@ -14,7 +14,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -167,9 +166,7 @@ function ActiveQuestionRow({
 
   return (
     <div className="flex items-start gap-3 px-5 py-4">
-      {canManage && (
-        <GripVertical className="mt-0.5 h-4 w-4 shrink-0 cursor-grab text-zinc-300" />
-      )}
+      {canManage && <GripVertical className="mt-0.5 h-4 w-4 shrink-0 cursor-grab text-zinc-300" />}
       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-zinc-100 font-mono text-[11px] font-bold text-zinc-500">
         {index + 1}
       </span>
@@ -180,10 +177,11 @@ function ActiveQuestionRow({
             {TYPE_LABELS[question.type] ?? question.type}
           </span>
           <span
-            className={`border px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide ${question.isRequired
-              ? "border-zinc-300 bg-zinc-100 text-zinc-500"
-              : "border-zinc-200 bg-white text-zinc-400"
-              }`}
+            className={`border px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide ${
+              question.isRequired
+                ? "border-zinc-300 bg-zinc-100 text-zinc-500"
+                : "border-zinc-200 bg-white text-zinc-400"
+            }`}
           >
             {question.isRequired ? "Required" : "Optional"}
           </span>
@@ -244,8 +242,8 @@ function ActiveQuestionSet({ canManage }: { canManage: boolean }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="font-mono text-[11px] text-zinc-400">
-          {activeCount} of {totalCount} question{totalCount !== 1 ? "s" : ""} active — these will
-          be used in the next confirmed cycle
+          {activeCount} of {totalCount} question{totalCount !== 1 ? "s" : ""} active — these will be
+          used in the next confirmed cycle
         </p>
         {canManage && (
           <Button
@@ -280,12 +278,7 @@ function ActiveQuestionSet({ canManage }: { canManage: boolean }) {
       ) : (
         <div className="divide-y divide-zinc-100 border border-zinc-200 bg-white">
           {questions.map((q, i) => (
-            <ActiveQuestionRow
-              key={q.id}
-              question={q}
-              index={i}
-              canManage={canManage}
-            />
+            <ActiveQuestionRow key={q.id} question={q} index={i} canManage={canManage} />
           ))}
         </div>
       )}
@@ -316,9 +309,7 @@ function PastCycleCard({
         className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-zinc-50"
       >
         <div className="flex items-center gap-3">
-          <span className="font-sans text-sm font-bold text-zinc-900">
-            {formatPeriod(period)}
-          </span>
+          <span className="font-sans text-sm font-bold text-zinc-900">{formatPeriod(period)}</span>
           <span className="border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] font-bold text-zinc-500">
             {questions.length} question{questions.length !== 1 ? "s" : ""}
           </span>
@@ -436,12 +427,7 @@ function QuestionHistory({ canManage }: { canManage: boolean }) {
   return (
     <div className="space-y-2">
       {visible.map(({ period, questions }) => (
-        <PastCycleCard
-          key={period}
-          period={period}
-          questions={questions}
-          canManage={canManage}
-        />
+        <PastCycleCard key={period} period={period} questions={questions} canManage={canManage} />
       ))}
       {hasMore && (
         <button
@@ -467,7 +453,9 @@ function QuestionBankContent() {
         <div className="mb-1 flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-zinc-400" />
           <p className="font-mono text-xs font-medium text-zinc-400">
-            <Link href="/admin/reflections" className="transition-colors hover:text-zinc-900">Reflections</Link>
+            <Link href="/admin/reflections" className="transition-colors hover:text-zinc-900">
+              Reflections
+            </Link>
             {" · "}
             Admin
           </p>

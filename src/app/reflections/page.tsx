@@ -150,8 +150,8 @@ function CurrentCycleBanner() {
                 data.reviewerNotes &&
                 Object.keys(data.reviewerNotes).length > 0 && (
                   <span className="font-mono text-[10px] text-red-600 truncate max-w-xs">
-                    {data.reviewerNotes["_legacy"]
-                      ? `"${data.reviewerNotes["_legacy"]}"`
+                    {data.reviewerNotes._legacy
+                      ? `"${data.reviewerNotes._legacy}"`
                       : "Feedback added to your answers — click to view"}
                   </span>
                 )}
@@ -227,14 +227,14 @@ function ReflectionCard({ r }: { r: ReflectionRecord }) {
       {expanded && (
         <div className="space-y-4 border-t border-grey-200 bg-grey-50/60 px-5 py-4">
           {/* Legacy flat note (pre-migration data) */}
-          {r.reviewerNotes?.["_legacy"] && (
+          {r.reviewerNotes?._legacy && (
             <div className="border border-grey-200 bg-white p-4">
               <div className="mb-1.5 flex items-center gap-1.5 font-mono text-xs font-semibold text-text-muted">
                 <MessageSquareText className="h-3.5 w-3.5" />
                 Reviewer feedback
               </div>
               <p className="whitespace-pre-wrap font-mono text-sm text-text-secondary">
-                {r.reviewerNotes["_legacy"]}
+                {r.reviewerNotes._legacy}
               </p>
             </div>
           )}

@@ -22,17 +22,18 @@ export function ReflectionPrompt() {
     changesRequested &&
     data?.reviewerNotes &&
     Object.entries(data.reviewerNotes).some(([k, v]) => k !== "_legacy" && v?.trim());
-  const legacyNote = data?.reviewerNotes?.["_legacy"];
+  const legacyNote = data?.reviewerNotes?._legacy;
 
   const label = changesRequested
     ? "Your reflection needs an update."
     : "Your monthly reflection is open.";
 
-  const body = changesRequested && (hasPerQuestionNotes || legacyNote)
-    ? "Feedback has been added to your answers."
-    : typeof daysRemaining === "number" && daysRemaining > 0
-      ? `${daysRemaining} day(s) left to submit.`
-      : "Due today.";
+  const body =
+    changesRequested && (hasPerQuestionNotes || legacyNote)
+      ? "Feedback has been added to your answers."
+      : typeof daysRemaining === "number" && daysRemaining > 0
+        ? `${daysRemaining} day(s) left to submit.`
+        : "Due today.";
 
   return (
     <SystemBanner

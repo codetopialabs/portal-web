@@ -175,7 +175,12 @@ export const ReflectionsService = {
     opensOn?: string;
   }> {
     const res = await axiosInstance.post<
-      ApiResponse<{ detail: string; questionsConfirmed: boolean; period?: string; opensOn?: string }>
+      ApiResponse<{
+        detail: string;
+        questionsConfirmed: boolean;
+        period?: string;
+        opensOn?: string;
+      }>
     >(`${BASE}/settings/confirm-questions/`);
     return res.data.data;
   },

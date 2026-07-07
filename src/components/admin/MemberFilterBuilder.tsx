@@ -171,7 +171,7 @@ export interface FilterQuery {
 }
 
 function newCondition(field: FieldDef["key"] = "isActive"): FilterCondition {
-  const def = FIELDS.find((f) => f.key === field)!;
+  const def = FIELDS.find((f) => f.key === field) ?? FIELDS[0];
   const op = OPERATORS_BY_TYPE[def.type][0].value;
   const val = def.options?.[0]?.value ?? "";
   return { id: crypto.randomUUID(), field, operator: op, value: val };
@@ -331,18 +331,19 @@ function ConditionRow({
   const activeOp = operators.find((o) => o.value === condition.operator) ?? operators[0];
 
   function handleFieldChange(key: string) {
-    const def = FIELDS.find((f) => f.key === key)!;
+    const def = FIELDS.find((f) => f.key === key);
+    if (!def) return;
     const op = OPERATORS_BY_TYPE[def.type][0].value;
     const val = def.options?.[0]?.value ?? "";
     onChange({ ...condition, field: key as FieldDef["key"], operator: op, value: val });
   }
 
   function handleOperatorChange(op: string) {
-    const opDef = operators.find((o) => o.value === op)!;
+    const opDef = operators.find((o) => o.value === op);
     onChange({
       ...condition,
       operator: op as Operator,
-      value: opDef.noValue ? "" : condition.value,
+      value: opDef?.noValue ? "" : condition.value,
     });
   }
 
@@ -367,32 +368,29 @@ function ConditionRow({
       />
 
       {/* Value */}
-      {!activeOp.noValue && (
-        <>
-          {fieldDef.options ? (
-            <StyledSelect
-              value={condition.value}
-              onChange={(v) => onChange({ ...condition, value: v })}
-              options={fieldDef.options}
-              className="min-w-[110px]"
-            />
-          ) : fieldDef.type === "date" ? (
-            <input
-              type="date"
-              value={condition.value}
-              onChange={(e) => onChange({ ...condition, value: e.target.value })}
-              className="h-8 border border-zinc-200 bg-white px-2.5 font-mono text-xs text-zinc-800 outline-none focus:border-zinc-900 hover:border-zinc-400 transition-colors"
-            />
-          ) : (
-            <Input
-              value={condition.value}
-              onChange={(e) => onChange({ ...condition, value: e.target.value })}
-              placeholder="Value…"
-              className="h-8 w-32 rounded-none border-zinc-200 font-mono text-xs"
-            />
-          )}
-        </>
-      )}
+      {!activeOp.noValue &&
+        (fieldDef.options ? (
+          <StyledSelect
+            value={condition.value}
+            onChange={(v) => onChange({ ...condition, value: v })}
+            options={fieldDef.options}
+            className="min-w-[110px]"
+          />
+        ) : fieldDef.type === "date" ? (
+          <input
+            type="date"
+            value={condition.value}
+            onChange={(e) => onChange({ ...condition, value: e.target.value })}
+            className="h-8 border border-zinc-200 bg-white px-2.5 font-mono text-xs text-zinc-800 outline-none focus:border-zinc-900 hover:border-zinc-400 transition-colors"
+          />
+        ) : (
+          <Input
+            value={condition.value}
+            onChange={(e) => onChange({ ...condition, value: e.target.value })}
+            placeholder="Value…"
+            className="h-8 w-32 rounded-none border-zinc-200 font-mono text-xs"
+          />
+        ))}
 
       {showDelete && (
         <button

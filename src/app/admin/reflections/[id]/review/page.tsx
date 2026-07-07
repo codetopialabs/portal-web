@@ -56,7 +56,9 @@ function formatDate(value: string | null) {
   if (!value) return "—";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "—";
-  return new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(d);
+  return new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric" }).format(
+    d
+  );
 }
 
 function formatPeriod(value: string) {

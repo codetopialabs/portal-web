@@ -2,11 +2,11 @@
 
 import { AlertTriangle, Clock, PenLine, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { usePermission } from "@/hooks/usePermission";
+import type { BannerVariant } from "@/components/dashboard/Navbar";
 import { useMe } from "@/hooks/useMe";
+import { usePermission } from "@/hooks/usePermission";
 import { useCurrentReflection, useUpcomingCycle } from "@/hooks/useReflections";
 import { useMyInvites } from "@/hooks/useTeams";
-import type { BannerVariant } from "@/components/dashboard/Navbar";
 
 export interface BannerDef {
   id: string;
@@ -63,7 +63,7 @@ function useReflectionBanner(pathname: string): BannerDef | null {
     changesRequested &&
     data.reviewerNotes &&
     Object.entries(data.reviewerNotes).some(([k, v]) => k !== "_legacy" && v?.trim());
-  const legacyNote = data.reviewerNotes?.["_legacy"];
+  const legacyNote = data.reviewerNotes?._legacy;
   const daysRemaining = data.daysRemaining;
 
   const label = changesRequested

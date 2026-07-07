@@ -20,17 +20,39 @@ import {
   useReflectionQuestions,
   useReflectionSettings,
   useTriggerReflectionCycle,
-  useUpdateReflectionSettings,
   useUpcomingCycle,
+  useUpdateReflectionSettings,
 } from "@/hooks/useReflections";
 
 const ORDINAL: Record<number, string> = {
-  1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th",
-  6: "6th", 7: "7th", 8: "8th", 9: "9th", 10: "10th",
-  11: "11th", 12: "12th", 13: "13th", 14: "14th", 15: "15th",
-  16: "16th", 17: "17th", 18: "18th", 19: "19th", 20: "20th",
-  21: "21st", 22: "22nd", 23: "23rd", 24: "24th", 25: "25th",
-  26: "26th", 27: "27th", 28: "28th",
+  1: "1st",
+  2: "2nd",
+  3: "3rd",
+  4: "4th",
+  5: "5th",
+  6: "6th",
+  7: "7th",
+  8: "8th",
+  9: "9th",
+  10: "10th",
+  11: "11th",
+  12: "12th",
+  13: "13th",
+  14: "14th",
+  15: "15th",
+  16: "16th",
+  17: "17th",
+  18: "18th",
+  19: "19th",
+  20: "20th",
+  21: "21st",
+  22: "22nd",
+  23: "23rd",
+  24: "24th",
+  25: "25th",
+  26: "26th",
+  27: "27th",
+  28: "28th",
 };
 
 /* ── Section wrapper ─────────────────────────────────────────────────────── */
@@ -48,9 +70,7 @@ function Section({
     <div className="border border-zinc-200 bg-white">
       <div className="border-b border-zinc-200 bg-zinc-50 px-5 py-3">
         <h2 className="font-sans text-base font-bold text-zinc-900">{title}</h2>
-        {description && (
-          <p className="mt-0.5 font-mono text-[11px] text-zinc-400">{description}</p>
-        )}
+        {description && <p className="mt-0.5 font-mono text-[11px] text-zinc-400">{description}</p>}
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -94,8 +114,7 @@ function ConfirmQuestionsSection() {
             Questions confirmed for {formatPeriod(upcoming.period)}
           </p>
           <p className="font-mono text-[10px] text-emerald-600">
-            The cycle will open on {formatDate(upcoming.opensOn)}. Members can submit once it
-            opens.
+            The cycle will open on {formatDate(upcoming.opensOn)}. Members can submit once it opens.
           </p>
         </div>
       </div>
@@ -114,8 +133,7 @@ function ConfirmQuestionsSection() {
           </p>
           <p className="font-mono text-[10px] text-amber-600 mt-0.5">
             The {formatPeriod(upcoming.period)} cycle won't open to members until you confirm the
-            question set. Scheduled to open on{" "}
-            <strong>{formatDate(upcoming.opensOn)}</strong>.
+            question set. Scheduled to open on <strong>{formatDate(upcoming.opensOn)}</strong>.
           </p>
         </div>
       </div>
@@ -148,9 +166,7 @@ function ConfirmQuestionsSection() {
                 <p className="font-mono text-xs font-bold text-zinc-900">
                   {i + 1}. {q.prompt}
                 </p>
-                {q.helpText && (
-                  <p className="font-mono text-[11px] text-zinc-400">{q.helpText}</p>
-                )}
+                {q.helpText && <p className="font-mono text-[11px] text-zinc-400">{q.helpText}</p>}
               </div>
             ))}
           </div>
@@ -234,10 +250,11 @@ function ScheduleSection() {
                   setOpenDay(d);
                   setDirty(true);
                 }}
-                className={`h-9 w-9 font-mono text-xs font-bold transition-colors ${openDay === d
+                className={`h-9 w-9 font-mono text-xs font-bold transition-colors ${
+                  openDay === d
                     ? "bg-zinc-900 text-white"
                     : "border border-zinc-200 bg-white text-zinc-500 hover:border-zinc-900 hover:text-zinc-900"
-                  }`}
+                }`}
               >
                 {d}
               </button>
@@ -271,8 +288,8 @@ function ScheduleSection() {
       {settings && (
         <p className="border border-zinc-100 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-500">
           Currently: reflections open on the{" "}
-          <span className="font-bold text-zinc-900">{ORDINAL[settings.openDay]}</span> of each
-          month and stay open for{" "}
+          <span className="font-bold text-zinc-900">{ORDINAL[settings.openDay]}</span> of each month
+          and stay open for{" "}
           <span className="font-bold text-zinc-900">{settings.windowDays} days</span>.
         </p>
       )}
@@ -316,8 +333,8 @@ function TriggerSection() {
     <div className="space-y-4">
       <p className="font-mono text-xs leading-6 text-zinc-500">
         Opens a reflection cycle for the current month starting{" "}
-        <span className="font-bold text-zinc-900">right now</span>, regardless of the schedule. If
-        a cycle for this month already exists, its window will be updated to start today.
+        <span className="font-bold text-zinc-900">right now</span>, regardless of the schedule. If a
+        cycle for this month already exists, its window will be updated to start today.
       </p>
 
       {result && (

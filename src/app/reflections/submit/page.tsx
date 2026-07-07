@@ -214,19 +214,19 @@ function ReflectionSubmitContent() {
           <div className="mt-5 border-l-4 border-red-500 bg-red-50 px-4 py-3">
             <p className="font-mono text-xs font-semibold text-red-700">Changes requested</p>
             {/* Legacy flat note */}
-            {data.reviewerNotes["_legacy"] && (
+            {data.reviewerNotes._legacy && (
               <p className="mt-1 font-mono text-xs leading-6 text-red-700">
-                {data.reviewerNotes["_legacy"]}
+                {data.reviewerNotes._legacy}
               </p>
             )}
             {/* Per-question notes summary */}
             {Object.entries(data.reviewerNotes)
               .filter(([key]) => key !== "_legacy")
               .some(([, v]) => v?.trim()) && (
-                <p className="mt-1 font-mono text-xs text-red-600">
-                  See individual feedback notes on each question below.
-                </p>
-              )}
+              <p className="mt-1 font-mono text-xs text-red-600">
+                See individual feedback notes on each question below.
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -283,17 +283,16 @@ function ReflectionSubmitContent() {
               )}
 
               {/* Per-question reviewer feedback */}
-              {data.status === "changes_requested" &&
-                data.reviewerNotes?.[question.id]?.trim() && (
-                  <div className="mt-2 border-l-4 border-red-400 bg-red-50 px-4 py-2.5">
-                    <p className="font-mono text-[10px] font-bold uppercase tracking-wide text-red-600">
-                      Reviewer feedback
-                    </p>
-                    <p className="mt-1 font-mono text-xs leading-5 text-red-700">
-                      {data.reviewerNotes[question.id]}
-                    </p>
-                  </div>
-                )}
+              {data.status === "changes_requested" && data.reviewerNotes?.[question.id]?.trim() && (
+                <div className="mt-2 border-l-4 border-red-400 bg-red-50 px-4 py-2.5">
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-wide text-red-600">
+                    Reviewer feedback
+                  </p>
+                  <p className="mt-1 font-mono text-xs leading-5 text-red-700">
+                    {data.reviewerNotes[question.id]}
+                  </p>
+                </div>
+              )}
 
               <div className={cn(questionNeedsText(question) && "mt-3")}>
                 <label

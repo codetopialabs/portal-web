@@ -245,6 +245,6 @@ export function DashboardNavbar() {
   );
 }
 
+export type { BannerVariant };
 /* ─── Export SystemBanner for use by other banner components ──────────────── */
 export { SystemBanner };
-export type { BannerVariant };

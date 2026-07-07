@@ -98,7 +98,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
   const review = useReviewCareerProgression();
   const [note, setNote] = useState("");
   const [activeAction, setActiveAction] = useState<"reject" | "revoke" | null>(null);
-  const meta = STATUS_META[item.status];
+  const _meta = STATUS_META[item.status];
 
   async function submit(action: "approve" | "reject" | "revoke") {
     try {
@@ -145,9 +145,7 @@ function ReviewCard({ item }: { item: CareerProgression }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-            <h3 className="font-sans text-sm font-bold text-zinc-950 leading-snug">
-              {item.title}
-            </h3>
+            <h3 className="font-sans text-sm font-bold text-zinc-950 leading-snug">{item.title}</h3>
             <StatusPill status={item.status} />
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -179,7 +177,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
       {/* ── Prior review note (non-pending) ── */}
       {item.status !== "pending" && item.reviewNote && (
         <div className="mx-5 mb-3 border-l-2 border-zinc-200 pl-3">
-          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Review note</p>
+          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">
+            Review note
+          </p>
           <p className="font-mono text-xs leading-5 text-zinc-500">{item.reviewNote}</p>
         </div>
       )}
