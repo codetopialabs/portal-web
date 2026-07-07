@@ -5,6 +5,7 @@ import type {
   ReflectionQuestion,
   ReflectionQuestionInput,
   ReflectionRecord,
+  UpcomingCycleInfo,
 } from "@/types/reflections.types";
 
 const BASE = "/reflections";
@@ -80,11 +81,11 @@ export const ReflectionsService = {
   async review(
     id: string,
     action: "approve" | "request_changes",
-    notes?: string
+    notes?: Record<string, string>
   ): Promise<ReflectionRecord> {
     const res = await axiosInstance.post<ApiResponse<ReflectionRecord>>(`${BASE}/${id}/`, {
       action,
-      notes: notes ?? "",
+      notes: notes ?? {},
     });
     return res.data.data;
   },
@@ -157,6 +158,25 @@ export const ReflectionsService = {
     const res = await axiosInstance.post<
       ApiResponse<{ detail: string; period: string; opensOn: string; dueOn: string }>
     >(`${BASE}/settings/trigger/`);
+    return res.data.data;
+  },
+
+  async getUpcomingCycle(): Promise<UpcomingCycleInfo> {
+    const res = await axiosInstance.get<ApiResponse<UpcomingCycleInfo>>(
+      `${BASE}/settings/upcoming/`
+    );
+    return res.data.data;
+  },
+
+  async confirmQuestions(): Promise<{
+    detail: string;
+    questionsConfirmed: boolean;
+    period?: string;
+    opensOn?: string;
+  }> {
+    const res = await axiosInstance.post<
+      ApiResponse<{ detail: string; questionsConfirmed: boolean; period?: string; opensOn?: string }>
+    >(`${BASE}/settings/confirm-questions/`);
     return res.data.data;
   },
 };
