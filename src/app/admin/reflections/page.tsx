@@ -375,7 +375,7 @@ function SubmittedTab({
                 <div className="flex items-center gap-3 min-w-0">
                   {/* biome-ignore lint/performance/noImgElement: avatar URL from API, next/image domain config not set up yet */}
                   <img
-                    src={getAvatarUrl(null, r.fullName)}
+                    src={getAvatarUrl(r.profilePictureUrl || null, r.fullName)}
                     alt={r.fullName}
                     className="h-8 w-8 shrink-0 object-cover"
                   />

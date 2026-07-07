@@ -32,10 +32,20 @@ export interface CurrentReflection {
   isOpen: boolean;
   status: ReflectionStatus;
   daysRemaining?: number;
-  reviewerNotes?: string;
+  /** Per-question reviewer notes. Key "_legacy" holds pre-migration flat notes. */
+  reviewerNotes?: Record<string, string>;
   answers?: Record<string, string>;
   attachments?: Record<string, string[]>;
   cycle: ReflectionCycleInfo | null;
+}
+
+export interface UpcomingCycleInfo {
+  id: string;
+  period: string;
+  opensOn: string;
+  dueOn: string;
+  questionsConfirmed: boolean;
+  questionsSnapshot: ReflectionQuestionSnapshot[];
 }
 
 export interface ReflectionRecord {
@@ -43,13 +53,15 @@ export interface ReflectionRecord {
   userId: string;
   username: string;
   fullName: string;
+  profilePictureUrl: string;
   period: string;
   questions: ReflectionQuestionSnapshot[];
   answers: Record<string, string>;
   attachments: Record<string, string[]>;
   status: ReflectionStatus;
   submittedAt: string | null;
-  reviewerNotes: string;
+  /** Per-question reviewer notes: { questionId: noteText }. Key "_legacy" holds pre-migration notes. */
+  reviewerNotes: Record<string, string>;
   reviewedByEmail: string;
   reviewedByUsername: string;
   reviewedByFullName: string;

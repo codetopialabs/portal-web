@@ -74,7 +74,7 @@ export function useReviewReflection() {
     }: {
       id: string;
       action: "approve" | "request_changes";
-      notes?: string;
+      notes?: Record<string, string>;
     }) => ReflectionsService.review(id, action, notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reflections", "list"] });
@@ -133,5 +133,22 @@ export function useUpdateReflectionSettings() {
 export function useTriggerReflectionCycle() {
   return useMutation({
     mutationFn: () => ReflectionsService.triggerCycle(),
+  });
+}
+
+export function useUpcomingCycle() {
+  return useQuery({
+    queryKey: ["reflections", "upcoming"] as const,
+    queryFn: () => ReflectionsService.getUpcomingCycle(),
+  });
+}
+
+export function useConfirmReflectionQuestions() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => ReflectionsService.confirmQuestions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reflections", "upcoming"] });
+    },
   });
 }
