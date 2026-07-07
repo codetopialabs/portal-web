@@ -16,6 +16,12 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
+import {
+  MemberFilterBuilder,
+  applyFilterQuery,
+  emptyQuery,
+} from "@/components/admin/MemberFilterBuilder";
+import type { FilterQuery } from "@/components/admin/MemberFilterBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -147,6 +153,7 @@ function MembersPageContent() {
       ? (initialStatus as StatusFilter)
       : "all"
   );
+  const [filterQuery, setFilterQuery] = useState<FilterQuery>(emptyQuery());
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
@@ -170,14 +177,16 @@ function MembersPageContent() {
 
   const filteredMembers = useMemo(() => {
     if (!members) return [];
-    if (statusFilter === "flagged") return members.filter((m) => m.isFlagged);
-    if (statusFilter === "suspended") return members.filter((m) => !m.isActive);
-    if (statusFilter === "unverified")
-      return members.filter((m) => m.isActive && !m.isEmailVerified);
-    if (statusFilter === "dormant") return members.filter(isDormant);
-    if (statusFilter === "active") return members.filter((m) => m.isActive && m.isEmailVerified);
-    return members;
-  }, [members, statusFilter]);
+    let result = members;
+    if (statusFilter === "flagged") result = result.filter((m) => m.isFlagged);
+    else if (statusFilter === "suspended") result = result.filter((m) => !m.isActive);
+    else if (statusFilter === "unverified")
+      result = result.filter((m) => m.isActive && !m.isEmailVerified);
+    else if (statusFilter === "dormant") result = result.filter(isDormant);
+    else if (statusFilter === "active")
+      result = result.filter((m) => m.isActive && m.isEmailVerified);
+    return applyFilterQuery(result, filterQuery);
+  }, [members, statusFilter, filterQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredMembers.length / rowsPerPage));
   const currentPage = Math.min(page, totalPages);
@@ -245,17 +254,26 @@ function MembersPageContent() {
         })}
       </div>
 
-      {/* Search */}
-      <div className="mb-4 group relative max-w-sm">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-icon-muted transition-colors group-focus-within:text-icon-primary" />
-        <Input
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
+      {/* Search + Filter toolbar */}
+      <div className="mb-4 flex items-center gap-3">
+        <div className="group relative max-w-sm flex-1">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-icon-muted transition-colors group-focus-within:text-icon-primary" />
+          <Input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search by name, username, or email"
+            className="h-10 rounded-none border-grey-200 bg-white pl-10 font-mono text-sm transition-all focus-visible:border-grey-900 focus-visible:ring-0"
+          />
+        </div>
+        <MemberFilterBuilder
+          query={filterQuery}
+          onChange={(q) => {
+            setFilterQuery(q);
             setPage(1);
           }}
-          placeholder="Search by name, username, or email"
-          className="h-10 rounded-none border-grey-200 bg-white pl-10 font-mono text-sm transition-all focus-visible:border-grey-900 focus-visible:ring-0"
         />
       </div>
 
