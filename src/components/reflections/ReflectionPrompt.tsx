@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowRight, PenLine } from "lucide-react";
-import Link from "next/link";
+import { PenLine } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { SystemBanner } from "@/components/dashboard/Navbar";
 import { useCurrentReflection } from "@/hooks/useReflections";
 
 export function ReflectionPrompt() {
@@ -11,33 +11,37 @@ export function ReflectionPrompt() {
 
   const shouldPrompt = !!data?.shouldPrompt;
 
-  // Don't nag on the reflection page itself.
+  // Don't nag on the reflection pages themselves.
   if (!shouldPrompt || pathname === "/reflections" || pathname === "/reflections/submit") {
     return null;
   }
 
   const daysRemaining = data?.daysRemaining;
   const changesRequested = data?.status === "changes_requested";
-  const headline = changesRequested
-    ? "Your reflection needs an update"
-    : "Your monthly reflection is open";
+  const hasPerQuestionNotes =
+    changesRequested &&
+    data?.reviewerNotes &&
+    Object.entries(data.reviewerNotes).some(([k, v]) => k !== "_legacy" && v?.trim());
+  const legacyNote = data?.reviewerNotes?.["_legacy"];
+
+  const label = changesRequested
+    ? "Your reflection needs an update."
+    : "Your monthly reflection is open.";
+
+  const body = changesRequested && (hasPerQuestionNotes || legacyNote)
+    ? "Feedback has been added to your answers."
+    : typeof daysRemaining === "number" && daysRemaining > 0
+      ? `${daysRemaining} day(s) left to submit.`
+      : "Due today.";
 
   return (
-    <div className="flex items-center gap-3 border-b border-warning-200 bg-warning-50 px-4 py-2.5 sm:px-6">
-      <PenLine className="h-4 w-4 shrink-0 text-warning-700" />
-      <p className="min-w-0 flex-1 font-mono text-xs text-warning-700">
-        <span className="font-bold">{headline}.</span>{" "}
-        {typeof daysRemaining === "number" && daysRemaining > 0
-          ? `${daysRemaining} day(s) left to submit.`
-          : "Due today."}
-      </p>
-      <Link
-        href="/reflections/submit"
-        className="hidden shrink-0 items-center gap-1.5 border border-warning-700 bg-warning-700 px-3 py-1 font-mono text-xs font-bold text-white transition-colors hover:bg-warning-600 sm:inline-flex"
-      >
-        Write reflection
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
+    <SystemBanner
+      variant="warning"
+      icon={PenLine}
+      label={label}
+      body={body}
+      ctaLabel="Write reflection"
+      ctaHref="/reflections/submit"
+    />
   );
 }

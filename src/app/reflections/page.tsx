@@ -146,11 +146,15 @@ function CurrentCycleBanner() {
                   {data.daysRemaining === 0 ? "Due today" : `${data.daysRemaining}d left`}
                 </span>
               )}
-              {status === "changes_requested" && data.reviewerNotes && (
-                <span className="font-mono text-[10px] text-red-600 truncate max-w-xs">
-                  "{data.reviewerNotes}"
-                </span>
-              )}
+              {status === "changes_requested" &&
+                data.reviewerNotes &&
+                Object.keys(data.reviewerNotes).length > 0 && (
+                  <span className="font-mono text-[10px] text-red-600 truncate max-w-xs">
+                    {data.reviewerNotes["_legacy"]
+                      ? `"${data.reviewerNotes["_legacy"]}"`
+                      : "Feedback added to your answers — click to view"}
+                  </span>
+                )}
             </div>
           </div>
         </div>
@@ -222,26 +226,40 @@ function ReflectionCard({ r }: { r: ReflectionRecord }) {
 
       {expanded && (
         <div className="space-y-4 border-t border-grey-200 bg-grey-50/60 px-5 py-4">
-          {r.reviewerNotes && (
+          {/* Legacy flat note (pre-migration data) */}
+          {r.reviewerNotes?.["_legacy"] && (
             <div className="border border-grey-200 bg-white p-4">
               <div className="mb-1.5 flex items-center gap-1.5 font-mono text-xs font-semibold text-text-muted">
                 <MessageSquareText className="h-3.5 w-3.5" />
                 Reviewer feedback
               </div>
               <p className="whitespace-pre-wrap font-mono text-sm text-text-secondary">
-                {r.reviewerNotes}
+                {r.reviewerNotes["_legacy"]}
               </p>
             </div>
           )}
 
-          {r.questions.map((q) => (
-            <div key={q.id}>
-              <p className="font-mono text-xs font-bold text-text-primary">{q.prompt}</p>
-              <p className="mt-1 whitespace-pre-wrap font-mono text-sm text-text-tertiary">
-                {r.answers?.[q.id] || "—"}
-              </p>
-            </div>
-          ))}
+          {r.questions.map((q) => {
+            const perQuestionNote = r.reviewerNotes?.[q.id];
+            return (
+              <div key={q.id}>
+                <p className="font-mono text-xs font-bold text-text-primary">{q.prompt}</p>
+                <p className="mt-1 whitespace-pre-wrap font-mono text-sm text-text-tertiary">
+                  {r.answers?.[q.id] || "—"}
+                </p>
+                {perQuestionNote?.trim() && (
+                  <div className="mt-2 border-l-2 border-warning-400 pl-3">
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-wide text-warning-600">
+                      Reviewer note
+                    </p>
+                    <p className="mt-0.5 font-mono text-xs leading-5 text-warning-700">
+                      {perQuestionNote}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
