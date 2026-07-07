@@ -97,6 +97,7 @@ function StatusPill({ status }: { status: CareerProgressionStatus }) {
 function ReviewCard({ item }: { item: CareerProgression }) {
   const review = useReviewCareerProgression();
   const [note, setNote] = useState("");
+  const [activeAction, setActiveAction] = useState<"reject" | "revoke" | null>(null);
   const meta = STATUS_META[item.status];
 
   async function submit(action: "approve" | "reject" | "revoke") {
@@ -110,153 +111,167 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             : "Changes requested."
       );
       setNote("");
+      setActiveAction(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Review failed.");
     }
   }
 
+  function handleActionClick(action: "reject" | "revoke") {
+    if (activeAction === action) {
+      // Already open — this is the confirm click
+      submit(action);
+    } else {
+      setActiveAction(action);
+      setNote("");
+    }
+  }
+
+  function cancelAction() {
+    setActiveAction(null);
+    setNote("");
+  }
+
   return (
-    <article className="border border-zinc-200 bg-white overflow-hidden flex">
-      <div className={`w-1 shrink-0 ${meta.bar}`} />
-      <div className="p-5">
-        {/* Top row — avatar + info + status */}
-        <div className="flex items-center gap-4">
-          {/* biome-ignore lint/performance/noImgElement: avatar URL from API */}
-          <img
-            src={getAvatarUrl(item.profilePictureUrl, item.fullName)}
-            alt={item.fullName}
-            className="h-10 w-10 shrink-0 object-cover border border-zinc-100"
-          />
+    <article className="border border-zinc-200 bg-white overflow-hidden">
+      {/* ── Main row ── */}
+      <div className="flex items-center gap-4 px-5 py-4">
+        {/* biome-ignore lint/performance/noImgElement: avatar URL from API */}
+        <img
+          src={getAvatarUrl(item.profilePictureUrl, item.fullName)}
+          alt={item.fullName}
+          className="h-9 w-9 shrink-0 object-cover border border-zinc-200"
+        />
 
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="min-w-0">
-                <h3 className="font-sans text-base font-bold text-zinc-950 leading-snug">
-                  {item.title}
-                </h3>
-                <p className="font-mono text-[11px] text-zinc-500">Codetopia Community</p>
-              </div>
-              <StatusPill status={item.status} />
-            </div>
-
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
-              <span className="font-mono text-[11px] text-zinc-400">
-                {formatDateRange(item.startDate, item.endDate)}
-                <span className="mx-1.5 text-zinc-300">·</span>
-                {getDuration(item.startDate, item.endDate)}
-              </span>
-              <Link
-                href={`/@${item.username}`}
-                className="flex items-center gap-1 font-mono text-[11px] text-zinc-400 hover:text-zinc-900 transition-colors"
-              >
-                <span className="font-bold text-zinc-600">{item.fullName}</span>
-                <span className="text-zinc-300">·</span>
-                <span>@{item.username}</span>
-              </Link>
-            </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+            <h3 className="font-sans text-sm font-bold text-zinc-950 leading-snug">
+              {item.title}
+            </h3>
+            <StatusPill status={item.status} />
+          </div>
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="font-mono text-[11px] text-zinc-400">
+              {formatDateRange(item.startDate, item.endDate)}
+              <span className="mx-1.5 text-zinc-300">·</span>
+              {getDuration(item.startDate, item.endDate)}
+            </span>
+            <span className="text-zinc-300">·</span>
+            <Link
+              href={`/@${item.username}`}
+              className="font-mono text-[11px] font-medium text-zinc-500 hover:text-zinc-900 hover:underline"
+            >
+              {item.fullName} · @{item.username}
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Description */}
-        {item.description && (
-          <p className="mt-4 whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500 border-l-2 border-zinc-100 pl-4">
+      {/* ── Description ── */}
+      {item.description && (
+        <div className="mx-5 mb-3 border border-dashed border-zinc-200 px-3 py-2.5">
+          <p className="whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500">
             {item.description}
           </p>
-        )}
+        </div>
+      )}
 
-        {/* Review note (non-pending) */}
-        {item.status !== "pending" && item.reviewNote && (
-          <div className="mt-4 border border-zinc-100 bg-zinc-50 px-4 py-3">
-            <p className="font-mono text-xs font-medium text-zinc-400 mb-1">Review note</p>
-            <p className="font-mono text-xs leading-5 text-zinc-600">{item.reviewNote}</p>
-          </div>
-        )}
+      {/* ── Prior review note (non-pending) ── */}
+      {item.status !== "pending" && item.reviewNote && (
+        <div className="mx-5 mb-3 border-l-2 border-zinc-200 pl-3">
+          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Review note</p>
+          <p className="font-mono text-xs leading-5 text-zinc-500">{item.reviewNote}</p>
+        </div>
+      )}
 
-        {/* Revoke approval */}
-        {item.status === "approved" && (
-          <div className="mt-5 border-t border-zinc-100 pt-4 space-y-3">
-            <div>
-              <p className="font-mono text-xs font-medium text-zinc-400 mb-2">
-                Reason for revoking
-                <span className="ml-1.5 font-normal text-zinc-400">
-                  — required, shown to the member
-                </span>
-              </p>
+      {/* ── Action zone ── */}
+      {(item.status === "approved" || item.status === "pending") && (
+        <div className="border-t border-zinc-100 px-5 py-3">
+          {/* Progressive disclosure textarea */}
+          {activeAction && (
+            <div className="mb-3">
               <textarea
+                // biome-ignore lint/a11y/noAutofocus: intentional for UX
+                autoFocus
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Why is this entry being revoked?"
-                className="min-h-[60px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none transition-colors"
+                placeholder={
+                  activeAction === "revoke"
+                    ? "Reason for revoking (required, shown to member)…"
+                    : "Feedback for the member (optional)…"
+                }
+                className="min-h-[60px] w-full resize-none border border-zinc-200 bg-white px-3 py-2 font-mono text-xs placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
               />
             </div>
-            <div className="flex justify-end">
+          )}
+
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {/* Cancel when something is open */}
+            {activeAction && (
+              <button
+                type="button"
+                onClick={cancelAction}
+                className="font-mono text-xs text-zinc-400 hover:text-zinc-700"
+              >
+                Cancel
+              </button>
+            )}
+
+            {/* Revoke (approved) */}
+            {item.status === "approved" && (
               <Button
                 type="button"
                 variant="outline"
-                disabled={review.isPending || !note.trim()}
-                onClick={() => submit("revoke")}
-                className="h-9 rounded-none border-zinc-200 font-mono text-sm font-medium text-zinc-500 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors disabled:opacity-50"
+                disabled={review.isPending || (activeAction === "revoke" && !note.trim())}
+                onClick={() => handleActionClick("revoke")}
+                className="h-7 rounded-none border-zinc-200 font-mono text-xs font-medium text-zinc-500 hover:border-red-300 hover:text-red-600 disabled:opacity-40"
               >
-                {review.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {review.isPending && activeAction === "revoke" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <Ban className="h-3.5 w-3.5" />
+                  <Ban className="h-3 w-3" />
                 )}
-                Revoke
+                {activeAction === "revoke" ? "Confirm Revoke" : "Revoke"}
               </Button>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Review actions (pending only) */}
-        {item.status === "pending" && (
-          <div className="mt-5 border-t border-zinc-100 pt-5 space-y-3">
-            <div>
-              <p className="font-mono text-xs font-medium text-zinc-400 mb-2">
-                Review note
-                <span className="ml-1.5 font-normal text-zinc-400">
-                  — optional, shown to member if changes are requested
-                </span>
-              </p>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Leave feedback for the member..."
-                className="min-h-[80px] w-full resize-none border border-zinc-200 px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none transition-colors"
-              />
-            </div>
-            <div className="flex flex-wrap justify-end gap-2">
+            {/* Request Changes (pending) */}
+            {item.status === "pending" && (
               <Button
                 type="button"
                 variant="outline"
                 disabled={review.isPending}
-                onClick={() => submit("reject")}
-                className="h-9 rounded-none border-zinc-200 font-mono text-sm font-medium text-zinc-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700 transition-colors"
+                onClick={() => handleActionClick("reject")}
+                className="h-7 rounded-none border-zinc-200 font-mono text-xs font-medium text-zinc-600 hover:border-amber-300 hover:text-amber-700 disabled:opacity-40"
               >
-                {review.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {review.isPending && activeAction === "reject" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <XCircle className="h-3.5 w-3.5" />
+                  <XCircle className="h-3 w-3" />
                 )}
-                Request Changes
+                {activeAction === "reject" ? "Confirm Request" : "Request Changes"}
               </Button>
+            )}
+
+            {/* Approve (pending) — always visible, no textarea needed */}
+            {item.status === "pending" && (
               <Button
                 type="button"
                 disabled={review.isPending}
                 onClick={() => submit("approve")}
-                className="h-9 rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800 transition-colors"
+                className="h-7 rounded-none bg-zinc-950 font-mono text-xs font-medium text-white hover:bg-zinc-800"
               >
-                {review.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                {review.isPending && !activeAction ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <CheckCircle2 className="h-3 w-3" />
                 )}
                 Approve
               </Button>
-            </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </article>
   );
 }

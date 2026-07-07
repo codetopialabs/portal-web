@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { AccountFlaggedBanner } from "@/components/dashboard/AccountFlaggedBanner";
-import { ReflectionPrompt } from "@/components/reflections/ReflectionPrompt";
+import { BannerStack } from "@/components/dashboard/BannerStack";
 import { InviteBanner } from "@/components/teams/InviteBanner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardNavbar } from "./Navbar";
@@ -24,9 +23,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <DashboardSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 w-full bg-[#f9fafb] relative h-screen overflow-hidden">
           <DashboardNavbar />
-          <AccountFlaggedBanner />
+          <BannerStack />
           <InviteBanner />
-          <ReflectionPrompt />
 
           <div className="flex-1 overflow-y-auto relative min-h-0 w-full">
             {/* Technical Background Overlays (Subtle for light mode) */}

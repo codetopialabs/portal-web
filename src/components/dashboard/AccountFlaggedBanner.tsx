@@ -1,9 +1,9 @@
 "use client";
 
-import { AlertTriangle, ArrowRight, Clock } from "lucide-react";
-import Link from "next/link";
+import { AlertTriangle, Clock } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useMe } from "@/hooks/useMe";
+import { SystemBanner } from "./Navbar";
 
 export function AccountFlaggedBanner() {
   const { profile } = useMe();
@@ -16,36 +16,23 @@ export function AccountFlaggedBanner() {
 
   if (underReview) {
     return (
-      <div className="flex items-center gap-3 border-b border-amber-300 bg-amber-500 px-4 py-2.5 sm:px-6">
-        <Clock className="h-4 w-4 shrink-0 text-white" />
-        <p className="min-w-0 flex-1 font-mono text-xs font-bold text-white">
-          Account under review.{" "}
-          <span className="font-normal opacity-90">
-            Your changes have been sent to the team — we'll let you know the outcome shortly.
-          </span>
-        </p>
-      </div>
+      <SystemBanner
+        variant="info"
+        icon={Clock}
+        label="Account under review."
+        body="Your changes have been sent to the team — we'll let you know the outcome shortly."
+      />
     );
   }
 
   return (
-    <div className="flex items-start gap-3 border-b border-red-700 bg-red-600 px-4 py-3 sm:px-6">
-      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-white" />
-      <div className="min-w-0 flex-1">
-        <p className="font-mono text-xs font-bold text-white">
-          Your account has been flagged for review.
-        </p>
-        <p className="mt-0.5 whitespace-pre-wrap font-mono text-[11px] text-red-100">
-          Reason: {profile.activeFlag.reason}
-        </p>
-      </div>
-      <Link
-        href="/settings/profile"
-        className="inline-flex shrink-0 items-center gap-1.5 border border-white bg-white px-3 py-1 font-mono text-[11px] font-bold text-red-700 transition-colors hover:bg-red-50"
-      >
-        Fix &amp; submit
-        <ArrowRight className="h-3 w-3" />
-      </Link>
-    </div>
+    <SystemBanner
+      variant="alert"
+      icon={AlertTriangle}
+      label="Your account has been flagged for review."
+      body={`Reason: ${profile.activeFlag.reason}`}
+      ctaLabel="Fix & submit"
+      ctaHref="/settings/profile"
+    />
   );
 }
