@@ -298,5 +298,9 @@ export function usePermissionList() {
   return useQuery({
     queryKey: adminKeys.permissions,
     queryFn: () => PermissionsService.getPermissions(),
+    // The permission list is a static backend-defined registry — it only
+    // changes when the backend is deployed. Cache it for a full hour so
+    // the role builder doesn't hammer the network on every focus/mount.
+    staleTime: 60 * 60 * 1000,
   });
 }
