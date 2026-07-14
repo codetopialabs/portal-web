@@ -144,6 +144,9 @@ export interface ActivityLogEntry {
   ipAddress: string | null;
   deviceName: string;
   createdAt: string;
+  actorId: string | null;
+  actorUsername: string | null;
+  actorEmail: string;
 }
 
 export const SessionService = {
