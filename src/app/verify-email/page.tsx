@@ -15,6 +15,8 @@ function VerifyEmailContent() {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState("");
 
+  // Verification is its own effect, with no timer -- `cancelled` just
+  // guards against a late response calling setState after unmount.
   useEffect(() => {
     const token = searchParams.get("token");
     if (!token) {
@@ -24,14 +26,12 @@ function VerifyEmailContent() {
     }
 
     let cancelled = false;
-    let redirectTimeout: ReturnType<typeof setTimeout> | undefined;
 
     AuthService.verifyEmail(token)
       .then((res) => {
         if (cancelled) return;
         setState("success");
         setMessage(res.detail);
-        redirectTimeout = setTimeout(() => router.push("/login"), 3000);
       })
       .catch((err: Error) => {
         if (cancelled) return;
@@ -41,9 +41,16 @@ function VerifyEmailContent() {
 
     return () => {
       cancelled = true;
-      if (redirectTimeout) clearTimeout(redirectTimeout);
     };
-  }, [searchParams, router]);
+  }, [searchParams]);
+
+  // Separate effect for the post-success redirect timer, so it's a plain
+  // synchronous setTimeout/clearTimeout pair with nothing async in between.
+  useEffect(() => {
+    if (state !== "success") return;
+    const redirectTimeout = setTimeout(() => router.push("/login"), 3000);
+    return () => clearTimeout(redirectTimeout);
+  }, [state, router]);
 
   return (
     <main className="min-h-screen bg-black flex flex-col font-mono text-white">
