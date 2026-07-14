@@ -25,6 +25,16 @@ import { usePermission } from "@/hooks/usePermission";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { type ActivityLogEntry, SessionService } from "@/services/auth.service";
 
+const ORG_ACTIVITY_WALKTHROUGH_STEPS: DriveStep[] = [
+  {
+    element: "#activity-org-toggle",
+    popover: {
+      title: "Org Activity",
+      description: "Switch to the organization-wide activity stream when you have access.",
+    },
+  },
+];
+
 // ─── event type config ────────────────────────────────────────────────────────
 
 type EventCategory = "auth" | "account" | "profile" | "session" | "career";
@@ -139,19 +149,9 @@ function ActivityPageContent() {
     viewMode === "org" && canViewOrgActivity
   );
 
-  const walkthroughSteps: DriveStep[] = [
-    {
-      element: "#activity-org-toggle",
-      popover: {
-        title: "Org Activity",
-        description: "Switch to the organization-wide activity stream when you have access.",
-      },
-    },
-  ];
-
   useWalkthrough({
     tourId: "org_activity_view",
-    steps: walkthroughSteps,
+    steps: ORG_ACTIVITY_WALKTHROUGH_STEPS,
     enabled: canViewOrgActivity,
   });
 

@@ -48,7 +48,7 @@ export function MemberDirectory({
     () => `${search}|${filters.role}|${filters.skill}|${filters.experience}`,
     [filters.experience, filters.role, filters.skill, search]
   );
-  const lastFeedKeyRef = useRef(feedKey);
+  const [prevFeedKey, setPrevFeedKey] = useState(feedKey);
 
   const options = useMemo(() => getMemberFilterOptions(members), [members]);
   const filteredMembers = useMemo(
@@ -67,8 +67,8 @@ export function MemberDirectory({
     [members]
   );
 
-  if (lastFeedKeyRef.current !== feedKey) {
-    lastFeedKeyRef.current = feedKey;
+  if (prevFeedKey !== feedKey) {
+    setPrevFeedKey(feedKey);
     setVisibleCount(INITIAL_VISIBLE_COUNT);
   }
 
