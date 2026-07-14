@@ -12,6 +12,7 @@ import {
   UserRoundCheck,
 } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileCompletionCarousel } from "@/components/dashboard/ProfileCompletionCarousel";
@@ -39,60 +40,65 @@ export function DashboardContent() {
   const strengthItems = profile ? buildStrengthItems(profile) : [];
   const profileStrength = profile ? calcStrength(strengthItems) : 0;
   const incompleteItems = profile ? strengthItems.filter((i) => !i.fulfilled) : [];
-  const walkthroughSteps: DriveStep[] = [
-    {
-      popover: {
-        title: "Welcome to your Dashboard",
-        description:
-          "This is your central hub for Codetopia Community. Let's take a quick look around.",
+  const hasIncompleteItems = incompleteItems.length > 0;
+  const walkthroughSteps: DriveStep[] = useMemo(() => {
+    const steps: DriveStep[] = [
+      {
+        popover: {
+          title: "Welcome to your Dashboard",
+          description:
+            "This is your central hub for Codetopia Community. Let's take a quick look around.",
+        },
       },
-    },
-    {
-      element: "#dashboard-profile-header",
-      popover: {
-        title: "Your Profile",
-        description:
-          "Here you can see your current community standing, roles, and how strong your profile is. Click 'Edit Profile' to add your skills and bio.",
-        side: "bottom",
-        align: "start",
+      {
+        element: "#dashboard-profile-header",
+        popover: {
+          title: "Your Profile",
+          description:
+            "Here you can see your current community standing, roles, and how strong your profile is. Click 'Edit Profile' to add your skills and bio.",
+          side: "bottom",
+          align: "start",
+        },
       },
-    },
-  ];
+    ];
 
-  if (incompleteItems.length > 0) {
-    walkthroughSteps.push({
-      element: "#dashboard-profile-completion",
+    if (hasIncompleteItems) {
+      steps.push({
+        element: "#dashboard-profile-completion",
+        popover: {
+          title: "Profile Completion",
+          description:
+            "Your profile is missing a few details. You can easily complete them by following these quick suggestions right here!",
+          side: "top",
+          align: "center",
+        },
+      });
+    }
+
+    steps.push({
+      element: "#dashboard-quick-actions",
       popover: {
-        title: "Profile Completion",
+        title: "Quick Actions",
         description:
-          "Your profile is missing a few details. You can easily complete them by following these quick suggestions right here!",
-        side: "top",
+          "Use these shortcuts to tune your public profile, review security, or browse the community directory.",
+        side: "bottom",
         align: "center",
       },
     });
-  }
 
-  walkthroughSteps.push({
-    element: "#dashboard-quick-actions",
-    popover: {
-      title: "Quick Actions",
-      description:
-        "Use these shortcuts to tune your public profile, review security, or browse the community directory.",
-      side: "bottom",
-      align: "center",
-    },
-  });
+    steps.push({
+      element: "#dashboard-security-widget",
+      popover: {
+        title: "Account Security",
+        description:
+          "This widget tracks your most recent active session. Keep an eye on the IP address and device to ensure there's no unauthorized access to your account.",
+        side: "left",
+        align: "start",
+      },
+    });
 
-  walkthroughSteps.push({
-    element: "#dashboard-security-widget",
-    popover: {
-      title: "Account Security",
-      description:
-        "This widget tracks your most recent active session. Keep an eye on the IP address and device to ensure there's no unauthorized access to your account.",
-      side: "left",
-      align: "start",
-    },
-  });
+    return steps;
+  }, [hasIncompleteItems]);
 
   useWalkthrough({
     tourId: "dashboard_welcome_tour_v3",

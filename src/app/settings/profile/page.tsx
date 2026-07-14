@@ -53,6 +53,76 @@ import { UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 import { normalizeUrl } from "@/utils/url";
 
+const PROFILE_WALKTHROUGH_STEPS: DriveStep[] = [
+  {
+    popover: {
+      title: "Welcome to Settings",
+      description:
+        "This is your account control center. Let's do a quick tour of your configuration options!",
+    },
+  },
+  {
+    element: "#settings-tabs",
+    popover: {
+      title: "Navigation Tabs",
+      description:
+        "Switch seamlessly between your Profile details, Security credentials (sessions and passwords), and Connected third-party apps.",
+      side: "bottom",
+      align: "start",
+    },
+  },
+  {
+    element: "#settings-profile-media",
+    popover: {
+      title: "Avatar & Cover Photo",
+      description:
+        "Upload a display avatar and cover image to customize your community presence and footprint.",
+      side: "right",
+      align: "start",
+    },
+  },
+  {
+    element: "#settings-personal-info",
+    popover: {
+      title: "Personal Information",
+      description:
+        "Update your full display name, username, location, job title, and bio so others in the community know what you're working on.",
+      side: "left",
+      align: "start",
+    },
+  },
+  {
+    element: "#settings-social-links",
+    popover: {
+      title: "Social connections",
+      description:
+        "Connect your digital footprint: Discord, GitHub, LinkedIn, Twitter/X, and add custom portfolio links.",
+      side: "left",
+      align: "start",
+    },
+  },
+  {
+    element: "#settings-skills",
+    popover: {
+      title: "Profile Skills",
+      description:
+        "Specify your core development skills. These will render as tags on your public profile card.",
+      side: "left",
+      align: "start",
+    },
+  },
+  {
+    element: "#settings-save-actions",
+    popover: {
+      title: "Apply Changes",
+      description:
+        "Once your settings are dialed in, hit Save Changes to sync across the community ecosystem, or Discard to revert.",
+      side: "top",
+      align: "end",
+    },
+  },
+];
+
 const inputStyles =
   "h-11 rounded-none border-zinc-200 bg-white px-3 font-mono text-sm placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:border-zinc-900 transition-all";
 
@@ -212,79 +282,9 @@ export default function SettingsProfilePage() {
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const walkthroughSteps: DriveStep[] = [
-    {
-      popover: {
-        title: "Welcome to Settings",
-        description:
-          "This is your account control center. Let's do a quick tour of your configuration options!",
-      },
-    },
-    {
-      element: "#settings-tabs",
-      popover: {
-        title: "Navigation Tabs",
-        description:
-          "Switch seamlessly between your Profile details, Security credentials (sessions and passwords), and Connected third-party apps.",
-        side: "bottom",
-        align: "start",
-      },
-    },
-    {
-      element: "#settings-profile-media",
-      popover: {
-        title: "Avatar & Cover Photo",
-        description:
-          "Upload a display avatar and cover image to customize your community presence and footprint.",
-        side: "right",
-        align: "start",
-      },
-    },
-    {
-      element: "#settings-personal-info",
-      popover: {
-        title: "Personal Information",
-        description:
-          "Update your full display name, username, location, job title, and bio so others in the community know what you're working on.",
-        side: "left",
-        align: "start",
-      },
-    },
-    {
-      element: "#settings-social-links",
-      popover: {
-        title: "Social connections",
-        description:
-          "Connect your digital footprint: Discord, GitHub, LinkedIn, Twitter/X, and add custom portfolio links.",
-        side: "left",
-        align: "start",
-      },
-    },
-    {
-      element: "#settings-skills",
-      popover: {
-        title: "Profile Skills",
-        description:
-          "Specify your core development skills. These will render as tags on your public profile card.",
-        side: "left",
-        align: "start",
-      },
-    },
-    {
-      element: "#settings-save-actions",
-      popover: {
-        title: "Apply Changes",
-        description:
-          "Once your settings are dialed in, hit Save Changes to sync across the community ecosystem, or Discard to revert.",
-        side: "top",
-        align: "end",
-      },
-    },
-  ];
-
   useWalkthrough({
     tourId: "settings_profile_tour_v1",
-    steps: walkthroughSteps,
+    steps: PROFILE_WALKTHROUGH_STEPS,
     enabled: Boolean(profile),
   });
 
