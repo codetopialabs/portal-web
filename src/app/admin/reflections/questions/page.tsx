@@ -77,7 +77,6 @@ function AddQuestionForm({
           setHelpText("");
           onDone?.();
         },
-        onError: () => toast.error("Failed to add question."),
       }
     );
   }
@@ -151,16 +150,12 @@ function ActiveQuestionRow({
   const { mutate: remove } = useDeleteReflectionQuestion();
 
   function toggleActive(isActive: boolean) {
-    update(
-      { id: question.id, data: { isActive } },
-      { onError: () => toast.error("Failed to update.") }
-    );
+    update({ id: question.id, data: { isActive } });
   }
 
   function handleDelete() {
     remove(question.id, {
       onSuccess: () => toast.success("Question removed."),
-      onError: () => toast.error("Failed to remove question."),
     });
   }
 
@@ -448,7 +443,7 @@ function QuestionBankContent() {
   const canManage = usePermission("reflections.manage");
 
   return (
-    <div className="w-full max-w-3xl pb-20">
+    <div className="mx-auto w-full max-w-3xl pb-20">
       <header className="mb-8">
         <div className="mb-1 flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-zinc-400" />

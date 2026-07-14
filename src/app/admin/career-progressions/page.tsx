@@ -112,8 +112,8 @@ function ReviewCard({ item }: { item: CareerProgression }) {
       );
       setNote("");
       setActiveAction(null);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Review failed.");
+    } catch {
+      // Axios interceptor already surfaces the error toast.
     }
   }
 

@@ -183,7 +183,6 @@ function RoleDetailContent({ slug }: { slug: string }) {
         toast.success(`Role "${role.name}" deleted.`);
         router.push("/admin/roles");
       },
-      onError: () => toast.error("Failed to delete role. Please try again."),
     });
   }
 

@@ -70,8 +70,7 @@ function CommunityContent() {
     router.replace(`?${params.toString()}`, { scroll: false });
   }
 
-  const memberLoadError =
-    error instanceof Error ? error.message : error ? "Unable to load members." : null;
+  const memberLoadError = error ? ((error as Error)?.message ?? "Unable to load members.") : null;
 
   return (
     <DashboardShell>

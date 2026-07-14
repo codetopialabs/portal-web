@@ -153,7 +153,7 @@ function ReflectionSubmitContent() {
       setErrors((current) => ({ ...current, [questionId]: "" }));
       toast.success(files.length === 1 ? "Attachment uploaded." : "Attachments uploaded.");
     } catch {
-      toast.error("Attachment upload failed.");
+      // Axios interceptor already surfaces the error toast.
     } finally {
       setUploadingQuestionId(null);
     }
@@ -177,7 +177,6 @@ function ReflectionSubmitContent() {
           toast.success("Reflection submitted.");
           router.push("/reflections");
         },
-        onError: () => toast.error("Failed to submit reflection."),
       }
     );
   };
