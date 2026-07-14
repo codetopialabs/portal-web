@@ -181,8 +181,8 @@ function ProgressionSheet({
         toast.success("Career progression submitted for review.");
       }
       onClose();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save entry.");
+    } catch {
+      // Axios interceptor already surfaces the error toast.
     }
   }
 
@@ -345,7 +345,7 @@ function ProgressionCard({
       await deleteMutation.mutateAsync(item.id);
       toast.success("Entry deleted.");
     } catch {
-      toast.error("Could not delete entry.");
+      // Axios interceptor already surfaces the error toast.
     }
     setConfirmDelete(false);
   }

@@ -26,6 +26,7 @@ function CreateTeamContent() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    isPrivate: false,
   });
 
   const [errors, setErrors] = useState<Partial<typeof formData>>({});
@@ -44,6 +45,7 @@ function CreateTeamContent() {
     const team = await createTeam({
       name: formData.name.trim(),
       description: formData.description.trim() || undefined,
+      isPrivate: formData.isPrivate,
     });
 
     router.push(`/teams/${team.slug}`);
@@ -59,7 +61,7 @@ function CreateTeamContent() {
 
   return (
     <DashboardShell>
-      <div className="w-full max-w-2xl pb-20">
+      <div className="mx-auto w-full max-w-2xl pb-20">
         {/* Back nav */}
         <Link
           href="/teams"
@@ -76,7 +78,7 @@ function CreateTeamContent() {
             Create a Team
           </h1>
           <p className="mt-2 font-mono text-sm leading-6 text-text-tertiary">
-            You will be assigned as Team Lead automatically. Members can be invited after creation.
+            You will be assigned as Team Owner automatically. Members can be invited after creation.
           </p>
         </div>
 
@@ -118,6 +120,23 @@ function CreateTeamContent() {
               placeholder="What is the focus of this team?"
               className="block w-full resize-none border border-grey-200 bg-white px-3 py-2 font-mono text-sm text-text-primary outline-none rounded-none placeholder:text-text-muted focus:border-grey-300 focus:ring-0 transition-colors"
             />
+          </div>
+
+          {/* Private toggle */}
+          <div className="flex items-start gap-2.5">
+            <input
+              id="isPrivate"
+              type="checkbox"
+              checked={formData.isPrivate}
+              onChange={(e) => setFormData((prev) => ({ ...prev, isPrivate: e.target.checked }))}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded-none border-grey-300 text-grey-900 focus:ring-0"
+            />
+            <Label htmlFor="isPrivate" className="font-mono text-sm text-text-secondary">
+              Private team
+              <span className="mt-0.5 block font-mono text-xs font-normal text-text-muted">
+                Hidden from Browse Teams. Members can only join by invite.
+              </span>
+            </Label>
           </div>
 
           {/* Actions */}

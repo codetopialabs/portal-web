@@ -62,7 +62,7 @@ ${formData.links.trim() || "None"}`;
 
   return (
     <DashboardShell>
-      <div className="w-full max-w-3xl space-y-6 pb-20">
+      <div className="mx-auto w-full max-w-3xl space-y-6 pb-20">
         {/* Back */}
         <Link
           href={`/teams/${teamSlug}?tab=reviews`}

@@ -14,6 +14,7 @@ export interface Team {
   slug: string;
   name: string;
   description: string | null;
+  isPrivate: boolean;
   createdAt: string;
   memberCount?: number;
   membersPreview?: TeamMemberPreview[];
@@ -203,6 +204,13 @@ export interface ContributionDay {
 export interface CreateTeamInput {
   name: string;
   description?: string;
+  isPrivate?: boolean;
+}
+
+export interface UpdateTeamInput {
+  name?: string;
+  description?: string;
+  isPrivate?: boolean;
 }
 
 export interface CreateReviewInput {
@@ -289,11 +297,22 @@ export const TeamsService = {
     return res.data.data;
   },
 
-  /** Create a new team. The calling user becomes the Lead automatically. */
+  /** Create a new team. The calling user becomes the Owner automatically. */
   async createTeam(data: CreateTeamInput): Promise<Team> {
     const res = await axiosInstance.post<ApiResponse<Team>>("/teams/", {
       name: data.name,
       description: data.description,
+      is_private: data.isPrivate,
+    });
+    return res.data.data;
+  },
+
+  /** Update a team's name/description/privacy. Requires Lead or Owner. */
+  async updateTeam(teamSlug: string, data: UpdateTeamInput): Promise<Team> {
+    const res = await axiosInstance.patch<ApiResponse<Team>>(`/teams/${teamSlug}/`, {
+      name: data.name,
+      description: data.description,
+      is_private: data.isPrivate,
     });
     return res.data.data;
   },

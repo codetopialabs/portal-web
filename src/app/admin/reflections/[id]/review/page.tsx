@@ -219,7 +219,6 @@ function ReviewPageContent({ id }: { id: string }) {
           queryClient.invalidateQueries({ queryKey: reflectionKeys.list() });
           router.push("/admin/reflections");
         },
-        onError: () => toast.error("Failed to submit review."),
       }
     );
   }

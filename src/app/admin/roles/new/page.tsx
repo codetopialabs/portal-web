@@ -70,7 +70,7 @@ function NewRoleForm() {
           router.push("/admin/roles");
         },
         onError: (err: unknown) => {
-          const status = (err as { response?: { status?: number } })?.response?.status;
+          const status = (err as { status?: number })?.status;
           setErrors((prev) =>
             status === 400
               ? { ...prev, name: "A role with this identifier already exists." }

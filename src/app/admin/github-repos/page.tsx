@@ -31,14 +31,12 @@ function TokenCard({ canManage }: { canManage: boolean }) {
         setTokenInput("");
         setEditing(false);
       },
-      onError: () => toast.error("Failed to save token."),
     });
   }
 
   function handleClear() {
     clearToken(undefined, {
       onSuccess: () => toast.success("GitHub token removed."),
-      onError: () => toast.error("Failed to remove token."),
     });
   }
 
@@ -140,14 +138,11 @@ function RepoListSection({ canManage }: { canManage: boolean }) {
   }, [repos, search]);
 
   function toggle(repo: (typeof repos)[number], isTracked: boolean) {
-    setTracked(
-      {
-        githubId: repo.githubId,
-        isTracked,
-        meta: { fullName: repo.fullName, name: repo.name, htmlUrl: repo.htmlUrl },
-      },
-      { onError: () => toast.error("Failed to update repo.") }
-    );
+    setTracked({
+      githubId: repo.githubId,
+      isTracked,
+      meta: { fullName: repo.fullName, name: repo.name, htmlUrl: repo.htmlUrl },
+    });
   }
 
   return (

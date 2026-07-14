@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Check, Crown, Mail, Users, X } from "lucide-react";
+import { AlertCircle, Check, Crown, Lock, Mail, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -242,9 +242,17 @@ function TeamsDirectoryContent() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="font-sans font-bold text-text-primary group-hover:text-text-secondary">
-                        {team.name}
-                      </h3>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="font-sans font-bold text-text-primary group-hover:text-text-secondary">
+                          {team.name}
+                        </h3>
+                        {team.isPrivate && (
+                          <Lock
+                            className="h-3 w-3 shrink-0 text-text-muted"
+                            aria-label="Private team"
+                          />
+                        )}
+                      </div>
                       {team.description && (
                         <p className="mt-1 font-mono text-xs leading-5 text-text-muted line-clamp-2">
                           {team.description}

@@ -107,7 +107,6 @@ function OAuthAppSheet({
             onOpenChange(false);
             onCreated(app);
           },
-          onError: () => toast.error("Failed to create OAuth App."),
         }
       );
     } else if (mode === "edit" && appToEdit) {
@@ -119,7 +118,6 @@ function OAuthAppSheet({
             onOpenChange(false);
             toast.success("OAuth App updated.");
           },
-          onError: () => toast.error("Failed to update OAuth App."),
         }
       );
     }
@@ -283,7 +281,6 @@ function OAuthAppsContent() {
         toast.success("OAuth App deleted.");
         setDeleteTarget(null);
       },
-      onError: () => toast.error("Failed to delete OAuth App."),
     });
   }
 

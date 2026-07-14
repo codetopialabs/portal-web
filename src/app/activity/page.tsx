@@ -15,10 +15,12 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import { useAdminActivity } from "@/hooks/useAdmin";
+import { useMe } from "@/hooks/useMe";
 import { usePermission } from "@/hooks/usePermission";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { type ActivityLogEntry, SessionService } from "@/services/auth.service";
@@ -115,6 +117,7 @@ export default function ActivityPage() {
 
 function ActivityPageContent() {
   const canViewOrgActivity = usePermission("activity.view_any");
+  const { profile } = useMe();
   const [entries, setEntries] = React.useState<ActivityLogEntry[]>([]);
   const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
@@ -122,6 +125,8 @@ function ActivityPageContent() {
   const [page, setPage] = React.useState(1);
   const [filter, setFilter] = React.useState<EventCategory | "all">("all");
   const [viewMode, setViewMode] = React.useState<"mine" | "org">("mine");
+  const [userFilterInput, setUserFilterInput] = React.useState("");
+  const [userFilter, setUserFilter] = React.useState("");
 
   const orgOffset = (page - 1) * PAGE_SIZE;
   const {
@@ -130,7 +135,7 @@ function ActivityPageContent() {
     isError: orgError,
     error: orgErrorValue,
   } = useAdminActivity(
-    { limit: PAGE_SIZE, offset: orgOffset },
+    { limit: PAGE_SIZE, offset: orgOffset, userId: userFilter || undefined },
     viewMode === "org" && canViewOrgActivity
   );
 
@@ -165,10 +170,10 @@ function ActivityPageContent() {
       .finally(() => setLoading(false));
   }, [page, viewMode]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally resets pagination when view mode or filter changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally resets pagination when view mode, filter, or user filter changes
   React.useEffect(() => {
     setPage(1);
-  }, [viewMode, filter]);
+  }, [viewMode, filter, userFilter]);
 
   const activeEntries = viewMode === "org" ? (orgActivity?.results ?? []) : (entries ?? []);
 
@@ -223,6 +228,35 @@ function ActivityPageContent() {
                   </button>
                 ))}
               </div>
+            )}
+            {canViewOrgActivity && viewMode === "org" && (
+              <form
+                className="mt-3 flex max-w-xs items-center gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setUserFilter(userFilterInput.trim());
+                }}
+              >
+                <input
+                  type="text"
+                  value={userFilterInput}
+                  onChange={(e) => setUserFilterInput(e.target.value)}
+                  placeholder="Filter by username…"
+                  className="w-full border border-zinc-200 px-3 py-1.5 font-mono text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                />
+                {userFilter && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserFilterInput("");
+                      setUserFilter("");
+                    }}
+                    className="font-mono text-xs font-medium text-zinc-400 hover:text-zinc-900"
+                  >
+                    Clear
+                  </button>
+                )}
+              </form>
             )}
           </div>
           <span className="w-fit border border-zinc-200 bg-white px-3 py-1.5 font-mono text-xs font-medium text-zinc-500">
@@ -296,6 +330,9 @@ function ActivityPageContent() {
                 "eventLabel" in entry && entry.eventLabel
                   ? entry.eventLabel
                   : formatEventLabel(entry.eventType);
+              const subjectUsername = "username" in entry ? entry.username : profile?.username;
+              const isThirdPartyActor =
+                entry.actorUsername && subjectUsername && entry.actorUsername !== subjectUsername;
               return (
                 <div
                   key={entry.id}
@@ -319,6 +356,35 @@ function ActivityPageContent() {
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-1.5 font-mono text-xs text-zinc-400">
+                      {viewMode === "org" && subjectUsername && (
+                        <span>
+                          on{" "}
+                          <Link
+                            href={`/${subjectUsername}`}
+                            className="text-zinc-500 hover:text-zinc-900 hover:underline"
+                          >
+                            @{subjectUsername}
+                          </Link>
+                        </span>
+                      )}
+                      {viewMode === "org" && subjectUsername && isThirdPartyActor && (
+                        <span className="text-zinc-200">·</span>
+                      )}
+                      {isThirdPartyActor && (
+                        <span>
+                          by{" "}
+                          <Link
+                            href={`/${entry.actorUsername}`}
+                            className="text-zinc-500 hover:text-zinc-900 hover:underline"
+                          >
+                            @{entry.actorUsername}
+                          </Link>
+                        </span>
+                      )}
+                      {(subjectUsername || isThirdPartyActor) &&
+                        (entry.deviceName || entry.ipAddress) && (
+                          <span className="text-zinc-200">·</span>
+                        )}
                       {entry.deviceName && <span>{entry.deviceName}</span>}
                       {entry.deviceName && entry.ipAddress && (
                         <span className="text-zinc-200">·</span>
