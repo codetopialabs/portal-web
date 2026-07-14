@@ -72,7 +72,7 @@ function AuthorizeInner() {
       const redirectTo = await OAuthService.authorize(params);
       window.location.href = redirectTo;
     } catch {
-      toast.error("Could not complete authorization. Please try again.");
+      // Axios interceptor already surfaces the error toast.
       setSubmitting(false);
     }
   }

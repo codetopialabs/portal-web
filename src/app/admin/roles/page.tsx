@@ -51,7 +51,6 @@ function DeleteRoleButton({ slug, name }: { slug: string; name: string }) {
         setConfirming(false);
       },
       onError: () => {
-        toast.error("Failed to delete role. Please try again.");
         setConfirming(false);
       },
     });

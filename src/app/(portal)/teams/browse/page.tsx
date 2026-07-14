@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Loader2, Search, Users } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Lock, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -17,7 +17,18 @@ function TeamCard({ team }: { team: BrowseTeam }) {
   return (
     <div className="flex flex-col justify-between border border-grey-200 bg-white p-6">
       <div>
-        <h3 className="font-sans font-bold text-text-primary">{team.name}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="font-sans font-bold text-text-primary">{team.name}</h3>
+          {team.isPrivate && (
+            <span
+              title="Private team"
+              className="inline-flex items-center gap-1 border border-grey-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide text-text-muted"
+            >
+              <Lock className="h-2.5 w-2.5" />
+              Private
+            </span>
+          )}
+        </div>
         {team.description && (
           <p className="mt-1 font-mono text-xs leading-5 text-text-muted line-clamp-2">
             {team.description}

@@ -127,7 +127,6 @@ function CreateKeySheet({
           onOpenChange(false);
           onCreated(key);
         },
-        onError: () => toast.error("Failed to create API key."),
       }
     );
   }
@@ -310,7 +309,6 @@ function ApiKeysContent() {
         toast.success("API key revoked.");
         setRevokeTarget(null);
       },
-      onError: () => toast.error("Failed to revoke API key."),
     });
   }
 

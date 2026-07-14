@@ -176,7 +176,6 @@ function ConfirmQuestionsSection() {
               onClick={() =>
                 confirm(undefined, {
                   onSuccess: (data) => toast.success(data.detail),
-                  onError: () => toast.error("Failed to confirm questions."),
                 })
               }
               disabled={isPending}
@@ -228,7 +227,6 @@ function ScheduleSection() {
           toast.success("Schedule saved.");
           setDirty(false);
         },
-        onError: () => toast.error("Failed to save schedule."),
       }
     );
   }
@@ -325,7 +323,6 @@ function TriggerSection() {
         setResult(data);
         setConfirmed(false);
       },
-      onError: () => toast.error("Failed to trigger cycle."),
     });
   }
 
@@ -388,7 +385,7 @@ function TriggerSection() {
 
 function ReflectionSettingsContent() {
   return (
-    <div className="w-full max-w-3xl pb-20">
+    <div className="mx-auto w-full max-w-3xl pb-20">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2 font-mono text-xs text-zinc-400">
         <ClipboardCheck className="h-3.5 w-3.5" />

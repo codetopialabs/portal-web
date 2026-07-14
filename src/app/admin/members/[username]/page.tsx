@@ -437,9 +437,6 @@ function MemberDetailContent({ username }: { username: string }) {
           setSelectedRoleName("");
           setConfirmAssignRole(false);
         },
-        onError: () => {
-          toast.error("Failed to assign role. Please try again.");
-        },
       }
     );
   }
@@ -454,9 +451,6 @@ function MemberDetailContent({ username }: { username: string }) {
           toast.success(`Permission "${selectedPermission}" granted.`);
           setSelectedPermission("");
         },
-        onError: () => {
-          toast.error("Failed to grant permission. Please try again.");
-        },
       }
     );
   }
@@ -469,9 +463,6 @@ function MemberDetailContent({ username }: { username: string }) {
       {
         onSuccess: () => {
           toast.success(`Permission "${permission}" revoked.`);
-        },
-        onError: () => {
-          toast.error("Failed to revoke permission. Please try again.");
         },
       }
     );
@@ -492,7 +483,6 @@ function MemberDetailContent({ username }: { username: string }) {
             toast.success(`Role "${dangerAction.roleName}" revoked.`);
             closeDangerAction();
           },
-          onError: () => toast.error("Failed to revoke role. Please try again."),
         }
       );
       return;
@@ -506,7 +496,6 @@ function MemberDetailContent({ username }: { username: string }) {
             toast.success("Session revoked.");
             closeDangerAction();
           },
-          onError: () => toast.error("Failed to revoke session."),
         }
       );
       return;
@@ -518,7 +507,6 @@ function MemberDetailContent({ username }: { username: string }) {
           toast.success("All sessions revoked.");
           closeDangerAction();
         },
-        onError: () => toast.error("Failed to revoke all sessions."),
       });
       return;
     }
@@ -529,7 +517,6 @@ function MemberDetailContent({ username }: { username: string }) {
           toast.success("Member suspended.");
           closeDangerAction();
         },
-        onError: () => toast.error("Failed to suspend member. Please try again."),
       });
       return;
     }
@@ -540,7 +527,6 @@ function MemberDetailContent({ username }: { username: string }) {
           toast.success("Member reactivated.");
           closeDangerAction();
         },
-        onError: () => toast.error("Failed to reactivate member."),
       });
       return;
     }
@@ -551,7 +537,6 @@ function MemberDetailContent({ username }: { username: string }) {
         closeDangerAction();
         router.push("/admin/members");
       },
-      onError: () => toast.error("Failed to delete member."),
     });
   }
 
@@ -565,7 +550,6 @@ function MemberDetailContent({ username }: { username: string }) {
           setFlagDialogOpen(false);
           setFlagReason("");
         },
-        onError: () => toast.error("Failed to flag account."),
       }
     );
   }
@@ -579,7 +563,6 @@ function MemberDetailContent({ username }: { username: string }) {
           toast.success("Flag resolved.");
           setUnflagDialogOpen(false);
         },
-        onError: () => toast.error("Failed to resolve flag."),
       }
     );
   }

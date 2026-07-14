@@ -108,13 +108,10 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
           toast.success("Role updated.");
           router.push(`/admin/roles/${updatedRole.name}`);
         },
-        onError: (error) =>
+        onError: (error: Error) =>
           setErrors((prev) => ({
             ...prev,
-            form:
-              error instanceof Error
-                ? error.message
-                : "Failed to update the role. Please try again.",
+            form: error?.message || "Failed to update the role. Please try again.",
           })),
       }
     );

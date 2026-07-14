@@ -1,4 +1,4 @@
-// biome-ignore-all lint/suspicious/noExplicitAny: React Query cache ops (getQueryData/setQueryData) and Axios error handlers use `any` because the cache entry shapes and error response types have no shared generic at this layer
+// biome-ignore-all lint/suspicious/noExplicitAny: React Query cache ops (getQueryData/setQueryData) use `any` because the cache entry shapes have no shared generic at this layer
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -6,6 +6,7 @@ import {
   type CreateReviewInput,
   type CreateTeamInput,
   TeamsService,
+  type UpdateTeamInput,
 } from "@/services/teams.service";
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
@@ -53,8 +54,18 @@ export function useCreateTeam() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["teams"] });
     },
-    onError: () => {
-      toast.error("Failed to create team. Please try again.");
+  });
+}
+
+export function useUpdateTeam(teamSlug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateTeamInput) => TeamsService.updateTeam(teamSlug, data),
+    onSuccess: (updated) => {
+      qc.setQueryData(["teams", teamSlug], updated);
+      qc.invalidateQueries({ queryKey: ["teams"] });
+      qc.invalidateQueries({ queryKey: ["teams", "browse"] });
+      toast.success("Team updated.");
     },
   });
 }
@@ -96,11 +107,10 @@ export function useRemoveMember(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
       toast.success("Member removed.");
     },
-    onError: (error: any, _userId, context) => {
+    onError: (_error, _userId, context) => {
       if (context?.previous) {
         qc.setQueryData(["teams", teamId, "members"], context.previous);
       }
-      toast.error(error.response?.data?.detail || "Failed to remove member.");
     },
   });
 }
@@ -114,9 +124,6 @@ export function useUpdateMemberRole(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
       toast.success("Role updated.");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to update role.");
-    },
   });
 }
 
@@ -128,9 +135,6 @@ export function useTransferOwnership(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members", "me"] });
       toast.success("Ownership transferred.");
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to transfer ownership.");
     },
   });
 }
@@ -163,9 +167,6 @@ export function useSendInvite(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "invites"] });
       toast.success("Invite sent.");
     },
-    onError: () => {
-      toast.error("Could not send invite. Check the username and try again.");
-    },
   });
 }
 
@@ -181,9 +182,6 @@ export function useAcceptInvite(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members", "me"] });
       toast.success("Invite accepted! You are now a team member.");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.detail || "Failed to accept invite.");
-    },
   });
 }
 
@@ -196,9 +194,6 @@ export function useDeclineInvite(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", "invites", "mine"] });
       toast.success("Invite declined.");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.detail || "Failed to decline invite.");
-    },
   });
 }
 
@@ -209,9 +204,6 @@ export function useRevokeInvite(teamId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "invites"] });
       toast.success("Invite revoked.");
-    },
-    onError: () => {
-      toast.error("Failed to revoke invite.");
     },
   });
 }
@@ -243,9 +235,6 @@ export function useRequestToJoin(teamSlug: string) {
       qc.invalidateQueries({ queryKey: ["teams", "join-requests", "mine"] });
       toast.success("Request sent. A team lead will review it.");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.detail || "Failed to request to join.");
-    },
   });
 }
 
@@ -257,9 +246,6 @@ export function useWithdrawJoinRequest(teamSlug: string) {
       qc.invalidateQueries({ queryKey: ["teams", "browse"] });
       qc.invalidateQueries({ queryKey: ["teams", "join-requests", "mine"] });
       toast.success("Request withdrawn.");
-    },
-    onError: () => {
-      toast.error("Failed to withdraw request.");
     },
   });
 }
@@ -283,9 +269,6 @@ export function useReviewJoinRequest(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "join-requests"] });
       qc.invalidateQueries({ queryKey: ["teams", teamId, "members"] });
       toast.success(action === "approve" ? "Request approved." : "Request declined.");
-    },
-    onError: () => {
-      toast.error("Failed to update the request.");
     },
   });
 }
@@ -317,9 +300,6 @@ export function useCreateReview(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "reviews"] });
       toast.success("Review opened.");
     },
-    onError: () => {
-      toast.error("Failed to open review. Please try again.");
-    },
   });
 }
 
@@ -332,9 +312,6 @@ export function useApproveReview(teamId: string, reviewId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "reviews"] });
       toast.success("Review approved.");
     },
-    onError: () => {
-      toast.error("Failed to approve review.");
-    },
   });
 }
 
@@ -346,9 +323,6 @@ export function useCloseReview(teamId: string, reviewId: string) {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);
       qc.invalidateQueries({ queryKey: ["teams", teamId, "reviews"] });
       toast.success("Review closed.");
-    },
-    onError: () => {
-      toast.error("Failed to close review.");
     },
   });
 }
@@ -395,7 +369,7 @@ export function useCreateComment(teamId: string, reviewId: string) {
       ]);
       return { previousComments };
     },
-    onError: (_err, _data, context) => {
+    onError: (_error, _data, context) => {
       // Roll back
       if (context?.previousComments) {
         qc.setQueryData(
@@ -403,7 +377,6 @@ export function useCreateComment(teamId: string, reviewId: string) {
           context.previousComments
         );
       }
-      toast.error("Failed to post comment.");
     },
     onSuccess: () => {
       // Replace the optimistic entry with the real server response
@@ -425,9 +398,6 @@ export function useEditComment(teamId: string, reviewId: string) {
       });
       toast.success("Comment updated.");
     },
-    onError: () => {
-      toast.error("Failed to edit comment.");
-    },
   });
 }
 
@@ -440,9 +410,6 @@ export function useDeleteComment(teamId: string, reviewId: string) {
         queryKey: ["teams", teamId, "reviews", reviewId, "comments"],
       });
       toast.success("Comment deleted.");
-    },
-    onError: () => {
-      toast.error("Failed to delete comment.");
     },
   });
 }
@@ -457,9 +424,6 @@ export function useEditReview(teamId: string, reviewId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "reviews"] });
       toast.success("Review updated.");
     },
-    onError: () => {
-      toast.error("Failed to update review.");
-    },
   });
 }
 
@@ -471,9 +435,6 @@ export function useReopenReview(teamId: string, reviewId: string) {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);
       qc.invalidateQueries({ queryKey: ["teams", teamId, "reviews"] });
       toast.success("Review reopened.");
-    },
-    onError: () => {
-      toast.error("Failed to reopen review.");
     },
   });
 }
@@ -497,9 +458,6 @@ export function useCreateTeamLabel(teamId: string) {
       qc.invalidateQueries({ queryKey: ["teams", teamId, "labels"] });
       toast.success("Label created.");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to create label.");
-    },
   });
 }
 
@@ -521,11 +479,10 @@ export function useAddReviewLabel(teamId: string, reviewId: string) {
       }
       return { previousReview };
     },
-    onError: (error: any, _labelId, context) => {
+    onError: (_error, _labelId, context) => {
       if (context?.previousReview) {
         qc.setQueryData(["teams", teamId, "reviews", reviewId], context.previousReview);
       }
-      toast.error(error.response?.data?.detail || "Failed to add label.");
     },
     onSuccess: (data) => {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);
@@ -550,11 +507,10 @@ export function useRemoveReviewLabel(teamId: string, reviewId: string) {
       }
       return { previousReview };
     },
-    onError: (error: any, _labelId, context) => {
+    onError: (_error, _labelId, context) => {
       if (context?.previousReview) {
         qc.setQueryData(["teams", teamId, "reviews", reviewId], context.previousReview);
       }
-      toast.error(error.response?.data?.detail || "Failed to remove label.");
     },
     onSuccess: (data) => {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);
@@ -583,11 +539,10 @@ export function useAddReviewAssignee(teamId: string, reviewId: string) {
       }
       return { previousReview };
     },
-    onError: (error: any, _userId, context) => {
+    onError: (_error, _userId, context) => {
       if (context?.previousReview) {
         qc.setQueryData(["teams", teamId, "reviews", reviewId], context.previousReview);
       }
-      toast.error(error.response?.data?.detail || "Failed to add assignee.");
     },
     onSuccess: (data) => {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);
@@ -612,11 +567,10 @@ export function useRemoveReviewAssignee(teamId: string, reviewId: string) {
       }
       return { previousReview };
     },
-    onError: (error: any, _userId, context) => {
+    onError: (_error, _userId, context) => {
       if (context?.previousReview) {
         qc.setQueryData(["teams", teamId, "reviews", reviewId], context.previousReview);
       }
-      toast.error(error.response?.data?.detail || "Failed to remove assignee.");
     },
     onSuccess: (data) => {
       qc.setQueryData(["teams", teamId, "reviews", reviewId], data);

@@ -92,10 +92,10 @@ function MemberEditFields({
       },
       {
         onSuccess: () => toast.success("Member updated successfully."),
-        onError: () => {
+        onError: (error: Error) => {
           setErrors((prev) => ({
             ...prev,
-            form: "Failed to update member. Please try again.",
+            form: error?.message || "Failed to update member. Please try again.",
           }));
         },
       }

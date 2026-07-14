@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { EditTeamDialog } from "@/components/teams/EditTeamDialog";
 import { TeamMembersTab } from "@/components/teams/TeamMembersTab";
 import { TeamOverviewTab } from "@/components/teams/TeamOverviewTab";
 import { TeamReviewsTab } from "@/components/teams/TeamReviewsTab";
@@ -30,6 +31,7 @@ function TeamWorkspaceContent() {
   const pathname = usePathname();
 
   const tab = searchParams.get("tab") || "overview";
+  const [editOpen, setEditOpen] = useState(false);
 
   // Core data — always needed for header & tab bar
   const { data: team, isLoading: teamLoading, isError: teamError } = useTeam(teamSlug);
@@ -118,6 +120,16 @@ function TeamWorkspaceContent() {
                 </p>
               )}
             </div>
+            {isLead && (
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="inline-flex h-9 shrink-0 items-center gap-1.5 border border-grey-200 bg-white px-3 font-mono text-xs font-medium text-text-secondary transition-colors hover:border-grey-400 hover:text-text-primary"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit team
+              </button>
+            )}
           </div>
         </div>
 
@@ -169,6 +181,7 @@ function TeamWorkspaceContent() {
           )}
         </div>
       </div>
+      {isLead && <EditTeamDialog team={team} open={editOpen} onOpenChange={setEditOpen} />}
     </DashboardShell>
   );
 }
