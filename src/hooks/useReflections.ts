@@ -9,6 +9,10 @@ export const reflectionKeys = {
   list: (params?: { period?: string; status?: string }) => ["reflections", "list", params] as const,
   detail: (id: string) => ["reflections", id] as const,
   questions: ["reflections", "questions"] as const,
+  historyMe: ["reflections", "history", "me"] as const,
+  member: (username: string) => ["reflections", "member", username] as const,
+  settings: ["reflections", "settings"] as const,
+  upcoming: ["reflections", "upcoming"] as const,
 };
 
 export function useCurrentReflection(enabled = true) {
@@ -31,7 +35,7 @@ export function useSubmitReflection() {
     }) => ReflectionsService.submit(answers, attachments),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
-      queryClient.invalidateQueries({ queryKey: ["reflections", "history", "me"] });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.historyMe });
     },
   });
 }
@@ -51,14 +55,14 @@ export function useReflections(params?: { period?: string; status?: string }) {
 
 export function useMyReflections() {
   return useQuery({
-    queryKey: ["reflections", "history", "me"] as const,
+    queryKey: reflectionKeys.historyMe,
     queryFn: () => ReflectionsService.listOwn(),
   });
 }
 
 export function useReflectionsByMember(username: string) {
   return useQuery({
-    queryKey: ["reflections", "member", username] as const,
+    queryKey: reflectionKeys.member(username),
     queryFn: () => ReflectionsService.listByUser(username),
     enabled: !!username,
   });
@@ -76,8 +80,14 @@ export function useReviewReflection() {
       action: "approve" | "request_changes";
       notes?: Record<string, string>;
     }) => ReflectionsService.review(id, action, notes),
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
+      // Bust the list views (prefix match covers all param variants)
       queryClient.invalidateQueries({ queryKey: ["reflections", "list"] });
+      // Bust the specific reflection detail
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.detail(id) });
+      // Bust all per-member history views — we don't know which member was
+      // reviewed here so we use the shared prefix to invalidate all of them.
+      queryClient.invalidateQueries({ queryKey: ["reflections", "member"] });
     },
   });
 }
@@ -93,7 +103,11 @@ export function useCreateReflectionQuestion() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: ReflectionQuestionInput) => ReflectionsService.createQuestion(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: reflectionKeys.questions }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.questions });
+      // Current cycle view shows the active questions — refresh it too.
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
+    },
   });
 }
 
@@ -102,7 +116,10 @@ export function useUpdateReflectionQuestion() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<ReflectionQuestionInput> }) =>
       ReflectionsService.updateQuestion(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: reflectionKeys.questions }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.questions });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
+    },
   });
 }
 
@@ -110,13 +127,16 @@ export function useDeleteReflectionQuestion() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => ReflectionsService.deleteQuestion(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: reflectionKeys.questions }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.questions });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
+    },
   });
 }
 
 export function useReflectionSettings() {
   return useQuery({
-    queryKey: ["reflections", "settings"] as const,
+    queryKey: reflectionKeys.settings,
     queryFn: () => ReflectionsService.getSettings(),
   });
 }
@@ -126,19 +146,31 @@ export function useUpdateReflectionSettings() {
   return useMutation({
     mutationFn: (data: Partial<{ openDay: number; windowDays: number }>) =>
       ReflectionsService.updateSettings(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reflections", "settings"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.settings });
+      // Cycle timing changes affect the upcoming cycle display too.
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.upcoming });
+    },
   });
 }
 
 export function useTriggerReflectionCycle() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => ReflectionsService.triggerCycle(),
+    onSuccess: () => {
+      // A new cycle was triggered — invalidate everything cycle-related so
+      // the settings page, upcoming panel, and current-cycle view all refresh.
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.upcoming });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.current });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.settings });
+    },
   });
 }
 
 export function useUpcomingCycle() {
   return useQuery({
-    queryKey: ["reflections", "upcoming"] as const,
+    queryKey: reflectionKeys.upcoming,
     queryFn: () => ReflectionsService.getUpcomingCycle(),
   });
 }
@@ -148,7 +180,7 @@ export function useConfirmReflectionQuestions() {
   return useMutation({
     mutationFn: () => ReflectionsService.confirmQuestions(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reflections", "upcoming"] });
+      queryClient.invalidateQueries({ queryKey: reflectionKeys.upcoming });
     },
   });
 }
