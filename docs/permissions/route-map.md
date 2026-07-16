@@ -25,10 +25,10 @@ Every protected page in the portal declares the permission required to access it
 | `/reflections/submit` | `reflections.submit` | Monthly reflection question form |
 | `/teams` | `teams.view` | Team directory |
 | `/teams/new` | `teams.create` | Team creation flow |
-| `/teams/[teamSlug]` | `teams.view:[teamSlug]` | Scoped team workspace — checked in-page |
+| `/teams/[teamSlug]` | `teams.view:[teamSlug]` | Scoped team workspace â€” checked in-page |
 | `/teams/[teamSlug]/reviews` | `teams.view:[teamSlug]` | Team contribution reviews |
 | `/teams/[teamSlug]/reviews/[reviewId]` | `teams.view:[teamSlug]` | Specific review discussion |
-| `/authorize` | authenticated | SSO consent screen — self-guards |
+| `/authorize` | authenticated | SSO consent screen â€” self-guards |
 | `/admin` | `admin.panel.access` | Any member with this permission |
 | `/admin/roles` | `roles.view` | |
 | `/admin/roles/new` | `roles.create` | |
@@ -47,7 +47,10 @@ Every protected page in the portal declares the permission required to access it
 | `/admin/reflections/settings` | `reflections.manage` | Schedule, questions, manual trigger |
 | `/admin/reflections/questions` | `reflections.manage` | Reflection question editor |
 | `/admin/career-progressions` | `career_progressions.review` | Career progression review dashboard |
-| `/docs` | `docs.view` | Live documentation portal |
+| `/badges` | authenticated | Member badge collection and featured badge selection |
+| `/admin/badges` | `badges.view` | Badge catalogue and award totals |
+| `/admin/badges/new` | `badges.create` | Badge creation and criteria builder |
+| `/admin/badges/[slug]/edit` | `badges.edit` | Badge editing and criteria management || `/docs` | `docs.view` | Live documentation portal |
 | `/@username` (or `/[username]`) | `profile.view` | Any authenticated member |
 
 ## Auth routes

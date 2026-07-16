@@ -5,6 +5,14 @@ const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Extend Axios request config to support silent error suppression.
+// Add silentError: true to any request config to skip the error toast.
+declare module "axios" {
+  interface AxiosRequestConfig {
+    silentError?: boolean;
+  }
+}
+
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function getCookie(name: string): string | null {
@@ -213,8 +221,11 @@ axiosInstance.interceptors.response.use(
       const is403 = error.response?.status === 403;
       const is401 = error.response?.status === 401;
 
-      // We don't toast 401s because they are handled by refresh/redirect logic
-      if (!is401) {
+      // We don't toast 401s because they are handled by refresh/redirect logic.
+      // Callers can set silentError: true on the request config to suppress toasts
+      // for expected errors they handle inline (e.g. criteria 403 in BadgeForm).
+      const isSilent = Boolean(originalRequest.silentError);
+      if (!is401 && !isSilent) {
         const { toast } = require("sonner");
         toast.error(is403 ? "Permission Denied" : "Error", {
           description: errorMessage,

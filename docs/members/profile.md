@@ -13,7 +13,7 @@ These fields are visible to anyone on the platform:
 | Cover image | Banner image behind the avatar |
 | Bio | Short description |
 | Discipline | e.g. Frontend Engineering, Product Design |
-| Experience level | Complete Beginner → Expert / Senior |
+| Experience level | Complete Beginner â†’ Expert / Senior |
 | Skills | List of skill tags |
 | Location | City / country |
 | GitHub handle | Links to GitHub profile |
@@ -23,7 +23,7 @@ These fields are visible to anyone on the platform:
 | Discord username | Community Discord handle |
 | Community roles | Badges showing assigned roles |
 | XP total | Coming Soon |
-| Badges | Coming Soon |
+| Badges | Earned achievements, with up to three featured publicly |
 
 ## Private fields (never shown publicly)
 
@@ -38,7 +38,7 @@ These fields are stored but never displayed on the public profile:
 
 ## Editing your profile
 
-Members edit their own profile at Settings → Profile. Changes are saved immediately and reflected on the public profile.
+Members edit their own profile at Settings â†’ Profile. Changes are saved immediately and reflected on the public profile.
 
 ## Profile URL
 

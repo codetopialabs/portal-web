@@ -1,5 +1,6 @@
 import {
   Activity,
+  Award,
   BriefcaseBusiness,
   ClipboardCheck,
   Code2,
@@ -36,6 +37,7 @@ const BASE_MENU_GROUPS: NavGroup[] = [
         activePrefix: "/reflections",
       },
       { icon: Activity, label: "Activity", href: "/activity", activePrefix: "/activity" },
+      { icon: Award, label: "Badges", href: "/badges", activePrefix: "/badges" },
       {
         icon: UserCheck,
         label: "Mentorship",
@@ -58,7 +60,7 @@ const BASE_MENU_GROUPS: NavGroup[] = [
   },
 ];
 
-// Community moderation/management — the day-to-day admin work.
+// Community moderation/management â€” the day-to-day admin work.
 const ADMIN_MENU_GROUP: NavGroup = {
   label: "Admin",
   items: [
@@ -66,6 +68,7 @@ const ADMIN_MENU_GROUP: NavGroup = {
     { icon: Users, label: "Members", href: "/admin/members", activePrefix: "/admin/members" },
     { icon: Users2, label: "All Teams", href: "/admin/teams", activePrefix: "/admin/teams" },
     { icon: ShieldCheck, label: "Roles", href: "/admin/roles", activePrefix: "/admin/roles" },
+    { icon: Award, label: "Badges", href: "/admin/badges", activePrefix: "/admin/badges" },
     {
       icon: ClipboardCheck,
       label: "Reflections",
@@ -81,7 +84,7 @@ const ADMIN_MENU_GROUP: NavGroup = {
   ],
 };
 
-// Platform/system configuration — one-time setup, not ongoing moderation.
+// Platform/system configuration â€” one-time setup, not ongoing moderation.
 const INTEGRATIONS_MENU_GROUP: NavGroup = {
   label: "Integrations",
   items: [

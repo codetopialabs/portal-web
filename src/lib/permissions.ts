@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Permission system utilities.
  *
  * Mirrors the backend wildcard resolver in apps/common/permissions.py.
@@ -11,6 +11,7 @@ export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
   "users.suspend",
   "roles.delete",
   "oauth_apps.delete",
+  "badges.delete",
 ]);
 
 /**
@@ -38,6 +39,9 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/github-repos": "github_repos.manage",
   "/admin/teams": "admin.panel.access",
   "/admin/teams/[teamSlug]": "admin.panel.access",
+  "/admin/badges": "badges.view",
+  "/admin/badges/new": "badges.create",
+  "/admin/badges/[slug]/edit": "badges.edit",
   "/reflections": "reflections.submit",
   "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",
@@ -52,6 +56,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/teams/browse": "authenticated",
   "/activity": "activity.view",
   "/docs": "docs.view",
+  "/badges": "authenticated",
 };
 
 // Dynamic route patterns (checked separately in RouteGuard)
@@ -74,6 +79,7 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   { pattern: /^\/admin\/members\/[^/]+$/, permission: "users.view" },
   { pattern: /^\/admin\/oauth-apps\/[^/]+\/edit$/, permission: "oauth_apps.edit" },
   { pattern: /^\/admin\/oauth-apps\/[^/]+$/, permission: "oauth_apps.view" },
+  { pattern: /^\/admin\/badges\/[^/]+\/edit$/, permission: "badges.edit" },
   { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
 ];
 
