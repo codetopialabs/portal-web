@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -25,10 +25,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
 import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { PublicProfileBadges } from "@/components/badges/PublicProfileBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
 import { formatJoinedAt } from "@/components/profile/utils";
+import { useMemberBadges } from "@/hooks/useBadges";
 import { usePermission } from "@/hooks/usePermission";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
 import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
@@ -95,6 +97,10 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
   const isOwnProfile = currentUser?.username === username;
   const showOwnProfileEdit = isOwnProfile && canEditOwnProfile;
   const showAdminEdit = !isOwnProfile && canEditMembers;
+
+  // Badge count for hero stats bar
+  const { data: badgeAwards = [] } = useMemberBadges(username);
+  const badgeCount = badgeAwards.filter((a) => !a.isRevoked).length;
 
   const socialLinks: SocialLink[] = [];
   if (profile.discordId) {
@@ -232,11 +238,19 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 </span>
               </div>
               {socialLinks.length > 0 && (
-                <div className="flex items-center gap-2 px-5 py-4">
+                <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4">
                   <span className="font-sans text-xl font-black text-white">
                     {socialLinks.length}
                   </span>
                   <span className="font-mono text-xs font-medium text-zinc-500">Links</span>
+                </div>
+              )}
+              {badgeCount > 0 && (
+                <div className="flex items-center gap-2 px-5 py-4">
+                  <span className="font-sans text-xl font-black text-white">{badgeCount}</span>
+                  <span className="font-mono text-xs font-medium text-zinc-500">
+                    {badgeCount === 1 ? "Badge" : "Badges"}
+                  </span>
                 </div>
               )}
             </div>
@@ -461,9 +475,15 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
         </section>
 
         {/* â”€â”€ Contributions â”€â”€ */}
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
           <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
         </section>
+
+        {badgeCount > 0 && (
+          <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+            <PublicProfileBadges username={profile.username} />
+          </section>
+        )}
       </main>
 
       <PublicProfileFooter />

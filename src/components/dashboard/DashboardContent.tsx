@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useMemo } from "react";
 import { toast } from "sonner";
+import { DashboardBadges } from "@/components/badges/DashboardBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileCompletionCarousel } from "@/components/dashboard/ProfileCompletionCarousel";
 import { DASHBOARD_MODULES, DASHBOARD_NEXT_ACTIONS } from "@/data/dashboard";
@@ -276,6 +277,8 @@ export function DashboardContent() {
           </Link>
         ))}
       </section>
+
+      <DashboardBadges />
 
       <ContributionGraph username={profile.username} joinedAt={profile.joinedAt ?? undefined} />
 

@@ -4,6 +4,13 @@ category: General
 order: 1
 ---
 
+## [2026-07-11] Badge preview validation fix
+
+**What changed:** The badge editor now prevents preview requests until the required badge fields are filled in, and the award-criteria section now shows a clear message if the criteria catalog cannot load instead of leaving a blank block behind.
+**Affected areas:** `/admin/badges/new`, `/admin/badges/[slug]/edit`.
+**Permissions added:** none.
+**Breaking changes:** No.
+
 ## [2026-07-04] Documentation catch-up
 
 **What changed:** Brought all docs up to date with current codebase. Added missing permissions (`career_progressions.*`, `users.flag`, `users.review_flag`, `teams.invite`, `teams.manage`, `teams.close_review`), filled in missing routes in the route map (career progressions, reflection admin sub-routes, `/authorize`, `/discord/link`, `/settings/career`), updated the admin overview to reflect API Keys, OAuth Apps, Reflections, and Career Progressions as live sections (no longer Coming Soon), moved API key and OAuth activity events out of the "Coming Soon" section in the activity log, added all team and reflection events, and created new doc files for Reflections and Career Progressions.
@@ -284,3 +291,24 @@ order: 1
 **Affected areas:** Entire portal — this is the foundation spec.  
 **Permissions added:** `admin.panel.access`, `members.view`, `members.edit`, `members.deactivate`, `roles.view`, `roles.create`, `roles.edit`, `roles.delete`, `roles.assign`, `roles.revoke`, `profile.view`, `profile.edit`, `permissions.view`  
 **Breaking changes:** No — greenfield.
+
+## [2026-07-11] Granular community badges
+
+**What changed:** Added permission-managed badge creation, square artwork uploads, nested ALL/ANY criteria, automatic and manual awards, matching-member previews, reconciliation, award celebrations, a member badge collection, dashboard summaries, and three featured public-profile badges.
+**Affected areas:** Admin Badges, Dashboard, Public Profiles, Badge Collection, API, Activity Log, Permissions.
+**Permissions added:** `badges.view`, `badges.create`, `badges.edit`, `badges.delete`, `badges.award`, `badges.revoke`.
+**Breaking changes:** No.
+
+## [2026-07-11] Badge collection redesign
+
+**What changed:** Redesigned the member badge collection with a richer achievement header, featured-profile shelf, responsive badge cards, and an improved badge details view.
+**Affected areas:** `/badges` member collection and public-profile featured badge selection.
+**Permissions added:** none.
+**Breaking changes:** No.
+
+## [2026-07-11] Granular badge criteria foundation
+
+**What changed:** Added validated badge rules for a member's community join order, membership of a specific team, and team-join date. Team options are now supplied to the visual rule builder.
+**Affected areas:** Admin badge criteria builder, badge matching API.
+**Permissions added:** none.
+**Breaking changes:** No.

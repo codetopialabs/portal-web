@@ -8,7 +8,7 @@ order: 2
 
 Every permission codename in the system. This list is the source of truth for what actions exist.
 
-Permissions are served to the frontend via `GET /api/v1/permissions/` — the admin role builder reads from this endpoint.
+Permissions are served to the frontend via `GET /api/v1/permissions/` â€” the admin role builder reads from this endpoint.
 
 > **When adding a new permission:** add it here, in `AGENTS.md`, and in `apps/common/permissions.py` on the backend.
 
@@ -60,7 +60,7 @@ Permissions are served to the frontend via `GET /api/v1/permissions/` — the ad
 | `teams.approve_review` | Approve contribution reviews in a team | No |
 | `teams.close_review` | Close a review without approving | No |
 | `teams.view:[slug]` | View a specific team's dashboard (scoped) | No |
-| `teams.manage:[slug]` | Manage a specific team — leads only (scoped) | No |
+| `teams.manage:[slug]` | Manage a specific team â€” leads only (scoped) | No |
 | `teams.create_review:[slug]` | Open a contribution review in a specific team (scoped) | No |
 | `teams.approve_review:[slug]` | Approve reviews in a specific team (scoped) | No |
 | `activity.view` | View own activity log | No |
@@ -69,7 +69,12 @@ Permissions are served to the frontend via `GET /api/v1/permissions/` — the ad
 | `security.revoke` | Revoke own sessions | No |
 | `sessions.view_any` | View sessions for other users | No |
 | `sessions.revoke_any` | Revoke sessions for other users | No |
-| `docs.view` | View the community documentation portal | No |
+| `badges.view` | View badge definitions and award totals | No |
+| `badges.create` | Create new badges and criteria | No |
+| `badges.edit` | Edit, publish, and reconcile badges | No |
+| `badges.delete` | Delete or archive a badge | **Yes** |
+| `badges.award` | Manually award a badge | No |
+| `badges.revoke` | Revoke a member's badge award | No || `docs.view` | View the community documentation portal | No |
 
 ## Planned permissions (Coming Soon features)
 

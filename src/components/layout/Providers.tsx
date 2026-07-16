@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthInitializer } from "@/components/auth/AuthInitializer";
 import { UserInitializer } from "@/components/auth/UserInitializer";
+import { BadgeCelebration } from "@/components/badges/BadgeCelebration";
 import { setQueryClient } from "@/lib/queryClient";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -13,7 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         queries: {
           // Treat cached data as fresh for 30 s by default. Queries that need
           // tighter freshness (live feeds, invite lists) override this locally.
-          // Without this the default is 0 ms — every window focus and component
+          // Without this the default is 0 ms â€” every window focus and component
           // mount triggers a network request even when nothing has changed.
           staleTime: 30_000,
           // Do not refetch on window focus by default. Queries that genuinely
@@ -33,6 +34,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthInitializer />
       <UserInitializer />
+      <BadgeCelebration />
       {children}
     </QueryClientProvider>
   );

@@ -1,0 +1,77 @@
+diff --git a/apps/badges/apps.py b/apps/badges/apps.py
+index 955bb78..3c79e63 100644
+--- a/apps/badges/apps.py
++++ b/apps/badges/apps.py
+@@ -4,3 +4,6 @@ class BadgesConfig(AppConfig):
+     default_auto_field = "django.db.models.BigAutoField"
+     name = "apps.badges"
++
++    def ready(self):
++        from apps.badges import signals  # noqa: F401
+diff --git a/config/settings.py b/config/settings.py
+--- a/config/settings.py
++++ b/config/settings.py
+@@ -97,6 +97,7 @@ INSTALLED_APPS = [
+     "apps.teams",
+     "apps.api_keys",
+     "apps.reflections",
++    "apps.badges",
+ ]
+diff --git a/config/api_v1.py b/config/api_v1.py
+--- a/config/api_v1.py
++++ b/config/api_v1.py
+@@ -18,4 +18,5 @@ urlpatterns = [
+     path("admin/overview/", include("apps.users.urls_admin_overview")),
+     path("admin/github-repos/", include("apps.teams.urls_admin_github")),
+     path("admin/teams/", include("apps.teams.urls_admin_teams")),
++    path("badges/", include("apps.badges.urls")),
+ ]
+diff --git a/apps/common/permissions.py b/apps/common/permissions.py
+--- a/apps/common/permissions.py
++++ b/apps/common/permissions.py
+@@ -72,6 +72,13 @@ VALID_PERMISSIONS = {
+         "Configure the GitHub token and choose which org repos are tracked for contribution data"
+     ),
++    # Badges
++    "badges.view": "View badge definitions and award totals",
++    "badges.create": "Create new badges and criteria",
++    "badges.edit": "Edit, publish, and reconcile badges",
++    "badges.delete": "Delete or archive badges",
++    "badges.award": "Manually award badges to members",
++    "badges.revoke": "Revoke a badge award from a member",
+ }
+@@ -81,6 +88,7 @@ DESTRUCTIVE_PERMISSIONS = {
+     "roles.delete",
+     "oauth_apps.delete",
++    "badges.delete",
+ }
+diff --git a/apps/authentication/models.py b/apps/authentication/models.py
+--- a/apps/authentication/models.py
++++ b/apps/authentication/models.py
+@@ -92,6 +92,13 @@ class ActivityEventType(models.TextChoices):
+     )
+     CAREER_PROGRESSION_REVOKED = "career_progression_revoked", "Career Progression Revoked"
++
++    # Badges
++    BADGE_CREATED = "badge_created", "Badge Created"
++    BADGE_UPDATED = "badge_updated", "Badge Updated"
++    BADGE_DELETED = "badge_deleted", "Badge Deleted"
++    BADGE_AWARDED = "badge_awarded", "Badge Awarded"
++    BADGE_REVOKED = "badge_revoked", "Badge Revoked"
+diff --git a/apps/authentication/views/account.py b/apps/authentication/views/account.py
+--- a/apps/authentication/views/account.py
++++ b/apps/authentication/views/account.py
+@@ -293,6 +293,15 @@ class CloudinarySignatureView(APIView):
+             folder = f"{folder}/cover"
+         elif upload_type == "reflection":
+             folder = f"portal/reflections/{request.user.id}"
++        elif upload_type == "badge":
++            if not request.user.has_permission("badges.create") and not request.user.has_permission(
++                "badges.edit"
++            ):
++                return Response(
++                    {"detail": "You do not have permission to upload badge artwork."},
++                    status=status.HTTP_403_FORBIDDEN,
++                )
++            folder = "portal/badges"
+         signature = cloudinary.utils.api_sign_request(
