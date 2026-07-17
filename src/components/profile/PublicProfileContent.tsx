@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
+  Award,
   Bot,
   BrainCircuit,
   CalendarDays,
@@ -20,6 +21,7 @@ import {
   Smartphone,
   Sparkles,
   TestTube2,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -60,6 +62,39 @@ const DISCIPLINE_MAP: Record<string, DisciplineMeta> = {
   other: { label: "Other", icon: HelpCircle },
 };
 
+function SectionHeader({
+  icon: Icon,
+  title,
+  meta,
+  size = "default",
+}: {
+  icon: ComponentType<{ className?: string }>;
+  title: string;
+  meta?: string;
+  size?: "default" | "compact";
+}) {
+  const isCompact = size === "compact";
+  return (
+    <div
+      className={`flex items-center justify-between gap-3 border-b border-zinc-100 ${isCompact ? "px-5 py-3" : "px-6 py-4"}`}
+    >
+      <div className="flex items-center gap-2.5">
+        {isCompact ? (
+          <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+        ) : (
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-zinc-950 text-white">
+            <Icon className="h-3.5 w-3.5" />
+          </div>
+        )}
+        <h2 className={`font-sans font-bold text-zinc-900 ${isCompact ? "text-base" : "text-lg"}`}>
+          {title}
+        </h2>
+      </div>
+      {meta && <span className="font-mono text-[10px] text-zinc-400">{meta}</span>}
+    </div>
+  );
+}
+
 export function PublicProfileContent({ initialProfile }: { initialProfile: CommunityMember }) {
   const username = initialProfile.username;
 
@@ -77,6 +112,11 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
     notFound();
   }
 
+  // The generated dicebear pattern (no coverImageUrl) is flat, low-contrast
+  // vector art — safe to show at high opacity. A real uploaded photo can be
+  // arbitrarily bright/busy, so it stays closer to the original muted look
+  // to keep the name/badges legible over it.
+  const hasCustomCover = Boolean(profile.coverImageUrl?.trim());
   const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
   const filteredRoles = profile.communityRoles?.filter((r: string) => r.trim() !== "") || [];
   const roleList = filteredRoles.length > 0 ? filteredRoles : ["Member"];
@@ -152,26 +192,27 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
         {/* â”€â”€ Hero â”€â”€ */}
         <section className="relative bg-zinc-950">
           {/* Cover image */}
-          <div className="absolute inset-0 h-80">
+          <div className="absolute inset-0 h-96">
             {/* biome-ignore lint/performance/noImgElement: user cover image */}
             <img
               src={getCoverUrl(profile.coverImageUrl, profile.fullName)}
               alt=""
-              className="h-full w-full object-cover opacity-40"
+              className={`h-full w-full object-cover ${hasCustomCover ? "opacity-45" : "opacity-80"}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/10" />
+            <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/40 via-transparent to-transparent" />
           </div>
 
           {/* Hero content */}
-          <div className="relative mx-auto max-w-7xl px-4 pb-0 pt-28 sm:px-6">
+          <div className="relative mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-2 px-4 pb-0 pt-32 duration-500 sm:px-6">
             {/* Badges */}
             <div className="mb-5 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+              <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-sm transition-colors hover:bg-white/15">
                 <Sparkles className="h-3 w-3 text-white/70" />
                 {primaryRole}
               </span>
               {discipline && (
-                <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-sm transition-colors hover:bg-white/15">
                   <discipline.icon className="h-3 w-3 text-white/70" />
                   {discipline.label}
                 </span>
@@ -179,8 +220,8 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             </div>
 
             {/* Avatar + name block */}
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
-              <div className="h-32 w-32 shrink-0 border-[3px] border-zinc-800 bg-zinc-900 p-0.5 sm:h-40 sm:w-40">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+              <div className="h-32 w-32 shrink-0 border-[3px] border-zinc-800 bg-zinc-900 p-0.5 ring-2 ring-white/25 sm:h-40 sm:w-40">
                 {/* biome-ignore lint/performance/noImgElement: user avatar */}
                 <img
                   src={getAvatarUrl(profile.profilePictureUrl, profile.fullName)}
@@ -189,7 +230,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 />
               </div>
 
-              <div className="min-w-0 pb-6">
+              <div className="min-w-0">
                 {jobTitle && (
                   <p className="mb-1 font-mono text-sm font-medium text-white/50">{jobTitle}</p>
                 )}
@@ -226,19 +267,22 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             </div>
 
             {/* Stats bar */}
-            <div className="mt-0 flex items-stretch border-t border-white/10">
-              <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4 first:pl-0">
+            <div className="mt-0 flex flex-wrap items-stretch border-t border-white/10">
+              <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors first:pl-0 hover:bg-white/[0.03]">
+                <Code2 className="h-4 w-4 text-zinc-600" />
                 <span className="font-sans text-xl font-black text-white">{skills.length}</span>
                 <span className="font-mono text-xs font-medium text-zinc-500">Skills</span>
               </div>
-              <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4">
+              <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors hover:bg-white/[0.03]">
+                <Users className="h-4 w-4 text-zinc-600" />
                 <span className="font-sans text-xl font-black text-white">{roleList.length}</span>
                 <span className="font-mono text-xs font-medium text-zinc-500">
                   {roleList.length === 1 ? "Role" : "Roles"}
                 </span>
               </div>
               {socialLinks.length > 0 && (
-                <div className="flex items-center gap-2 border-r border-white/10 px-5 py-4">
+                <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors hover:bg-white/[0.03]">
+                  <Link2 className="h-4 w-4 text-zinc-600" />
                   <span className="font-sans text-xl font-black text-white">
                     {socialLinks.length}
                   </span>
@@ -246,7 +290,8 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 </div>
               )}
               {badgeCount > 0 && (
-                <div className="flex items-center gap-2 px-5 py-4">
+                <div className="flex items-center gap-2.5 px-5 py-4 transition-colors hover:bg-white/[0.03]">
+                  <Award className="h-4 w-4 text-zinc-600" />
                   <span className="font-sans text-xl font-black text-white">{badgeCount}</span>
                   <span className="font-mono text-xs font-medium text-zinc-500">
                     {badgeCount === 1 ? "Badge" : "Badges"}
@@ -263,9 +308,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
           <div className="space-y-6">
             {/* Bio */}
             <div className="border border-zinc-200 bg-white">
-              <div className="border-b border-zinc-100 px-6 py-4">
-                <h2 className="font-sans text-lg font-bold text-zinc-900">Bio</h2>
-              </div>
+              <SectionHeader icon={FileText} title="Bio" />
               <div className="p-6">
                 {profile.bio ? (
                   <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600">
@@ -281,9 +324,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
 
             {/* Career Progression */}
             <div className="border border-zinc-200 bg-white">
-              <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-sans text-lg font-bold text-zinc-900">Career Progression</h2>
-              </div>
+              <SectionHeader icon={CalendarDays} title="Career Progression" />
               <div className="p-6">
                 {careerProgressions.length > 0 ? (
                   <div className="relative space-y-0">
@@ -313,7 +354,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                         <article key={item.id} className={`relative pl-6 ${isLast ? "" : "pb-7"}`}>
                           {/* Timeline dot */}
                           <span
-                            className={`absolute left-0 top-[6px] h-[10px] w-[10px] border-2 ${isCurrent ? "border-zinc-950 bg-zinc-950" : "border-zinc-300 bg-white"}`}
+                            className={`absolute left-0 top-[6px] h-[10px] w-[10px] border-2 ${isCurrent ? "border-zinc-950 bg-zinc-950 shadow-[0_0_0_3px_var(--grey-100)]" : "border-zinc-300 bg-white"}`}
                           />
                           {/* Connector line — only between entries, never below the last */}
                           {!isLast && (
@@ -326,7 +367,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                                 {item.title}
                               </h3>
                               <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
-                                Codetopia Community
+                                {item.teamName ?? "Codetopia Community"}
                               </p>
                               <p className="mt-1 font-mono text-[11px] text-zinc-400">
                                 {fmt(item.startDate)} <span className="text-zinc-300">–</span>{" "}
@@ -359,12 +400,11 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             </div>
             {/* Skills */}
             <div className="border border-zinc-200 bg-white">
-              <div className="border-b border-zinc-100 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-sans text-lg font-bold text-zinc-900">Skills</h2>
-                {skills.length > 0 && (
-                  <span className="font-mono text-[10px] text-zinc-400">{skills.length} total</span>
-                )}
-              </div>
+              <SectionHeader
+                icon={Code2}
+                title="Skills"
+                meta={skills.length > 0 ? `${skills.length} total` : undefined}
+              />
               <div className="p-6">
                 {skills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -390,7 +430,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             {showOwnProfileEdit && (
               <Link
                 href="/settings/profile"
-                className="flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+                className="flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 font-mono text-sm font-medium text-white shadow-[4px_4px_0_0_var(--grey-300)] transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-zinc-800 hover:shadow-[5px_5px_0_0_var(--grey-300)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_0_var(--grey-300)]"
               >
                 Edit Your Profile
                 <Link2 className="h-4 w-4" />
@@ -399,7 +439,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             {showAdminEdit && (
               <Link
                 href={`/admin/members/${profile.username}/edit`}
-                className="flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 font-mono text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-900 hover:text-white"
+                className="flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 font-mono text-sm font-medium text-zinc-950 shadow-[4px_4px_0_0_var(--grey-200)] transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-zinc-900 hover:text-white hover:shadow-[5px_5px_0_0_var(--grey-200)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_0_var(--grey-200)]"
               >
                 <Pencil className="h-4 w-4" />
                 Edit Member
@@ -409,9 +449,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             {/* Discipline */}
             {discipline && (
               <div className="border border-zinc-200 bg-white">
-                <div className="border-b border-zinc-100 px-5 py-3">
-                  <h2 className="font-sans text-base font-bold text-zinc-900">Discipline</h2>
-                </div>
+                <SectionHeader icon={discipline.icon} title="Discipline" size="compact" />
                 <div className="p-5">
                   <div className="flex items-center gap-3 border border-zinc-900 bg-zinc-900 px-4 py-3">
                     <discipline.icon className="h-4 w-4 shrink-0 text-white/70" />
@@ -425,12 +463,13 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
 
             {/* Community roles */}
             <div className="border border-zinc-200 bg-white">
-              <div className="border-b border-zinc-100 px-5 py-3">
-                <h2 className="font-sans text-base font-bold text-zinc-900">Community Roles</h2>
-              </div>
+              <SectionHeader icon={Users} title="Community Roles" size="compact" />
               <div className="divide-y divide-zinc-100">
                 {roleList.map((role, i) => (
-                  <div key={role} className="flex items-center justify-between px-5 py-3">
+                  <div
+                    key={role}
+                    className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-zinc-50"
+                  >
                     <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-800">
                       {role}
                     </span>
@@ -447,11 +486,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
             {/* Social links */}
             {socialLinks.length > 0 && (
               <div className="border border-zinc-200 bg-white">
-                <div className="border-b border-zinc-100 px-5 py-3">
-                  <h2 className="font-sans text-base font-bold text-zinc-900">
-                    Find {firstName} online
-                  </h2>
-                </div>
+                <SectionHeader icon={Link2} title={`Find ${firstName} online`} size="compact" />
                 <div className="divide-y divide-zinc-100">
                   {socialLinks.map((link) => {
                     const Icon = link.icon;

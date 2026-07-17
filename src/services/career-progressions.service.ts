@@ -17,7 +17,7 @@ export const CareerProgressionsService = {
   async submit(data: CareerProgressionInput): Promise<CareerProgression> {
     const res = await axiosInstance.post<ApiResponse<CareerProgression>>(`${BASE}/me/`, {
       title: data.title,
-      organization: data.organization ?? "",
+      team: data.teamId ?? null,
       start_date: data.startDate,
       end_date: data.endDate ?? null,
       description: data.description ?? "",
@@ -28,7 +28,7 @@ export const CareerProgressionsService = {
   async update(id: number, data: CareerProgressionInput): Promise<CareerProgression> {
     const res = await axiosInstance.patch<ApiResponse<CareerProgression>>(`${BASE}/me/${id}/`, {
       title: data.title,
-      organization: data.organization ?? "",
+      team: data.teamId ?? null,
       start_date: data.startDate,
       end_date: data.endDate ?? null,
       description: data.description ?? "",

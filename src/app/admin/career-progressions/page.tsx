@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  AlertTriangle,
   Ban,
   BriefcaseBusiness,
   CheckCircle2,
   Clock3,
+  HelpCircle,
   Loader2,
   Search,
   XCircle,
@@ -21,6 +23,7 @@ import {
   useReviewCareerProgression,
 } from "@/hooks/useCareerProgressions";
 import { getAvatarUrl } from "@/lib/utils";
+import { useUserStore } from "@/store/user.store";
 import type { CareerProgression, CareerProgressionStatus } from "@/types/career-progressions.types";
 
 const STATUS_META: Record<
@@ -96,6 +99,8 @@ function StatusPill({ status }: { status: CareerProgressionStatus }) {
 
 function ReviewCard({ item }: { item: CareerProgression }) {
   const review = useReviewCareerProgression();
+  const currentUser = useUserStore((s) => s.profile);
+  const isOwnSubmission = currentUser?.username === item.username;
   const [note, setNote] = useState("");
   const [activeAction, setActiveAction] = useState<"reject" | "revoke" | null>(null);
   const _meta = STATUS_META[item.status];
@@ -184,8 +189,30 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         </div>
       )}
 
+      {/* ── Self-submission notice ── */}
+      {isOwnSubmission && (item.status === "approved" || item.status === "pending") && (
+        <div className="mx-5 mb-3 flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+          <p className="font-mono text-[11px] font-medium text-amber-700">
+            Submitted by you — you can't review your own entry.
+          </p>
+        </div>
+      )}
+
+      {/* ── Manual verification notice ── */}
+      {item.needsManualVerification && item.status === "pending" && (
+        <div className="mx-5 mb-3 flex items-start gap-2 border border-blue-200 bg-blue-50 px-3 py-2">
+          <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
+          <p className="font-mono text-[11px] font-medium text-blue-700">
+            Could not auto-verify this team claim — the member doesn't currently show up with the
+            required team membership. This may just mean they've since left or changed roles; team
+            data only reflects who's on the team right now, not history. Use your own judgment.
+          </p>
+        </div>
+      )}
+
       {/* ── Action zone ── */}
-      {(item.status === "approved" || item.status === "pending") && (
+      {!isOwnSubmission && (item.status === "approved" || item.status === "pending") && (
         <div className="border-t border-zinc-100 px-5 py-3">
           {/* Progressive disclosure textarea */}
           {activeAction && (

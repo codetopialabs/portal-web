@@ -1,3 +1,6 @@
+export type TeamRequirement = "none" | "optional" | "required";
+export type TeamRoleRequirement = "any" | "lead_or_owner";
+
 export interface Role {
   id: number;
   name: string;
@@ -7,6 +10,10 @@ export interface Role {
   permissions: string[];
   isSystem: boolean;
   isPublic: boolean;
+  progressionEligible: boolean;
+  teamRequirement: TeamRequirement;
+  teamRoleRequirement: TeamRoleRequirement;
+  requiresContribution: boolean;
   memberCount: number;
 }
 
@@ -18,6 +25,10 @@ export interface CreateRoleInput {
   description?: string;
   rank: number;
   isPublic?: boolean;
+  progressionEligible?: boolean;
+  teamRequirement?: TeamRequirement;
+  teamRoleRequirement?: TeamRoleRequirement;
+  requiresContribution?: boolean;
   permissions: string[];
 }
 
@@ -26,5 +37,9 @@ export interface UpdateRoleInput {
   description?: string;
   rank?: number;
   isPublic?: boolean;
+  progressionEligible?: boolean;
+  teamRequirement?: TeamRequirement;
+  teamRoleRequirement?: TeamRoleRequirement;
+  requiresContribution?: boolean;
   permissions?: string[];
 }
