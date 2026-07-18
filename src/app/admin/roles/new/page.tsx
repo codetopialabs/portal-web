@@ -26,6 +26,10 @@ function NewRoleForm() {
   const [description, setDescription] = useState("");
   const [rank, setRank] = useState("");
   const [isPublic, setIsPublic] = useState(false);
+  const [progressionEligible, setProgressionEligible] = useState(false);
+  const [teamRequirement, setTeamRequirement] = useState<"none" | "optional" | "required">("none");
+  const [teamRoleRequirement, setTeamRoleRequirement] = useState<"any" | "lead_or_owner">("any");
+  const [requiresContribution, setRequiresContribution] = useState(false);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [errors, setErrors] = useState<{
@@ -62,6 +66,10 @@ function NewRoleForm() {
         description: description.trim(),
         rank: Number(rank),
         isPublic,
+        progressionEligible,
+        teamRequirement,
+        teamRoleRequirement,
+        requiresContribution,
         permissions,
       },
       {
@@ -189,6 +197,79 @@ function NewRoleForm() {
               </p>
             </div>
           </label>
+
+          <label className="flex cursor-pointer items-start gap-3 border border-grey-200 p-3 hover:bg-grey-50">
+            <input
+              type="checkbox"
+              checked={progressionEligible}
+              onChange={(e) => setProgressionEligible(e.target.checked)}
+              className="mt-0.5 h-3.5 w-3.5 shrink-0"
+            />
+            <div>
+              <p className="font-mono text-xs font-bold text-text-primary">
+                Selectable as a Career Progression title
+              </p>
+              <p className="mt-1 font-mono text-[11px] leading-5 text-text-muted">
+                When on, members can pick this role from the dropdown when submitting a career
+                progression entry.
+              </p>
+            </div>
+          </label>
+
+          {progressionEligible && (
+            <>
+              <div className="space-y-1.5 border border-grey-200 p-3">
+                <p className="font-mono text-xs font-bold text-text-primary">Team</p>
+                <p className="font-mono text-[11px] leading-5 text-text-muted">
+                  Whether an entry using this role can or must reference a team. Team-membership
+                  data only reflects who currently belongs to a team — a claim that fails this check
+                  is flagged for manual review rather than rejected outright, since someone may have
+                  since left/been demoted from a team they were legitimately part of.
+                </p>
+                <select
+                  value={teamRequirement}
+                  onChange={(e) =>
+                    setTeamRequirement(e.target.value as "none" | "optional" | "required")
+                  }
+                  className="mt-2 h-9 w-full rounded-none border border-grey-300 bg-white px-2 font-mono text-xs text-text-primary outline-none focus:border-grey-900"
+                >
+                  <option value="none">No team</option>
+                  <option value="optional">Optional team</option>
+                  <option value="required">Required team</option>
+                </select>
+                {teamRequirement !== "none" && (
+                  <select
+                    value={teamRoleRequirement}
+                    onChange={(e) =>
+                      setTeamRoleRequirement(e.target.value as "any" | "lead_or_owner")
+                    }
+                    className="mt-2 h-9 w-full rounded-none border border-grey-300 bg-white px-2 font-mono text-xs text-text-primary outline-none focus:border-grey-900"
+                  >
+                    <option value="any">Any membership (member, lead, or owner)</option>
+                    <option value="lead_or_owner">Lead or Owner only</option>
+                  </select>
+                )}
+              </div>
+
+              <label className="flex cursor-pointer items-start gap-3 border border-grey-200 p-3 hover:bg-grey-50">
+                <input
+                  type="checkbox"
+                  checked={requiresContribution}
+                  onChange={(e) => setRequiresContribution(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                />
+                <div>
+                  <p className="font-mono text-xs font-bold text-text-primary">
+                    Requires an approved contribution
+                  </p>
+                  <p className="mt-1 font-mono text-[11px] leading-5 text-text-muted">
+                    The member must have at least one approved internal review or a merged GitHub
+                    pull request before this role can be selected. Use for roles like "Contributor."
+                  </p>
+                </div>
+              </label>
+            </>
+          )}
         </div>
       </section>
 

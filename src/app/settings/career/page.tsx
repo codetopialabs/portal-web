@@ -11,20 +11,32 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useRoles } from "@/hooks/useAdmin";
 import {
   useDeleteCareerProgression,
   useMyCareerProgressions,
   useSubmitCareerProgression,
   useUpdateCareerProgression,
 } from "@/hooks/useCareerProgressions";
+import { useMyTeams } from "@/hooks/useTeams";
 import type { CareerProgression, CareerProgressionStatus } from "@/types/career-progressions.types";
+
+const selectItemStyles =
+  "rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none";
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
@@ -99,6 +111,7 @@ function StatusPill({ status }: { status: CareerProgressionStatus }) {
 
 interface FormValues {
   title: string;
+  teamId: string;
   startDate: string;
   endDate: string;
   isCurrent: boolean;
@@ -120,16 +133,27 @@ function ProgressionSheet({
   const updateMutation = useUpdateCareerProgression();
   const isPending = submitMutation.isPending || updateMutation.isPending;
 
+  const { data: roles = [] } = useRoles();
+  const progressionRoles = useMemo(() => roles.filter((r) => r.progressionEligible), [roles]);
+
+  const { data: myTeams = [] } = useMyTeams();
+  const ledTeams = useMemo(
+    () => myTeams.filter((t) => t.role === "lead" || t.role === "owner"),
+    [myTeams]
+  );
+
   const {
     register,
     handleSubmit,
     reset,
     watch,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
       title: "",
+      teamId: "",
       startDate: "",
       endDate: "",
       isCurrent: false,
@@ -142,6 +166,7 @@ function ProgressionSheet({
     if (editing) {
       reset({
         title: editing.title,
+        teamId: editing.team ?? "",
         startDate: editing.startDate,
         endDate: editing.endDate ?? "",
         isCurrent: !editing.endDate,
@@ -150,6 +175,7 @@ function ProgressionSheet({
     } else {
       reset({
         title: "",
+        teamId: "",
         startDate: "",
         endDate: "",
         isCurrent: false,
@@ -159,15 +185,43 @@ function ProgressionSheet({
   }, [editing, reset]);
 
   const isCurrent = watch("isCurrent");
+  const selectedTitle = watch("title");
+  const selectedRole = progressionRoles.find((r) => r.displayName === selectedTitle);
+  const teamRequirement = selectedRole?.teamRequirement ?? "none";
+  const showTeamField = teamRequirement !== "none";
+  const teamIsRequired = teamRequirement === "required";
+  const eligibleTeams = selectedRole?.teamRoleRequirement === "lead_or_owner" ? ledTeams : myTeams;
 
   function handleIsCurrentChange(checked: boolean) {
     setValue("isCurrent", checked);
     if (checked) setValue("endDate", "");
   }
 
+  function handleTitleChange(value: string) {
+    setValue("title", value);
+    // Switching away from a team-requiring role (or to one) invalidates
+    // whatever was previously picked in the team select.
+    setValue("teamId", "");
+  }
+
   async function onSubmit(data: FormValues) {
+    if (!data.title) {
+      setError("title", { message: "Please select a role." });
+      return;
+    }
+    if (teamIsRequired && !data.teamId) {
+      setError("teamId", { message: "Please select a team." });
+      return;
+    }
+
     const payload = {
       title: data.title.trim(),
+      // Not gated on showTeamField: teamId is already cleared by
+      // handleTitleChange whenever the role changes, so it only ever holds a
+      // stale value when the role can't be resolved from the fetched list at
+      // all (e.g. editing an entry whose role was since disabled) — in that
+      // case we want to preserve it, not silently null it out.
+      teamId: data.teamId || null,
       startDate: data.startDate,
       endDate: data.isCurrent ? null : data.endDate.trim() || null,
       description: data.description.trim(),
@@ -219,16 +273,83 @@ function ProgressionSheet({
             <Label htmlFor="title" className={labelStyles}>
               Role <span className="text-red-400">*</span>
             </Label>
-            <Input
-              id="title"
-              placeholder="e.g. Contributor, Team Lead, Frontend Engineer"
-              className={inputStyles}
-              {...register("title", { required: "This field is required." })}
-            />
+            <Select value={selectedTitle || undefined} onValueChange={handleTitleChange}>
+              <SelectTrigger
+                id="title"
+                className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
+              >
+                <SelectValue placeholder="Select a role..." />
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                align="start"
+                className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
+              >
+                {progressionRoles.map((role) => (
+                  <SelectItem key={role.id} value={role.displayName} className={selectItemStyles}>
+                    {role.displayName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {progressionRoles.length === 0 && (
+              <p className="font-mono text-xs text-zinc-400">
+                No roles are available yet — ask an admin to add one in Roles.
+              </p>
+            )}
             {errors.title && (
               <p className="font-mono text-xs text-red-500">{errors.title.message}</p>
             )}
           </div>
+
+          {/* Team — only for roles that accept/require one */}
+          {showTeamField && (
+            <div className="space-y-2">
+              <Label htmlFor="teamId" className={labelStyles}>
+                Team
+                {teamIsRequired ? (
+                  <span className="text-red-400">*</span>
+                ) : (
+                  <span className="ml-1 normal-case text-zinc-400">(optional)</span>
+                )}
+              </Label>
+              <Select
+                value={watch("teamId") || undefined}
+                onValueChange={(v) => setValue("teamId", v)}
+              >
+                <SelectTrigger
+                  id="teamId"
+                  className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
+                >
+                  <SelectValue placeholder="Select a team..." />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
+                >
+                  {eligibleTeams.map((team) => (
+                    <SelectItem key={team.id} value={team.id} className={selectItemStyles}>
+                      {team.name}{" "}
+                      <span className="text-zinc-400">
+                        (
+                        {team.role === "owner" ? "Owner" : team.role === "lead" ? "Lead" : "Member"}
+                        )
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {teamIsRequired && eligibleTeams.length === 0 && (
+                <p className="font-mono text-xs text-amber-600">
+                  You aren't a Lead or Owner of any team yet, so this role can't be submitted.
+                </p>
+              )}
+              {errors.teamId && (
+                <p className="font-mono text-xs text-red-500">{errors.teamId.message}</p>
+              )}
+            </div>
+          )}
 
           {/* Date range */}
           <div className="grid grid-cols-2 gap-3">
@@ -290,22 +411,32 @@ function ProgressionSheet({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" className={labelStyles}>
-              Description
-              <span className="ml-1 normal-case text-zinc-400">(optional)</span>
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description" className={labelStyles}>
+                Description
+                <span className="ml-1 normal-case text-zinc-400">(optional)</span>
+              </Label>
+              <span className="font-mono text-[10px] text-zinc-400">
+                {watch("description")?.length ?? 0} / 500
+              </span>
+            </div>
             <textarea
               id="description"
               placeholder="Describe your role and what you did."
+              maxLength={500}
               className="min-h-28 w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
-              {...register("description")}
+              {...register("description", { maxLength: 500 })}
             />
           </div>
 
           <Button
             type="submit"
-            disabled={isPending}
-            className="h-11 w-full rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800"
+            disabled={
+              isPending ||
+              progressionRoles.length === 0 ||
+              (teamIsRequired && eligibleTeams.length === 0)
+            }
+            className="h-11 w-full rounded-none bg-zinc-950 font-mono text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isPending ? (
               <>
@@ -355,7 +486,9 @@ function ProgressionCard({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h3 className="font-sans text-base font-bold text-zinc-950">{item.title}</h3>
-          <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">Codetopia Community</p>
+          <p className="mt-0.5 font-mono text-xs font-bold text-zinc-500">
+            {item.teamName ?? "Codetopia Community"}
+          </p>
           <p className="mt-1 font-mono text-xs text-zinc-400">
             {formatDateRange(item.startDate, item.endDate)}
             <span className="ml-2 text-zinc-300">·</span>

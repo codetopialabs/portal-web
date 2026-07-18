@@ -6,7 +6,8 @@ export interface CareerProgression {
   fullName: string;
   profilePictureUrl: string | null;
   title: string;
-  organization: string;
+  team: string | null;
+  teamName: string | null;
   startDate: string;
   endDate: string | null; // null = Present / ongoing
   description: string;
@@ -14,13 +15,14 @@ export interface CareerProgression {
   reviewNote: string;
   reviewedByUsername: string | null;
   reviewedAt: string | null;
+  needsManualVerification: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CareerProgressionInput {
   title: string;
-  organization?: string;
+  teamId?: string | null;
   startDate: string;
   endDate?: string | null;
   description?: string;

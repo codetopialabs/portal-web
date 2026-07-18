@@ -24,6 +24,10 @@ export const RolesService = {
       description: data.description ?? "",
       rank: data.rank,
       is_public: data.isPublic ?? false,
+      progression_eligible: data.progressionEligible ?? false,
+      team_requirement: data.teamRequirement ?? "none",
+      team_role_requirement: data.teamRoleRequirement ?? "any",
+      requires_contribution: data.requiresContribution ?? false,
       permissions: data.permissions,
     });
     return res.data.data;
@@ -35,6 +39,13 @@ export const RolesService = {
     if (data.description !== undefined) payload.description = data.description;
     if (data.rank !== undefined) payload.rank = data.rank;
     if (data.isPublic !== undefined) payload.is_public = data.isPublic;
+    if (data.progressionEligible !== undefined)
+      payload.progression_eligible = data.progressionEligible;
+    if (data.teamRequirement !== undefined) payload.team_requirement = data.teamRequirement;
+    if (data.teamRoleRequirement !== undefined)
+      payload.team_role_requirement = data.teamRoleRequirement;
+    if (data.requiresContribution !== undefined)
+      payload.requires_contribution = data.requiresContribution;
     if (data.permissions !== undefined) payload.permissions = data.permissions;
     const res = await axiosInstance.patch<ApiResponse<Role>>(`${ROLES_BASE}/${slug}/`, payload);
     return res.data.data;
