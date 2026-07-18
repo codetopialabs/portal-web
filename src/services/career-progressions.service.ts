@@ -4,11 +4,17 @@ import type {
   CareerProgression,
   CareerProgressionInput,
   CareerProgressionStatus,
+  EligibleRole,
 } from "@/types/career-progressions.types";
 
 const BASE = "/career-progressions";
 
 export const CareerProgressionsService = {
+  async listEligibleRoles(): Promise<EligibleRole[]> {
+    const res = await axiosInstance.get<ApiResponse<EligibleRole[]>>(`${BASE}/eligible-roles/`);
+    return res.data.data;
+  },
+
   async listMine(): Promise<CareerProgression[]> {
     const res = await axiosInstance.get<ApiResponse<CareerProgression[]>>(`${BASE}/me/`);
     return res.data.data;

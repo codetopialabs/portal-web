@@ -9,9 +9,17 @@ import type {
 
 export const careerProgressionKeys = {
   mine: ["career-progressions", "mine"] as const,
+  eligibleRoles: ["career-progressions", "eligible-roles"] as const,
   admin: (params?: { status?: CareerProgressionStatus | ""; search?: string }) =>
     ["career-progressions", "admin", params] as const,
 };
+
+export function useEligibleRoles() {
+  return useQuery({
+    queryKey: careerProgressionKeys.eligibleRoles,
+    queryFn: () => CareerProgressionsService.listEligibleRoles(),
+  });
+}
 
 export function useMyCareerProgressions() {
   return useQuery({

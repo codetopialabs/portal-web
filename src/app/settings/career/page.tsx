@@ -19,9 +19,9 @@ import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useRoles } from "@/hooks/useAdmin";
 import {
   useDeleteCareerProgression,
+  useEligibleRoles,
   useMyCareerProgressions,
   useSubmitCareerProgression,
   useUpdateCareerProgression,
@@ -141,8 +141,7 @@ function ProgressionSheet({
   const updateMutation = useUpdateCareerProgression();
   const isPending = submitMutation.isPending || updateMutation.isPending;
 
-  const { data: roles = [] } = useRoles();
-  const progressionRoles = useMemo(() => roles.filter((r) => r.progressionEligible), [roles]);
+  const { data: progressionRoles = [] } = useEligibleRoles();
 
   const { data: myTeams = [] } = useMyTeams();
   const ledTeams = useMemo(

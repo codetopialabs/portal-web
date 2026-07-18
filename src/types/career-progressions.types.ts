@@ -27,3 +27,14 @@ export interface CareerProgressionInput {
   endDate?: string | null;
   description?: string;
 }
+
+// Minimal, member-safe shape — deliberately not the full Role type from
+// roles.types.ts (no permissions, rank, or member count; that requires
+// roles.view, an admin-only permission every member submitting a career
+// progression entry does not and should not hold).
+export interface EligibleRole {
+  id: number;
+  displayName: string;
+  teamRequirement: "none" | "optional" | "required";
+  teamRoleRequirement: "any" | "lead_or_owner";
+}
