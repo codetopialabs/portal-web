@@ -65,6 +65,23 @@ const STATUS_META: Record<
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function articleFor(word: string): "a" | "an" {
+  return /^[aeiou]/i.test(word) ? "an" : "a";
+}
+
+function getDescriptionPlaceholder(
+  roleName: string,
+  teamName: string | undefined,
+  isCurrent: boolean
+): string {
+  if (!roleName) return "Describe your role and what you did.";
+  const tense = isCurrent ? "do" : "did";
+  const subject = `${articleFor(roleName)} ${roleName}`;
+  return teamName
+    ? `What ${tense} you do as ${subject} in ${teamName}?`
+    : `What ${tense} you do as ${subject}?`;
+}
+
 function formatDateRange(startDate: string, endDate: string | null): string {
   const fmt = (d: string) =>
     new Intl.DateTimeFormat("en", { month: "short", year: "numeric" }).format(new Date(d));
@@ -182,6 +199,12 @@ function ProgressionSheet({
   const showTeamField = teamRequirement !== "none";
   const teamIsRequired = teamRequirement === "required";
   const eligibleTeams = selectedRole?.teamRoleRequirement === "lead_or_owner" ? ledTeams : myTeams;
+  const selectedTeamName = eligibleTeams.find((t) => t.id === watch("teamId"))?.name;
+  const descriptionPlaceholder = getDescriptionPlaceholder(
+    selectedTitle,
+    showTeamField ? selectedTeamName : undefined,
+    isCurrent
+  );
 
   function handleIsCurrentChange(checked: boolean) {
     setValue("isCurrent", checked);
@@ -384,8 +407,7 @@ function ProgressionSheet({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="description" className={labelStyles}>
-                Description
-                <span className="ml-1 normal-case text-zinc-400">(optional)</span>
+                Description <span className="text-red-400">*</span>
               </Label>
               <span className="font-mono text-[10px] text-zinc-400">
                 {watch("description")?.length ?? 0} / 500
@@ -393,11 +415,18 @@ function ProgressionSheet({
             </div>
             <textarea
               id="description"
-              placeholder="Describe your role and what you did."
+              placeholder={descriptionPlaceholder}
               maxLength={500}
               className="min-h-28 w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
-              {...register("description", { maxLength: 500 })}
+              {...register("description", {
+                maxLength: 500,
+                validate: (val) =>
+                  val.trim().length > 0 || "Please describe what you did in this role.",
+              })}
             />
+            {errors.description && (
+              <p className="font-mono text-xs text-red-500">{errors.description.message}</p>
+            )}
           </div>
 
           <Button
