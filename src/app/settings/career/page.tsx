@@ -15,15 +15,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useRoles } from "@/hooks/useAdmin";
 import {
@@ -34,9 +28,6 @@ import {
 } from "@/hooks/useCareerProgressions";
 import { useMyTeams } from "@/hooks/useTeams";
 import type { CareerProgression, CareerProgressionStatus } from "@/types/career-progressions.types";
-
-const selectItemStyles =
-  "rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none";
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
@@ -273,25 +264,18 @@ function ProgressionSheet({
             <Label htmlFor="title" className={labelStyles}>
               Role <span className="text-red-400">*</span>
             </Label>
-            <Select value={selectedTitle || undefined} onValueChange={handleTitleChange}>
-              <SelectTrigger
-                id="title"
-                className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
-              >
-                <SelectValue placeholder="Select a role..." />
-              </SelectTrigger>
-              <SelectContent
-                position="popper"
-                align="start"
-                className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
-              >
-                {progressionRoles.map((role) => (
-                  <SelectItem key={role.id} value={role.displayName} className={selectItemStyles}>
-                    {role.displayName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              id="title"
+              value={selectedTitle || undefined}
+              onValueChange={handleTitleChange}
+              options={progressionRoles.map((role) => ({
+                value: role.displayName,
+                label: role.displayName,
+              }))}
+              placeholder="Select a role..."
+              searchPlaceholder="Search roles..."
+              emptyText="No matching role."
+            />
             {progressionRoles.length === 0 && (
               <p className="font-mono text-xs text-zinc-400">
                 No roles are available yet — ask an admin to add one in Roles.
@@ -313,33 +297,20 @@ function ProgressionSheet({
                   <span className="ml-1 normal-case text-zinc-400">(optional)</span>
                 )}
               </Label>
-              <Select
+              <Combobox
+                id="teamId"
                 value={watch("teamId") || undefined}
                 onValueChange={(v) => setValue("teamId", v)}
-              >
-                <SelectTrigger
-                  id="teamId"
-                  className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
-                >
-                  <SelectValue placeholder="Select a team..." />
-                </SelectTrigger>
-                <SelectContent
-                  position="popper"
-                  align="start"
-                  className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
-                >
-                  {eligibleTeams.map((team) => (
-                    <SelectItem key={team.id} value={team.id} className={selectItemStyles}>
-                      {team.name}{" "}
-                      <span className="text-zinc-400">
-                        (
-                        {team.role === "owner" ? "Owner" : team.role === "lead" ? "Lead" : "Member"}
-                        )
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={eligibleTeams.map((team) => ({
+                  value: team.id,
+                  label: `${team.name} (${
+                    team.role === "owner" ? "Owner" : team.role === "lead" ? "Lead" : "Member"
+                  })`,
+                }))}
+                placeholder="Select a team..."
+                searchPlaceholder="Search teams..."
+                emptyText="No matching team."
+              />
               {teamIsRequired && eligibleTeams.length === 0 && (
                 <p className="font-mono text-xs text-amber-600">
                   You aren't a Lead or Owner of any team yet, so this role can't be submitted.
