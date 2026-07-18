@@ -263,8 +263,8 @@ function NewRoleForm() {
                     Requires an approved contribution
                   </p>
                   <p className="mt-1 font-mono text-[11px] leading-5 text-text-muted">
-                    The member must have at least one approved review before this role can be
-                    selected. Use for roles like "Contributor."
+                    The member must have at least one approved internal review or a merged GitHub
+                    pull request before this role can be selected. Use for roles like "Contributor."
                   </p>
                 </div>
               </label>

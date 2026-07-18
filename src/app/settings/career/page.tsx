@@ -216,7 +216,12 @@ function ProgressionSheet({
 
     const payload = {
       title: data.title.trim(),
-      teamId: showTeamField ? data.teamId || null : null,
+      // Not gated on showTeamField: teamId is already cleared by
+      // handleTitleChange whenever the role changes, so it only ever holds a
+      // stale value when the role can't be resolved from the fetched list at
+      // all (e.g. editing an entry whose role was since disabled) — in that
+      // case we want to preserve it, not silently null it out.
+      teamId: data.teamId || null,
       startDate: data.startDate,
       endDate: data.isCurrent ? null : data.endDate.trim() || null,
       description: data.description.trim(),
@@ -275,7 +280,11 @@ function ProgressionSheet({
               >
                 <SelectValue placeholder="Select a role..." />
               </SelectTrigger>
-              <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72">
+              <SelectContent
+                position="popper"
+                align="start"
+                className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
+              >
                 {progressionRoles.map((role) => (
                   <SelectItem key={role.id} value={role.displayName} className={selectItemStyles}>
                     {role.displayName}
@@ -314,7 +323,11 @@ function ProgressionSheet({
                 >
                   <SelectValue placeholder="Select a team..." />
                 </SelectTrigger>
-                <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72">
+                <SelectContent
+                  position="popper"
+                  align="start"
+                  className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50 max-h-72"
+                >
                   {eligibleTeams.map((team) => (
                     <SelectItem key={team.id} value={team.id} className={selectItemStyles}>
                       {team.name}{" "}
