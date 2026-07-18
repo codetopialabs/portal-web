@@ -70,6 +70,25 @@ function formatDateRange(startDate: string, endDate: string | null): string {
   return `${fmt(startDate)} – ${endDate ? fmt(endDate) : "Present"}`;
 }
 
+function timeAgo(iso: string): string {
+  const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months}mo ago`;
+  return `${Math.floor(months / 12)}y ago`;
+}
+
+function formatDateTime(iso: string): string {
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(
+    new Date(iso)
+  );
+}
+
 function getDuration(startDate: string, endDate: string | null): string {
   const start = new Date(startDate);
   const end = endDate ? new Date(endDate) : new Date();
@@ -153,6 +172,9 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             <h3 className="font-sans text-sm font-bold text-zinc-950 leading-snug">{item.title}</h3>
             <StatusPill status={item.status} />
           </div>
+          {item.teamName && (
+            <p className="mt-0.5 font-mono text-[11px] font-bold text-zinc-600">{item.teamName}</p>
+          )}
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <span className="font-mono text-[11px] text-zinc-400">
               {formatDateRange(item.startDate, item.endDate)}
@@ -166,6 +188,10 @@ function ReviewCard({ item }: { item: CareerProgression }) {
             >
               {item.fullName} · @{item.username}
             </Link>
+            <span className="text-zinc-300">·</span>
+            <span className="font-mono text-[11px] text-zinc-400">
+              submitted {timeAgo(item.createdAt)}
+            </span>
           </div>
         </div>
       </div>
@@ -179,13 +205,18 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         </div>
       )}
 
-      {/* ── Prior review note (non-pending) ── */}
-      {item.status !== "pending" && item.reviewNote && (
+      {/* ── Prior review (non-pending) ── */}
+      {item.status !== "pending" && (item.reviewedByUsername || item.reviewNote) && (
         <div className="mx-5 mb-3 border-l-2 border-zinc-200 pl-3">
-          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">
-            Review note
-          </p>
-          <p className="font-mono text-xs leading-5 text-zinc-500">{item.reviewNote}</p>
+          {item.reviewedByUsername && (
+            <p className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">
+              Reviewed by @{item.reviewedByUsername}
+              {item.reviewedAt && ` · ${formatDateTime(item.reviewedAt)}`}
+            </p>
+          )}
+          {item.reviewNote && (
+            <p className="font-mono text-xs leading-5 text-zinc-500">{item.reviewNote}</p>
+          )}
         </div>
       )}
 
@@ -204,9 +235,11 @@ function ReviewCard({ item }: { item: CareerProgression }) {
         <div className="mx-5 mb-3 flex items-start gap-2 border border-blue-200 bg-blue-50 px-3 py-2">
           <HelpCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
           <p className="font-mono text-[11px] font-medium text-blue-700">
-            Could not auto-verify this team claim — the member doesn't currently show up with the
-            required team membership. This may just mean they've since left or changed roles; team
-            data only reflects who's on the team right now, not history. Use your own judgment.
+            Could not auto-verify the claimed{" "}
+            {item.teamName ? <span className="font-black">{item.teamName}</span> : "team"}{" "}
+            membership — the member doesn't currently show up with the required team membership.
+            This may just mean they've since left or changed roles; team data only reflects who's on
+            the team right now, not history. Use your own judgment.
           </p>
         </div>
       )}
