@@ -10,6 +10,7 @@ import {
   Key,
   LayoutDashboard,
   Library,
+  Mail,
   Settings,
   ShieldCheck,
   UserCheck,
@@ -81,6 +82,7 @@ const ADMIN_MENU_GROUP: NavGroup = {
       href: "/admin/career-progressions",
       activePrefix: "/admin/career-progressions",
     },
+    { icon: Mail, label: "Emails", href: "/admin/emails", activePrefix: "/admin/emails" },
   ],
 };
 
