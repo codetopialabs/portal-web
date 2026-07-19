@@ -21,6 +21,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
+import { ComposeEmailDialog } from "@/components/emails/ComposeEmailDialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -328,6 +329,8 @@ function MemberDetailContent({ username }: { username: string }) {
   const canRevokeSessions = usePermission("sessions.revoke_any");
   const canFlag = usePermission("users.flag");
   const canReviewFlag = usePermission("users.review_flag");
+  const canEmail = usePermission("emails.send");
+  const [composeOpen, setComposeOpen] = useState(false);
 
   const { data: sessions, isLoading: sessionsLoading } = useAdminUserSessions(
     username,
@@ -655,6 +658,16 @@ function MemberDetailContent({ username }: { username: string }) {
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 Resolve flag
+              </button>
+            )}
+            {canEmail && (
+              <button
+                type="button"
+                onClick={() => setComposeOpen(true)}
+                className="flex h-10 items-center justify-center gap-2 border border-grey-200 bg-white px-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                Email member
               </button>
             )}
             <Link
@@ -1371,6 +1384,8 @@ function MemberDetailContent({ username }: { username: string }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ComposeEmailDialog open={composeOpen} onOpenChange={setComposeOpen} recipients={[member]} />
     </div>
   );
 }

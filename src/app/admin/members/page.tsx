@@ -18,10 +18,12 @@ import { Suspense, useMemo, useState } from "react";
 import type { FilterQuery } from "@/components/admin/MemberFilterBuilder";
 import {
   applyFilterQuery,
+  countActiveFilters,
   emptyQuery,
   MemberFilterBuilder,
 } from "@/components/admin/MemberFilterBuilder";
 import { RouteGuard } from "@/components/auth/RouteGuard";
+import { ComposeEmailDialog } from "@/components/emails/ComposeEmailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMembers } from "@/hooks/useAdmin";
+import { usePermission } from "@/hooks/usePermission";
 import { cn, getAvatarUrl } from "@/lib/utils";
 import type { AdminMember } from "@/types/users.types";
 
@@ -200,6 +203,17 @@ function MembersPageContent() {
     return 0;
   };
 
+  const canEmail = usePermission("emails.send");
+  const [composeOpen, setComposeOpen] = useState(false);
+
+  const audienceSummary = [
+    `Status: ${STATUS_TABS.find((t) => t.key === statusFilter)?.label ?? statusFilter}`,
+    search.trim() && `search "${search.trim()}"`,
+    countActiveFilters(filterQuery) > 0 && `${countActiveFilters(filterQuery)} filter condition(s)`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <div className="pb-20">
       {/* Header */}
@@ -270,7 +284,26 @@ function MembersPageContent() {
             setPage(1);
           }}
         />
+        {canEmail && (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 rounded-none font-mono text-xs font-bold"
+            disabled={filteredMembers.length === 0}
+            onClick={() => setComposeOpen(true)}
+          >
+            <Mail className="h-3.5 w-3.5" />
+            Email members ({filteredMembers.length})
+          </Button>
+        )}
       </div>
+
+      <ComposeEmailDialog
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+        recipients={filteredMembers}
+        audienceSummary={audienceSummary}
+      />
 
       {/* Table */}
       {isLoading && <MembersTableSkeleton />}
