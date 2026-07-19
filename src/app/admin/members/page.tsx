@@ -157,21 +157,16 @@ function MembersPageContent() {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
+  // Always fetch the full (search-only) list — status tabs, counts, and the
+  // advanced filter builder all filter this same set client-side below. Once
+  // this also sent isActive/isFlagged based on the selected tab, which meant
+  // "members" was a different subset depending on which tab was active when
+  // it last fetched, so every tab's count (and the advanced filter) silently
+  // operated on the wrong base set.
   const queryParams = useMemo(() => {
     const trimmed = search.trim();
-    return {
-      search: trimmed || undefined,
-      isFlagged: statusFilter === "flagged" ? true : undefined,
-      isActive:
-        statusFilter === "suspended"
-          ? false
-          : statusFilter === "flagged"
-            ? undefined
-            : statusFilter === "all"
-              ? undefined
-              : true,
-    };
-  }, [search, statusFilter]);
+    return { search: trimmed || undefined };
+  }, [search]);
 
   const { data: members, isLoading, isError } = useAdminMembers(queryParams);
 

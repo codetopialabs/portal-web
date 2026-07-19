@@ -182,7 +182,11 @@ function newGroup(): FilterGroup {
 }
 
 export function emptyQuery(): FilterQuery {
-  return { logic: "and", groups: [], conditions: [newCondition()] };
+  // Genuinely empty — applyFilterQuery treats zero conditions/groups as a
+  // no-op. Seeding a default condition here looked convenient but meant
+  // every view silently applied "Status is Active" before the user ever
+  // touched the filter panel, since evalCondition has no "unset" state.
+  return { logic: "and", groups: [], conditions: [] };
 }
 
 export function countActiveFilters(query: FilterQuery): number {
@@ -505,9 +509,7 @@ function FilterPanel({
   }
 
   function removeCondition(idx: number) {
-    const conditions = query.conditions.filter((_, i) => i !== idx);
-    // always keep at least one condition
-    onChange({ ...query, conditions: conditions.length ? conditions : [newCondition()] });
+    onChange({ ...query, conditions: query.conditions.filter((_, i) => i !== idx) });
   }
 
   function addCondition() {
@@ -576,7 +578,7 @@ function FilterPanel({
                 condition={c}
                 onChange={(u) => updateCondition(i, u)}
                 onDelete={() => removeCondition(i)}
-                showDelete={hasMultiple}
+                showDelete
               />
             </div>
           </div>
