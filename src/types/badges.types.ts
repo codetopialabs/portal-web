@@ -23,6 +23,7 @@ export interface Badge {
   description: string;
   imageUrl: string;
   status: BadgeStatus;
+  isPublic: boolean;
   criteria: BadgeRuleGroup;
   criteriaVersion: number;
   awardCount: number;
@@ -62,6 +63,7 @@ export interface BadgeInput {
   description: string;
   imageUrl: string;
   status: BadgeStatus;
+  isPublic: boolean;
   criteria: BadgeRuleGroup;
 }
 

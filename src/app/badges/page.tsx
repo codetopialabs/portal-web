@@ -29,6 +29,7 @@ function BadgeCard({
   onSelect: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const isPrivate = !award.badge.isPublic;
   const awardedDate = new Date(award.awardedAt).toLocaleDateString("en", {
     month: "short",
     year: "numeric",
@@ -59,6 +60,7 @@ function BadgeCard({
         <div className="mt-6">
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-zinc-500">
             {award.source === "manual" ? "Community recognition" : "Milestone unlocked"}
+            {isPrivate && <span className="text-zinc-400"> · Private</span>}
           </p>
           <h2 className="mt-2 font-sans text-lg font-black uppercase tracking-wide text-zinc-950">
             {award.badge.name}
@@ -152,7 +154,7 @@ function BadgeCard({
                   onSelect();
                   setOpen(false);
                 }}
-                disabled={!isFeatured && !canFeature}
+                disabled={!isFeatured && (!canFeature || isPrivate)}
               >
                 {isFeatured ? (
                   <>
@@ -164,7 +166,12 @@ function BadgeCard({
                   </>
                 )}
               </Button>
-              {!isFeatured && !canFeature && (
+              {!isFeatured && isPrivate && (
+                <p className="mt-2 text-center font-mono text-[10px] text-zinc-400">
+                  Private badges can't be featured on your public profile.
+                </p>
+              )}
+              {!isFeatured && !isPrivate && !canFeature && (
                 <p className="mt-2 text-center font-mono text-[10px] text-zinc-400">
                   Remove a featured badge before adding another.
                 </p>
