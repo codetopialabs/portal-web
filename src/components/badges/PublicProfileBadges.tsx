@@ -55,7 +55,7 @@ function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => vo
         {/* Info */}
         <div className="px-5 py-4">
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            Featured badge
+            {award.featuredRank !== null ? "Featured badge" : "Badge earned"}
           </p>
           <h3 className="mt-1 font-sans text-lg font-black uppercase tracking-wide text-zinc-950">
             {award.badge.name}
@@ -97,73 +97,129 @@ function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => vo
   );
 }
 
+function AllBadgesGrid({
+  awards,
+  onSelect,
+}: {
+  awards: BadgeAward[];
+  onSelect: (award: BadgeAward) => void;
+}) {
+  return (
+    <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
+      {awards.map((award) => (
+        <button
+          key={award.id}
+          type="button"
+          onClick={() => onSelect(award)}
+          title={award.badge.name}
+          className="group flex flex-col items-center gap-1.5 border border-zinc-200 bg-white p-2.5 text-center transition-all duration-200 hover:border-zinc-950 hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.04)]"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-950">
+            {award.badge.imageUrl ? (
+              <img
+                src={award.badge.imageUrl}
+                alt={award.badge.name}
+                className="h-7 w-7 object-contain"
+              />
+            ) : (
+              <Award className="h-5 w-5 text-zinc-500" />
+            )}
+          </div>
+          <p className="line-clamp-2 font-mono text-[9px] font-bold uppercase leading-tight tracking-wide text-zinc-700 group-hover:text-zinc-950">
+            {award.badge.name}
+          </p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function PublicProfileBadges({ username }: { username: string }) {
   const { data: awards = [], isLoading } = useMemberBadges(username);
   const [selected, setSelected] = useState<BadgeAward | null>(null);
-  const featured = awards
-    .filter((award) => !award.isRevoked && award.featuredRank !== null)
+  const earned = awards.filter((award) => !award.isRevoked);
+  const featured = [...earned]
+    .filter((award) => award.featuredRank !== null)
     .sort((a, b) => (a.featuredRank ?? 0) - (b.featuredRank ?? 0));
-  if (isLoading || !featured.length) return null;
+  if (isLoading || !earned.length) return null;
 
   return (
     <>
+      {featured.length > 0 && (
+        <section className="border-t border-zinc-200 pt-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                Recognition
+              </p>
+              <h2 className="mt-1 font-sans text-sm font-black uppercase tracking-widest text-zinc-950">
+                Featured badges
+              </h2>
+            </div>
+            <span className="font-mono text-[10px] text-zinc-400">{featured.length} selected</span>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2.5">
+            {featured.map((award) => {
+              const count = award.badge.awardCount ?? 0;
+              return (
+                <button
+                  key={award.id}
+                  type="button"
+                  onClick={() => setSelected(award)}
+                  className="group relative min-w-0 overflow-hidden border border-zinc-200 bg-white text-left transition-all duration-200 hover:border-zinc-950 hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.04)]"
+                >
+                  {/* Badge artwork — dark hero strip */}
+                  <div className="flex justify-center bg-zinc-950 px-3 py-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
+                      {award.badge.imageUrl ? (
+                        <img
+                          src={award.badge.imageUrl}
+                          alt={award.badge.name}
+                          className="h-10 w-10 object-contain drop-shadow-[0_0_6px_rgba(255,255,255,0.08)]"
+                        />
+                      ) : (
+                        <Award className="h-6 w-6 text-zinc-500" />
+                      )}
+                    </div>
+                  </div>
+                  {/* Info */}
+                  <div className="px-3 py-2.5">
+                    <p className="truncate font-sans text-[11px] font-black uppercase tracking-wide text-zinc-950">
+                      {award.badge.name}
+                    </p>
+                    <p className="mt-0.5 flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-zinc-400">
+                      {count <= 1 ? (
+                        <Crown className="h-2.5 w-2.5 text-amber-500" />
+                      ) : count <= 5 ? (
+                        <Trophy className="h-2.5 w-2.5 text-amber-500" />
+                      ) : (
+                        <Users className="h-2.5 w-2.5 text-zinc-400" />
+                      )}
+                      {holderLabel(count)}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="border-t border-zinc-200 pt-6">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-              Recognition
+              Achievements
             </p>
             <h2 className="mt-1 font-sans text-sm font-black uppercase tracking-widest text-zinc-950">
-              Featured badges
+              All badges
             </h2>
           </div>
-          <span className="font-mono text-[10px] text-zinc-400">{featured.length} selected</span>
+          <span className="font-mono text-[10px] text-zinc-400">{earned.length} earned</span>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2.5">
-          {featured.map((award) => {
-            const count = award.badge.awardCount ?? 0;
-            return (
-              <button
-                key={award.id}
-                type="button"
-                onClick={() => setSelected(award)}
-                className="group relative min-w-0 overflow-hidden border border-zinc-200 bg-white text-left transition-all duration-200 hover:border-zinc-950 hover:shadow-[2px_2px_0_0_rgba(0,0,0,0.04)]"
-              >
-                {/* Badge artwork — dark hero strip */}
-                <div className="flex justify-center bg-zinc-950 px-3 py-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                    {award.badge.imageUrl ? (
-                      <img
-                        src={award.badge.imageUrl}
-                        alt={award.badge.name}
-                        className="h-10 w-10 object-contain drop-shadow-[0_0_6px_rgba(255,255,255,0.08)]"
-                      />
-                    ) : (
-                      <Award className="h-6 w-6 text-zinc-500" />
-                    )}
-                  </div>
-                </div>
-                {/* Info */}
-                <div className="px-3 py-2.5">
-                  <p className="truncate font-sans text-[11px] font-black uppercase tracking-wide text-zinc-950">
-                    {award.badge.name}
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-zinc-400">
-                    {count <= 1 ? (
-                      <Crown className="h-2.5 w-2.5 text-amber-500" />
-                    ) : count <= 5 ? (
-                      <Trophy className="h-2.5 w-2.5 text-amber-500" />
-                    ) : (
-                      <Users className="h-2.5 w-2.5 text-zinc-400" />
-                    )}
-                    {holderLabel(count)}
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        <AllBadgesGrid awards={earned} onSelect={setSelected} />
       </section>
+
       {selected && <BadgeDetails award={selected} onClose={() => setSelected(null)} />}
     </>
   );

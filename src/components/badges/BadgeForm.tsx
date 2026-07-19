@@ -634,6 +634,7 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
   const [description, setDescription] = useState(badge?.description ?? "");
   const [imageUrl, setImageUrl] = useState(badge?.imageUrl ?? "");
   const [status, setStatus] = useState<BadgeInput["status"]>(badge?.status ?? "draft");
+  const [isPublic, setIsPublic] = useState(badge?.isPublic ?? true);
   const [criteria, setCriteria] = useState<BadgeRuleGroup>(badge?.criteria ?? newGroup());
 
   // Holds a pending file — only uploaded when Save is clicked.
@@ -719,7 +720,14 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
       setUploading(false);
     }
 
-    const input: BadgeInput = { name, description, imageUrl: finalImageUrl, status, criteria };
+    const input: BadgeInput = {
+      name,
+      description,
+      imageUrl: finalImageUrl,
+      status,
+      isPublic,
+      criteria,
+    };
     const saved = badge
       ? await update.mutateAsync({ slug: badge.slug, input })
       : await create.mutateAsync(input);
@@ -779,6 +787,7 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
         description,
         imageUrl: imageUrl || "placeholder",
         status,
+        isPublic,
         criteria,
       };
       const result = await BadgesService.preview(input);
@@ -1007,6 +1016,22 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
                   className="w-full border border-zinc-200 bg-white p-3 font-mono text-xs text-zinc-700 outline-none focus:border-zinc-950 resize-none"
                   placeholder="What does this badge recognise?"
                 />
+              </div>
+              <div className="flex items-start gap-2.5 sm:col-span-2">
+                <input
+                  id="badge-is-public"
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded-none border-zinc-300 text-zinc-900 focus:ring-0"
+                />
+                <Label htmlFor="badge-is-public" className="font-mono text-sm text-zinc-700">
+                  Public facing
+                  <span className="mt-0.5 block font-mono text-xs font-normal text-zinc-400">
+                    Shown on members' public profiles when earned. Turn off for internal-only
+                    recognitions.
+                  </span>
+                </Label>
               </div>
             </div>
           </section>
