@@ -8,6 +8,7 @@ import type { BadgeInput } from "@/types/badges.types";
 export const badgeKeys = {
   admin: ["badges", "admin"] as const,
   detail: (slug: string) => ["badges", "admin", slug] as const,
+  awards: (slug: string) => ["badges", "admin", slug, "awards"] as const,
   criteria: ["badges", "criteria"] as const,
   mine: ["badges", "mine"] as const,
   pending: ["badges", "pending"] as const,
@@ -75,8 +76,15 @@ export function useReconcileBadge() {
 export function useAwardBadge() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ slug, userId, reason }: { slug: string; userId: string; reason: string }) =>
-      BadgesService.award(slug, userId, reason),
+    mutationFn: ({
+      slug,
+      identifier,
+      reason,
+    }: {
+      slug: string;
+      identifier: string;
+      reason: string;
+    }) => BadgesService.award(slug, identifier, reason),
     onSuccess: () => qc.invalidateQueries({ queryKey: badgeKeys.admin }),
   });
 }
@@ -86,6 +94,13 @@ export function useRevokeBadge() {
     mutationFn: ({ awardId, reason }: { awardId: string; reason: string }) =>
       BadgesService.revoke(awardId, reason),
     onSuccess: () => qc.invalidateQueries({ queryKey: badgeKeys.admin }),
+  });
+}
+export function useBadgeAwards(slug: string) {
+  return useQuery({
+    queryKey: badgeKeys.awards(slug),
+    queryFn: () => BadgesService.listAwards(slug),
+    enabled: Boolean(slug),
   });
 }
 export function useFeatureBadges() {

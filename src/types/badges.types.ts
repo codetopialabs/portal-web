@@ -64,3 +64,32 @@ export interface BadgeInput {
   status: BadgeStatus;
   criteria: BadgeRuleGroup;
 }
+
+export interface MemberSummary {
+  id: string;
+  username: string;
+  communityId: string;
+  fullName: string;
+  profilePictureUrl: string;
+}
+
+// Full detail — only returned for a single resolved member (the manual-award
+// lookup), never for a match list, since primaryRole costs an extra query.
+export interface MemberLookupResult extends MemberSummary {
+  primaryRole: string;
+  email: string;
+}
+
+export type BadgeMatch = MemberSummary;
+
+export interface BadgePreviewResult {
+  count: number;
+  members: BadgeMatch[];
+}
+
+export interface BadgeAwardHolder extends MemberSummary {
+  userId: string;
+  source: "automatic" | "manual";
+  reason: string;
+  awardedAt: string;
+}
