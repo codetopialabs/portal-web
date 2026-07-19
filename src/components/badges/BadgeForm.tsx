@@ -504,7 +504,7 @@ function MatchList({ count, members }: { count: number; members: BadgeMatch[] })
 // ─── Current holders — revoke a badge from a specific member ─────────────────
 
 function CurrentHoldersPanel({ slug }: { slug: string }) {
-  const { data: holders = [], isLoading } = useBadgeAwards(slug);
+  const { data: holders = [], isLoading, isError, error } = useBadgeAwards(slug);
   const revoke = useRevokeBadge();
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
@@ -516,10 +516,6 @@ function CurrentHoldersPanel({ slug }: { slug: string }) {
 
   const confirmRevoke = async () => {
     if (!revokingId) return;
-    if (!reason.trim()) {
-      toast.error("Enter a reason for revoking this badge.");
-      return;
-    }
     try {
       await revoke.mutateAsync({ awardId: revokingId, reason: reason.trim() });
       toast.success("Badge revoked — it's been removed from their profile.");
@@ -543,6 +539,13 @@ function CurrentHoldersPanel({ slug }: { slug: string }) {
       <div className="mt-4 space-y-2">
         {isLoading ? (
           <Skeleton className="h-9 w-full rounded-none" />
+        ) : isError ? (
+          <div className="flex items-start gap-2 border border-red-200 bg-red-50 p-3">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-600" />
+            <p className="font-mono text-xs font-bold text-red-700">
+              Couldn't load current holders — {(error as Error)?.message || "try refreshing."}
+            </p>
+          </div>
         ) : holders.length === 0 ? (
           <p className="font-mono text-xs text-zinc-400">Nobody has this badge yet.</p>
         ) : (
@@ -576,7 +579,7 @@ function CurrentHoldersPanel({ slug }: { slug: string }) {
                     autoFocus
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
-                    placeholder="Reason for revoking (shown in the badge's history)…"
+                    placeholder="Reason for revoking (optional, shown in the badge's history)…"
                     className="h-9 rounded-none font-mono text-xs"
                   />
                   <div className="flex gap-2">
