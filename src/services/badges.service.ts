@@ -1,6 +1,14 @@
 import axiosInstance from "@/lib/axios";
 import type { ApiResponse } from "@/types/api.types";
-import type { Badge, BadgeAward, BadgeCriteriaCatalog, BadgeInput } from "@/types/badges.types";
+import type {
+  Badge,
+  BadgeAward,
+  BadgeAwardHolder,
+  BadgeCriteriaCatalog,
+  BadgeInput,
+  BadgePreviewResult,
+  MemberLookupResult,
+} from "@/types/badges.types";
 
 const BASE = "/badges";
 
@@ -39,16 +47,30 @@ export const BadgesService = {
     );
     return res.data.data;
   },
-  async preview(input: BadgeInput): Promise<{ count: number }> {
-    const res = await axiosInstance.post<ApiResponse<{ count: number }>>(
+  async preview(input: BadgeInput): Promise<BadgePreviewResult> {
+    const res = await axiosInstance.post<ApiResponse<BadgePreviewResult>>(
       `${BASE}/admin/preview/`,
       input
+    );
+    return res.data.data;
+  },
+  // Same preview, but against a badge's already-saved criteria — used to show
+  // who Reconcile is about to award to, before actually running it.
+  async previewSaved(slug: string): Promise<BadgePreviewResult> {
+    const res = await axiosInstance.post<ApiResponse<BadgePreviewResult>>(
+      `${BASE}/admin/${slug}/preview/`
     );
     return res.data.data;
   },
   async reconcile(slug: string): Promise<{ awarded: number }> {
     const res = await axiosInstance.post<ApiResponse<{ awarded: number }>>(
       `${BASE}/admin/${slug}/reconcile/`
+    );
+    return res.data.data;
+  },
+  async listAwards(slug: string): Promise<BadgeAwardHolder[]> {
+    const res = await axiosInstance.get<ApiResponse<BadgeAwardHolder[]>>(
+      `${BASE}/admin/${slug}/awards/`
     );
     return res.data.data;
   },
@@ -92,8 +114,15 @@ export const BadgesService = {
     if (!res.ok) throw new Error(json.error?.message ?? "Artwork upload failed.");
     return json.secure_url as string;
   },
-  async award(slug: string, userId: string, reason: string): Promise<void> {
-    await axiosInstance.post(`${BASE}/admin/${slug}/award/`, { userId, reason });
+  async lookupMember(identifier: string): Promise<MemberLookupResult> {
+    const res = await axiosInstance.get<ApiResponse<MemberLookupResult>>(
+      `${BASE}/admin/lookup-member/`,
+      { params: { identifier } }
+    );
+    return res.data.data;
+  },
+  async award(slug: string, identifier: string, reason: string): Promise<void> {
+    await axiosInstance.post(`${BASE}/admin/${slug}/award/`, { identifier, reason });
   },
   async revoke(awardId: string, reason: string): Promise<void> {
     await axiosInstance.post(`${BASE}/admin/awards/${awardId}/revoke/`, { reason });

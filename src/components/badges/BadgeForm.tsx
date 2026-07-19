@@ -9,35 +9,51 @@ import {
   Plus,
   RefreshCw,
   Save,
+  ShieldOff,
   Trash2,
   Upload,
   Users,
 } from "lucide-react";
+import NextImage from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAwardBadge,
+  useBadgeAwards,
   useBadgeCriteria,
   useCreateBadge,
   useDeleteBadge,
   useReconcileBadge,
+  useRevokeBadge,
   useUpdateBadge,
 } from "@/hooks/useBadges";
 import { usePermission } from "@/hooks/usePermission";
+import { getAvatarUrl } from "@/lib/utils";
 import { BadgesService } from "@/services/badges.service";
 import type {
   Badge,
   BadgeCondition,
   BadgeInput,
+  BadgeMatch,
   BadgeOperator,
   BadgeRuleGroup,
   CriteriaDefinition,
+  MemberLookupResult,
+  MemberSummary,
 } from "@/types/badges.types";
 
 const OPERATORS: Record<BadgeOperator, string> = {
@@ -301,19 +317,37 @@ function ArtworkPreview({ imageUrl, pendingFile }: { imageUrl: string; pendingFi
 
 function ManualAwardPanel({ slug }: { slug: string }) {
   const award = useAwardBadge();
-  const [userId, setUserId] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [reason, setReason] = useState("");
+  const [resolving, setResolving] = useState(false);
+  const [resolvedMember, setResolvedMember] = useState<MemberLookupResult | null>(null);
 
-  const submit = async () => {
-    if (!userId.trim() || !reason.trim()) {
-      toast.error("Enter a user ID and reason.");
+  // Step 1: resolve the typed username/Community ID to a real member and
+  // show their profile before anything is actually awarded.
+  const handleLookup = async () => {
+    if (!identifier.trim() || !reason.trim()) {
+      toast.error("Enter a username or Community ID, and a reason.");
       return;
     }
+    setResolving(true);
     try {
-      await award.mutateAsync({ slug, userId: userId.trim(), reason: reason.trim() });
+      const member = await BadgesService.lookupMember(identifier.trim());
+      setResolvedMember(member);
+    } catch {
+      /* axios interceptor already showed the toast */
+    } finally {
+      setResolving(false);
+    }
+  };
+
+  // Step 2: admin has seen who it is — actually award it.
+  const handleConfirmAward = async () => {
+    try {
+      await award.mutateAsync({ slug, identifier: identifier.trim(), reason: reason.trim() });
       toast.success("Badge awarded.");
-      setUserId("");
+      setIdentifier("");
       setReason("");
+      setResolvedMember(null);
     } catch {
       /* axios interceptor already showed the toast */
     }
@@ -325,18 +359,18 @@ function ManualAwardPanel({ slug }: { slug: string }) {
         Manual award
       </h2>
       <p className="mt-1 font-mono text-xs text-zinc-500">
-        Award this badge directly to a member by their user ID.
+        Award this badge directly to a member by their username or Community ID.
       </p>
       <div className="mt-4 space-y-3">
-        <label htmlFor="award-user-id" className="block space-y-1.5">
+        <label htmlFor="award-identifier" className="block space-y-1.5">
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-            User ID
+            Username or Community ID
           </span>
           <Input
-            id="award-user-id"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            id="award-identifier"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="e.g. jane_doe or CC-26-A1B2C3"
             className="h-9 rounded-none font-mono text-xs"
           />
         </label>
@@ -357,12 +391,219 @@ function ManualAwardPanel({ slug }: { slug: string }) {
           variant="outline"
           size="sm"
           className="h-9 rounded-none font-mono text-xs font-bold"
-          disabled={award.isPending}
-          onClick={submit}
+          disabled={resolving}
+          onClick={handleLookup}
         >
           <Award className="h-3.5 w-3.5" />
-          {award.isPending ? "Awarding…" : "Award badge"}
+          {resolving ? "Looking up…" : "Award badge"}
         </Button>
+      </div>
+
+      {/* Confirmation — shows exactly who this is before the award actually
+          submits, since a typo'd identifier could otherwise resolve to the
+          wrong person. */}
+      <Dialog open={resolvedMember !== null} onOpenChange={(v) => !v && setResolvedMember(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Confirm award</DialogTitle>
+            <DialogDescription>Double-check this is the right person.</DialogDescription>
+          </DialogHeader>
+          {resolvedMember && (
+            <div className="border border-zinc-200 bg-zinc-50 p-3">
+              <MemberIdentity member={resolvedMember} size={48} />
+              <p className="mt-2 truncate font-mono text-[10px] text-zinc-400">
+                {resolvedMember.email}
+              </p>
+              {resolvedMember.primaryRole && (
+                <p className="mt-1.5 inline-block bg-zinc-900 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wide text-white">
+                  {resolvedMember.primaryRole}
+                </p>
+              )}
+            </div>
+          )}
+          <p className="font-mono text-[10px] text-zinc-500">
+            Reason: <span className="text-zinc-700">{reason}</span>
+          </p>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-none font-mono text-xs"
+              onClick={() => setResolvedMember(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              className="rounded-none font-mono text-xs font-bold bg-emerald-700 hover:bg-emerald-800"
+              onClick={handleConfirmAward}
+              disabled={award.isPending}
+            >
+              {award.isPending ? "Awarding…" : "Confirm — award badge"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
+
+// ─── Member identity — avatar + name linking to their public profile.
+// Shared by every badges confirmation surface (manual award, preview
+// matches, reconcile, current holders) so they all show the same detail. ──
+
+function MemberIdentity({ member, size = 32 }: { member: MemberSummary; size?: number }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5">
+      <NextImage
+        src={getAvatarUrl(member.profilePictureUrl, member.fullName)}
+        alt={member.fullName}
+        width={size}
+        height={size}
+        className="border border-zinc-200 object-cover shrink-0"
+      />
+      <div className="min-w-0">
+        <a
+          href={`/@${member.username}`}
+          target="_blank"
+          rel="noreferrer"
+          className="font-mono text-xs font-bold text-zinc-900 hover:underline"
+        >
+          {member.fullName}
+        </a>
+        <p className="mt-0.5 truncate font-mono text-[10px] text-zinc-400">
+          @{member.username} · {member.communityId}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Match list — shared between "Preview matches" and the Reconcile confirm ──
+
+function MatchList({ count, members }: { count: number; members: BadgeMatch[] }) {
+  const shown = members.length;
+  return (
+    <ul className="mt-2 max-h-64 space-y-2 overflow-y-auto">
+      {members.map((m) => (
+        <li key={m.id} className="border border-emerald-100 bg-emerald-50 p-2">
+          <MemberIdentity member={m} size={28} />
+        </li>
+      ))}
+      {count > shown && (
+        <li className="font-mono text-xs italic text-emerald-600">
+          +{count - shown} more not shown
+        </li>
+      )}
+    </ul>
+  );
+}
+
+// ─── Current holders — revoke a badge from a specific member ─────────────────
+
+function CurrentHoldersPanel({ slug }: { slug: string }) {
+  const { data: holders = [], isLoading } = useBadgeAwards(slug);
+  const revoke = useRevokeBadge();
+  const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
+
+  const startRevoke = (id: string) => {
+    setRevokingId(id);
+    setReason("");
+  };
+
+  const confirmRevoke = async () => {
+    if (!revokingId) return;
+    if (!reason.trim()) {
+      toast.error("Enter a reason for revoking this badge.");
+      return;
+    }
+    try {
+      await revoke.mutateAsync({ awardId: revokingId, reason: reason.trim() });
+      toast.success("Badge revoked — it's been removed from their profile.");
+      setRevokingId(null);
+      setReason("");
+    } catch {
+      /* axios interceptor already showed the toast */
+    }
+  };
+
+  return (
+    <section className="border border-zinc-200 bg-white p-5">
+      <h2 className="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-400">
+        Current holders
+      </h2>
+      <p className="mt-1 font-mono text-xs text-zinc-500">
+        Members who currently have this badge. Revoking removes it from their dashboard and public
+        profile immediately.
+      </p>
+
+      <div className="mt-4 space-y-2">
+        {isLoading ? (
+          <Skeleton className="h-9 w-full rounded-none" />
+        ) : holders.length === 0 ? (
+          <p className="font-mono text-xs text-zinc-400">Nobody has this badge yet.</p>
+        ) : (
+          holders.map((holder) => (
+            <div key={holder.id} className="border border-zinc-200 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <MemberIdentity member={holder} />
+                  <p className="mt-1.5 font-mono text-[10px] text-zinc-400">
+                    {holder.source === "manual" ? "Manually awarded" : "Auto-awarded"}
+                    {" · "}
+                    {new Date(holder.awardedAt).toLocaleDateString()}
+                  </p>
+                </div>
+                {revokingId !== holder.id && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-none font-mono text-xs font-bold text-red-600 border-red-200 hover:bg-red-50 hover:border-red-400"
+                    onClick={() => startRevoke(holder.id)}
+                  >
+                    <ShieldOff className="h-3.5 w-3.5" />
+                    Revoke
+                  </Button>
+                )}
+              </div>
+              {revokingId === holder.id && (
+                <div className="mt-3 space-y-2 border-t border-zinc-100 pt-3">
+                  <Input
+                    autoFocus
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="Reason for revoking (shown in the badge's history)…"
+                    className="h-9 rounded-none font-mono text-xs"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-8 rounded-none font-mono text-xs font-bold bg-red-600 hover:bg-red-700"
+                      onClick={confirmRevoke}
+                      disabled={revoke.isPending}
+                    >
+                      {revoke.isPending ? "Revoking…" : "Confirm revoke"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-8 rounded-none font-mono text-xs"
+                      onClick={() => setRevokingId(null)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </section>
   );
@@ -384,6 +625,7 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
   const reconcile = useReconcileBadge();
   const canDelete = usePermission("badges.delete");
   const canAward = usePermission("badges.award");
+  const canRevoke = usePermission("badges.revoke");
 
   const [name, setName] = useState(badge?.name ?? "");
   const [description, setDescription] = useState(badge?.description ?? "");
@@ -397,7 +639,16 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [matchCount, setMatchCount] = useState<number | null>(null);
+  const [matchMembers, setMatchMembers] = useState<BadgeMatch[]>([]);
   const [matchLoading, setMatchLoading] = useState(false);
+
+  // Reconcile confirmation — who it's about to award to, fetched before the
+  // admin commits, not after.
+  const [reconcilePreview, setReconcilePreview] = useState<{
+    count: number;
+    members: BadgeMatch[];
+  } | null>(null);
+  const [reconcilePreviewLoading, setReconcilePreviewLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -471,7 +722,24 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
     }
   };
 
-  const handleReconcile = async () => {
+  // Step 1: fetch who's about to be awarded, using the badge's *saved*
+  // criteria (matches what Reconcile will actually run against), and show
+  // it for confirmation instead of running reconcile blind.
+  const handleReconcileClick = async () => {
+    if (!badge) return;
+    setReconcilePreviewLoading(true);
+    try {
+      const result = await BadgesService.previewSaved(badge.slug);
+      setReconcilePreview(result);
+    } catch {
+      /* axios interceptor already showed the toast */
+    } finally {
+      setReconcilePreviewLoading(false);
+    }
+  };
+
+  // Step 2: admin has seen the list and confirmed — actually run it.
+  const handleReconcileConfirm = async () => {
     if (!badge) return;
     try {
       const result = await reconcile.mutateAsync(badge.slug);
@@ -480,6 +748,7 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
           ? "No new awards — all eligible members already have this badge."
           : `Awarded to ${result.awarded} member${result.awarded === 1 ? "" : "s"}.`
       );
+      setReconcilePreview(null);
     } catch {
       /* axios interceptor already showed the toast */
     }
@@ -498,6 +767,7 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
       };
       const result = await BadgesService.preview(input);
       setMatchCount(result.count);
+      setMatchMembers(result.members);
     } catch {
       /* no-op */
     } finally {
@@ -552,11 +822,13 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
                 variant="outline"
                 size="sm"
                 className="h-9 rounded-none font-mono text-xs font-bold"
-                onClick={handleReconcile}
-                disabled={reconcile.isPending}
+                onClick={handleReconcileClick}
+                disabled={reconcilePreviewLoading}
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${reconcile.isPending ? "animate-spin" : ""}`} />
-                {reconcile.isPending ? "Running…" : "Reconcile"}
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${reconcilePreviewLoading ? "animate-spin" : ""}`}
+                />
+                {reconcilePreviewLoading ? "Checking…" : "Reconcile"}
               </Button>
             </>
           )}
@@ -604,6 +876,51 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
           </div>
         </div>
       )}
+
+      {/* Reconcile confirmation — modal, not inline. Reconcile can award to an
+          unbounded number of people in one click, unlike Delete or a single
+          Revoke, so it gets more deliberate focus than an inline panel the
+          admin might not notice if they're scrolled away from the header. */}
+      <Dialog
+        open={reconcilePreview !== null}
+        onOpenChange={(v) => !v && setReconcilePreview(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reconcile this badge</DialogTitle>
+            <DialogDescription>
+              {reconcilePreview?.count === 0
+                ? "Nobody new — every eligible member already has this badge."
+                : `This will award the badge to ${reconcilePreview?.count} member${reconcilePreview?.count === 1 ? "" : "s"} who don't have it yet:`}
+            </DialogDescription>
+          </DialogHeader>
+          {reconcilePreview && reconcilePreview.count > 0 && (
+            <MatchList count={reconcilePreview.count} members={reconcilePreview.members} />
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-none font-mono text-xs"
+              onClick={() => setReconcilePreview(null)}
+            >
+              {reconcilePreview && reconcilePreview.count > 0 ? "Cancel" : "Close"}
+            </Button>
+            {reconcilePreview && reconcilePreview.count > 0 && (
+              <Button
+                type="button"
+                size="sm"
+                className="rounded-none font-mono text-xs font-bold bg-emerald-700 hover:bg-emerald-800"
+                onClick={handleReconcileConfirm}
+                disabled={reconcile.isPending}
+              >
+                {reconcile.isPending ? "Awarding…" : "Confirm — award badge"}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px] items-start">
         {/* Left column */}
@@ -680,11 +997,31 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
               </Button>
             </div>
 
-            {matchCount !== null && (
-              <div className="mx-5 mt-4 border border-emerald-200 bg-emerald-50 px-4 py-3 font-mono text-xs font-bold text-emerald-700">
-                {matchCount} existing member{matchCount === 1 ? "" : "s"} currently match this rule.
-              </div>
-            )}
+            <Dialog open={matchCount !== null} onOpenChange={(v) => !v && setMatchCount(null)}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Who matches this rule</DialogTitle>
+                  <DialogDescription>
+                    {matchCount} existing member{matchCount === 1 ? "" : "s"} currently match this
+                    rule.
+                  </DialogDescription>
+                </DialogHeader>
+                {matchCount !== null && matchCount > 0 && (
+                  <MatchList count={matchCount} members={matchMembers} />
+                )}
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-none font-mono text-xs"
+                    onClick={() => setMatchCount(null)}
+                  >
+                    Close
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             <div className="p-5">
               {criteriaLoading ? (
@@ -724,6 +1061,9 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
 
           {/* Manual award — only on edit page for users with badges.award */}
           {badge && canAward && <ManualAwardPanel slug={badge.slug} />}
+
+          {/* Current holders / revoke — only on edit page for users with badges.revoke */}
+          {badge && canRevoke && <CurrentHoldersPanel slug={badge.slug} />}
         </div>
 
         {/* Right column — artwork */}
