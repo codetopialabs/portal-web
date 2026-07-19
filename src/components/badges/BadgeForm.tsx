@@ -659,6 +659,19 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
   const hasCriteria = criteria.children.length > 0;
   const criteriaStatus = (error as (Error & { status?: number }) | undefined)?.status;
 
+  // Reconcile runs against what's saved on the server, not this form's live
+  // state — surface that distinction so an admin doesn't assume Reconcile
+  // just used the rules they're currently looking at.
+  const hasUnsavedChanges = Boolean(
+    badge &&
+      (name !== badge.name ||
+        description !== badge.description ||
+        imageUrl !== badge.imageUrl ||
+        status !== badge.status ||
+        pendingFile ||
+        JSON.stringify(criteria) !== JSON.stringify(badge.criteria))
+  );
+
   const validateFile = (file: File): boolean => {
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Badge artwork must be 2 MB or smaller.");
@@ -846,6 +859,20 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
         </div>
       </div>
 
+      {/* Unsaved-changes note — Reconcile/Preview-saved-criteria run against
+          what's on the server, not this form, so make that gap visible
+          instead of letting an admin assume Reconcile just used what
+          they're looking at. */}
+      {hasUnsavedChanges && (
+        <div className="flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+          <p className="font-mono text-[10px] font-bold text-amber-700">
+            You have unsaved changes — Reconcile still runs against the last saved rules until you
+            Save badge.
+          </p>
+        </div>
+      )}
+
       {/* Delete confirmation */}
       {confirmDelete && (
         <div className="flex items-start gap-4 border border-red-200 bg-red-50 p-5">
@@ -897,6 +924,14 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
                 : `This will award the badge to ${reconcilePreview?.count} member${reconcilePreview?.count === 1 ? "" : "s"} who don't have it yet:`}
             </DialogDescription>
           </DialogHeader>
+          {hasUnsavedChanges && (
+            <div className="flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+              <p className="font-mono text-[10px] font-bold text-amber-700">
+                This matches the last saved rules — your unsaved edits aren't reflected here.
+              </p>
+            </div>
+          )}
           {reconcilePreview && reconcilePreview.count > 0 && (
             <MatchList count={reconcilePreview.count} members={reconcilePreview.members} />
           )}
