@@ -509,16 +509,16 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
           </aside>
         </section>
 
-        {/* â”€â”€ Contributions â”€â”€ */}
-        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
-          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
-        </section>
-
         {badgeCount > 0 && (
-          <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+          <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
             <PublicProfileBadges username={profile.username} />
           </section>
         )}
+
+        {/* â”€â”€ Contributions â”€â”€ */}
+        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
+        </section>
       </main>
 
       <PublicProfileFooter />
