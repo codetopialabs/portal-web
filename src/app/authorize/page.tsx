@@ -3,7 +3,7 @@
 import { Loader2, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useMe } from "@/hooks/useMe";
 import { OAuthService } from "@/services/oauth.service";
@@ -19,6 +19,7 @@ function AuthorizeInner() {
   const searchParams = useSearchParams();
   const { profile: me } = useMe();
   const [submitting, setSubmitting] = useState(false);
+  const autoAuthorizeStarted = useRef(false);
 
   const params = useMemo(() => {
     return {
@@ -41,6 +42,8 @@ function AuthorizeInner() {
     }
   }, [params.appName, params.redirectUri]);
 
+  const missing = !params.clientId || !params.redirectUri;
+
   // Not logged in → bounce to login, preserving the full authorize URL.
   useEffect(() => {
     const token = getCookie("accessToken");
@@ -50,6 +53,21 @@ function AuthorizeInner() {
       router.replace(`/login?next=${encodeURIComponent(here)}`);
     }
   }, [router, searchParams]);
+
+  // Registered OAuth applications are first-party SSO consumers. Once the
+  // portal session is known, mint the code and return without another click.
+  useEffect(() => {
+    if (!me || missing || autoAuthorizeStarted.current) return;
+    autoAuthorizeStarted.current = true;
+    setSubmitting(true);
+    OAuthService.authorize(params)
+      .then((redirectTo) => {
+        window.location.href = redirectTo;
+      })
+      .catch(() => {
+        setSubmitting(false);
+      });
+  }, [me, missing, params]);
 
   function deny() {
     if (!params.redirectUri) {
@@ -76,8 +94,6 @@ function AuthorizeInner() {
       setSubmitting(false);
     }
   }
-
-  const missing = !params.clientId || !params.redirectUri;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f9fafb] px-4">
@@ -120,7 +136,12 @@ function AuthorizeInner() {
           </ul>
         </div>
 
-        {missing ? (
+        {submitting ? (
+          <div className="flex h-11 items-center justify-center gap-2 border border-grey-200 bg-grey-50 font-mono text-xs font-bold text-text-secondary">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Signing you in…
+          </div>
+        ) : missing ? (
           <p className="border border-error-200 bg-error-50 px-3 py-2 font-mono text-xs font-bold text-error-700">
             This authorization link is invalid or incomplete.
           </p>
