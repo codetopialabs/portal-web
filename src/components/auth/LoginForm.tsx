@@ -162,6 +162,7 @@ export function LoginForm({
                         socialMutation.mutate({ provider: "google", tokenOrCode: token })
                       }
                       disabled={mutation.isPending || socialMutation.isPending}
+                      isLoading={socialMutation.isPending}
                     />
                   )}
                   {GITHUB_CLIENT_ID && (
@@ -169,11 +170,17 @@ export function LoginForm({
                       type="button"
                       variant="outline"
                       onClick={handleGithubLogin}
-                      className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
+                      className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 hover:text-white h-11 rounded-none text-sm font-medium transition-all"
                       disabled={mutation.isPending || socialMutation.isPending}
                     >
-                      <FaGithub className="mr-2 h-4 w-4" />
-                      GitHub
+                      {socialMutation.isPending ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-transparent" />
+                      ) : (
+                        <>
+                          <FaGithub className="mr-2 h-4 w-4" />
+                          GitHub
+                        </>
+                      )}
                     </Button>
                   )}
                 </div>
