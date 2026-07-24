@@ -12,9 +12,11 @@ import { Button } from "@/components/ui/button";
 export function GoogleLoginButton({
   onToken,
   disabled,
+  isLoading,
 }: {
   onToken: (accessToken: string) => void;
   disabled?: boolean;
+  isLoading?: boolean;
 }) {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -27,11 +29,17 @@ export function GoogleLoginButton({
       type="button"
       variant="outline"
       onClick={() => login()}
-      className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 h-11 rounded-none text-sm font-medium transition-all"
+      className="bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 text-zinc-200 hover:text-white h-11 rounded-none text-sm font-medium transition-all"
       disabled={disabled}
     >
-      <FcGoogle className="mr-2 h-4 w-4" />
-      Google
+      {isLoading ? (
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-transparent" />
+      ) : (
+        <>
+          <FcGoogle className="mr-2 h-4 w-4" />
+          Google
+        </>
+      )}
     </Button>
   );
 }
