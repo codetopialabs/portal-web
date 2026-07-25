@@ -31,7 +31,7 @@ import { PublicProfileBadges } from "@/components/badges/PublicProfileBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
-import { formatJoinedAt } from "@/components/profile/utils";
+import { formatJoinedAt, roleBadgeColors } from "@/components/profile/utils";
 import { useMemberBadges } from "@/hooks/useBadges";
 import { usePermission } from "@/hooks/usePermission";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
@@ -189,7 +189,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
       <PublicProfileHeader />
 
       <main className="flex-grow">
-        {/* â”€â”€ Hero â”€â”€ */}
+        {/* Hero */}
         <section className="relative bg-zinc-950">
           {/* Cover image */}
           <div className="absolute inset-0 h-96">
@@ -221,7 +221,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
 
             {/* Avatar + name block */}
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-              <div className="h-32 w-32 shrink-0 border-[3px] border-zinc-800 bg-zinc-900 p-0.5 ring-2 ring-white/25 sm:h-40 sm:w-40">
+              <div className="h-32 w-32 shrink-0 ring-4 ring-white/20 sm:h-40 sm:w-40">
                 {/* biome-ignore lint/performance/noImgElement: user avatar */}
                 <img
                   src={getAvatarUrl(profile.profilePictureUrl, profile.fullName)}
@@ -232,13 +232,13 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
 
               <div className="min-w-0">
                 {jobTitle && (
-                  <p className="mb-1 font-mono text-sm font-medium text-white/50">{jobTitle}</p>
+                  <p className="mb-2 font-mono text-sm font-medium text-white/50">{jobTitle}</p>
                 )}
                 <h1 className="font-sans text-5xl font-black leading-none tracking-tight text-white sm:text-7xl">
                   {profile.fullName}
                 </h1>
-                <p className="mt-1.5 font-mono text-sm text-zinc-400">@{profile.username}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-4 font-mono text-[11px] text-zinc-400">
+                <p className="mt-2 font-mono text-sm text-zinc-400">@{profile.username}</p>
+                <div className="mt-5 flex flex-wrap items-center gap-4 font-mono text-[11px] text-zinc-400">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5 text-zinc-500" />
                     {displayLocation ?? "Remote"}
@@ -302,7 +302,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
           </div>
         </section>
 
-        {/* â”€â”€ Main body â”€â”€ */}
+        {/* Main body */}
         <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-16 sm:px-6 lg:grid-cols-[1fr_320px]">
           {/* Left â€” bio + skills */}
           <div className="space-y-6">
@@ -468,13 +468,15 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 {roleList.map((role, i) => (
                   <div
                     key={role}
-                    className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-zinc-50"
+                    className="flex items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-zinc-50"
                   >
-                    <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-zinc-800">
+                    <span
+                      className={`inline-flex items-center border px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] ${roleBadgeColors[role] ?? roleBadgeColors.Member}`}
+                    >
                       {role}
                     </span>
                     {i === 0 && (
-                      <span className="bg-zinc-900 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-white">
+                      <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-400">
                         Primary
                       </span>
                     )}
@@ -515,7 +517,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
           </section>
         )}
 
-        {/* â”€â”€ Contributions â”€â”€ */}
+        {/* Contributions */}
         <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
           <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
         </section>
