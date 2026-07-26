@@ -27,6 +27,43 @@ export function useAdminTeams() {
   });
 }
 
+export function useAdminTeam(teamSlug: string) {
+  return useQuery({
+    queryKey: ["admin", "teams", teamSlug],
+    queryFn: () => TeamsService.getAdminTeam(teamSlug),
+    enabled: Boolean(teamSlug),
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useAdminTeamMembers(teamSlug: string) {
+  return useQuery({
+    queryKey: ["admin", "teams", teamSlug, "members"],
+    queryFn: () => TeamsService.getAdminTeamMembers(teamSlug),
+    enabled: Boolean(teamSlug),
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useAdminTeamReviews(teamSlug: string) {
+  return useQuery({
+    queryKey: ["admin", "teams", teamSlug, "reviews"],
+    queryFn: () => TeamsService.getAdminTeamReviews(teamSlug),
+    enabled: Boolean(teamSlug),
+    staleTime: 1000 * 20,
+  });
+}
+
+export function useAdminTeamActivity(teamSlug: string) {
+  return useQuery({
+    queryKey: ["admin", "teams", teamSlug, "activity"],
+    queryFn: () => TeamsService.getAdminTeamActivity(teamSlug),
+    enabled: Boolean(teamSlug),
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
+  });
+}
+
 export function useTeam(teamId: string) {
   return useQuery({
     queryKey: ["teams", teamId],

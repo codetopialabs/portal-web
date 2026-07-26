@@ -20,7 +20,12 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeam, useTeamActivity, useTeamMembers, useTeamReviews } from "@/hooks/useTeams";
+import {
+  useAdminTeam,
+  useAdminTeamActivity,
+  useAdminTeamMembers,
+  useAdminTeamReviews,
+} from "@/hooks/useTeams";
 import { getAvatarUrl } from "@/lib/utils";
 import type { ActivityItem } from "@/services/teams.service";
 
@@ -131,10 +136,10 @@ function RoleBadge({ role }: { role: string }) {
 
 function AdminTeamDetailContent() {
   const { teamSlug } = useParams<{ teamSlug: string }>();
-  const { data: team, isLoading: teamLoading, isError: teamError } = useTeam(teamSlug);
-  const { data: members, isLoading: membersLoading } = useTeamMembers(teamSlug);
-  const { data: reviews, isLoading: reviewsLoading } = useTeamReviews(teamSlug);
-  const { data: activity, isLoading: activityLoading } = useTeamActivity(teamSlug);
+  const { data: team, isLoading: teamLoading, isError: teamError } = useAdminTeam(teamSlug);
+  const { data: members, isLoading: membersLoading } = useAdminTeamMembers(teamSlug);
+  const { data: reviews, isLoading: reviewsLoading } = useAdminTeamReviews(teamSlug);
+  const { data: activity, isLoading: activityLoading } = useAdminTeamActivity(teamSlug);
 
   const owners = members?.filter((m) => m.role === "owner") ?? [];
   const leads = members?.filter((m) => m.role === "lead") ?? [];
