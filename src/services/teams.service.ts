@@ -238,6 +238,34 @@ export const TeamsService = {
     return res.data.data;
   },
 
+  /** Admin-only: fetch any team regardless of the caller's membership. */
+  async getAdminTeam(teamSlug: string): Promise<Team> {
+    const res = await axiosInstance.get<ApiResponse<Team>>(`/admin/teams/${teamSlug}/`);
+    return res.data.data;
+  },
+
+  /** Admin-only: list members of any team. */
+  async getAdminTeamMembers(teamSlug: string): Promise<TeamMember[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamMember[]>>(
+      `/admin/teams/${teamSlug}/members/`
+    );
+    return res.data.data;
+  },
+
+  /** Admin-only: list reviews for any team. */
+  async getAdminTeamReviews(teamSlug: string): Promise<Review[]> {
+    const res = await axiosInstance.get<ApiResponse<Review[]>>(`/admin/teams/${teamSlug}/reviews/`);
+    return res.data.data;
+  },
+
+  /** Admin-only: fetch activity for any team. */
+  async getAdminTeamActivity(teamSlug: string): Promise<ActivityItem[]> {
+    const res = await axiosInstance.get<ApiResponse<ActivityItem[]>>(
+      `/admin/teams/${teamSlug}/activity/`
+    );
+    return res.data.data;
+  },
+
   /** Every team platform-wide, for any member to browse and request to
    * join. Annotated with the caller's own membership/request state. */
   async browseTeams(): Promise<BrowseTeam[]> {
