@@ -21,6 +21,7 @@ import {
   Smartphone,
   Sparkles,
   TestTube2,
+  Trophy,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -35,7 +36,7 @@ import { formatJoinedAt, roleBadgeColors } from "@/components/profile/utils";
 import { useMemberBadges } from "@/hooks/useBadges";
 import { usePermission } from "@/hooks/usePermission";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
-import { getAvatarUrl, getCoverUrl, sanitizeHandle } from "@/lib/utils";
+import { getAvatarUrl, getCoverUrl, getWallOfImpactUrl, sanitizeHandle } from "@/lib/utils";
 import { type CommunityMember, UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
 import type { SocialLink } from "@/types/profile";
@@ -132,6 +133,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
     : null;
   const skills = profile.skills ?? [];
   const careerProgressions = profile.careerProgressions ?? [];
+  const recognitions = profile.recognitions ?? [];
   const firstName = profile.fullName?.split(" ")[0] || "This member";
 
   const isOwnProfile = currentUser?.username === username;
@@ -398,6 +400,59 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 )}
               </div>
             </div>
+            {/* Wall of Impact — only rendered when there's something to show.
+                Unlike bio or skills, an empty "no awards yet" state on every
+                profile reads as an absence rather than an invitation. */}
+            {recognitions.length > 0 && (
+              <div className="border border-zinc-200 bg-white">
+                <SectionHeader
+                  icon={Trophy}
+                  title="Recognition"
+                  meta={`${recognitions.length} award${recognitions.length === 1 ? "" : "s"}`}
+                />
+                <div className="divide-y divide-zinc-100">
+                  {recognitions.map((item) => (
+                    <a
+                      key={item.id}
+                      href={getWallOfImpactUrl(item.slug)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group block p-6 transition-colors hover:bg-zinc-50"
+                    >
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                        <h3 className="font-sans text-base font-bold leading-snug text-zinc-950 group-hover:underline">
+                          {item.awardName}
+                        </h3>
+                        <span className="font-mono text-[11px] text-zinc-400">{item.period}</span>
+                      </div>
+                      <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
+                        {item.domain || item.roleLabel || "Codetopia Community"}
+                      </p>
+                      <p className="mt-2.5 font-sans text-sm leading-6 text-zinc-500">
+                        {item.impactSummary}
+                      </p>
+                      {item.achievements.length > 0 && (
+                        <ul className="mt-3 space-y-1.5">
+                          {item.achievements.map((achievement) => (
+                            <li
+                              key={achievement}
+                              className="flex gap-2.5 font-mono text-xs leading-5 text-zinc-500"
+                            >
+                              <span
+                                aria-hidden="true"
+                                className="mt-[7px] h-1 w-1 shrink-0 bg-zinc-300"
+                              />
+                              {achievement}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Skills */}
             <div className="border border-zinc-200 bg-white">
               <SectionHeader

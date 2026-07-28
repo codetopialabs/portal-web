@@ -23,6 +23,17 @@ export function getCoverUrl(url: string | null | undefined, name: string): strin
 }
 
 /**
+ * A published recognition's page. Recognitions are curated in the portal but
+ * *read* on the public community site, so this points off-portal.
+ */
+export function getWallOfImpactUrl(slug: string): string {
+  const base = (
+    process.env.NEXT_PUBLIC_COMMUNITY_SITE_URL ?? "https://community.codetopia.org"
+  ).replace(/\/+$/, "");
+  return `${base}/wall-of-impact/${slug}`;
+}
+
+/**
  * Converts a string to title case (e.g. "FRONTEND DEVELOPER" → "Frontend Developer").
  * Always applies — any casing the user types is normalised on blur/submit.
  */

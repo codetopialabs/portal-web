@@ -1,5 +1,6 @@
 ﻿import axiosInstance from "@/lib/axios";
 import type { CareerProgression } from "@/types/career-progressions.types";
+import type { MemberRecognition } from "@/types/recognitions.types";
 
 export interface SocialLink {
   platform: string;
@@ -82,6 +83,7 @@ export interface CommunityMember {
   isOnboarded: boolean;
   joinedAt: string;
   careerProgressions: CareerProgression[];
+  recognitions: MemberRecognition[];
 }
 
 export interface UpdateMeRequest {
