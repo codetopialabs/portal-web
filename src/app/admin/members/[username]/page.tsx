@@ -7,9 +7,13 @@ import {
   CheckCircle2,
   ChevronLeft,
   Clock,
+  History,
   KeyRound,
   Laptop,
+  LogIn,
+  type LucideIcon,
   Mail,
+  Maximize2,
   Shield,
   ShieldAlert,
   Trash2,
@@ -148,21 +152,51 @@ function DetailItem({
   );
 }
 
-function HeaderStat({ label, value }: { label: string; value: string }) {
+function HeaderFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-b border-grey-200 p-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
-      <p className="truncate font-sans text-xl font-black text-text-primary">{value}</p>
-      <p className="mt-1 font-mono text-xs font-medium text-text-muted">{label}</p>
-    </div>
+    <span className="font-mono text-xs">
+      <span className="font-bold text-text-primary">{value}</span>{" "}
+      <span className="text-text-muted">{label}</span>
+    </span>
   );
 }
 
-function SideFact({ label, value }: { label: string; value: string }) {
+function HeaderFlag({
+  ok,
+  okLabel,
+  pendingLabel,
+}: {
+  ok: boolean;
+  okLabel: string;
+  pendingLabel: string;
+}) {
   return (
-    <div className="flex items-center justify-between gap-4 px-5 py-3">
-      <p className="font-mono text-xs font-medium text-text-muted">{label}</p>
-      <p className="truncate text-right font-mono text-xs text-text-secondary">{value}</p>
-    </div>
+    <span
+      className={`inline-flex items-center gap-1.5 font-mono text-xs font-bold ${
+        ok ? "text-emerald-700" : "text-amber-700"
+      }`}
+    >
+      {ok ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+      {ok ? okLabel : pendingLabel}
+    </span>
+  );
+}
+
+function HeaderDate({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5 font-mono text-xs">
+      <Icon className="h-3.5 w-3.5 text-icon-muted" />
+      <span className="text-text-muted">{label}</span>
+      <span className="font-bold text-text-primary">{value}</span>
+    </span>
   );
 }
 
@@ -345,6 +379,7 @@ function MemberDetailContent({ username }: { username: string }) {
   const [flagDialogOpen, setFlagDialogOpen] = useState(false);
   const [flagReason, setFlagReason] = useState("");
   const [unflagDialogOpen, setUnflagDialogOpen] = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
 
   const permissionDescriptions = useMemo(() => {
     return new Map(
@@ -573,7 +608,10 @@ function MemberDetailContent({ username }: { username: string }) {
   const activeSessions = sessions ?? [];
   const modalCopy = dangerCopy(dangerAction, member.username, dangerRoleEffects);
   const canConfirmDangerAction = confirmationInput === member.username && !pendingDangerAction;
+  const avatarUrl = getAvatarUrl(member.profilePictureUrl, member.fullName || member.username);
+  const hasUploadedAvatar = Boolean(member.profilePictureUrl);
   const canShowDangerZone =
+    (!member.isFlagged && canFlag) ||
     (canRevokeSessions && activeSessions.length > 0) ||
     (member.isActive && canSuspend) ||
     (!member.isActive && canReactivate) ||
@@ -591,20 +629,28 @@ function MemberDetailContent({ username }: { username: string }) {
         </Link>
       </div>
 
-      <header className="mb-6 border border-grey-200 bg-white">
-        <div className="flex flex-col gap-5 p-5 md:flex-row md:items-start md:justify-between">
-          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">
-            <div className="h-24 w-24 shrink-0 overflow-hidden border border-grey-200 bg-grey-50">
+      <header className="mb-6 border border-grey-200 bg-white p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex min-w-0 gap-4">
+            <button
+              type="button"
+              onClick={() => setAvatarOpen(true)}
+              aria-label={`View profile picture for ${member.fullName || member.username}`}
+              className="group relative h-16 w-16 shrink-0 overflow-hidden border border-grey-200 bg-grey-50 transition-colors hover:border-grey-900"
+            >
               {/* biome-ignore lint/performance/noImgElement: user avatar */}
               <img
-                src={getAvatarUrl(member.profilePictureUrl, member.fullName || member.username)}
+                src={avatarUrl}
                 alt={member.fullName || member.username}
                 className="h-full w-full object-cover"
               />
-            </div>
+              <span className="absolute inset-0 flex items-center justify-center bg-grey-900/55 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                <Maximize2 className="h-4 w-4 text-white" />
+              </span>
+            </button>
             <div className="min-w-0">
-              <div className="mb-2 flex flex-wrap items-center gap-3">
-                <h1 className="font-sans text-3xl font-black leading-tight text-text-primary">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="font-sans text-2xl font-bold leading-tight text-text-primary">
                   {member.fullName || member.username}
                 </h1>
                 <StatusPill
@@ -612,51 +658,42 @@ function MemberDetailContent({ username }: { username: string }) {
                   isFlagged={member.isFlagged}
                   underReview={member.activeFlag?.profileUpdatedAfterFlag}
                 />
+                {member.isFlagged && !member.isActive && (
+                  <span className="inline-flex items-center gap-1.5 border border-zinc-800 bg-zinc-800 px-2.5 py-1 font-mono text-[11px] font-bold text-white">
+                    Suspended
+                  </span>
+                )}
               </div>
-              <p className="font-mono text-sm text-text-tertiary">@{member.username}</p>
-              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-text-secondary">
-                <span className="flex min-w-0 items-center gap-2">
+              <p className="mt-0.5 font-mono text-[11px] text-text-muted">@{member.username}</p>
+              <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-xs text-text-secondary">
+                <span className="flex min-w-0 items-center gap-1.5">
                   <Mail className="h-3.5 w-3.5 shrink-0 text-icon-muted" />
                   <span className="break-all">{member.email}</span>
                 </span>
-                <span className="flex items-center gap-2">
-                  <Shield className="h-3.5 w-3.5 text-icon-muted" />
+                <span className="flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5 shrink-0 text-icon-muted" />
                   {member.communityId || "No community ID"}
-                </span>
-                <span className="flex items-center gap-2">
-                  <CalendarDays className="h-3.5 w-3.5 text-icon-muted" />
-                  Joined {formatDate(member.joinedAt || member.createdAt)}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row md:justify-end">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap md:justify-end">
             {canEdit && (
               <Link
                 href={`/admin/members/${member.username}/edit`}
-                className="flex h-10 items-center justify-center border border-grey-900 bg-grey-900 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800"
+                className="flex h-9 shrink-0 items-center justify-center whitespace-nowrap border border-grey-900 bg-grey-900 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-grey-800"
               >
                 Edit profile
               </Link>
-            )}
-            {!member.isFlagged && canFlag && (
-              <button
-                type="button"
-                onClick={() => setFlagDialogOpen(true)}
-                className="flex h-10 items-center justify-center gap-2 border border-red-600 bg-red-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-red-700"
-              >
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Flag account
-              </button>
             )}
             {member.isFlagged && canReviewFlag && (
               <button
                 type="button"
                 onClick={() => setUnflagDialogOpen(true)}
-                className="flex h-10 items-center justify-center gap-2 border border-emerald-600 bg-emerald-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-emerald-700"
+                className="flex h-9 shrink-0 items-center justify-center gap-2 whitespace-nowrap border border-emerald-600 bg-emerald-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-emerald-700"
               >
-                <CheckCircle2 className="h-3.5 w-3.5" />
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                 Resolve flag
               </button>
             )}
@@ -664,29 +701,46 @@ function MemberDetailContent({ username }: { username: string }) {
               <button
                 type="button"
                 onClick={() => setComposeOpen(true)}
-                className="flex h-10 items-center justify-center gap-2 border border-grey-200 bg-white px-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
+                className="flex h-9 shrink-0 items-center justify-center gap-2 whitespace-nowrap border border-grey-200 bg-white px-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
               >
-                <Mail className="h-3.5 w-3.5" />
+                <Mail className="h-3.5 w-3.5 shrink-0" />
                 Email member
               </button>
             )}
             <Link
               href={`/@${member.username}`}
               target="_blank"
-              className="flex h-10 items-center justify-center gap-2 border border-grey-200 bg-white px-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
+              className="flex h-9 shrink-0 items-center justify-center gap-2 whitespace-nowrap border border-grey-200 bg-white px-4 font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
             >
               Public profile
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 border-t border-grey-200 sm:grid-cols-4 lg:grid-cols-5">
-          <HeaderStat label="Roles" value={String(member.roles.length)} />
-          <HeaderStat label="Onboarded" value={member.isOnboarded ? "Yes" : "No"} />
-          <HeaderStat label="Email" value={member.isEmailVerified ? "Verified" : "Pending"} />
-          <HeaderStat label="Primary role" value={member.primaryRole || "None"} />
-          <HeaderStat label="Last login" value={formatDate(member.lastLoginAt)} />
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-grey-100 pt-4">
+          <HeaderFact
+            value={String(member.roles.length)}
+            label={member.roles.length === 1 ? "role" : "roles"}
+          />
+          {member.primaryRole && <HeaderFact value={member.primaryRole} label="primary" />}
+          <HeaderFlag
+            ok={member.isOnboarded}
+            okLabel="Onboarded"
+            pendingLabel="Onboarding pending"
+          />
+          <HeaderFlag
+            ok={member.isEmailVerified}
+            okLabel="Email verified"
+            pendingLabel="Email unverified"
+          />
+          <HeaderDate
+            icon={CalendarDays}
+            label="Joined"
+            value={formatDate(member.joinedAt || member.createdAt)}
+          />
+          <HeaderDate icon={LogIn} label="Last login" value={formatDate(member.lastLoginAt)} />
+          <HeaderDate icon={History} label="Updated" value={formatDate(member.updatedAt)} />
         </div>
       </header>
 
@@ -729,20 +783,13 @@ function MemberDetailContent({ username }: { username: string }) {
                 )}
               </div>
             </div>
-            {canReviewFlag && (
-              <button
-                type="button"
-                onClick={() => setUnflagDialogOpen(true)}
-                className="shrink-0 border border-emerald-600 bg-emerald-600 px-3 py-1.5 font-mono text-xs font-bold text-white hover:bg-emerald-700"
-              >
-                Resolve flag
-              </button>
-            )}
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div
+        className={`grid grid-cols-1 gap-6 ${canViewSessions ? "lg:grid-cols-[minmax(0,1fr)_340px]" : ""}`}
+      >
         <main className="space-y-6">
           <section className="border border-grey-200 bg-white">
             <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
@@ -969,23 +1016,8 @@ function MemberDetailContent({ username }: { username: string }) {
           </section>
         </main>
 
-        <aside className="space-y-6">
-          <section className="border border-grey-200 bg-white">
-            <div className="border-b border-grey-200 bg-grey-50 px-5 py-3">
-              <h2 className="font-sans text-base font-bold text-text-primary">Account</h2>
-            </div>
-            <div className="divide-y divide-grey-200">
-              <SideFact label="Status" value={member.isActive ? "Active" : "Suspended"} />
-              <SideFact
-                label="Email verification"
-                value={member.isEmailVerified ? "Verified" : "Pending"}
-              />
-              <SideFact label="Onboarding" value={member.isOnboarded ? "Completed" : "Pending"} />
-              <SideFact label="Last updated" value={formatDate(member.updatedAt)} />
-            </div>
-          </section>
-
-          {canViewSessions && (
+        {canViewSessions && (
+          <aside className="space-y-6">
             <section className="border border-grey-200 bg-white">
               <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">
                 <div className="flex items-center gap-2">
@@ -1041,8 +1073,8 @@ function MemberDetailContent({ username }: { username: string }) {
                 )}
               </div>
             </section>
-          )}
-        </aside>
+          </aside>
+        )}
       </div>
 
       {canShowDangerZone && (
@@ -1054,6 +1086,14 @@ function MemberDetailContent({ username }: { username: string }) {
             </div>
           </div>
           <div className="divide-y divide-error-200">
+            {!member.isFlagged && canFlag && (
+              <DangerRow
+                title="Flag this account"
+                description="Mark this account for moderation review and notify the member."
+                buttonLabel="Flag account"
+                onClick={() => setFlagDialogOpen(true)}
+              />
+            )}
             {canRevokeSessions && activeSessions.length > 0 && (
               <DangerRow
                 title="Revoke all sessions"
@@ -1299,6 +1339,40 @@ function MemberDetailContent({ username }: { username: string }) {
               {pendingDangerAction ? "Working..." : modalCopy.button}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Profile picture viewer */}
+      <Dialog open={avatarOpen} onOpenChange={setAvatarOpen}>
+        <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-sans text-xl font-bold text-text-primary">
+              {member.fullName || member.username}
+            </DialogTitle>
+            <DialogDescription className="pt-2 font-mono text-xs text-text-secondary">
+              @{member.username} ·{" "}
+              {hasUploadedAvatar ? "Uploaded profile picture" : "Generated placeholder avatar"}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="border border-grey-200 bg-grey-50 p-4">
+            {/* biome-ignore lint/performance/noImgElement: user avatar */}
+            <img
+              src={avatarUrl}
+              alt={member.fullName || member.username}
+              className="mx-auto max-h-[60vh] w-full object-contain"
+            />
+          </div>
+          {hasUploadedAvatar && (
+            <a
+              href={avatarUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex h-9 items-center justify-center gap-2 border border-grey-200 bg-white font-mono text-xs font-bold text-text-secondary transition-colors hover:bg-grey-50"
+            >
+              Open original
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
+          )}
         </DialogContent>
       </Dialog>
 
