@@ -13,6 +13,7 @@ export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
   "oauth_apps.delete",
   "badges.delete",
   "recognitions.revoke",
+  "certificates.revoke",
 ]);
 
 /**
@@ -46,6 +47,9 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/recognitions": "recognitions.view",
   "/admin/recognitions/new": "recognitions.create",
   "/admin/recognitions/[id]/edit": "recognitions.create",
+  "/admin/certificates": "certificates.view",
+  "/admin/certificates/new": "certificates.create",
+  "/admin/certificates/[id]/edit": "certificates.create",
   "/reflections": "reflections.submit",
   "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",
@@ -85,6 +89,7 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   { pattern: /^\/admin\/oauth-apps\/[^/]+$/, permission: "oauth_apps.view" },
   { pattern: /^\/admin\/badges\/[^/]+\/edit$/, permission: "badges.edit" },
   { pattern: /^\/admin\/recognitions\/[^/]+\/edit$/, permission: "recognitions.create" },
+  { pattern: /^\/admin\/certificates\/[^/]+\/edit$/, permission: "certificates.create" },
   { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
 ];
 
