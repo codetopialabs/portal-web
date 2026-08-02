@@ -83,7 +83,9 @@ export interface CommunityMember {
   isOnboarded: boolean;
   joinedAt: string;
   careerProgressions: CareerProgression[];
-  recognitions: MemberRecognition[];
+  // Detail endpoint only (/users/members/<username>/) — the member list
+  // deliberately omits these, so list results won't carry the field.
+  recognitions?: MemberRecognition[];
 }
 
 export interface UpdateMeRequest {

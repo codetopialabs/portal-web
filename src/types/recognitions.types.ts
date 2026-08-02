@@ -24,6 +24,7 @@ export interface Recognition {
   awardName: string;
   period: string;
   periodStart: string | null;
+  periodEnd: string | null;
   impactSummary: string;
   achievements: string[];
   domain: string;
@@ -52,6 +53,7 @@ export interface MemberRecognition {
   awardName: string;
   period: string;
   periodStart: string | null;
+  periodEnd: string | null;
   impactSummary: string;
   achievements: string[];
   domain: string;
@@ -66,6 +68,7 @@ export interface RecognitionInput {
   awardName: string;
   period: string;
   periodStart?: string | null;
+  periodEnd?: string | null;
   impactSummary: string;
   achievements: string[];
   domain?: string;

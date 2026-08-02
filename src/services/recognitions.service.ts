@@ -16,6 +16,7 @@ function toPayload(data: RecognitionInput) {
     award_name: data.awardName,
     period: data.period,
     period_start: data.periodStart || null,
+    period_end: data.periodEnd || null,
     impact_summary: data.impactSummary,
     achievements: data.achievements,
     domain: data.domain ?? "",

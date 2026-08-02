@@ -25,6 +25,47 @@ const inputCls =
 const textareaCls =
   "w-full resize-none border border-zinc-200 bg-white p-3 font-mono text-xs text-zinc-700 outline-none focus:border-zinc-950";
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+/** <input type="month"> speaks "YYYY-MM"; the API stores a real date, so both
+ *  ends are pinned to the 1st of their month. */
+const toMonthInput = (isoDate: string | null | undefined) => (isoDate ? isoDate.slice(0, 7) : "");
+const toIsoDate = (month: string) => (month ? `${month}-01` : "");
+
+/**
+ * The label a curator would have typed by hand for this range. Kept as a
+ * suggestion rather than a computed field — "Q1 2026" and "Summit 2025" are
+ * legitimate labels that no date pair can express, so the curator always wins.
+ */
+function derivePeriodLabel(fromMonth: string, toMonth: string): string {
+  if (!fromMonth) return "";
+  const [fromYear, fromM] = fromMonth.split("-").map(Number);
+  const fromName = MONTH_NAMES[fromM - 1];
+  if (!toMonth || toMonth === fromMonth) return `${fromName} ${fromYear}`;
+
+  const [toYear, toM] = toMonth.split("-").map(Number);
+  const toName = MONTH_NAMES[toM - 1];
+  if (fromYear === toYear) {
+    // A full calendar year reads better as just the year.
+    if (fromM === 1 && toM === 12) return `${fromYear}`;
+    return `${fromName.slice(0, 3)} – ${toName.slice(0, 3)} ${fromYear}`;
+  }
+  return `${fromName.slice(0, 3)} ${fromYear} – ${toName.slice(0, 3)} ${toYear}`;
+}
+
 /** Picks the honoree. Only shown when creating — a published entry is about
  *  one member, and moving it would rewrite what people already read. */
 function MemberPicker({
@@ -128,8 +169,12 @@ export function RecognitionForm({ editing }: { editing?: Recognition }) {
   const [member, setMember] = useState<CommunityMember | null>(null);
   const [category, setCategory] = useState<RecognitionCategory>(editing?.category ?? "member");
   const [awardName, setAwardName] = useState(editing?.awardName ?? "");
+  const [periodFrom, setPeriodFrom] = useState(toMonthInput(editing?.periodStart));
+  const [periodTo, setPeriodTo] = useState(toMonthInput(editing?.periodEnd));
   const [period, setPeriod] = useState(editing?.period ?? "");
-  const [periodStart, setPeriodStart] = useState(editing?.periodStart ?? "");
+  // Once a curator types their own label, the month pickers stop overwriting
+  // it. An existing entry counts as authored — its label came from somewhere.
+  const [labelEdited, setLabelEdited] = useState(Boolean(editing?.period));
   const [impactSummary, setImpactSummary] = useState(editing?.impactSummary ?? "");
   // Kept as {id, text} rather than a bare string[] so the list survives
   // duplicate wording without React reusing the wrong row.
@@ -143,12 +188,21 @@ export function RecognitionForm({ editing }: { editing?: Recognition }) {
     editing?.featuredRank != null ? String(editing.featuredRank) : ""
   );
 
+  const rangeIsBackwards = Boolean(periodTo) && Boolean(periodFrom) && periodTo < periodFrom;
+
   const isSaving = create.isPending || update.isPending;
   const canSave =
     Boolean(awardName.trim()) &&
     Boolean(period.trim()) &&
     Boolean(impactSummary.trim()) &&
+    !rangeIsBackwards &&
     (isEdit || Boolean(member));
+
+  function setMonths(from: string, to: string) {
+    setPeriodFrom(from);
+    setPeriodTo(to);
+    if (!labelEdited) setPeriod(derivePeriodLabel(from, to));
+  }
 
   function addAchievement() {
     const value = achievementDraft.trim();
@@ -165,7 +219,8 @@ export function RecognitionForm({ editing }: { editing?: Recognition }) {
       category,
       awardName: awardName.trim(),
       period: period.trim(),
-      periodStart: periodStart || null,
+      periodStart: toIsoDate(periodFrom) || null,
+      periodEnd: toIsoDate(periodTo) || null,
       impactSummary: impactSummary.trim(),
       achievements: achievements.map((entry) => entry.text),
       domain: domain.trim(),
@@ -278,26 +333,46 @@ export function RecognitionForm({ editing }: { editing?: Recognition }) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className={labelCls}>Period</Label>
+              <Label className={labelCls}>Period from</Label>
               <Input
-                value={period}
-                onChange={(e) => setPeriod(e.target.value)}
-                placeholder="January 2026"
+                type="month"
+                value={periodFrom}
+                onChange={(e) => setMonths(e.target.value, periodTo)}
                 className={inputCls}
               />
-              <p className="font-mono text-[10px] text-zinc-400">Shown on the card as written.</p>
             </div>
 
             <div className="space-y-1.5">
-              <Label className={labelCls}>Period start</Label>
+              <Label className={labelCls}>Period to</Label>
               <Input
-                type="date"
-                value={periodStart ?? ""}
-                onChange={(e) => setPeriodStart(e.target.value)}
+                type="month"
+                value={periodTo}
+                min={periodFrom || undefined}
+                onChange={(e) => setMonths(periodFrom, e.target.value)}
                 className={inputCls}
               />
               <p className="font-mono text-[10px] text-zinc-400">
-                Optional. Used for monthly reporting, never displayed.
+                {rangeIsBackwards
+                  ? "The period can't end before it starts."
+                  : "Leave blank for a single month."}
+              </p>
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label className={labelCls}>Display label</Label>
+              <Input
+                value={period}
+                onChange={(e) => {
+                  setPeriod(e.target.value);
+                  setLabelEdited(true);
+                }}
+                placeholder="January 2026"
+                className={inputCls}
+              />
+              <p className="font-mono text-[10px] text-zinc-400">
+                {labelEdited
+                  ? "Shown on the card as written. The months above still drive reporting."
+                  : "Written for you from the months above — type over it for “Q1 2026” or “Summit 2025”."}
               </p>
             </div>
 
