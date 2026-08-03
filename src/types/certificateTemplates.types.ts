@@ -1,5 +1,13 @@
 export type CertificateTemplateStatus = "draft" | "active" | "archived";
 
+/** Shared with the render route (which enforces it server-side on every
+ * render) so the upload step can reject an oversized template up front,
+ * instead of letting it save and only fail later at preview time. 4000px
+ * is well beyond any standard certificate print size (300 DPI tops out
+ * around 11-14in on a side, i.e. ~3300-4200px) -- it's a render-cost guard,
+ * not a quality ceiling. */
+export const MAX_TEMPLATE_DIMENSION = 4000;
+
 /** Kept small and explicit -- these are the only families loadGoogleFontTtf
  * (the render route) knows how to fetch. Not user-extensible via upload.
  *
