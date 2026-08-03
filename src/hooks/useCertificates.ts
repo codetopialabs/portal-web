@@ -16,9 +16,14 @@ type AdminListParams = {
 
 export const certificateKeys = {
   all: ["certificates"] as const,
+  mine: ["certificates", "mine"] as const,
   admin: (params?: AdminListParams) => ["certificates", "admin", params] as const,
   detail: (id: string) => ["certificates", "detail", id] as const,
 };
+
+export function useMyCertificates() {
+  return useQuery({ queryKey: certificateKeys.mine, queryFn: CertificatesService.mine });
+}
 
 export function useAdminCertificates(params?: AdminListParams) {
   return useQuery({

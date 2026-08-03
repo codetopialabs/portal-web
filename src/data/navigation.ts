@@ -9,6 +9,7 @@ import {
   Home,
   Key,
   LayoutDashboard,
+  LayoutTemplate,
   Library,
   Mail,
   ScrollText,
@@ -41,6 +42,12 @@ const BASE_MENU_GROUPS: NavGroup[] = [
       },
       { icon: Activity, label: "Activity", href: "/activity", activePrefix: "/activity" },
       { icon: Award, label: "Badges", href: "/badges", activePrefix: "/badges" },
+      {
+        icon: ScrollText,
+        label: "Certificates",
+        href: "/certificates",
+        activePrefix: "/certificates",
+      },
       {
         icon: UserCheck,
         label: "Mentorship",
@@ -95,6 +102,12 @@ const ADMIN_MENU_GROUP: NavGroup = {
       label: "Certificates",
       href: "/admin/certificates",
       activePrefix: "/admin/certificates",
+    },
+    {
+      icon: LayoutTemplate,
+      label: "Certificate Templates",
+      href: "/admin/certificate-templates",
+      activePrefix: "/admin/certificate-templates",
     },
     { icon: Mail, label: "Emails", href: "/admin/emails", activePrefix: "/admin/emails" },
   ],

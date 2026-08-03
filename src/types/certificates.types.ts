@@ -1,3 +1,5 @@
+import type { TemplateTextPositions } from "@/types/certificateTemplates.types";
+
 export type CertificateStatus = "pending" | "active" | "revoked";
 
 /** Free text, like Recognition's awardName -- a curator can issue a new kind
@@ -34,6 +36,11 @@ export interface Certificate {
   issuedDate: string;
   artworkUrl: string;
   status: CertificateStatus;
+  templateId: string | null;
+  templateName: string | null;
+  /** Per-recipient override of the template's own text_positions -- null
+   * means "use the template's default placement/size as-is". */
+  textPositions: TemplateTextPositions | null;
   issuedByUsername: string | null;
   publishedByUsername: string | null;
   publishedAt: string | null;
@@ -45,10 +52,16 @@ export interface Certificate {
 }
 
 /** One recipient row in a batch-issue request -- either an existing member
- * (by username) or a plain name+email for someone with no account. */
+ * (by username) or a plain name+email for someone with no account.
+ * `textPositions`, when set, overrides the batch's template placement for
+ * just this one recipient (only meaningful alongside a templateId). */
 export type CertificateRecipientInput =
-  | { username: string }
-  | { recipientName: string; recipientEmail: string };
+  | { username: string; textPositions?: TemplateTextPositions | null }
+  | {
+      recipientName: string;
+      recipientEmail: string;
+      textPositions?: TemplateTextPositions | null;
+    };
 
 export interface CertificateBatchInput {
   certificateType: CertificateType;
@@ -56,6 +69,9 @@ export interface CertificateBatchInput {
   programDetails?: string;
   issuedDate: string;
   recipients: CertificateRecipientInput[];
+  /** An active CertificateTemplate to auto-generate artwork from. Omitted
+   * entirely preserves the manual-upload flow byte-for-byte. */
+  templateId?: string;
 }
 
 export interface CertificateEditInput {
@@ -64,4 +80,24 @@ export interface CertificateEditInput {
   programDetails?: string;
   issuedDate?: string;
   artworkUrl?: string;
+  textPositions?: TemplateTextPositions | null;
+}
+
+/**
+ * What a member sees on their own "/certificates" page -- deliberately the
+ * public shape (no recipient email, no internal actor fields), since it's
+ * the exact same data anyone with the verification code could already look
+ * up publicly. Pending certificates never appear here; revoked ones do
+ * (labeled, not downloadable) rather than silently disappearing.
+ */
+export interface MyCertificate {
+  id: string;
+  verificationCode: string;
+  recipientName: string;
+  certificateType: CertificateType;
+  title: string;
+  issuedDate: string;
+  artworkUrl: string;
+  status: CertificateStatus;
+  publishedAt: string | null;
 }

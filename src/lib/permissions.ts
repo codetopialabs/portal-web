@@ -14,6 +14,7 @@ export const DESTRUCTIVE_PERMISSIONS = new Set<string>([
   "badges.delete",
   "recognitions.revoke",
   "certificates.revoke",
+  "certificate_templates.delete",
 ]);
 
 /**
@@ -50,6 +51,9 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/certificates": "certificates.view",
   "/admin/certificates/new": "certificates.create",
   "/admin/certificates/[id]/edit": "certificates.create",
+  "/admin/certificate-templates": "certificate_templates.view",
+  "/admin/certificate-templates/new": "certificate_templates.create",
+  "/admin/certificate-templates/[id]/edit": "certificate_templates.edit",
   "/reflections": "reflections.submit",
   "/reflections/submit": "reflections.submit",
   "/settings/profile": "profile.edit",
@@ -65,6 +69,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/activity": "activity.view",
   "/docs": "docs.view",
   "/badges": "authenticated",
+  "/certificates": "authenticated",
 };
 
 // Dynamic route patterns (checked separately in RouteGuard)
@@ -90,6 +95,10 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   { pattern: /^\/admin\/badges\/[^/]+\/edit$/, permission: "badges.edit" },
   { pattern: /^\/admin\/recognitions\/[^/]+\/edit$/, permission: "recognitions.create" },
   { pattern: /^\/admin\/certificates\/[^/]+\/edit$/, permission: "certificates.create" },
+  {
+    pattern: /^\/admin\/certificate-templates\/[^/]+\/edit$/,
+    permission: "certificate_templates.edit",
+  },
   { pattern: /^\/docs(\/.*)?$/, permission: "docs.view" },
 ];
 

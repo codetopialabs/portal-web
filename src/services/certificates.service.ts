@@ -5,6 +5,7 @@ import type {
   CertificateBatchInput,
   CertificateEditInput,
   CertificateStatus,
+  MyCertificate,
 } from "@/types/certificates.types";
 
 const BASE = "/certificates";
@@ -23,11 +24,16 @@ function toBatchPayload(data: CertificateBatchInput) {
     title: data.title,
     program_details: data.programDetails ?? "",
     issued_date: data.issuedDate,
-    recipients: data.recipients.map((recipient) =>
-      "username" in recipient
+    recipients: data.recipients.map((recipient) => ({
+      ...("username" in recipient
         ? { username: recipient.username }
-        : { recipient_name: recipient.recipientName, recipient_email: recipient.recipientEmail }
-    ),
+        : { recipient_name: recipient.recipientName, recipient_email: recipient.recipientEmail }),
+      // Left camelCase inside -- text_positions is on the parser's
+      // ignore_fields list so its own fontFamily/fontSizeRatio/etc keys
+      // survive untouched, same as a template's own text_positions.
+      ...(recipient.textPositions !== undefined ? { text_positions: recipient.textPositions } : {}),
+    })),
+    ...(data.templateId !== undefined ? { template_id: data.templateId } : {}),
   };
 }
 
@@ -38,10 +44,16 @@ function toEditPayload(data: CertificateEditInput) {
     ...(data.programDetails !== undefined ? { program_details: data.programDetails } : {}),
     ...(data.issuedDate !== undefined ? { issued_date: data.issuedDate } : {}),
     ...(data.artworkUrl !== undefined ? { artwork_url: data.artworkUrl } : {}),
+    ...(data.textPositions !== undefined ? { text_positions: data.textPositions } : {}),
   };
 }
 
 export const CertificatesService = {
+  async mine(): Promise<MyCertificate[]> {
+    const res = await axiosInstance.get<ApiResponse<MyCertificate[]>>(`${BASE}/me/`);
+    return res.data.data;
+  },
+
   async listForAdmin(params?: {
     status?: CertificateStatus | "";
     certificateType?: string;
@@ -100,14 +112,16 @@ export const CertificatesService = {
 
   /** Same signed-Cloudinary-upload flow as BadgesService.uploadArtwork --
    * the file goes straight to Cloudinary, only the resulting URL comes back
-   * here to be PATCHed onto the certificate. */
-  async uploadArtwork(file: File): Promise<string> {
+   * here to be PATCHed onto the certificate. Accepts a bare Blob too, since
+   * template-generated artwork comes back from the render route as one,
+   * with no filename of its own. */
+  async uploadArtwork(file: File | Blob): Promise<string> {
     const sigRes = await axiosInstance.get<ApiResponse<UploadSignature>>(
       "/auth/cloudinary-signature/?type=certificate"
     );
     const sig = sigRes.data.data;
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", file, file instanceof File ? file.name : "certificate.png");
     form.append("api_key", sig.apiKey);
     form.append("timestamp", String(sig.timestamp));
     form.append("signature", sig.signature);

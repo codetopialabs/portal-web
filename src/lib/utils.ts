@@ -34,6 +34,18 @@ export function getWallOfImpactUrl(slug: string): string {
 }
 
 /**
+ * A certificate's public verification page -- also read on the public
+ * community site rather than in the portal, same reasoning as
+ * getWallOfImpactUrl.
+ */
+export function getCertificateVerifyUrl(verificationCode: string): string {
+  const base = (
+    process.env.NEXT_PUBLIC_COMMUNITY_SITE_URL ?? "https://community.codetopia.org"
+  ).replace(/\/+$/, "");
+  return `${base}/verify?code=${encodeURIComponent(verificationCode)}`;
+}
+
+/**
  * Converts a string to title case (e.g. "FRONTEND DEVELOPER" → "Frontend Developer").
  * Always applies — any casing the user types is normalised on blur/submit.
  */
