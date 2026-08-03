@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Award, Crown, Trophy, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BadgesService } from "@/services/badges.service";
@@ -144,11 +145,14 @@ export function BadgeCelebration() {
               }`}
             >
               {award.badge.imageUrl ? (
-                <img
-                  src={award.badge.imageUrl}
-                  alt={award.badge.name}
-                  className="h-20 w-20 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.25)]"
-                />
+                <div className="relative h-20 w-20 drop-shadow-[0_0_8px_rgba(251,191,36,0.25)]">
+                  <Image
+                    src={award.badge.imageUrl}
+                    alt={award.badge.name}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
               ) : (
                 <Award className="h-12 w-12 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.25)]" />
               )}

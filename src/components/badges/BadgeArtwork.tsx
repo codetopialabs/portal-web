@@ -1,4 +1,5 @@
 import { Award } from "lucide-react";
+import Image from "next/image";
 import type { Badge } from "@/types/badges.types";
 
 export function BadgeArtwork({
@@ -17,13 +18,14 @@ export function BadgeArtwork({
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden bg-zinc-50 transition-shadow duration-300 ${shape} ${glowStyle} ${className}`}
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden bg-zinc-50 transition-shadow duration-300 ${shape} ${glowStyle} ${className}`}
     >
       {badge.imageUrl ? (
-        <img
+        <Image
           src={badge.imageUrl}
           alt={`${badge.name} badge`}
-          className="h-full w-full object-contain p-1"
+          fill
+          className="object-contain p-1"
         />
       ) : (
         <Award className="h-1/3 w-1/3 text-zinc-300" />

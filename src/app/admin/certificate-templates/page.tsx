@@ -1,6 +1,7 @@
 "use client";
 
 import { LayoutTemplate, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -61,9 +62,9 @@ function TemplateCard({ item }: { item: CertificateTemplate }) {
   return (
     <article className="border border-zinc-200 bg-white">
       <div className="flex items-center gap-4 px-5 py-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center border border-zinc-100 bg-zinc-50">
+        <div className="relative flex h-16 w-16 shrink-0 items-center justify-center border border-zinc-100 bg-zinc-50">
           {item.imageUrl ? (
-            <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+            <Image src={item.imageUrl} alt="" fill className="object-cover" />
           ) : (
             <LayoutTemplate className="h-6 w-6 text-zinc-200" />
           )}

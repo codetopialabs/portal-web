@@ -1,10 +1,10 @@
 import { ImageResponse } from "next/og";
 import { NextResponse } from "next/server";
 import { loadGoogleFontTtf } from "@/lib/og-fonts";
+import { MAX_TEMPLATE_DIMENSION } from "@/types/certificateTemplates.types";
 
 export const runtime = "nodejs";
 
-const MAX_DIMENSION = 4000;
 const ALLOWED_ALIGN = new Set(["left", "center", "right"]);
 
 interface MarkerConfig {
@@ -123,10 +123,10 @@ export async function POST(req: Request) {
     !imageUrl ||
     typeof imageWidth !== "number" ||
     imageWidth <= 0 ||
-    imageWidth > MAX_DIMENSION ||
+    imageWidth > MAX_TEMPLATE_DIMENSION ||
     typeof imageHeight !== "number" ||
     imageHeight <= 0 ||
-    imageHeight > MAX_DIMENSION ||
+    imageHeight > MAX_TEMPLATE_DIMENSION ||
     typeof name !== "string" ||
     typeof code !== "string" ||
     !markers ||

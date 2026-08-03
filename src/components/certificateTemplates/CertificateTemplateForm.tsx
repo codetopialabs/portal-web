@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle, ArrowLeft, Eye, ImagePlus, Save, Trash2, Upload } from "lucide-react";
+import NextImage from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,12 +17,13 @@ import {
 } from "@/hooks/useCertificateTemplates";
 import { usePermission } from "@/hooks/usePermission";
 import { CertificateTemplatesService } from "@/services/certificateTemplates.service";
-import type {
-  CertificateTemplate,
-  CertificateTemplateInput,
-  CertificateTemplateStatus,
-  TemplateMarker,
-  TemplateTextPositions,
+import {
+  MAX_TEMPLATE_DIMENSION,
+  type CertificateTemplate,
+  type CertificateTemplateInput,
+  type CertificateTemplateStatus,
+  type TemplateMarker,
+  type TemplateTextPositions,
 } from "@/types/certificateTemplates.types";
 
 // Deliberately long, so the true-render preview surfaces overflow before an
@@ -109,6 +111,12 @@ export function CertificateTemplateForm({ template }: { template?: CertificateTe
     setImageUploading(true);
     try {
       const { width, height } = await readImageDimensions(file);
+      if (width > MAX_TEMPLATE_DIMENSION || height > MAX_TEMPLATE_DIMENSION) {
+        toast.error(
+          `Template image must be ${MAX_TEMPLATE_DIMENSION}px or smaller on each side (this one is ${width}x${height}).`
+        );
+        return;
+      }
       const uploadedUrl = await CertificateTemplatesService.uploadImage(file);
       setImageWidth(width);
       setImageHeight(height);
@@ -432,12 +440,14 @@ export function CertificateTemplateForm({ template }: { template?: CertificateTe
                 {previewLoading ? "Rendering…" : "Render"}
               </Button>
             </div>
-            <div className="flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-zinc-100 bg-zinc-50 p-3">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-zinc-100 bg-zinc-50 p-3">
               {previewUrl ? (
-                <img
+                <NextImage
                   src={previewUrl}
                   alt="True render preview"
-                  className="h-full w-full object-contain"
+                  fill
+                  unoptimized
+                  className="object-contain"
                 />
               ) : (
                 <p className="px-4 text-center font-mono text-[10px] text-zinc-400">

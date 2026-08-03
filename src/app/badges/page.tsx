@@ -1,6 +1,7 @@
 "use client";
 
 import { Award, Check, LockKeyhole, Sparkles, Star, X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
@@ -11,7 +12,9 @@ import type { BadgeAward } from "@/types/badges.types";
 
 function BadgeImage({ award, size = "h-16 w-16" }: { award: BadgeAward; size?: string }) {
   return award.badge.imageUrl ? (
-    <img src={award.badge.imageUrl} alt={award.badge.name} className={`${size} object-contain`} />
+    <div className={`relative ${size}`}>
+      <Image src={award.badge.imageUrl} alt={award.badge.name} fill className="object-contain" />
+    </div>
   ) : (
     <Award className={`${size} p-4 text-zinc-400`} />
   );

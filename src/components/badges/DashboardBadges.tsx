@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Award, Sparkles } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMyBadges } from "@/hooks/useBadges";
@@ -68,11 +69,14 @@ export function DashboardBadges() {
 
                 <div className="relative flex h-11 w-11 shrink-0 items-center justify-center border border-zinc-200 bg-zinc-50 transition-colors group-hover:border-zinc-300 group-hover:bg-white">
                   {award.badge.imageUrl ? (
-                    <img
-                      src={award.badge.imageUrl}
-                      alt={award.badge.name}
-                      className="h-8 w-8 object-contain"
-                    />
+                    <div className="relative h-8 w-8">
+                      <Image
+                        src={award.badge.imageUrl}
+                        alt={award.badge.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
                   ) : (
                     <Award className="h-4 w-4 text-zinc-300" />
                   )}
