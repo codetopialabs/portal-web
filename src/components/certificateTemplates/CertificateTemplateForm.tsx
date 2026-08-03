@@ -18,10 +18,10 @@ import {
 import { usePermission } from "@/hooks/usePermission";
 import { CertificateTemplatesService } from "@/services/certificateTemplates.service";
 import {
-  MAX_TEMPLATE_DIMENSION,
   type CertificateTemplate,
   type CertificateTemplateInput,
   type CertificateTemplateStatus,
+  MAX_TEMPLATE_DIMENSION,
   type TemplateMarker,
   type TemplateTextPositions,
 } from "@/types/certificateTemplates.types";
