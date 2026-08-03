@@ -1,6 +1,7 @@
 "use client";
 
 import { Award, Plus, Search } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -124,13 +125,9 @@ function BadgeAdminContent() {
               >
                 <div className="flex items-start gap-4">
                   {/* Artwork */}
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center bg-zinc-50 border border-zinc-100">
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center bg-zinc-50 border border-zinc-100">
                     {badge.imageUrl ? (
-                      <img
-                        src={badge.imageUrl}
-                        alt=""
-                        className="h-full w-full object-contain p-2"
-                      />
+                      <Image src={badge.imageUrl} alt="" fill className="object-contain p-2" />
                     ) : (
                       <Award className="h-8 w-8 text-zinc-200" />
                     )}

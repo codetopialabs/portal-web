@@ -1,6 +1,7 @@
 "use client";
 
 import { Award, Crown, Trophy, Users, X } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { useMemberBadges } from "@/hooks/useBadges";
 import type { BadgeAward } from "@/types/badges.types";
@@ -41,11 +42,14 @@ function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => vo
           </button>
           <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/5">
             {award.badge.imageUrl ? (
-              <img
-                src={award.badge.imageUrl}
-                alt={award.badge.name}
-                className="h-16 w-16 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"
-              />
+              <div className="relative h-16 w-16 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+                <Image
+                  src={award.badge.imageUrl}
+                  alt={award.badge.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             ) : (
               <Award className="h-10 w-10 text-zinc-500" />
             )}
@@ -116,11 +120,14 @@ function AllBadgesGrid({
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-950">
             {award.badge.imageUrl ? (
-              <img
-                src={award.badge.imageUrl}
-                alt={award.badge.name}
-                className="h-7 w-7 object-contain"
-              />
+              <div className="relative h-7 w-7">
+                <Image
+                  src={award.badge.imageUrl}
+                  alt={award.badge.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             ) : (
               <Award className="h-5 w-5 text-zinc-500" />
             )}
@@ -172,11 +179,14 @@ export function PublicProfileBadges({ username }: { username: string }) {
                   <div className="flex justify-center bg-zinc-950 px-3 py-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5">
                       {award.badge.imageUrl ? (
-                        <img
-                          src={award.badge.imageUrl}
-                          alt={award.badge.name}
-                          className="h-10 w-10 object-contain drop-shadow-[0_0_6px_rgba(255,255,255,0.08)]"
-                        />
+                        <div className="relative h-10 w-10 drop-shadow-[0_0_6px_rgba(255,255,255,0.08)]">
+                          <Image
+                            src={award.badge.imageUrl}
+                            alt={award.badge.name}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
                       ) : (
                         <Award className="h-6 w-6 text-zinc-500" />
                       )}

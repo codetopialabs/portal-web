@@ -310,7 +310,17 @@ function ArtworkPreview({ imageUrl, pendingFile }: { imageUrl: string; pendingFi
   if (!src) {
     return <ImagePlus className="h-12 w-12 text-zinc-200" />;
   }
-  return <img src={src} alt="Badge preview" className="h-full w-full object-contain p-6" />;
+  return (
+    <div className="relative h-full w-full">
+      <NextImage
+        src={src}
+        alt="Badge preview"
+        fill
+        unoptimized={!!pendingFile}
+        className="object-contain p-6"
+      />
+    </div>
+  );
 }
 
 // ─── Manual Award Panel ────────────────────────────────────────────────────
@@ -1174,12 +1184,14 @@ export function BadgeForm({ badge }: { badge?: Badge }) {
             <p className="font-mono text-[9px] font-black uppercase tracking-widest text-zinc-500">
               Preview
             </p>
-            <div className="mx-auto mt-4 flex h-28 w-28 items-center justify-center bg-white/5">
+            <div className="relative mx-auto mt-4 flex h-28 w-28 items-center justify-center bg-white/5">
               {pendingFile || imageUrl ? (
-                <img
+                <NextImage
                   src={pendingFile ? URL.createObjectURL(pendingFile) : imageUrl}
                   alt=""
-                  className="h-full w-full object-contain p-3"
+                  fill
+                  unoptimized={!!pendingFile}
+                  className="object-contain p-3"
                 />
               ) : (
                 <ImagePlus className="h-8 w-8 text-zinc-700" />
