@@ -1,7 +1,7 @@
 "use client";
 
 import { Crosshair } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -223,7 +223,9 @@ export function MarkerCanvas({
   // component's lifetime -- means the window listeners are never torn
   // down and re-added while a drag is still in progress.
   const latestRef = useRef({ textPositions, onChange });
-  latestRef.current = { textPositions, onChange };
+  useLayoutEffect(() => {
+    latestRef.current = { textPositions, onChange };
+  });
 
   useEffect(() => {
     const el = imgWrapRef.current;
