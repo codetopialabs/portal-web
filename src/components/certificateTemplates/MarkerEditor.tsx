@@ -305,9 +305,10 @@ export function MarkerCanvas({
                   color: marker.color,
                   lineHeight: 1.2,
                   padding: 2,
+                  whiteSpace: "pre-line",
                 }}
               >
-                {previewText[key]}
+                {key === "code" ? `Verification code\n${previewText[key]}` : previewText[key]}
               </div>
 
               {/* Draggable anchor */}
