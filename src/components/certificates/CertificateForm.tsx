@@ -19,7 +19,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { MarkerCanvas, MarkerStylePanel } from "@/components/certificateTemplates/MarkerEditor";
+import { MarkerCanvas } from "@/components/certificateTemplates/MarkerEditor";
 import { MemberPicker } from "@/components/members/MemberPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -191,9 +191,11 @@ function RecipientPreviewThumbnail({
 }
 
 // ─── Per-recipient placement adjuster -- a long name and a short one don't
-// always suit the template's shared default, so this drags/styles just
-// this one recipient's markers, seeded from the template's own defaults
-// (or whatever override was already made for this row). ────────────────────
+// always suit the template's shared default, so this drags just this one
+// recipient's markers, seeded from the template's own defaults (or whatever
+// override was already made for this row). Font/style stay locked to the
+// template -- changing those means editing the template itself, not one
+// recipient's certificate. ──────────────────────────────────────────────────
 
 function RecipientPlacementAdjuster({
   template,
@@ -263,11 +265,6 @@ function RecipientPlacementAdjuster({
             selectedKey={selectedKey}
             onSelectKey={setSelectedKey}
             previewText={{ name: "Full Name", code: previewCode }}
-          />
-
-          <MarkerStylePanel
-            marker={markers[selectedKey]}
-            onChange={(marker) => onChange({ ...markers, [selectedKey]: marker })}
           />
         </div>
       )}
