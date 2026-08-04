@@ -305,7 +305,7 @@ export function MarkerCanvas({
                   padding: 2,
                 }}
               >
-                {previewText[key]}
+                {key === "code" ? `Verification code: ${previewText[key]}` : previewText[key]}
               </div>
 
               {/* Draggable anchor */}

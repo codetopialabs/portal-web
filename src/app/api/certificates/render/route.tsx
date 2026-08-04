@@ -181,7 +181,11 @@ export async function POST(req: Request) {
         alt=""
       />
       <TextLayer marker={markers.name} text={name} imageHeight={imageHeight} />
-      <TextLayer marker={markers.code} text={code} imageHeight={imageHeight} />
+      <TextLayer
+        marker={markers.code}
+        text={`Verification code: ${code}`}
+        imageHeight={imageHeight}
+      />
     </div>,
     { width: imageWidth, height: imageHeight, fonts }
   );
