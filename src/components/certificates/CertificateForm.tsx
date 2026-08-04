@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { MarkerCanvas } from "@/components/certificateTemplates/MarkerEditor";
 import { MemberPicker } from "@/components/members/MemberPicker";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -137,6 +138,7 @@ function RecipientPreviewThumbnail({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [zoomOpen, setZoomOpen] = useState(false);
 
   useEffect(() => {
     if (!name.trim()) {
@@ -175,18 +177,38 @@ function RecipientPreviewThumbnail({
   }, [template.imageUrl, template.imageWidth, template.imageHeight, markers, name, code]);
 
   return (
-    <div className="mt-2 flex h-20 w-28 shrink-0 items-center justify-center overflow-hidden border border-zinc-200 bg-zinc-50">
-      {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin text-zinc-300" />
-      ) : error ? (
-        <span className="px-1.5 text-center font-mono text-[9px] text-red-500">{error}</span>
-      ) : previewUrl ? (
-        // biome-ignore lint/performance/noImgElement: blob preview
-        <img src={previewUrl} alt="" className="h-full w-full object-contain" />
-      ) : (
-        <span className="font-mono text-[9px] text-zinc-300">Preview</span>
-      )}
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => previewUrl && setZoomOpen(true)}
+        disabled={!previewUrl}
+        title={previewUrl ? "View full preview" : undefined}
+        className="mt-2 flex h-20 w-28 shrink-0 cursor-zoom-in items-center justify-center overflow-hidden border border-zinc-200 bg-zinc-50 hover:border-zinc-400 disabled:cursor-default disabled:hover:border-zinc-200"
+      >
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-zinc-300" />
+        ) : error ? (
+          <span className="px-1.5 text-center font-mono text-[9px] text-red-500">{error}</span>
+        ) : previewUrl ? (
+          // biome-ignore lint/performance/noImgElement: blob preview
+          <img src={previewUrl} alt="" className="h-full w-full object-contain" />
+        ) : (
+          <span className="font-mono text-[9px] text-zinc-300">Preview</span>
+        )}
+      </button>
+
+      <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogTitle className="sr-only">
+            Certificate preview for {name || "recipient"}
+          </DialogTitle>
+          {previewUrl && (
+            // biome-ignore lint/performance/noImgElement: blob preview
+            <img src={previewUrl} alt="" className="w-full object-contain" />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
