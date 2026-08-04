@@ -75,6 +75,10 @@ function alignTransform(align: MarkerConfig["align"]): string {
   return `translate(${x}, -50%)`;
 }
 
+/** Satori doesn't turn a literal "\n" inside a text node into a line break,
+ * so an explicitly multi-line marker (e.g. a label above a code) is split
+ * here and rendered as one full-width flex row per line -- each row keeps
+ * the same width/align/wrap behavior a single-line marker always had. */
 function TextLayer({
   marker,
   text,
@@ -84,18 +88,18 @@ function TextLayer({
   text: string;
   imageHeight: number;
 }) {
+  const justifyContent =
+    marker.align === "left" ? "flex-start" : marker.align === "right" ? "flex-end" : "center";
   return (
     <div
       style={{
         position: "absolute",
         display: "flex",
+        flexDirection: "column",
         left: `${marker.x * 100}%`,
         top: `${marker.y * 100}%`,
         width: `${marker.maxWidthRatio * 100}%`,
         transform: alignTransform(marker.align),
-        justifyContent:
-          marker.align === "left" ? "flex-start" : marker.align === "right" ? "flex-end" : "center",
-        textAlign: marker.align,
         fontFamily: marker.fontFamily,
         fontWeight: marker.fontWeight,
         fontSize: marker.fontSizeRatio * imageHeight,
@@ -103,7 +107,12 @@ function TextLayer({
         lineHeight: 1.2,
       }}
     >
-      {text}
+      {text.split("\n").map((line, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: lines are a static split of one render's text, never reordered
+        <div key={i} style={{ display: "flex", justifyContent, textAlign: marker.align }}>
+          {line}
+        </div>
+      ))}
     </div>
   );
 }
@@ -181,7 +190,11 @@ export async function POST(req: Request) {
         alt=""
       />
       <TextLayer marker={markers.name} text={name} imageHeight={imageHeight} />
-      <TextLayer marker={markers.code} text={code} imageHeight={imageHeight} />
+      <TextLayer
+        marker={markers.code}
+        text={`Verification code\n${code}`}
+        imageHeight={imageHeight}
+      />
     </div>,
     { width: imageWidth, height: imageHeight, fonts }
   );
