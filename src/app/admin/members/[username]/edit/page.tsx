@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMember, useUpdateAdminMember } from "@/hooks/useAdmin";
 import { getAvatarUrl } from "@/lib/utils";
@@ -123,7 +124,7 @@ function MemberEditFields({
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-text-secondary">
                 <span className="flex min-w-0 items-center gap-2">
                   <Mail className="h-3.5 w-3.5 shrink-0 text-icon-muted" />
-                  <span className="break-all">{member.email}</span>
+                  <SensitiveText value={member.email} kind="email" className="break-all" />
                 </span>
                 <span className="flex items-center gap-2">
                   <Shield className="h-3.5 w-3.5 text-icon-muted" />
