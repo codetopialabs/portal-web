@@ -5,8 +5,13 @@ import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+
+/** Long enough that crossing the icon on the way somewhere else doesn't open it. */
+const HOVER_OPEN_DELAY = 400;
+/** Short grace period so the pointer can travel from the icon into the panel. */
+const HOVER_CLOSE_DELAY = 150;
 
 export interface FieldHintContent {
   /** Field name, repeated as the popover heading. */
@@ -20,9 +25,13 @@ export interface FieldHintContent {
 }
 
 /**
- * "?" affordance next to a field label. Opens on hover for mouse users and on
- * tap/Enter for everyone else — Radix tooltips never open on touch, so this is
- * a popover with hover behaviour bolted on rather than a plain tooltip.
+ * "?" affordance next to a field label. Hovering with intent peeks at the hint;
+ * clicking pins it open so a long one can be read without holding the mouse
+ * still. Pinned hints close on a second click, Escape, or a click elsewhere.
+ *
+ * The button is an anchor rather than a Radix trigger because the trigger's
+ * built-in click-to-toggle fights the hover state: hover opens, then the click
+ * meant to pin reads as a close.
  */
 export function FieldHint({
   hint,
@@ -36,72 +45,99 @@ export function FieldHint({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
     () => () => {
+      if (openTimer.current) clearTimeout(openTimer.current);
       if (closeTimer.current) clearTimeout(closeTimer.current);
     },
     []
   );
 
-  function clearTimer() {
+  function clearTimers() {
+    if (openTimer.current) {
+      clearTimeout(openTimer.current);
+      openTimer.current = null;
+    }
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
   }
 
-  function openNow() {
-    clearTimer();
-    setOpen(true);
-  }
-
-  // Small grace period so the pointer can travel from the icon into the popover.
-  function closeSoon() {
-    clearTimer();
-    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  function close() {
+    clearTimers();
+    setPinned(false);
+    setOpen(false);
   }
 
   function handlePointerEnter(e: React.PointerEvent) {
-    if (e.pointerType === "mouse") openNow();
+    if (e.pointerType !== "mouse" || pinned) return;
+    clearTimers();
+    openTimer.current = setTimeout(() => setOpen(true), HOVER_OPEN_DELAY);
   }
 
   function handlePointerLeave(e: React.PointerEvent) {
-    if (e.pointerType === "mouse") closeSoon();
+    if (e.pointerType !== "mouse" || pinned) return;
+    clearTimers();
+    closeTimer.current = setTimeout(() => setOpen(false), HOVER_CLOSE_DELAY);
+  }
+
+  // Keeps the hint up while the pointer is inside the panel itself.
+  function handleContentEnter(e: React.PointerEvent) {
+    if (e.pointerType !== "mouse" || pinned) return;
+    clearTimers();
+  }
+
+  function handleClick() {
+    clearTimers();
+    if (pinned) {
+      close();
+      return;
+    }
+    setPinned(true);
+    setOpen(true);
   }
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={(next) => {
-        clearTimer();
-        setOpen(next);
-      }}
-    >
-      <PopoverTrigger asChild>
+    <Popover open={open} onOpenChange={(next) => !next && close()}>
+      <PopoverAnchor asChild>
         <button
+          ref={buttonRef}
           type="button"
+          aria-expanded={open}
           aria-label={`Why we ask for ${hint.title.toLowerCase()}`}
+          onClick={handleClick}
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
-          onFocus={openNow}
-          onBlur={closeSoon}
+          onFocus={() => setOpen(true)}
+          onBlur={() => !pinned && close()}
           className={cn(
-            "inline-flex h-4 w-4 shrink-0 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-900 focus-visible:text-zinc-900 focus-visible:outline-none data-[state=open]:text-zinc-900",
+            "inline-flex h-4 w-4 shrink-0 items-center justify-center transition-colors focus-visible:text-zinc-900 focus-visible:outline-none",
+            open ? "text-zinc-900" : "text-zinc-300 hover:text-zinc-500",
             className
           )}
         >
           <CircleQuestionMark className="h-3.5 w-3.5" />
         </button>
-      </PopoverTrigger>
+      </PopoverAnchor>
       <PopoverContent
         side={side}
         align={align}
         sideOffset={6}
         collisionPadding={12}
         onOpenAutoFocus={(e) => e.preventDefault()}
-        onPointerEnter={openNow}
+        // The button is an anchor, not a trigger, so Radix counts a click on it
+        // as "outside". Without this the close fires before handleClick, and a
+        // pinned hint reopens instead of closing.
+        onPointerDownOutside={(e) => {
+          if (buttonRef.current?.contains(e.target as Node)) e.preventDefault();
+        }}
+        onPointerEnter={handleContentEnter}
         onPointerLeave={handlePointerLeave}
         className="w-72 gap-0 rounded-none border border-zinc-200 bg-white p-0 shadow-md ring-0"
       >
