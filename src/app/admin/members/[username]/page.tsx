@@ -71,13 +71,14 @@ import {
   useUnflagMember,
 } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
+import { composeFlagReason, FLAG_REASON_GROUPS } from "@/lib/flag-reasons";
 import {
   DISCIPLINES,
   EXPERIENCE_LEVELS,
   labelForOption,
   MEMBER_STATUSES,
 } from "@/lib/profile-options";
-import { getAvatarUrl } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 type DangerAction =
   | { type: "revoke-role"; roleName: string }
@@ -378,7 +379,9 @@ function MemberDetailContent({ username }: { username: string }) {
   const [dangerAction, setDangerAction] = useState<DangerAction | null>(null);
   const [confirmationInput, setConfirmationInput] = useState("");
   const [flagDialogOpen, setFlagDialogOpen] = useState(false);
-  const [flagReason, setFlagReason] = useState("");
+  const [flagReasonIds, setFlagReasonIds] = useState<string[]>([]);
+  const [customFlagChecked, setCustomFlagChecked] = useState(false);
+  const [customFlagReason, setCustomFlagReason] = useState("");
   const [unflagDialogOpen, setUnflagDialogOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
 
@@ -579,15 +582,30 @@ function MemberDetailContent({ username }: { username: string }) {
     });
   }
 
+  // Also what gets stored on the flag and shown in the portal, so the admin is
+  // previewing the real thing rather than an approximation of it.
+  const flagPreview = composeFlagReason(flagReasonIds, customFlagChecked ? customFlagReason : "");
+
+  function resetFlagDialog() {
+    setFlagDialogOpen(false);
+    setFlagReasonIds([]);
+    setCustomFlagChecked(false);
+    setCustomFlagReason("");
+  }
+
+  function toggleFlagReason(id: string) {
+    setFlagReasonIds((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
+  }
+
   function handleFlag() {
-    if (!member || !flagReason.trim()) return;
+    const reason = composeFlagReason(flagReasonIds, customFlagChecked ? customFlagReason : "");
+    if (!member || !reason) return;
     flagMember(
-      { id: member.id, reason: flagReason.trim() },
+      { id: member.id, reason },
       {
         onSuccess: () => {
           toast.success("Account flagged.");
-          setFlagDialogOpen(false);
-          setFlagReason("");
+          resetFlagDialog();
         },
       }
     );
@@ -1382,38 +1400,112 @@ function MemberDetailContent({ username }: { username: string }) {
       </Dialog>
 
       {/* Flag dialog */}
-      <Dialog open={flagDialogOpen} onOpenChange={setFlagDialogOpen}>
-        <DialogContent className="max-w-md rounded-none border-grey-900 bg-white">
+      <Dialog
+        open={flagDialogOpen}
+        onOpenChange={(open) => (open ? setFlagDialogOpen(true) : resetFlagDialog())}
+      >
+        <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto rounded-none border-grey-900 bg-white">
           <DialogHeader>
             <DialogTitle className="font-sans text-xl font-bold text-red-700">
               Flag account
             </DialogTitle>
             <DialogDescription className="pt-2 font-mono text-xs leading-6 text-text-secondary">
-              The member will see this reason and be prompted to fix their profile. Admins will be
-              notified when they update their profile.
+              Tick everything this member needs to fix. They're emailed the list and prompted to
+              update their profile; admins are notified once they do.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <label htmlFor="flag-reason" className="font-mono text-xs font-medium text-text-muted">
-              Reason
-            </label>
-            <textarea
-              id="flag-reason"
-              value={flagReason}
-              onChange={(e) => setFlagReason(e.target.value)}
-              placeholder="e.g. Profile picture does not appear professional. Please upload a clear headshot."
-              rows={4}
-              className="w-full resize-none border border-grey-300 bg-white px-3 py-2.5 font-mono text-sm text-text-primary placeholder:text-text-muted focus:border-grey-900 focus:outline-none"
-            />
+
+          <div className="space-y-5">
+            {FLAG_REASON_GROUPS.map((group) => (
+              <fieldset key={group.title} className="space-y-1.5">
+                <legend className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                  {group.title}
+                </legend>
+                {group.reasons.map((reason) => {
+                  const checked = flagReasonIds.includes(reason.id);
+                  return (
+                    <label
+                      key={reason.id}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-2.5 border px-3 py-2 transition-colors",
+                        checked
+                          ? "border-red-300 bg-red-50/60"
+                          : "border-transparent hover:bg-grey-50"
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleFlagReason(reason.id)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded-none border-grey-300 text-red-600 focus:ring-0"
+                      />
+                      <span className="min-w-0">
+                        <span className="block font-mono text-xs font-bold text-text-primary">
+                          {reason.label}
+                        </span>
+                        <span className="mt-0.5 block font-mono text-[11px] leading-5 text-text-muted">
+                          {reason.message}
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </fieldset>
+            ))}
+
+            {/* Custom reason */}
+            <fieldset className="space-y-1.5">
+              <legend className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                Something else
+              </legend>
+              <label
+                className={cn(
+                  "flex cursor-pointer items-start gap-2.5 border px-3 py-2 transition-colors",
+                  customFlagChecked
+                    ? "border-red-300 bg-red-50/60"
+                    : "border-transparent hover:bg-grey-50"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={customFlagChecked}
+                  onChange={(e) => setCustomFlagChecked(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded-none border-grey-300 text-red-600 focus:ring-0"
+                />
+                <span className="block font-mono text-xs font-bold text-text-primary">
+                  Add a custom reason
+                </span>
+              </label>
+              {customFlagChecked && (
+                <textarea
+                  id="flag-custom-reason"
+                  autoFocus
+                  value={customFlagReason}
+                  onChange={(e) => setCustomFlagReason(e.target.value)}
+                  placeholder="Written to the member exactly as typed — e.g. Your cover image is a screenshot of someone else's work."
+                  rows={3}
+                  className="w-full resize-none border border-grey-300 bg-white px-3 py-2.5 font-mono text-sm text-text-primary placeholder:text-text-muted focus:border-grey-900 focus:outline-none"
+                />
+              )}
+            </fieldset>
+
+            {flagPreview && (
+              <div className="border border-grey-200 bg-grey-50 p-3">
+                <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-text-muted">
+                  What we email them
+                </p>
+                <p className="whitespace-pre-wrap font-mono text-[11px] leading-5 text-text-secondary">
+                  {flagPreview}
+                </p>
+              </div>
+            )}
           </div>
+
           <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                setFlagDialogOpen(false);
-                setFlagReason("");
-              }}
+              onClick={resetFlagDialog}
               className="h-10 rounded-none font-mono text-xs font-bold"
             >
               Cancel
@@ -1421,7 +1513,7 @@ function MemberDetailContent({ username }: { username: string }) {
             <button
               type="button"
               onClick={handleFlag}
-              disabled={!flagReason.trim() || isFlagging}
+              disabled={!flagPreview || isFlagging}
               className="h-10 border border-red-600 bg-red-600 px-4 font-mono text-xs font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
             >
               {isFlagging ? "Flagging..." : "Flag account"}

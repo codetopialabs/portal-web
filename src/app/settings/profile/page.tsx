@@ -20,6 +20,7 @@ import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
+import { FlaggedProfileChecklist } from "@/components/profile/FlaggedProfileChecklist";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
 import { FieldHint, type FieldHintContent, FieldLabel } from "@/components/ui/field-hint";
@@ -474,6 +475,8 @@ export default function SettingsProfilePage() {
       onSubmit={handleSubmit(onSubmit)}
       className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start"
     >
+      <FlaggedProfileChecklist className="lg:col-span-3" />
+
       {/* LEFT — avatar */}
       <div id="settings-profile-media" className="space-y-6">
         {/* Cover image */}
