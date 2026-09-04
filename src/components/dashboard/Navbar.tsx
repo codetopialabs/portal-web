@@ -1,12 +1,14 @@
 "use client";
 
-import { ArrowRight, ChevronRight, HelpCircle, Home, LogOut } from "lucide-react";
+import { ArrowRight, ChevronRight, Eye, EyeOff, HelpCircle, Home, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useLogoutMutation } from "@/hooks/useAuthMutations";
 import { getAvatarUrl } from "@/lib/utils";
+import { usePrivacyStore } from "@/store/privacy.store";
 import { useUserStore } from "@/store/user.store";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -176,8 +178,10 @@ function ProfileDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  const revealSensitive = usePrivacyStore((s) => s.revealSensitive);
+  const toggleRevealSensitive = usePrivacyStore((s) => s.toggleRevealSensitive);
+
   const name = profile?.fullName ?? "—";
-  const email = profile?.email ?? "—";
   const avatarUrl = profile?.profilePictureUrl;
 
   return (
@@ -199,9 +203,26 @@ function ProfileDropdown() {
         <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-zinc-200 shadow-lg z-50">
           <div className="px-4 py-3 border-b border-zinc-100">
             <p className="font-mono font-bold text-sm text-zinc-900 truncate">{name}</p>
-            <p className="font-mono text-xs text-zinc-400 truncate mt-0.5">{email}</p>
+            <SensitiveText
+              value={profile?.email}
+              kind="email"
+              className="font-mono text-xs text-zinc-400 truncate mt-0.5 block max-w-full"
+            />
           </div>
           <div className="py-1">
+            <button
+              type="button"
+              onClick={() => toggleRevealSensitive()}
+              className="w-full flex items-center gap-3 px-4 py-2.5 font-mono text-sm text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+              title="Hides IP addresses and email addresses across the portal, so a screen share doesn't expose them."
+            >
+              {revealSensitive ? (
+                <EyeOff className="w-3.5 h-3.5 shrink-0" />
+              ) : (
+                <Eye className="w-3.5 h-3.5 shrink-0" />
+              )}
+              {revealSensitive ? "Hide sensitive info" : "Show sensitive info"}
+            </button>
             <button
               type="button"
               onClick={() => {

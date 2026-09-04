@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { PROFILE_FIELD_HINTS } from "@/lib/profile-field-hints";
 import {
@@ -570,7 +571,12 @@ export default function SettingsProfilePage() {
               </p>
               <FieldHint hint={PROFILE_FIELD_HINTS.avatar} side="bottom" align="center" />
             </div>
-            <p className="font-mono text-xs text-zinc-500 mt-0.5">{profile?.email ?? ""}</p>
+            <SensitiveText
+              value={profile?.email}
+              kind="email"
+              fallback=""
+              className="font-mono text-xs text-zinc-500 mt-0.5"
+            />
           </div>
           <button
             type="button"

@@ -19,6 +19,7 @@ import Link from "next/link";
 import React from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { DashboardShell } from "@/components/dashboard/Shell";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { useAdminActivity } from "@/hooks/useAdmin";
 import { useMe } from "@/hooks/useMe";
 import { usePermission } from "@/hooks/usePermission";
@@ -389,7 +390,7 @@ function ActivityPageContent() {
                       {entry.deviceName && entry.ipAddress && (
                         <span className="text-zinc-200">·</span>
                       )}
-                      {entry.ipAddress && <span>{entry.ipAddress}</span>}
+                      {entry.ipAddress && <SensitiveText value={entry.ipAddress} kind="ip" />}
                     </div>
                   </div>
                 </div>
