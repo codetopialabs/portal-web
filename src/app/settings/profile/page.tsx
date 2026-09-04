@@ -22,6 +22,7 @@ import { FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { toast } from "sonner";
 import { formatRoleLabel } from "@/components/profile/utils";
 import { Button } from "@/components/ui/button";
+import { FieldHint, type FieldHintContent, FieldLabel } from "@/components/ui/field-hint";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NationalitySelect } from "@/components/ui/nationality-select";
@@ -33,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
+import { PROFILE_FIELD_HINTS } from "@/lib/profile-field-hints";
 import {
   COMMUNITY_GOALS,
   DISCIPLINES,
@@ -147,13 +149,22 @@ interface ProfileFormValues {
   member_status: string;
 }
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+function SectionHeader({
+  icon: Icon,
+  title,
+  hint,
+}: {
+  icon: React.ElementType;
+  title: string;
+  hint?: FieldHintContent;
+}) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-7 h-7 bg-black text-white flex items-center justify-center shrink-0">
         <Icon className="w-3.5 h-3.5" />
       </div>
       <h2 className="font-sans text-xl font-bold text-zinc-900">{title}</h2>
+      {hint && <FieldHint hint={hint} side="right" align="center" />}
     </div>
   );
 }
@@ -514,6 +525,10 @@ export default function SettingsProfilePage() {
               </>
             )}
           </button>
+          <div className="flex items-center justify-center gap-1.5 border-t border-zinc-100 py-2">
+            <span className="font-mono text-[10px] text-zinc-400">What is this?</span>
+            <FieldHint hint={PROFILE_FIELD_HINTS.coverImage} side="bottom" align="center" />
+          </div>
         </div>
         <div className="bg-white border border-zinc-200 p-6 flex flex-col items-center gap-4">
           <input
@@ -549,7 +564,12 @@ export default function SettingsProfilePage() {
             </div>
           </button>
           <div className="text-center">
-            <p className="font-sans text-lg font-bold text-zinc-900">{profile?.fullName ?? "—"}</p>
+            <div className="flex items-center justify-center gap-1.5">
+              <p className="font-sans text-lg font-bold text-zinc-900">
+                {profile?.fullName ?? "—"}
+              </p>
+              <FieldHint hint={PROFILE_FIELD_HINTS.avatar} side="bottom" align="center" />
+            </div>
             <p className="font-mono text-xs text-zinc-500 mt-0.5">{profile?.email ?? ""}</p>
           </div>
           <button
@@ -585,15 +605,23 @@ export default function SettingsProfilePage() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <Label htmlFor="full-name" className={labelStyles}>
+                <FieldLabel
+                  htmlFor="full-name"
+                  className={labelStyles}
+                  hint={PROFILE_FIELD_HINTS.fullName}
+                >
                   Display Name
-                </Label>
+                </FieldLabel>
                 <Input id="full-name" className={inputStyles} {...register("full_name")} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="username" className={labelStyles}>
+                <FieldLabel
+                  htmlFor="username"
+                  className={labelStyles}
+                  hint={PROFILE_FIELD_HINTS.username}
+                >
                   Username
-                </Label>
+                </FieldLabel>
                 {(() => {
                   const lastChanged = profile?.usernameLastChanged
                     ? new Date(profile.usernameLastChanged)
@@ -655,9 +683,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location" className={labelStyles}>
+              <FieldLabel
+                htmlFor="location"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.location}
+              >
                 Location
-              </Label>
+              </FieldLabel>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
                 <Input
@@ -670,9 +702,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="current-role" className={labelStyles}>
+              <FieldLabel
+                htmlFor="current-role"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.currentRole}
+              >
                 Job Title / Occupation
-              </Label>
+              </FieldLabel>
               <Input
                 id="current-role"
                 placeholder="e.g. Frontend Developer, CS student, Freelance designer"
@@ -707,12 +743,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="primary-role" className={labelStyles}>
+              <FieldLabel
+                htmlFor="primary-role"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.primaryRole}
+              >
                 Primary Community Role
-              </Label>
-              <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
-                Identify yourself with one of your assigned roles to the community.
-              </p>
+              </FieldLabel>
               <Controller
                 control={control}
                 name="primary_role"
@@ -752,13 +789,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="date-of-birth" className={labelStyles}>
+              <FieldLabel
+                htmlFor="date-of-birth"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.dateOfBirth}
+              >
                 Birthday
-              </Label>
-              <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">
-                Used to celebrate your birthday with the community. Your birth year is never shared
-                publicly.
-              </p>
+              </FieldLabel>
               <Input
                 id="date-of-birth"
                 type="date"
@@ -773,9 +810,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="gender" className={labelStyles}>
+              <FieldLabel
+                htmlFor="gender"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.gender}
+              >
                 Gender *
-              </Label>
+              </FieldLabel>
               <Controller
                 name="gender"
                 control={control}
@@ -823,9 +864,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nationality" className={labelStyles}>
+              <FieldLabel
+                htmlFor="nationality"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.nationality}
+              >
                 Country
-              </Label>
+              </FieldLabel>
               <Controller
                 name="nationality"
                 control={control}
@@ -840,9 +885,9 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio" className={labelStyles}>
+              <FieldLabel htmlFor="bio" className={labelStyles} hint={PROFILE_FIELD_HINTS.bio}>
                 Bio
-              </Label>
+              </FieldLabel>
               <textarea
                 id="bio"
                 placeholder="Tell the community who you are..."
@@ -864,9 +909,13 @@ export default function SettingsProfilePage() {
           <SectionHeader icon={Briefcase} title="Background" />
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="discipline" className={labelStyles}>
+              <FieldLabel
+                htmlFor="discipline"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.discipline}
+              >
                 Primary Discipline
-              </Label>
+              </FieldLabel>
               <Controller
                 control={control}
                 name="discipline"
@@ -887,9 +936,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="experience-level" className={labelStyles}>
+              <FieldLabel
+                htmlFor="experience-level"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.experienceLevel}
+              >
                 Experience Level
-              </Label>
+              </FieldLabel>
               <Controller
                 control={control}
                 name="experience_level"
@@ -920,9 +973,13 @@ export default function SettingsProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="member-status" className={labelStyles}>
+              <FieldLabel
+                htmlFor="member-status"
+                className={labelStyles}
+                hint={PROFILE_FIELD_HINTS.memberStatus}
+              >
                 Current Status
-              </Label>
+              </FieldLabel>
               <Controller
                 control={control}
                 name="member_status"
@@ -951,7 +1008,9 @@ export default function SettingsProfilePage() {
           <SectionHeader icon={Target} title="Goals" />
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label className={labelStyles}>What Do You Want From This Community?</Label>
+              <FieldLabel className={labelStyles} hint={PROFILE_FIELD_HINTS.communityGoals}>
+                What Do You Want From This Community?
+              </FieldLabel>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {COMMUNITY_GOALS.map((goal) => {
                   const checked = communityGoals.includes(goal.value);
@@ -992,7 +1051,7 @@ export default function SettingsProfilePage() {
 
         {/* Social Links */}
         <section id="settings-social-links" className="space-y-6">
-          <SectionHeader icon={Globe} title="Social Links" />
+          <SectionHeader icon={Globe} title="Social Links" hint={PROFILE_FIELD_HINTS.socialLinks} />
           <div className="bg-white border border-zinc-200 divide-y divide-zinc-100">
             <div className="flex items-center gap-3 px-4">
               <FaGithub className="w-4 h-4 shrink-0" style={{ color: "#181717" }} />
@@ -1096,7 +1155,7 @@ export default function SettingsProfilePage() {
 
         {/* Skills */}
         <section id="settings-skills" className="space-y-6">
-          <SectionHeader icon={Cpu} title="Skills" />
+          <SectionHeader icon={Cpu} title="Skills" hint={PROFILE_FIELD_HINTS.skills} />
           <div className="flex flex-wrap gap-2">
             {skills.map((skill) => (
               <span
