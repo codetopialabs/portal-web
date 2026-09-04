@@ -43,6 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import {
   Sheet,
   SheetContent,
@@ -668,7 +669,7 @@ function MemberDetailContent({ username }: { username: string }) {
               <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-xs text-text-secondary">
                 <span className="flex min-w-0 items-center gap-1.5">
                   <Mail className="h-3.5 w-3.5 shrink-0 text-icon-muted" />
-                  <span className="break-all">{member.email}</span>
+                  <SensitiveText value={member.email} kind="email" className="break-all" />
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Shield className="h-3.5 w-3.5 shrink-0 text-icon-muted" />
@@ -1048,8 +1049,12 @@ function MemberDetailContent({ username }: { username: string }) {
                             {session.deviceName}
                           </p>
                           <p className="mt-1 font-mono text-xs text-text-muted">
-                            {session.ipAddress || "Unknown IP"} · Started{" "}
-                            {formatDate(session.createdAt)}
+                            <SensitiveText
+                              value={session.ipAddress}
+                              kind="ip"
+                              fallback="Unknown IP"
+                            />{" "}
+                            · Started {formatDate(session.createdAt)}
                           </p>
                         </div>
                         {canRevokeSessions && (

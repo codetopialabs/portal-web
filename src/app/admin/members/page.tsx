@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMembers } from "@/hooks/useAdmin";
 import { usePermission } from "@/hooks/usePermission";
@@ -376,7 +377,7 @@ function MembersPageContent() {
                     </Link>
                     <div className="mt-0.5 flex items-center gap-1.5 font-mono text-[11px] text-text-tertiary">
                       <Mail className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{member.email}</span>
+                      <SensitiveText value={member.email} kind="email" className="truncate" />
                     </div>
                     <div className="mt-0.5 font-mono text-[10px] text-text-muted">
                       @{member.username} · {member.communityId}

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { AuthService, SessionService, type UserSession } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { useUserStore } from "@/store/user.store";
@@ -337,7 +338,7 @@ function ActiveSessionsSection() {
                       )}
                     </div>
                     <p className="font-mono text-xs text-zinc-400 mt-0.5">
-                      {session.ipAddress ?? "Unknown IP"} ·{" "}
+                      <SensitiveText value={session.ipAddress} kind="ip" fallback="Unknown IP" /> ·{" "}
                       {formatSessionAgeLabel(session.createdAt, session.lastSeenAt)} · Signed in{" "}
                       {timeAgo(session.createdAt)}
                     </p>

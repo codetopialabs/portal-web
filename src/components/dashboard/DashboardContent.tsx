@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { DashboardBadges } from "@/components/badges/DashboardBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
 import { ProfileCompletionCarousel } from "@/components/dashboard/ProfileCompletionCarousel";
+import { SensitiveText } from "@/components/ui/sensitive-text";
 import { DASHBOARD_MODULES, DASHBOARD_NEXT_ACTIONS } from "@/data/dashboard";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { getAvatarUrl, getCoverUrl } from "@/lib/utils";
@@ -356,7 +357,11 @@ export function DashboardContent() {
                 </div>
                 <div className="flex items-center justify-between gap-4 border-b border-zinc-100 pb-3">
                   <span className="text-zinc-500">IP address</span>
-                  <span className="font-medium text-zinc-950">{lastSession.ipAddress}</span>
+                  <SensitiveText
+                    value={lastSession.ipAddress}
+                    kind="ip"
+                    className="font-medium text-zinc-950"
+                  />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-zinc-500">Created</span>
