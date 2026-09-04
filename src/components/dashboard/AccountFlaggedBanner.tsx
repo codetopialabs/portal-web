@@ -3,6 +3,7 @@
 import { AlertTriangle, Clock } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useMe } from "@/hooks/useMe";
+import { parseFlagReason } from "@/lib/flag-reasons";
 import { SystemBanner } from "./Navbar";
 
 export function AccountFlaggedBanner() {
@@ -25,12 +26,20 @@ export function AccountFlaggedBanner() {
     );
   }
 
+  // A flag can list several things to fix; the banner is one line, so it
+  // summarises and the full checklist lives on the profile settings page.
+  const items = parseFlagReason(profile.activeFlag.reason);
+  const body =
+    items.length > 1
+      ? `${items.length} things to fix — ${items[0]}`
+      : `Reason: ${items[0] ?? profile.activeFlag.reason}`;
+
   return (
     <SystemBanner
       variant="alert"
       icon={AlertTriangle}
       label="Your account has been flagged for review."
-      body={`Reason: ${profile.activeFlag.reason}`}
+      body={body}
       ctaLabel="Fix & submit"
       ctaHref="/settings/profile"
     />
