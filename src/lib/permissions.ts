@@ -42,6 +42,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/github-repos": "github_repos.manage",
   "/admin/teams": "admin.panel.access",
   "/admin/teams/[teamSlug]": "admin.panel.access",
+  "/admin/departments": "admin.panel.access",
   "/admin/badges": "badges.view",
   "/admin/badges/new": "badges.create",
   "/admin/badges/[slug]/edit": "badges.edit",

@@ -9,12 +9,25 @@ export interface TeamMemberPreview {
   profilePictureUrl: string | null;
 }
 
+/** The department a team sits under, as embedded on the team. */
+export interface TeamDepartment {
+  id: string;
+  slug: string;
+  name: string;
+}
+
 export interface Team {
   id: string;
   slug: string;
   name: string;
   description: string | null;
   isPrivate: boolean;
+  /** Admin-assigned grouping. Null until an admin picks one. */
+  department: TeamDepartment | null;
+  /** "What counts as a contribution here", one line, lead-editable. */
+  whatCounts: string;
+  /** Link to the team's "How this team works" page. Admin-set. */
+  handbookUrl: string;
   createdAt: string;
   memberCount?: number;
   membersPreview?: TeamMemberPreview[];
@@ -211,6 +224,15 @@ export interface UpdateTeamInput {
   name?: string;
   description?: string;
   isPrivate?: boolean;
+  whatCounts?: string;
+}
+
+/** Admin-only fields on top of UpdateTeamInput. `department` is the
+ * department ID, or null to unassign. */
+export interface AdminUpdateTeamInput extends UpdateTeamInput {
+  department?: string | null;
+  handbookUrl?: string;
+  discordRoleIds?: string[];
 }
 
 export interface CreateReviewInput {
@@ -341,7 +363,23 @@ export const TeamsService = {
       name: data.name,
       description: data.description,
       is_private: data.isPrivate,
+      what_counts: data.whatCounts,
     });
+    return res.data.data;
+  },
+
+  /** Admin-only: set department, handbook link and Discord roles on any
+   * team, alongside the ordinary fields. */
+  async adminUpdateTeam(teamSlug: string, data: AdminUpdateTeamInput): Promise<Team> {
+    const payload: Record<string, unknown> = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.description !== undefined) payload.description = data.description;
+    if (data.isPrivate !== undefined) payload.is_private = data.isPrivate;
+    if (data.whatCounts !== undefined) payload.what_counts = data.whatCounts;
+    if (data.department !== undefined) payload.department = data.department;
+    if (data.handbookUrl !== undefined) payload.handbook_url = data.handbookUrl;
+    if (data.discordRoleIds !== undefined) payload.discord_role_ids = data.discordRoleIds;
+    const res = await axiosInstance.patch<ApiResponse<Team>>(`/admin/teams/${teamSlug}/`, payload);
     return res.data.data;
   },
 
