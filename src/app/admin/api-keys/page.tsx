@@ -7,12 +7,13 @@ import {
   Eye,
   EyeOff,
   KeyRound,
+  Pencil,
   Plus,
   Search,
   ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -37,7 +38,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePermissionList } from "@/hooks/useAdmin";
-import { useApiKeys, useCreateApiKey, useRevokeApiKey } from "@/hooks/useApiKeys";
+import { useApiKeys, useCreateApiKey, useRevokeApiKey, useUpdateApiKey } from "@/hooks/useApiKeys";
 import { usePermission } from "@/hooks/usePermission";
 import { buildPermissionVocab, compressScopes } from "@/lib/scopes";
 import type { ApiKey, CreatedApiKey } from "@/types/api-keys.types";
@@ -68,23 +69,46 @@ function KeyStatusBadge({ apiKey }: { apiKey: ApiKey }) {
   );
 }
 
-// ─── Create sheet (AWS IAM-style: details + grouped, searchable scopes) ─────────
+// ─── Create / edit sheet (AWS IAM-style: details + grouped, searchable scopes) ──
+// The same sheet creates a key or edits a live one. Editing changes the
+// name and scopes in place; the secret never changes, so whatever system
+// holds the key keeps working without a redeploy.
 
-function CreateKeySheet({
+function KeySheet({
   open,
   onOpenChange,
   onCreated,
+  editing,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: (key: CreatedApiKey) => void;
+  /** When set, the sheet edits this key instead of creating one. */
+  editing?: ApiKey | null;
 }) {
   const { data: permissions } = usePermissionList();
-  const { mutate: createKey, isPending } = useCreateApiKey();
+  const { mutate: createKey, isPending: isCreating } = useCreateApiKey();
+  const { mutate: updateKey, isPending: isUpdating } = useUpdateApiKey();
+  const isPending = isCreating || isUpdating;
 
   const [name, setName] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [scopeSearch, setScopeSearch] = useState("");
+
+  // Prefill from the key being edited each time the sheet opens.
+  useEffect(() => {
+    if (open) {
+      setName(editing?.name ?? "");
+      setSelected(editing?.permissions ?? []);
+      setScopeSearch("");
+    }
+  }, [open, editing]);
+
+  const unchanged =
+    !!editing &&
+    name.trim() === editing.name &&
+    selected.length === editing.permissions.length &&
+    selected.every((s) => editing.permissions.includes(s));
 
   // Group scopes by service (the part before the first dot) — IAM-like.
   const groups = useMemo(() => {
@@ -117,8 +141,21 @@ function CreateKeySheet({
     setScopeSearch("");
   }
 
-  function handleCreate() {
+  function handleSubmit() {
     if (!name.trim() || selected.length === 0) return;
+    if (editing) {
+      updateKey(
+        { id: editing.id, data: { name: name.trim(), permissions: selected } },
+        {
+          onSuccess: () => {
+            toast.success("API key updated.");
+            reset();
+            onOpenChange(false);
+          },
+        }
+      );
+      return;
+    }
     createKey(
       { name: name.trim(), permissions: selected },
       {
@@ -142,11 +179,12 @@ function CreateKeySheet({
       <SheetContent className="flex w-full flex-col gap-0 border-grey-200 bg-white p-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-grey-200 p-5 pr-12">
           <SheetTitle className="font-sans text-xl font-bold text-text-primary">
-            Create API key
+            {editing ? "Edit API key" : "Create API key"}
           </SheetTitle>
           <SheetDescription className="pt-1 font-mono text-xs leading-6 text-text-secondary">
-            Name the key and attach the permission scopes it may use. You can only grant scopes you
-            hold yourself. The secret is shown once.
+            {editing
+              ? "Change the name or scopes. The secret stays the same, so nothing using this key needs updating. You can only add scopes you hold yourself."
+              : "Name the key and attach the permission scopes it may use. You can only grant scopes you hold yourself. The secret is shown once."}
           </SheetDescription>
         </SheetHeader>
 
@@ -251,11 +289,17 @@ function CreateKeySheet({
             </Button>
             <Button
               type="button"
-              onClick={handleCreate}
-              disabled={isPending || !name.trim() || selected.length === 0}
+              onClick={handleSubmit}
+              disabled={isPending || !name.trim() || selected.length === 0 || unchanged}
               className="h-10 rounded-none font-mono text-xs font-bold"
             >
-              {isPending ? "Creating..." : "Create key"}
+              {editing
+                ? isPending
+                  ? "Saving..."
+                  : "Save changes"
+                : isPending
+                  ? "Creating..."
+                  : "Create key"}
             </Button>
           </div>
         </SheetFooter>
@@ -275,9 +319,11 @@ function ApiKeysContent() {
   const vocab = useMemo(() => buildPermissionVocab(permissions ?? []), [permissions]);
 
   const canCreate = usePermission("api_keys.create");
+  const canEdit = usePermission("api_keys.edit");
   const canRevoke = usePermission("api_keys.revoke");
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<ApiKey | null>(null);
   const [createdKey, setCreatedKey] = useState<CreatedApiKey | null>(null);
   const [copied, setCopied] = useState(false);
   const [masked, setMasked] = useState(true);
@@ -392,7 +438,19 @@ function ApiKeysContent() {
                   {formatDate(apiKey.createdAt)}
                 </div>
 
-                <div className="flex lg:justify-end">
+                <div className="flex gap-2 lg:justify-end">
+                  {canEdit && apiKey.isActive && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditTarget(apiKey)}
+                      className="h-8 rounded-none px-3 font-mono text-xs font-bold"
+                    >
+                      <Pencil className="mr-1.5 h-3 w-3" />
+                      Edit
+                    </Button>
+                  )}
                   {canRevoke && apiKey.isActive && (
                     <Button
                       type="button"
@@ -411,7 +469,13 @@ function ApiKeysContent() {
         </div>
       )}
 
-      <CreateKeySheet open={createOpen} onOpenChange={setCreateOpen} onCreated={setCreatedKey} />
+      <KeySheet open={createOpen} onOpenChange={setCreateOpen} onCreated={setCreatedKey} />
+      <KeySheet
+        open={!!editTarget}
+        onOpenChange={(open) => !open && setEditTarget(null)}
+        onCreated={setCreatedKey}
+        editing={editTarget}
+      />
 
       {/* Reveal-once dialog */}
       <Dialog open={!!createdKey} onOpenChange={(open) => !open && closeReveal()}>

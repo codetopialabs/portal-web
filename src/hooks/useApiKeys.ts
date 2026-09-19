@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiKeysService } from "@/services/api-keys.service";
-import type { CreateApiKeyInput } from "@/types/api-keys.types";
+import type { CreateApiKeyInput, UpdateApiKeyInput } from "@/types/api-keys.types";
 
 const apiKeysKey = ["admin", "api-keys"] as const;
 
@@ -17,6 +17,17 @@ export function useCreateApiKey() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateApiKeyInput) => ApiKeysService.createKey(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: apiKeysKey });
+    },
+  });
+}
+
+export function useUpdateApiKey() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateApiKeyInput }) =>
+      ApiKeysService.updateKey(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: apiKeysKey });
     },
