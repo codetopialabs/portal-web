@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, BookOpen, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -118,6 +118,23 @@ function TeamWorkspaceContent() {
                 <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
                   {team.description}
                 </p>
+              )}
+              {team.whatCounts && (
+                <p className="mt-2 max-w-2xl font-mono text-xs leading-5 text-text-secondary">
+                  <span className="font-semibold text-text-primary">What counts here:</span>{" "}
+                  {team.whatCounts}
+                </p>
+              )}
+              {team.handbookUrl && (
+                <a
+                  href={team.handbookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex h-8 items-center gap-1.5 border border-grey-200 bg-white px-3 font-mono text-xs font-medium text-text-secondary transition-colors hover:border-grey-400 hover:text-text-primary"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  How this team works
+                </a>
               )}
             </div>
             {isLead && (

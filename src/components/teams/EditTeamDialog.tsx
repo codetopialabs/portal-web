@@ -15,6 +15,9 @@ import { Label } from "@/components/ui/label";
 import { useUpdateTeam } from "@/hooks/useTeams";
 import type { Team } from "@/services/teams.service";
 
+// Mirrors WHAT_COUNTS_MAX_LENGTH on the backend Team model.
+const WHAT_COUNTS_MAX = 200;
+
 export function EditTeamDialog({
   team,
   open,
@@ -28,6 +31,7 @@ export function EditTeamDialog({
 
   const [name, setName] = useState(team.name);
   const [description, setDescription] = useState(team.description ?? "");
+  const [whatCounts, setWhatCounts] = useState(team.whatCounts ?? "");
   const [isPrivate, setIsPrivate] = useState(team.isPrivate);
   const [nameError, setNameError] = useState("");
 
@@ -37,6 +41,7 @@ export function EditTeamDialog({
     if (open) {
       setName(team.name);
       setDescription(team.description ?? "");
+      setWhatCounts(team.whatCounts ?? "");
       setIsPrivate(team.isPrivate);
       setNameError("");
     }
@@ -50,7 +55,12 @@ export function EditTeamDialog({
     }
 
     updateTeam(
-      { name: name.trim(), description: description.trim(), isPrivate },
+      {
+        name: name.trim(),
+        description: description.trim(),
+        whatCounts: whatCounts.trim(),
+        isPrivate,
+      },
       { onSuccess: () => onOpenChange(false) }
     );
   }
@@ -101,6 +111,30 @@ export function EditTeamDialog({
               onChange={(e) => setDescription(e.target.value)}
               className="block w-full resize-none rounded-none border border-grey-200 bg-white px-3 py-2 font-mono text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-grey-300 focus:ring-0"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="edit-what-counts"
+              className="font-mono text-sm font-semibold text-text-secondary"
+            >
+              What counts as a contribution here{" "}
+              <span className="font-mono text-[10px] normal-case tracking-normal text-text-muted">
+                (optional)
+              </span>
+            </Label>
+            <Input
+              id="edit-what-counts"
+              value={whatCounts}
+              maxLength={WHAT_COUNTS_MAX}
+              onChange={(e) => setWhatCounts(e.target.value)}
+              placeholder="A published post on the community blog."
+              className="h-10 rounded-none font-mono text-sm"
+            />
+            <p className="font-mono text-xs text-text-muted">
+              One line, in your own words. Shown to people deciding whether to join.{" "}
+              {whatCounts.length}/{WHAT_COUNTS_MAX}
+            </p>
           </div>
 
           <div className="flex items-start gap-2.5">

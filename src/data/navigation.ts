@@ -8,6 +8,7 @@ import {
   Globe,
   Home,
   Key,
+  Layers,
   LayoutDashboard,
   LayoutTemplate,
   Library,
@@ -77,6 +78,12 @@ const ADMIN_MENU_GROUP: NavGroup = {
     { icon: LayoutDashboard, label: "Overview", href: "/admin", activePrefix: "/admin" },
     { icon: Users, label: "Members", href: "/admin/members", activePrefix: "/admin/members" },
     { icon: Users2, label: "All Teams", href: "/admin/teams", activePrefix: "/admin/teams" },
+    {
+      icon: Layers,
+      label: "Departments",
+      href: "/admin/departments",
+      activePrefix: "/admin/departments",
+    },
     { icon: ShieldCheck, label: "Roles", href: "/admin/roles", activePrefix: "/admin/roles" },
     { icon: Award, label: "Badges", href: "/admin/badges", activePrefix: "/admin/badges" },
     {

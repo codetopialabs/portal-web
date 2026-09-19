@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { TeamDirectorySettings } from "@/components/admin/TeamDirectorySettings";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -180,7 +181,9 @@ function AdminTeamDetailContent() {
       </Link>
 
       <div className="border border-zinc-200 bg-white p-6">
-        <p className="font-mono text-xs font-medium text-zinc-400">Admin Panel · Team</p>
+        <p className="font-mono text-xs font-medium text-zinc-400">
+          Admin Panel · Team{team.department ? ` · ${team.department.name}` : ""}
+        </p>
         <h1 className="mt-1 font-sans text-3xl font-bold text-zinc-950">{team.name}</h1>
         {team.description && (
           <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-zinc-500">
@@ -216,6 +219,8 @@ function AdminTeamDetailContent() {
           </div>
         </div>
       </div>
+
+      <TeamDirectorySettings team={team} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Members */}
