@@ -23,3 +23,10 @@ export interface CreateApiKeyInput {
   permissions: string[];
   expiresAt?: string | null;
 }
+
+/** Edit a live key in place. The secret does not change. */
+export interface UpdateApiKeyInput {
+  name?: string;
+  permissions?: string[];
+  expiresAt?: string | null;
+}
