@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  type AdminUpdateTeamInput,
   type CreateCommentInput,
   type CreateReviewInput,
   type CreateTeamInput,
@@ -33,6 +34,20 @@ export function useAdminTeam(teamSlug: string) {
     queryFn: () => TeamsService.getAdminTeam(teamSlug),
     enabled: Boolean(teamSlug),
     staleTime: 1000 * 30,
+  });
+}
+
+export function useAdminUpdateTeam(teamSlug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: AdminUpdateTeamInput) => TeamsService.adminUpdateTeam(teamSlug, data),
+    onSuccess: (updated) => {
+      qc.setQueryData(["admin", "teams", teamSlug], updated);
+      qc.invalidateQueries({ queryKey: ["admin", "teams"] });
+      qc.invalidateQueries({ queryKey: ["admin", "departments"] });
+      qc.invalidateQueries({ queryKey: ["teams"] });
+      toast.success("Team updated.");
+    },
   });
 }
 
