@@ -24,7 +24,7 @@ const SNOWFLAKE_REGEX = /^\d{15,32}$/;
 /**
  * The admin-only settings that place a team on the public directory and
  * wire it to Discord: department, the "what counts" line, the handbook
- * link, and any extra Discord roles beyond the department's own.
+ * link, and the team's own Discord role on top of the department's.
  */
 export function TeamDirectorySettings({ team }: { team: Team }) {
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
@@ -33,28 +33,23 @@ export function TeamDirectorySettings({ team }: { team: Team }) {
   const [departmentId, setDepartmentId] = useState<string>(team.department?.id ?? NONE);
   const [whatCounts, setWhatCounts] = useState(team.whatCounts ?? "");
   const [handbookUrl, setHandbookUrl] = useState(team.handbookUrl ?? "");
-  const [extraRoles, setExtraRoles] = useState("");
-  const [errors, setErrors] = useState<{ handbookUrl?: string; extraRoles?: string }>({});
+  const [discordRoleId, setDiscordRoleId] = useState(team.discordRoleId ?? "");
+  const [errors, setErrors] = useState<{ handbookUrl?: string; discordRoleId?: string }>({});
 
-  // The team query carries no Discord IDs (member-facing serializer), so
-  // extras start empty and only the admin's edits are sent. Saving with an
-  // empty box leaves the stored list untouched.
   useEffect(() => {
     setDepartmentId(team.department?.id ?? NONE);
     setWhatCounts(team.whatCounts ?? "");
     setHandbookUrl(team.handbookUrl ?? "");
+    setDiscordRoleId(team.discordRoleId ?? "");
   }, [team]);
 
   function validate(): boolean {
     const next: typeof errors = {};
     const url = handbookUrl.trim();
     if (url && !/^https?:\/\//i.test(url)) next.handbookUrl = "Must start with http:// or https://";
-    const ids = extraRoles
-      .split(/[\s,]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (ids.some((id) => !SNOWFLAKE_REGEX.test(id)))
-      next.extraRoles = "Role IDs are long numbers, one per line.";
+    const roleId = discordRoleId.trim();
+    if (roleId && !SNOWFLAKE_REGEX.test(roleId))
+      next.discordRoleId = "Paste the role ID, a long number, not the role name.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -62,17 +57,11 @@ export function TeamDirectorySettings({ team }: { team: Team }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    const ids = extraRoles
-      .split(/[\s,]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
     updateTeam({
       department: departmentId === NONE ? null : departmentId,
       whatCounts: whatCounts.trim(),
       handbookUrl: handbookUrl.trim(),
-      // An empty box means "leave the stored list alone", since the team
-      // query never returns the IDs for the form to prefill.
-      ...(extraRoles.trim() !== "" ? { discordRoleIds: ids } : {}),
+      discordRoleId: discordRoleId.trim(),
     });
   }
 
@@ -161,27 +150,33 @@ export function TeamDirectorySettings({ team }: { team: Team }) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="team-extra-roles" className="font-mono text-xs font-medium text-zinc-500">
-            Extra Discord role IDs{" "}
+          <Label
+            htmlFor="team-discord-role"
+            className="font-mono text-xs font-medium text-zinc-500"
+          >
+            Team's own Discord role ID{" "}
             <span className="font-mono text-[10px] normal-case tracking-normal text-zinc-400">
-              (optional, replaces the stored list when filled)
+              (optional)
             </span>
           </Label>
-          <textarea
-            id="team-extra-roles"
-            rows={2}
-            value={extraRoles}
+          <Input
+            id="team-discord-role"
+            value={discordRoleId}
             onChange={(e) => {
-              setExtraRoles(e.target.value);
-              if (errors.extraRoles) setErrors((p) => ({ ...p, extraRoles: undefined }));
+              setDiscordRoleId(e.target.value);
+              if (errors.discordRoleId) setErrors((p) => ({ ...p, discordRoleId: undefined }));
             }}
-            placeholder="One per line. Only for a team that wants its own role beyond the department's."
-            className="block w-full resize-none rounded-none border border-zinc-200 bg-white px-3 py-2 font-mono text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-0"
-            aria-invalid={!!errors.extraRoles}
+            placeholder="123456789012345678"
+            inputMode="numeric"
+            className="h-10 rounded-none border-zinc-200 font-mono text-sm"
+            aria-invalid={!!errors.discordRoleId}
           />
-          {errors.extraRoles && (
-            <p className="font-mono text-[10px] text-error-600">{errors.extraRoles}</p>
-          )}
+          <p
+            className={`font-mono text-[10px] ${errors.discordRoleId ? "text-error-600" : "text-zinc-400"}`}
+          >
+            {errors.discordRoleId ??
+              "Granted on top of the department's role. Only for a team that wants one of its own."}
+          </p>
         </div>
 
         <div className="flex justify-end">
