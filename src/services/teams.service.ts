@@ -28,6 +28,9 @@ export interface Team {
   whatCounts: string;
   /** Link to the team's "How this team works" page. Admin-set. */
   handbookUrl: string;
+  /** The team's own Discord role, granted on top of its department's.
+   * Admin-only: present on /admin/teams/<slug>/, absent elsewhere. */
+  discordRoleId?: string;
   createdAt: string;
   memberCount?: number;
   membersPreview?: TeamMemberPreview[];
@@ -232,7 +235,7 @@ export interface UpdateTeamInput {
 export interface AdminUpdateTeamInput extends UpdateTeamInput {
   department?: string | null;
   handbookUrl?: string;
-  discordRoleIds?: string[];
+  discordRoleId?: string;
 }
 
 export interface CreateReviewInput {
@@ -368,8 +371,8 @@ export const TeamsService = {
     return res.data.data;
   },
 
-  /** Admin-only: set department, handbook link and Discord roles on any
-   * team, alongside the ordinary fields. */
+  /** Admin-only: set department, handbook link and the team's Discord role
+   * on any team, alongside the ordinary fields. */
   async adminUpdateTeam(teamSlug: string, data: AdminUpdateTeamInput): Promise<Team> {
     const payload: Record<string, unknown> = {};
     if (data.name !== undefined) payload.name = data.name;
@@ -378,7 +381,7 @@ export const TeamsService = {
     if (data.whatCounts !== undefined) payload.what_counts = data.whatCounts;
     if (data.department !== undefined) payload.department = data.department;
     if (data.handbookUrl !== undefined) payload.handbook_url = data.handbookUrl;
-    if (data.discordRoleIds !== undefined) payload.discord_role_ids = data.discordRoleIds;
+    if (data.discordRoleId !== undefined) payload.discord_role_id = data.discordRoleId;
     const res = await axiosInstance.patch<ApiResponse<Team>>(`/admin/teams/${teamSlug}/`, payload);
     return res.data.data;
   },
