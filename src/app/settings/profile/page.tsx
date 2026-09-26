@@ -851,18 +851,6 @@ export default function SettingsProfilePage() {
                       >
                         Female
                       </SelectItem>
-                      <SelectItem
-                        value="Non-binary"
-                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
-                      >
-                        Non-binary
-                      </SelectItem>
-                      <SelectItem
-                        value="Prefer not to say"
-                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
-                      >
-                        Prefer not to say
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                 )}

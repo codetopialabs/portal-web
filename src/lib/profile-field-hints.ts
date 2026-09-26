@@ -55,7 +55,7 @@ export const PROFILE_FIELD_HINTS = {
   },
   gender: {
     title: "Gender",
-    what: "How you identify. 'Prefer not to say' is a complete answer.",
+    what: "Male or female.",
     why: "Used in aggregate to track how representative the community is and to report to programme partners. It isn't shown on your public profile.",
   },
   nationality: {
