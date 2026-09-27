@@ -11,8 +11,17 @@ import { cn } from "@/lib/utils";
 // Teams v2: one row per team for the Leads Council scoreboard. Counts and
 // the health label are computed on the backend so this agrees with the API.
 
-const GRID = "lg:grid-cols-[1.8fr_1.4fr_1.4fr_0.9fr_0.9fr_0.9fr_1fr]";
-const HEADERS = ["Team", "Lead", "Deputy", "Active Core", "Total Active", "Minimum", "Health"];
+const GRID = "lg:grid-cols-[1.8fr_1.4fr_1.4fr_0.9fr_0.9fr_0.9fr_0.9fr_1fr]";
+const HEADERS = [
+  "Team",
+  "Lead",
+  "Deputy",
+  "Active Core",
+  "Total Active",
+  "Minimum",
+  "This Month",
+  "Health",
+];
 
 function TeamHealthContent() {
   const teamsV2 = useFeature("teamsV2");
@@ -125,6 +134,12 @@ function TeamHealthContent() {
                   )}
                 </div>
                 <div className="font-mono text-sm text-zinc-500">{row.minActiveMembers}</div>
+                <div
+                  className={`font-mono text-sm ${row.approvedThisMonth > 0 ? "text-zinc-900" : "text-zinc-400"}`}
+                  title="Contributions approved since the 1st of this month"
+                >
+                  {row.approvedThisMonth}
+                </div>
                 <div>
                   <HealthPill health={row.health} />
                 </div>

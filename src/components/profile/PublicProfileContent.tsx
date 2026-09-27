@@ -30,6 +30,7 @@ import type { ComponentType } from "react";
 import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
 import { PublicProfileBadges } from "@/components/badges/PublicProfileBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
+import { PublicProfileContributions } from "@/components/profile/PublicProfileContributions";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
 import { formatJoinedAt, roleBadgeColors } from "@/components/profile/utils";
@@ -400,6 +401,10 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                 )}
               </div>
             </div>
+            {/* Teams v2: approved contributions, with links. Renders nothing
+                while the flag is off or the member has none. */}
+            <PublicProfileContributions username={profile.username} />
+
             {/* Wall of Impact — only rendered when there's something to show.
                 Unlike bio or skills, an empty "no awards yet" state on every
                 profile reads as an absence rather than an invitation. */}

@@ -149,6 +149,13 @@ const MY_TEAM_ITEM = {
   activePrefix: "/my-team",
 };
 
+const CONTRIBUTIONS_ITEM = {
+  icon: ClipboardCheck,
+  label: "Contributions",
+  href: "/contributions",
+  activePrefix: "/contributions",
+};
+
 const TEAM_HEALTH_ITEM = {
   icon: HeartPulse,
   label: "Team Health",
@@ -182,8 +189,10 @@ export function getDashboardMenuGroups(
     let items = group.items
       .filter((item) => item.href !== "/teams" && item.href !== "/admin/teams")
       .map((item) => (item.href === "/admin/departments" ? { ...item, label: "Teams" } : item));
-    if (group.label === "My Space" && options.isTeamLead) {
-      items = [MY_TEAM_ITEM, ...items];
+    if (group.label === "My Space") {
+      items = options.isTeamLead
+        ? [MY_TEAM_ITEM, CONTRIBUTIONS_ITEM, ...items]
+        : [CONTRIBUTIONS_ITEM, ...items];
     }
     if (group.label === "Admin" && options.canViewTeamHealth) {
       const at = items.findIndex((item) => item.href === "/admin/departments");

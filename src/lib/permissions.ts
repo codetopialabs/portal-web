@@ -67,6 +67,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/resources": "authenticated",
   "/teams": "teams.view",
   "/my-team": "authenticated", // Teams v2; the page itself checks lead/deputy
+  "/contributions": "authenticated", // Teams v2
   "/admin/team-health": "community_teams.health", // Teams v2
   "/teams/new": "teams.create",
   "/teams/browse": "authenticated",
@@ -86,7 +87,7 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   // top-level route name so a real username can't collide with them.
   {
     pattern:
-      /^\/(?!admin|community|mentorship|resources|settings|teams|my-team|activity|docs|reflections|login|signup|forgot-password|reset-password|verify-email|onboarding|authorize|discord)[^/]+$/,
+      /^\/(?!admin|community|mentorship|resources|settings|teams|my-team|contributions|activity|docs|reflections|login|signup|forgot-password|reset-password|verify-email|onboarding|authorize|discord)[^/]+$/,
     permission: "profile.view",
   },
   { pattern: /^\/teams\/[^/]+(\/.*)?$/, permission: "authenticated" }, // Scoped checks handled in-page or by backend

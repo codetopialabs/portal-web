@@ -7,6 +7,8 @@ import { ME_QUERY_KEY } from "@/hooks/useMe";
 import {
   type CommunityTeam,
   CommunityTeamsService,
+  type ContributionStatus,
+  type ContributionSubmit,
   type LeadershipUpdate,
   type MemberStatus,
   type RosterMemberUpdate,
@@ -97,5 +99,81 @@ export function useTeamHealth() {
     queryFn: () => CommunityTeamsService.health(),
     enabled,
     staleTime: 30_000,
+  });
+}
+
+// ── Contributions ────────────────────────────────────────────────────────────
+
+export const CONTRIBUTIONS_KEY = [...COMMUNITY_TEAMS_KEY, "contributions"] as const;
+
+export function useMyContributions() {
+  const enabled = useFeature("teamsV2");
+  return useQuery({
+    queryKey: [...CONTRIBUTIONS_KEY, "mine"],
+    queryFn: () => CommunityTeamsService.myContributions(),
+    enabled,
+    staleTime: 30_000,
+  });
+}
+
+export function useSubmitContribution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: ContributionSubmit) => CommunityTeamsService.submitContribution(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: CONTRIBUTIONS_KEY });
+    },
+  });
+}
+
+export function useWithdrawContribution() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => CommunityTeamsService.withdrawContribution(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: CONTRIBUTIONS_KEY });
+    },
+  });
+}
+
+/** A member's approved contributions, for their public profile. */
+export function useMemberContributions(username: string) {
+  const enabled = useFeature("teamsV2");
+  return useQuery({
+    queryKey: [...CONTRIBUTIONS_KEY, "by", username],
+    queryFn: () => CommunityTeamsService.memberContributions(username),
+    enabled: enabled && !!username,
+    staleTime: 60_000,
+  });
+}
+
+export function useTeamContributions(slug: string | null, status: ContributionStatus | "all") {
+  const enabled = useFeature("teamsV2");
+  return useQuery({
+    queryKey: [...CONTRIBUTIONS_KEY, "team", slug, status],
+    queryFn: () => CommunityTeamsService.teamContributions(slug as string, status),
+    enabled: enabled && !!slug,
+    staleTime: 15_000,
+  });
+}
+
+export function useReviewContribution(slug: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      decision,
+      note,
+    }: {
+      id: string;
+      decision: "approve" | "decline";
+      note?: string;
+    }) => CommunityTeamsService.reviewContribution(slug, id, decision, note),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: CONTRIBUTIONS_KEY });
+      // Approval refreshes the member's check-in, which the roster shows.
+      qc.invalidateQueries({ queryKey: [...COMMUNITY_TEAMS_KEY, slug, "roster"] });
+      qc.invalidateQueries({ queryKey: [...COMMUNITY_TEAMS_KEY, "health"] });
+    },
   });
 }

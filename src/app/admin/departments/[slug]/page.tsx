@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { DepartmentDialog } from "@/components/admin/DepartmentDialog";
 import { RouteGuard } from "@/components/auth/RouteGuard";
+import { ContributionQueue } from "@/components/community-teams/ContributionQueue";
 import { HealthPill } from "@/components/community-teams/pills";
 import { Roster } from "@/components/community-teams/Roster";
 import { Button } from "@/components/ui/button";
@@ -117,6 +118,8 @@ function TeamDetailContent() {
             </p>
             <Roster team={team} fullAccess={fullAccess} />
           </section>
+
+          <ContributionQueue slug={team.slug} teamName={team.name} />
 
           {department && (
             <DepartmentDialog open={editing} onOpenChange={setEditing} department={department} />

@@ -3,6 +3,7 @@
 import { UsersRound } from "lucide-react";
 import { useState } from "react";
 import { RouteGuard } from "@/components/auth/RouteGuard";
+import { ContributionQueue } from "@/components/community-teams/ContributionQueue";
 import { Roster } from "@/components/community-teams/Roster";
 import { DashboardShell } from "@/components/dashboard/Shell";
 import {
@@ -86,6 +87,7 @@ function MyTeamContent() {
               <span>Needs {team.minActiveMembers} active</span>
             </div>
             <Roster team={team} fullAccess={fullAccess} />
+            <ContributionQueue slug={team.slug} teamName={team.name} />
           </>
         )}
       </div>

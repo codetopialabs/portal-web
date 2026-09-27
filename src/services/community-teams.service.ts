@@ -69,6 +69,8 @@ export interface TeamHealthRow {
   activeCoreCount: number;
   totalActiveCount: number;
   minActiveMembers: number;
+  /** Contributions approved since the 1st of this month. */
+  approvedThisMonth: number;
   health: TeamHealth;
 }
 
@@ -76,6 +78,32 @@ export interface LeadershipUpdate {
   lead?: string | null;
   deputy?: string | null;
   minActiveMembers?: number;
+}
+
+export type ContributionStatus = "submitted" | "approved" | "declined";
+
+/** A piece of work a member did for a team, with a public link as proof. */
+export interface Contribution {
+  id: string;
+  member: PersonSummary;
+  team: TeamSummary;
+  title: string;
+  description: string;
+  link: string;
+  doneOn: string;
+  status: ContributionStatus;
+  reviewedBy: PersonSummary | null;
+  reviewedAt: string | null;
+  reviewNote: string;
+  createdAt: string;
+}
+
+export interface ContributionSubmit {
+  team: string; // slug
+  title: string;
+  description: string;
+  link: string;
+  doneOn: string;
 }
 
 const BASE = "/community-teams";
@@ -126,6 +154,60 @@ export const CommunityTeamsService = {
 
   async health(): Promise<TeamHealthRow[]> {
     const res = await axiosInstance.get<ApiResponse<TeamHealthRow[]>>(`${BASE}/health/`);
+    return res.data.data;
+  },
+
+  // ── Contributions ──
+
+  async myContributions(): Promise<Contribution[]> {
+    const res = await axiosInstance.get<ApiResponse<Contribution[]>>(`${BASE}/contributions/`);
+    return res.data.data;
+  },
+
+  async submitContribution(data: ContributionSubmit): Promise<Contribution> {
+    const res = await axiosInstance.post<ApiResponse<Contribution>>(`${BASE}/contributions/`, {
+      team: data.team,
+      title: data.title,
+      description: data.description,
+      link: data.link,
+      done_on: data.doneOn,
+    });
+    return res.data.data;
+  },
+
+  async withdrawContribution(id: string): Promise<void> {
+    await axiosInstance.delete(`${BASE}/contributions/${id}/`);
+  },
+
+  async memberContributions(username: string): Promise<Contribution[]> {
+    const res = await axiosInstance.get<ApiResponse<Contribution[]>>(
+      `${BASE}/contributions/by/${encodeURIComponent(username)}/`,
+      { silentError: true }
+    );
+    return res.data.data;
+  },
+
+  async teamContributions(
+    slug: string,
+    status: ContributionStatus | "all" = "submitted"
+  ): Promise<Contribution[]> {
+    const res = await axiosInstance.get<ApiResponse<Contribution[]>>(
+      `${BASE}/${slug}/contributions/`,
+      { params: { status } }
+    );
+    return res.data.data;
+  },
+
+  async reviewContribution(
+    slug: string,
+    id: string,
+    decision: "approve" | "decline",
+    note = ""
+  ): Promise<Contribution> {
+    const res = await axiosInstance.post<ApiResponse<Contribution>>(
+      `${BASE}/${slug}/contributions/${id}/${decision}/`,
+      { note }
+    );
     return res.data.data;
   },
 };
