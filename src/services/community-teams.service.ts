@@ -26,6 +26,58 @@ export interface CommunityTeam extends TeamSummary {
   memberCount: number;
 }
 
+export type MemberLevel = "member" | "contributor" | "core" | "lead" | "alumni";
+export type MemberStatus = "" | "active" | "paused" | "inactive";
+export type HoursPerMonth = "" | "1-2" | "3-5" | "6-10" | "10+";
+/** Computed on the backend: Active with no check-in for 60+ days, Active
+ * with no check-in ever, or nothing. */
+export type RosterFlag = "stale" | "no_check_in" | null;
+export type TeamHealth = "OK" | "UNDERSTAFFED" | "NO_LEAD";
+
+export interface RosterMember {
+  userId: string;
+  username: string;
+  fullName: string;
+  profilePictureUrl: string | null;
+  discordUsername: string;
+  level: MemberLevel;
+  roleTitle: string;
+  status: MemberStatus;
+  lastCheckIn: string | null;
+  hoursPerMonth: HoursPerMonth;
+  recentContribution: string;
+  primaryTeam: TeamSummary | null;
+  secondaryTeam: TeamSummary | null;
+  flag: RosterFlag;
+}
+
+/** What a lead or deputy may change. Admins may also send primary_team,
+ * secondary_team, hours_per_month and recent_contribution. */
+export interface RosterMemberUpdate {
+  level?: MemberLevel;
+  roleTitle?: string;
+  status?: MemberStatus;
+  lastCheckIn?: string | null;
+}
+
+export interface TeamHealthRow {
+  id: string;
+  slug: string;
+  name: string;
+  lead: PersonSummary | null;
+  deputy: PersonSummary | null;
+  activeCoreCount: number;
+  totalActiveCount: number;
+  minActiveMembers: number;
+  health: TeamHealth;
+}
+
+export interface LeadershipUpdate {
+  lead?: string | null;
+  deputy?: string | null;
+  minActiveMembers?: number;
+}
+
 const BASE = "/community-teams";
 
 export const CommunityTeamsService = {
@@ -36,6 +88,44 @@ export const CommunityTeamsService = {
 
   async get(slug: string): Promise<CommunityTeam> {
     const res = await axiosInstance.get<ApiResponse<CommunityTeam>>(`${BASE}/${slug}/`);
+    return res.data.data;
+  },
+
+  async updateLeadership(slug: string, data: LeadershipUpdate): Promise<CommunityTeam> {
+    const payload: Record<string, unknown> = {};
+    if (data.lead !== undefined) payload.lead = data.lead;
+    if (data.deputy !== undefined) payload.deputy = data.deputy;
+    if (data.minActiveMembers !== undefined) payload.min_active_members = data.minActiveMembers;
+    const res = await axiosInstance.patch<ApiResponse<CommunityTeam>>(`${BASE}/${slug}/`, payload);
+    return res.data.data;
+  },
+
+  async roster(slug: string, status?: MemberStatus): Promise<RosterMember[]> {
+    const res = await axiosInstance.get<ApiResponse<RosterMember[]>>(`${BASE}/${slug}/members/`, {
+      params: status ? { status } : undefined,
+    });
+    return res.data.data;
+  },
+
+  async updateMember(
+    slug: string,
+    userId: string,
+    data: RosterMemberUpdate
+  ): Promise<RosterMember> {
+    const payload: Record<string, unknown> = {};
+    if (data.level !== undefined) payload.level = data.level;
+    if (data.roleTitle !== undefined) payload.role_title = data.roleTitle;
+    if (data.status !== undefined) payload.status = data.status;
+    if (data.lastCheckIn !== undefined) payload.last_check_in = data.lastCheckIn;
+    const res = await axiosInstance.patch<ApiResponse<RosterMember>>(
+      `${BASE}/${slug}/members/${userId}/`,
+      payload
+    );
+    return res.data.data;
+  },
+
+  async health(): Promise<TeamHealthRow[]> {
+    const res = await axiosInstance.get<ApiResponse<TeamHealthRow[]>>(`${BASE}/health/`);
     return res.data.data;
   },
 };

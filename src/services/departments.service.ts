@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axios";
+import type { PersonSummary } from "@/services/community-teams.service";
 import type { ApiResponse } from "@/types/api.types";
 
 // Departments group teams and each maps to one Discord channel. Admin-only
@@ -14,6 +15,10 @@ export interface Department {
   /** Display order on the public directory. Lower first. */
   order: number;
   teamCount: number;
+  // Teams v2. Read here; written through CommunityTeamsService.updateLeadership.
+  lead: PersonSummary | null;
+  deputy: PersonSummary | null;
+  minActiveMembers: number;
   createdAt: string;
 }
 

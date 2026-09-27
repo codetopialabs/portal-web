@@ -19,6 +19,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { getDashboardMenuGroups } from "@/data/navigation";
+import { useMyLedTeams } from "@/hooks/useCommunityTeams";
 import { useFeature } from "@/hooks/useFeatures";
 import { usePermission } from "@/hooks/usePermission";
 import { useMyInvites } from "@/hooks/useTeams";
@@ -44,7 +45,13 @@ export function DashboardSidebar() {
   const canAccessAdmin = usePermission("admin.panel.access");
 
   const teamsV2 = useFeature("teamsV2");
-  const menuGroups = getDashboardMenuGroups(canAccessAdmin, teamsV2);
+  const { teams: ledTeams } = useMyLedTeams();
+  const canViewTeamHealth = usePermission("community_teams.health");
+  const menuGroups = getDashboardMenuGroups(canAccessAdmin, {
+    teamsV2,
+    isTeamLead: ledTeams.length > 0,
+    canViewTeamHealth,
+  });
   const { data: myInvites } = useMyInvites();
   const pendingInviteCount = myInvites?.filter((i) => i.status === "pending").length ?? 0;
 

@@ -43,6 +43,7 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/admin/teams": "admin.panel.access",
   "/admin/teams/[teamSlug]": "admin.panel.access",
   "/admin/departments": "admin.panel.access",
+  "/admin/departments/[slug]": "admin.panel.access",
   "/admin/badges": "badges.view",
   "/admin/badges/new": "badges.create",
   "/admin/badges/[slug]/edit": "badges.edit",
@@ -65,6 +66,8 @@ export const ROUTE_PERMISSIONS: Record<string, string | "authenticated"> = {
   "/mentorship": "authenticated",
   "/resources": "authenticated",
   "/teams": "teams.view",
+  "/my-team": "authenticated", // Teams v2; the page itself checks lead/deputy
+  "/admin/team-health": "community_teams.health", // Teams v2
   "/teams/new": "teams.create",
   "/teams/browse": "authenticated",
   "/activity": "activity.view",
@@ -83,10 +86,11 @@ export const DYNAMIC_ROUTE_PERMISSIONS: Array<{
   // top-level route name so a real username can't collide with them.
   {
     pattern:
-      /^\/(?!admin|community|mentorship|resources|settings|teams|activity|docs|reflections|login|signup|forgot-password|reset-password|verify-email|onboarding|authorize|discord)[^/]+$/,
+      /^\/(?!admin|community|mentorship|resources|settings|teams|my-team|activity|docs|reflections|login|signup|forgot-password|reset-password|verify-email|onboarding|authorize|discord)[^/]+$/,
     permission: "profile.view",
   },
   { pattern: /^\/teams\/[^/]+(\/.*)?$/, permission: "authenticated" }, // Scoped checks handled in-page or by backend
+  { pattern: /^\/admin\/departments\/[^/]+$/, permission: "admin.panel.access" },
   { pattern: /^\/admin\/roles\/[^/]+\/edit$/, permission: "roles.edit" },
   { pattern: /^\/admin\/roles\/[^/]+$/, permission: "roles.view" },
   { pattern: /^\/admin\/members\/[^/]+\/edit$/, permission: "users.edit" },
