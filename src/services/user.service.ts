@@ -1,4 +1,5 @@
 ﻿import axiosInstance from "@/lib/axios";
+import type { TeamSummary } from "@/services/community-teams.service";
 import type { CareerProgression } from "@/types/career-progressions.types";
 import type { MemberRecognition } from "@/types/recognitions.types";
 
@@ -53,6 +54,15 @@ export interface UserProfile {
     flaggedAt: string;
     profileUpdatedAfterFlag: boolean;
   } | null;
+  // Teams v2 roster fields. Present only while the teamsV2 flag is on.
+  level?: "member" | "contributor" | "core" | "lead" | "alumni";
+  roleTitle?: string;
+  primaryTeam?: TeamSummary | null;
+  secondaryTeam?: TeamSummary | null;
+  status?: "" | "active" | "paused" | "inactive";
+  lastCheckIn?: string | null;
+  hoursPerMonth?: "" | "1-2" | "3-5" | "6-10" | "10+";
+  recentContribution?: string;
 }
 
 export interface CommunityMember {
@@ -115,6 +125,13 @@ export interface UpdateMeRequest {
   profile_picture_url?: string;
   cover_image_url?: string;
   completed_walkthroughs?: string[];
+  // Teams v2: what a member may set on their own roster row. Teams are
+  // sent by slug. Level, role title, status and check-in belong to the
+  // team's lead and are ignored by the backend if sent here.
+  primary_team?: string | null;
+  secondary_team?: string | null;
+  hours_per_month?: string;
+  recent_contribution?: string;
 }
 
 interface UploadSignature {

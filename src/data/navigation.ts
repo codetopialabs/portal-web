@@ -140,8 +140,24 @@ const INTEGRATIONS_MENU_GROUP: NavGroup = {
   ],
 };
 
-export function getDashboardMenuGroups(canAccessAdmin: boolean): NavGroup[] {
-  return canAccessAdmin
+export function getDashboardMenuGroups(canAccessAdmin: boolean, teamsV2 = false): NavGroup[] {
+  const groups = canAccessAdmin
     ? [...BASE_MENU_GROUPS, ADMIN_MENU_GROUP, INTEGRATIONS_MENU_GROUP]
     : BASE_MENU_GROUPS;
+  if (!teamsV2) return groups;
+  // Teams v2: the six community teams are "Teams", so the squad-style
+  // project teams under /teams are shown as "Projects" to avoid two
+  // different things called Teams in one sidebar.
+  return groups.map((group) => ({
+    ...group,
+    items: group.items.map((item) =>
+      item.href === "/teams"
+        ? { ...item, label: "Projects" }
+        : item.href === "/admin/teams"
+          ? { ...item, label: "All Projects" }
+          : item.href === "/admin/departments"
+            ? { ...item, label: "Teams" }
+            : item
+    ),
+  }));
 }

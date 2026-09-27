@@ -19,6 +19,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { getDashboardMenuGroups } from "@/data/navigation";
+import { useFeature } from "@/hooks/useFeatures";
 import { usePermission } from "@/hooks/usePermission";
 import { useMyInvites } from "@/hooks/useTeams";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,8 @@ export function DashboardSidebar() {
   const isCollapsed = state === "collapsed";
   const canAccessAdmin = usePermission("admin.panel.access");
 
-  const menuGroups = getDashboardMenuGroups(canAccessAdmin);
+  const teamsV2 = useFeature("teamsV2");
+  const menuGroups = getDashboardMenuGroups(canAccessAdmin, teamsV2);
   const { data: myInvites } = useMyInvites();
   const pendingInviteCount = myInvites?.filter((i) => i.status === "pending").length ?? 0;
 

@@ -9,16 +9,24 @@ import { OnboardingStepConduct } from "@/components/onboarding/OnboardingStepCon
 import { OnboardingStepCongrats } from "@/components/onboarding/OnboardingStepCongrats";
 import { OnboardingStepGoals } from "@/components/onboarding/OnboardingStepGoals";
 import { OnboardingStepProfile } from "@/components/onboarding/OnboardingStepProfile";
+import { OnboardingStepTeam } from "@/components/onboarding/OnboardingStepTeam";
 import { OnboardingStepTerms } from "@/components/onboarding/OnboardingStepTerms";
 import { OnboardingStepValues } from "@/components/onboarding/OnboardingStepValues";
 import { OnboardingStepVideo } from "@/components/onboarding/OnboardingStepVideo";
 import { OnboardingStepWelcome } from "@/components/onboarding/OnboardingStepWelcome";
+import { useFeature } from "@/hooks/useFeatures";
 import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
-const TOTAL_STEPS = 10;
+const BASE_TOTAL_STEPS = 10;
 
 export default function OnboardingPage() {
+  // Teams v2 adds a "Your Team" step at index 8, pushing Profile and
+  // Welcome In one place along. Flag off: exactly the ten steps as before.
+  const teamsV2 = useFeature("teamsV2");
+  const TOTAL_STEPS = teamsV2 ? BASE_TOTAL_STEPS + 1 : BASE_TOTAL_STEPS;
+  const profileStep = teamsV2 ? 9 : 8;
+  const congratsStep = teamsV2 ? 10 : 9;
   const isLoading = useUserStore((s) => s.isLoading);
   const isOnboarded = useUserStore((s) => s.isOnboarded);
   const router = useRouter();
@@ -33,7 +41,7 @@ export default function OnboardingPage() {
     if (!isLoading && isOnboarded && step !== TOTAL_STEPS - 1) {
       router.replace("/");
     }
-  }, [isLoading, isOnboarded, router, step]);
+  }, [isLoading, isOnboarded, router, step, TOTAL_STEPS]);
 
   useEffect(() => {
     setHydrated(true);
@@ -85,8 +93,11 @@ export default function OnboardingPage() {
               {step === 5 && <OnboardingStepCommunity onNext={nextStep} onBack={prevStep} />}
               {step === 6 && <OnboardingStepBackground onNext={nextStep} onBack={prevStep} />}
               {step === 7 && <OnboardingStepGoals onNext={nextStep} onBack={prevStep} />}
-              {step === 8 && <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />}
-              {step === 9 && <OnboardingStepCongrats />}
+              {teamsV2 && step === 8 && <OnboardingStepTeam onNext={nextStep} onBack={prevStep} />}
+              {step === profileStep && (
+                <OnboardingStepProfile onBack={prevStep} onNext={nextStep} />
+              )}
+              {step === congratsStep && <OnboardingStepCongrats />}
             </>
           )}
         </div>

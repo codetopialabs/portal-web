@@ -142,3 +142,26 @@ export function labelForOption<T extends { value: string; label: string }>(
   if (match) return match.label;
   return value.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 }
+
+// ── Teams v2 ────────────────────────────────────────────────────────────────
+
+export const HOURS_PER_MONTH = [
+  { value: "1-2", label: "1 to 2 hours", description: "A one-off task now and then." },
+  { value: "3-5", label: "3 to 5 hours", description: "A core role: one thing shipped a month." },
+  { value: "6-10", label: "6 to 10 hours", description: "A lead's commitment." },
+  { value: "10+", label: "10+ hours", description: "More than most roles need." },
+];
+
+export const MEMBER_LEVEL_LABELS: Record<string, string> = {
+  member: "Member",
+  contributor: "Contributor",
+  core: "Core team",
+  lead: "Lead",
+  alumni: "Alumni",
+};
+
+export const MEMBER_STATUS_LABELS: Record<string, string> = {
+  active: "Active",
+  paused: "Paused",
+  inactive: "Inactive",
+};
