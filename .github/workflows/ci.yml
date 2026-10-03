@@ -54,7 +54,7 @@ jobs:
 
       # ── Step 3: React Doctor health audit ────────────────────────────────
       - name: React Doctor
-        run: npx -y react-doctor@latest .
+        run: npx -y react-doctor@0.9.14 .
 
       # ── Hand off to Vercel's own pipeline ────────────────────────────────
       # Vercel auto-deploys on push. Configure branch protection rules in
