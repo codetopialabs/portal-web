@@ -58,7 +58,7 @@ function ContributionsContent() {
               Not available yet
             </p>
             <p className="mt-1 font-mono text-xs text-text-tertiary">
-              The six-team structure has not been switched on.
+              The new team structure has not been switched on.
             </p>
           </div>
         )}

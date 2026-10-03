@@ -180,7 +180,7 @@ export function getDashboardMenuGroups(
     ? [...BASE_MENU_GROUPS, ADMIN_MENU_GROUP, INTEGRATIONS_MENU_GROUP]
     : BASE_MENU_GROUPS;
   if (!options.teamsV2) return groups;
-  // Teams v2: the six community teams are "Teams". The older squad-style
+  // Teams v2: the five community teams are "Teams". The older squad-style
   // teams under /teams are hidden from the sidebar (their pages stay
   // reachable by URL and their data is untouched) so the sidebar has one
   // meaning of "team". Revisit in December. Leads get My Team; Team Health

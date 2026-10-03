@@ -60,7 +60,7 @@ function TeamHealthContent() {
         <div className="flex flex-col items-center justify-center gap-2 border border-dashed border-zinc-200 bg-zinc-50 py-16 text-center">
           <HeartPulse className="h-6 w-6 text-zinc-300" />
           <p className="font-mono text-xs text-zinc-400">
-            The six-team structure has not been switched on.
+            The new team structure has not been switched on.
           </p>
         </div>
       )}

@@ -45,7 +45,7 @@ function TeamDetailContent() {
       {!teamsV2 && (
         <div className="border border-dashed border-zinc-200 bg-zinc-50 py-16 text-center">
           <p className="font-mono text-xs text-zinc-400">
-            Team pages arrive with the six-team structure, which has not been switched on.
+            Team pages arrive with the new team structure, which has not been switched on.
           </p>
         </div>
       )}

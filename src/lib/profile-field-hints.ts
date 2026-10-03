@@ -12,7 +12,7 @@ import type { FieldHintContent } from "@/components/ui/field-hint";
 export const PROFILE_FIELD_HINTS = {
   primaryTeam: {
     title: "Primary team",
-    what: "The community team you want to help in: Events, Projects & Tech, Learning & Mentorship, Comms & Brand, Operations or Partnerships.",
+    what: "The community team you want to help in: Events, Projects & Tech, Comms & Brand, Operations or Partnerships.",
     why: "Its lead sees you on their roster and can offer you a role card. You can change it any time. Leave it empty to stay in the contributor pool and pick up one-off tasks.",
   },
   secondaryTeam: {

@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axios";
 import type { ApiResponse } from "@/types/api.types";
 
-// Teams v2: the six community teams (Events, Projects & Tech, ...). Served
+// Teams v2: the five community teams (Events, Projects & Tech, ...). Served
 // from /community-teams/, which answers 404 while TEAMS_V2_ENABLED is off,
 // so only call these behind useFeature("teamsV2"). Not to be confused with
 // /teams/, the squad-style project teams in teams.service.ts.

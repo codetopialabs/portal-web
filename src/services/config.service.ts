@@ -6,7 +6,7 @@ import type { ApiResponse } from "@/types/api.types";
 // is unauthenticated and carries nothing secret or per-user.
 
 export interface FeatureFlags {
-  /** The six-team structure: team leads, member levels, team health. */
+  /** The five-team structure: team leads, member levels, team health. */
   teamsV2: boolean;
 }
 

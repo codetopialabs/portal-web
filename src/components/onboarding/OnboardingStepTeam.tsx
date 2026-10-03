@@ -163,8 +163,9 @@ export function OnboardingStepTeam({ onNext, onBack }: OnboardingStepTeamProps) 
         Where Would You Like To Help?
       </h1>
       <p className="font-mono text-zinc-500 text-sm leading-relaxed mb-10">
-        Codetopia Community runs on six teams, each with a lead and a small core team. Pick the one
-        you are drawn to, or skip this and pick up one-off tasks from any team later.
+        Codetopia Community runs on five teams, each with a lead and a small core team. Pick the one
+        you are drawn to, or skip this and help out whenever you like: teams post what they need in
+        #get-involved on Discord.
       </p>
 
       <div className="space-y-8">

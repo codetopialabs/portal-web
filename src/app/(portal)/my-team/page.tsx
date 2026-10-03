@@ -73,7 +73,7 @@ function MyTeamContent() {
             <p className="mt-1 font-mono text-xs text-text-tertiary">
               {teamsV2
                 ? "This page is for team leads and deputies. Ask the Community Lead if you should be one."
-                : "The six-team structure has not been switched on."}
+                : "The new team structure has not been switched on."}
             </p>
           </div>
         ) : isLoading || !team ? (

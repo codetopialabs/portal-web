@@ -167,7 +167,7 @@ function DepartmentsContent() {
               : "Teams sit under departments. Each department has one Discord channel, unlocked by the role whose ID you paste here. Set the role's permissions in Discord, not here."}
           </p>
         </div>
-        {/* The six teams are fixed by the operating plan. A seventh needs a
+        {/* The five teams are fixed by the operating plan. A seventh needs a
             charter and the Leads Council, and is added in Django admin. */}
         {!teamsV2 && (
           <Button
@@ -193,7 +193,7 @@ function DepartmentsContent() {
           <Layers className="h-6 w-6 text-zinc-300" />
           <p className="font-mono text-xs text-zinc-400">
             {teamsV2
-              ? "No teams yet. Run the Teams v2 migrations to seed the six teams."
+              ? "No teams yet. Run the Teams v2 migrations to seed the five teams."
               : "No departments yet. Create one, then assign teams to it from each team's admin page."}
           </p>
         </div>
