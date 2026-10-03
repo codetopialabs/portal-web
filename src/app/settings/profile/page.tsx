@@ -13,6 +13,7 @@ import {
   Plus,
   Target,
   User,
+  UsersRound,
   X,
 } from "lucide-react";
 import type React from "react";
@@ -35,12 +36,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SensitiveText } from "@/components/ui/sensitive-text";
+import { useCommunityTeams } from "@/hooks/useCommunityTeams";
+import { useFeature } from "@/hooks/useFeatures";
 import { useWalkthrough } from "@/hooks/useWalkthrough";
 import { PROFILE_FIELD_HINTS } from "@/lib/profile-field-hints";
 import {
   COMMUNITY_GOALS,
   DISCIPLINES,
   EXPERIENCE_LEVELS,
+  HOURS_PER_MONTH,
+  MEMBER_LEVEL_LABELS,
+  MEMBER_STATUS_LABELS,
   MEMBER_STATUSES,
   resolvePresetOrOther,
 } from "@/lib/profile-options";
@@ -149,6 +155,11 @@ interface ProfileFormValues {
   discipline: string;
   experience_level: string;
   member_status: string;
+  // Teams v2 (only submitted while the flag is on)
+  primary_team: string;
+  secondary_team: string;
+  hours_per_month: string;
+  recent_contribution: string;
 }
 
 function SectionHeader({
@@ -386,8 +397,15 @@ export default function SettingsProfilePage() {
       discipline: disciplineResolved.selected ?? "",
       experience_level: profile?.experienceLevel ?? "",
       member_status: memberStatusResolved.selected ?? "",
+      primary_team: profile?.primaryTeam?.slug ?? "",
+      secondary_team: profile?.secondaryTeam?.slug ?? "",
+      hours_per_month: profile?.hoursPerMonth ?? "",
+      recent_contribution: profile?.recentContribution ?? "",
     },
   });
+  const teamsV2 = useFeature("teamsV2");
+  const { data: communityTeams = [] } = useCommunityTeams();
+  const watchedPrimaryTeam = watch("primary_team");
 
   function addSkill() {
     const trimmed = newSkill.trim();
@@ -450,6 +468,14 @@ export default function SettingsProfilePage() {
         experience_level: data.experience_level,
         member_status: resolvedMemberStatus,
         community_goals: communityGoals,
+        ...(teamsV2
+          ? {
+              primary_team: data.primary_team || null,
+              secondary_team: data.primary_team ? data.secondary_team || null : null,
+              hours_per_month: data.hours_per_month,
+              recent_contribution: data.recent_contribution.trim(),
+            }
+          : {}),
       });
 
       toast.success("Profile updated.");
@@ -851,18 +877,6 @@ export default function SettingsProfilePage() {
                       >
                         Female
                       </SelectItem>
-                      <SelectItem
-                        value="Non-binary"
-                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
-                      >
-                        Non-binary
-                      </SelectItem>
-                      <SelectItem
-                        value="Prefer not to say"
-                        className="rounded-none font-mono py-2 px-3 text-zinc-900 hover:bg-zinc-50 cursor-pointer focus:bg-zinc-50 focus:text-zinc-900 focus:outline-none"
-                      >
-                        Prefer not to say
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -1009,6 +1023,196 @@ export default function SettingsProfilePage() {
             </div>
           </div>
         </section>
+
+        {teamsV2 && (
+          <>
+            <Divider />
+
+            {/* Team (Teams v2) */}
+            <section id="settings-team" className="space-y-6">
+              <SectionHeader icon={UsersRound} title="Team" />
+
+              <div className="border border-zinc-200 bg-zinc-50 px-4 py-3 flex flex-wrap items-center gap-x-8 gap-y-2">
+                <div>
+                  <FieldLabel className={labelStyles} hint={PROFILE_FIELD_HINTS.levelAndRole}>
+                    Level
+                  </FieldLabel>
+                  <p className="font-mono text-sm text-zinc-900 mt-1">
+                    {MEMBER_LEVEL_LABELS[profile?.level ?? "member"] ?? "Member"}
+                  </p>
+                </div>
+                <div>
+                  <p className={labelStyles}>Role</p>
+                  <p className="font-mono text-sm text-zinc-900 mt-1">
+                    {profile?.roleTitle || <span className="text-zinc-400">No role card yet</span>}
+                  </p>
+                </div>
+                {profile?.status && (
+                  <div>
+                    <p className={labelStyles}>Status</p>
+                    <p className="font-mono text-sm text-zinc-900 mt-1">
+                      {MEMBER_STATUS_LABELS[profile.status] ?? profile.status}
+                    </p>
+                  </div>
+                )}
+                <p className="font-mono text-[11px] text-zinc-500 basis-full">
+                  Set by your team lead. Ask them if something here is wrong.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <FieldLabel
+                    htmlFor="primary-team"
+                    className={labelStyles}
+                    hint={PROFILE_FIELD_HINTS.primaryTeam}
+                  >
+                    Primary Team
+                  </FieldLabel>
+                  <Controller
+                    control={control}
+                    name="primary_team"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || "none"}
+                        onValueChange={(v) => {
+                          const next = v === "none" ? "" : v;
+                          field.onChange(next);
+                          if (!next || watch("secondary_team") === next) {
+                            setValue("secondary_team", "", { shouldDirty: true });
+                          }
+                        }}
+                      >
+                        <SelectTrigger
+                          id="primary-team"
+                          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
+                        >
+                          <SelectValue placeholder="No team, contributor pool" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
+                          <SelectItem value="none" className={selectItemStyles}>
+                            No team, contributor pool
+                          </SelectItem>
+                          {communityTeams.map((team) => (
+                            <SelectItem
+                              key={team.slug}
+                              value={team.slug}
+                              className={selectItemStyles}
+                            >
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <FieldLabel
+                    htmlFor="secondary-team"
+                    className={labelStyles}
+                    hint={PROFILE_FIELD_HINTS.secondaryTeam}
+                  >
+                    Secondary Team
+                  </FieldLabel>
+                  <Controller
+                    control={control}
+                    name="secondary_team"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || "none"}
+                        onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                        disabled={!watchedPrimaryTeam}
+                      >
+                        <SelectTrigger
+                          id="secondary-team"
+                          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400 disabled:opacity-50"
+                        >
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
+                          <SelectItem value="none" className={selectItemStyles}>
+                            None
+                          </SelectItem>
+                          {communityTeams
+                            .filter((team) => team.slug !== watchedPrimaryTeam)
+                            .map((team) => (
+                              <SelectItem
+                                key={team.slug}
+                                value={team.slug}
+                                className={selectItemStyles}
+                              >
+                                {team.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <FieldLabel
+                    htmlFor="hours-per-month"
+                    className={labelStyles}
+                    hint={PROFILE_FIELD_HINTS.hoursPerMonth}
+                  >
+                    Hours Per Month
+                  </FieldLabel>
+                  <Controller
+                    control={control}
+                    name="hours_per_month"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || "none"}
+                        onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                      >
+                        <SelectTrigger
+                          id="hours-per-month"
+                          className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
+                        >
+                          <SelectValue placeholder="Not set" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
+                          <SelectItem value="none" className={selectItemStyles}>
+                            Not set
+                          </SelectItem>
+                          {HOURS_PER_MONTH.map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value}
+                              className={selectItemStyles}
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel
+                  htmlFor="recent-contribution"
+                  className={labelStyles}
+                  hint={PROFILE_FIELD_HINTS.recentContribution}
+                >
+                  What have you done for Codetopia Community in the last 3 months?
+                </FieldLabel>
+                <textarea
+                  id="recent-contribution"
+                  {...register("recent_contribution", { maxLength: 2000 })}
+                  rows={3}
+                  placeholder="e.g. Hosted the September meetup, reviewed two pull requests, answered questions in #help"
+                  className="w-full border border-zinc-200 bg-white px-3 py-2.5 font-mono text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-all resize-none"
+                />
+              </div>
+            </section>
+          </>
+        )}
 
         <Divider />
 

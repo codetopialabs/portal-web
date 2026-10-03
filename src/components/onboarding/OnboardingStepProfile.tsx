@@ -431,8 +431,6 @@ export function OnboardingStepProfile({ onBack, onNext }: OnboardingStepProfileP
                       <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1">
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Non-binary">Non-binary</SelectItem>
-                        <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

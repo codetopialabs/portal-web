@@ -20,6 +20,10 @@ export interface OnboardingData {
   communityGoals: string[];
   referralSource: string | null;
   otherReferral: string;
+  // Team (Teams v2 only)
+  primaryTeam: string | null;
+  secondaryTeam: string | null;
+  hoursPerMonth: string;
   // Profile
   fullName: string;
   username: string;
@@ -57,6 +61,9 @@ const INITIAL: OnboardingData = {
   communityGoals: [],
   referralSource: null,
   otherReferral: "",
+  primaryTeam: null,
+  secondaryTeam: null,
+  hoursPerMonth: "",
   fullName: "",
   username: "",
   dateOfBirth: "",

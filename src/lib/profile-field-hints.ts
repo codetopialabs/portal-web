@@ -10,6 +10,31 @@ import type { FieldHintContent } from "@/components/ui/field-hint";
  * who thinks it is a throwaway box.
  */
 export const PROFILE_FIELD_HINTS = {
+  primaryTeam: {
+    title: "Primary team",
+    what: "The community team you want to help in: Events, Projects & Tech, Comms & Brand, Operations or Partnerships.",
+    why: "Its lead sees you on their roster and can offer you a role card. You can change it any time. Leave it empty to stay in the contributor pool and pick up one-off tasks.",
+  },
+  secondaryTeam: {
+    title: "Secondary team",
+    what: "A second team you also want to help, if any. Must be different from your primary team.",
+    why: "Shows that team's lead you are available too. Most members leave this empty.",
+  },
+  hoursPerMonth: {
+    title: "Hours per month",
+    what: "Roughly how much time you can give the community each month.",
+    why: "Leads match roles to the time people actually have. Hours are a ceiling, not a floor: nobody is chased for more.",
+  },
+  recentContribution: {
+    title: "Recent contribution",
+    what: "What have you done for Codetopia Community in the last 3 months? Hosted, built, posted, answered, mentored, showed up to help.",
+    why: "This is the evidence a lead uses when offering core roles. Specific beats general: 'booked the venue and handled 80 RSVPs' says more than 'helped with events'.",
+  },
+  levelAndRole: {
+    title: "Level and role",
+    what: "Where you are on the contributor ladder (Member, Contributor, Core team, Lead, Alumni) and the role card you hold, if any.",
+    why: "Set by your team's lead, not edited here. Finish a one-off task to become a Contributor; a lead offers Core roles to people who have delivered.",
+  },
   avatar: {
     title: "Avatar",
     what: "Your photo across the portal — member directory, teams, reflections, and anywhere you're mentioned.",
@@ -55,7 +80,7 @@ export const PROFILE_FIELD_HINTS = {
   },
   gender: {
     title: "Gender",
-    what: "How you identify. 'Prefer not to say' is a complete answer.",
+    what: "Male or female.",
     why: "Used in aggregate to track how representative the community is and to report to programme partners. It isn't shown on your public profile.",
   },
   nationality: {

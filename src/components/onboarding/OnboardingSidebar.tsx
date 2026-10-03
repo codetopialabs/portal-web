@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { TEAM_STEP, TEAM_STEP_INDEX } from "@/data/onboarding";
+import { useFeature } from "@/hooks/useFeatures";
 
-const STEPS = [
+const BASE_STEPS = [
   { label: "Terms", description: "Platform & privacy" },
   { label: "Welcome", description: "Who we are" },
   { label: "Core Values", description: "What we stand for" },
@@ -20,6 +22,10 @@ interface OnboardingSidebarProps {
 }
 
 export function OnboardingSidebar({ currentStep }: OnboardingSidebarProps) {
+  const teamsV2 = useFeature("teamsV2");
+  const STEPS = teamsV2
+    ? [...BASE_STEPS.slice(0, TEAM_STEP_INDEX), TEAM_STEP, ...BASE_STEPS.slice(TEAM_STEP_INDEX)]
+    : BASE_STEPS;
   const progress = Math.round((currentStep / (STEPS.length - 1)) * 100);
 
   return (
