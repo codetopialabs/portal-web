@@ -222,7 +222,7 @@ function RosterRow({ member, onEdit }: { member: RosterMember; onEdit: () => voi
       </div>
       <div className="font-mono text-xs text-text-primary">{MEMBER_LEVEL_LABELS[member.level]}</div>
       <div className="truncate font-mono text-xs text-text-primary">
-        {member.roleTitle || <span className="text-text-muted">No role card</span>}
+        {member.roleTitle || <span className="text-text-muted">No role</span>}
       </div>
       <div>
         <StatusPill status={member.status} />
