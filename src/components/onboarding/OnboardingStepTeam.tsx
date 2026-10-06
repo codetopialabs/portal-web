@@ -9,8 +9,8 @@ import { useOnboardingStore } from "@/store/onboarding.store";
 import { useUserStore } from "@/store/user.store";
 
 // Teams v2 only: rendered by the onboarding page when the teamsV2 flag is on.
-// Picking a team is optional here. Most members stay in the contributor pool
-// and take one-off tasks; a lead offers a core role to people who deliver.
+// Picking a team is optional here. Most members skip it and help now and
+// then, when a team asks in #get-involved; a lead may later ask them to join.
 
 interface OnboardingStepTeamProps {
   onNext: () => void;

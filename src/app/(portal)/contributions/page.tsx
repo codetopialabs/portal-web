@@ -35,8 +35,8 @@ function ContributionsContent() {
               Contributions
             </h1>
             <p className="mt-2 max-w-2xl font-mono text-sm leading-6 text-text-tertiary">
-              Work you did for a team, with a link as proof. Your team lead reviews it. Approved
-              work shows on your public profile and is what leads look at when offering roles.
+              Work you did for a team, with a link to it. The team&apos;s lead reviews it, and
+              approved work shows on your public profile.
             </p>
           </div>
           {teamsV2 && (

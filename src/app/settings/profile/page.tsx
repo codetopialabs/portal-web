@@ -1044,7 +1044,7 @@ export default function SettingsProfilePage() {
                 <div>
                   <p className={labelStyles}>Role</p>
                   <p className="font-mono text-sm text-zinc-900 mt-1">
-                    {profile?.roleTitle || <span className="text-zinc-400">No role card yet</span>}
+                    {profile?.roleTitle || <span className="text-zinc-400">No role yet</span>}
                   </p>
                 </div>
                 {profile?.status && (
@@ -1087,11 +1087,11 @@ export default function SettingsProfilePage() {
                           id="primary-team"
                           className="h-11 w-full rounded-none border-zinc-200 bg-white px-3 font-mono text-sm text-zinc-900 focus-visible:border-zinc-900 focus-visible:ring-0 data-placeholder:text-zinc-400"
                         >
-                          <SelectValue placeholder="No team, contributor pool" />
+                          <SelectValue placeholder="No team" />
                         </SelectTrigger>
                         <SelectContent className="rounded-none border border-zinc-200 bg-white font-mono text-sm shadow-md z-50 p-1 min-w-50">
                           <SelectItem value="none" className={selectItemStyles}>
-                            No team, contributor pool
+                            No team
                           </SelectItem>
                           {communityTeams.map((team) => (
                             <SelectItem

@@ -13,7 +13,7 @@ export const PROFILE_FIELD_HINTS = {
   primaryTeam: {
     title: "Primary team",
     what: "The community team you want to help in: Events, Projects & Tech, Comms & Brand, Operations or Partnerships.",
-    why: "Its lead sees you on their roster and can offer you a role card. You can change it any time. Leave it empty to stay in the contributor pool and pick up one-off tasks.",
+    why: "Its lead sees you on their roster, so they know you would like to help. You can change it any time. Leave it empty if you would rather help now and then, when a team asks in #get-involved on Discord.",
   },
   secondaryTeam: {
     title: "Secondary team",
@@ -28,12 +28,12 @@ export const PROFILE_FIELD_HINTS = {
   recentContribution: {
     title: "Recent contribution",
     what: "What have you done for Codetopia Community in the last 3 months? Hosted, built, posted, answered, mentored, showed up to help.",
-    why: "This is the evidence a lead uses when offering core roles. Specific beats general: 'booked the venue and handled 80 RSVPs' says more than 'helped with events'.",
+    why: "Leads read this when they look for people to join their team. Specific beats general: 'booked the venue and handled 80 RSVPs' says more than 'helped with events'.",
   },
   levelAndRole: {
     title: "Level and role",
-    what: "Where you are on the contributor ladder (Member, Contributor, Core team, Lead, Alumni) and the role card you hold, if any.",
-    why: "Set by your team's lead, not edited here. Finish a one-off task to become a Contributor; a lead offers Core roles to people who have delivered.",
+    what: "Your place in the community (Member, Contributor, Core team, Lead or Alumni) and your role on a team, if you have one.",
+    why: "Set by your team's lead, not edited here. Ask them if it looks wrong.",
   },
   avatar: {
     title: "Avatar",
