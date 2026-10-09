@@ -117,7 +117,7 @@ function DiscordLinkContent() {
                 onClick={handleConfirm}
                 className="w-full flex items-center justify-center gap-2 rounded-md bg-white text-black text-sm font-semibold py-2.5 px-4 hover:bg-zinc-200 transition-colors"
               >
-                Confirm — Connect my Discord
+                Confirm: Connect my Discord
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -141,7 +141,7 @@ function DiscordLinkContent() {
                 <h2 className="text-2xl font-sans font-bold text-white">You're all set!</h2>
                 <p className="text-sm text-zinc-400">
                   Your Discord account is now linked to your Codetopia portal account. Head back to
-                  Discord — the bot will grant you access shortly.
+                  Discord. The bot will give you access shortly.
                 </p>
               </div>
             </>

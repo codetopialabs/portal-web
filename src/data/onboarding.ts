@@ -10,3 +10,14 @@ export const ONBOARDING_STEPS = [
   { label: "Your Profile", description: "Set up your account" },
   { label: "Welcome In", description: "You're all set" },
 ] as const;
+
+// Teams v2 adds a "Your Team" step between Goals and Profile.
+export const TEAM_STEP = { label: "Your Team", description: "Where you'd like to help" } as const;
+export const TEAM_STEP_INDEX = 8;
+
+export function getOnboardingSteps(teamsV2: boolean) {
+  if (!teamsV2) return [...ONBOARDING_STEPS];
+  const steps = [...ONBOARDING_STEPS] as { label: string; description: string }[];
+  steps.splice(TEAM_STEP_INDEX, 0, TEAM_STEP);
+  return steps;
+}

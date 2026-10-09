@@ -6,6 +6,7 @@ import {
   Code2,
   GitFork,
   Globe,
+  HeartPulse,
   Home,
   Key,
   Layers,
@@ -20,6 +21,7 @@ import {
   UserCheck,
   Users,
   Users2,
+  UsersRound,
 } from "lucide-react";
 import type { NavGroup } from "@/types/navigation";
 
@@ -140,8 +142,62 @@ const INTEGRATIONS_MENU_GROUP: NavGroup = {
   ],
 };
 
-export function getDashboardMenuGroups(canAccessAdmin: boolean): NavGroup[] {
-  return canAccessAdmin
+const MY_TEAM_ITEM = {
+  icon: UsersRound,
+  label: "My Team",
+  href: "/my-team",
+  activePrefix: "/my-team",
+};
+
+const CONTRIBUTIONS_ITEM = {
+  icon: ClipboardCheck,
+  label: "Contributions",
+  href: "/contributions",
+  activePrefix: "/contributions",
+};
+
+const TEAM_HEALTH_ITEM = {
+  icon: HeartPulse,
+  label: "Team Health",
+  href: "/admin/team-health",
+  activePrefix: "/admin/team-health",
+};
+
+export interface DashboardMenuOptions {
+  /** TEAMS_V2_ENABLED, from useFeature("teamsV2"). */
+  teamsV2?: boolean;
+  /** The user leads or deputises at least one community team. */
+  isTeamLead?: boolean;
+  /** The user holds community_teams.health. */
+  canViewTeamHealth?: boolean;
+}
+
+export function getDashboardMenuGroups(
+  canAccessAdmin: boolean,
+  options: DashboardMenuOptions = {}
+): NavGroup[] {
+  const groups = canAccessAdmin
     ? [...BASE_MENU_GROUPS, ADMIN_MENU_GROUP, INTEGRATIONS_MENU_GROUP]
     : BASE_MENU_GROUPS;
+  if (!options.teamsV2) return groups;
+  // Teams v2: the five community teams are "Teams". The older squad-style
+  // teams under /teams are hidden from the sidebar (their pages stay
+  // reachable by URL and their data is untouched) so the sidebar has one
+  // meaning of "team". Revisit in December. Leads get My Team; Team Health
+  // joins the admin group for those who may see it.
+  return groups.map((group) => {
+    let items = group.items
+      .filter((item) => item.href !== "/teams" && item.href !== "/admin/teams")
+      .map((item) => (item.href === "/admin/departments" ? { ...item, label: "Teams" } : item));
+    if (group.label === "My Space") {
+      items = options.isTeamLead
+        ? [MY_TEAM_ITEM, CONTRIBUTIONS_ITEM, ...items]
+        : [CONTRIBUTIONS_ITEM, ...items];
+    }
+    if (group.label === "Admin" && options.canViewTeamHealth) {
+      const at = items.findIndex((item) => item.href === "/admin/departments");
+      items.splice(at === -1 ? items.length : at + 1, 0, TEAM_HEALTH_ITEM);
+    }
+    return { ...group, items };
+  });
 }
