@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteRole, useRoles } from "@/hooks/useAdmin";
+import { useFeature } from "@/hooks/useFeatures";
 import { usePermission } from "@/hooks/usePermission";
 
 type RoleFilter = "all" | "system" | "custom";
@@ -117,9 +118,13 @@ function RoleRow({
     memberCount: number;
     isSystem: boolean;
     isPublic: boolean;
+    discordRoleId?: string;
+    color?: string;
+    synced?: boolean;
   };
   canDelete: boolean;
 }) {
+  const roleSync = useFeature("roleSync");
   const highRisk = role.permissions.some((p) =>
     ["users.delete", "users.suspend", "roles.delete"].includes(p)
   );
@@ -140,6 +145,13 @@ function RoleRow({
 
         {/* Identity */}
         <div className="flex items-center gap-2 pr-6">
+          {roleSync && role.color && (
+            <span
+              aria-hidden="true"
+              className="h-2.5 w-2.5 shrink-0 rounded-full border border-grey-300"
+              style={{ backgroundColor: role.color }}
+            />
+          )}
           <span className="truncate font-sans text-sm font-bold text-text-primary">
             {role.displayName}
           </span>
@@ -161,6 +173,14 @@ function RoleRow({
         </div>
         <p className="mt-0.5 font-mono text-[11px] text-text-muted">
           {role.name} · rank {role.rank}
+          {roleSync &&
+            (role.discordRoleId && role.synced ? (
+              <> · On Discord</>
+            ) : role.discordRoleId ? (
+              <> · Protected</>
+            ) : (
+              <> · Portal only</>
+            ))}
         </p>
 
         {/* Footer */}

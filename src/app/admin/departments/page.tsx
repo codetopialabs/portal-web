@@ -10,6 +10,7 @@ import { HealthPill } from "@/components/community-teams/pills";
 import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRoles } from "@/hooks/useAdmin";
 import { useTeamHealth } from "@/hooks/useCommunityTeams";
 import { useDeleteDepartment, useDepartments } from "@/hooks/useDepartments";
 import { useFeature } from "@/hooks/useFeatures";
@@ -28,6 +29,9 @@ function DepartmentRow({
 }) {
   const { mutate: deleteDepartment, isPending } = useDeleteDepartment();
   const teamsV2 = useFeature("teamsV2");
+  const roleSync = useFeature("roleSync");
+  const { data: roles } = useRoles();
+  const teamRole = roleSync ? roles?.find((r) => r.id === department.role) : undefined;
   const hasTeams = department.teamCount > 0;
 
   return (
@@ -68,7 +72,21 @@ function DepartmentRow({
         <p className="mt-1.5 font-mono text-[11px] text-zinc-400">
           {department.teamCount} {teamsV2 ? "project" : "team"}
           {department.teamCount === 1 ? "" : "s"} ·{" "}
-          {department.discordRoleId ? (
+          {teamRole ? (
+            // Role sync: the team's Discord role lives on its portal role.
+            <>
+              Team role{" "}
+              <Link
+                href={`/admin/roles/${teamRole.name}`}
+                className="text-zinc-600 underline underline-offset-2 hover:text-zinc-900"
+              >
+                {teamRole.displayName}
+              </Link>
+              {!teamRole.discordRoleId && (
+                <span className="text-amber-700"> · not on Discord yet</span>
+              )}
+            </>
+          ) : department.discordRoleId ? (
             <>
               Discord role <span className="text-zinc-600">{department.discordRoleId}</span>
             </>
