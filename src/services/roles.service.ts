@@ -27,6 +27,9 @@ export const RolesService = {
       team_role_requirement: data.teamRoleRequirement ?? "any",
       requires_contribution: data.requiresContribution ?? false,
       permissions: data.permissions,
+      ...(data.discordRoleId !== undefined && { discord_role_id: data.discordRoleId }),
+      ...(data.color !== undefined && { color: data.color }),
+      ...(data.synced !== undefined && { synced: data.synced }),
     });
     return res.data.data;
   },
@@ -45,6 +48,9 @@ export const RolesService = {
     if (data.requiresContribution !== undefined)
       payload.requires_contribution = data.requiresContribution;
     if (data.permissions !== undefined) payload.permissions = data.permissions;
+    if (data.discordRoleId !== undefined) payload.discord_role_id = data.discordRoleId;
+    if (data.color !== undefined) payload.color = data.color;
+    if (data.synced !== undefined) payload.synced = data.synced;
     const res = await axiosInstance.patch<ApiResponse<Role>>(`${ROLES_BASE}/${slug}/`, payload);
     return res.data.data;
   },

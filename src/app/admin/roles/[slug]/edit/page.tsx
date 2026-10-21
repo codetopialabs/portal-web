@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  DiscordRoleFields,
+  type DiscordRoleValues,
+  discordRoleErrors,
+} from "@/components/admin/DiscordRoleFields";
 import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -13,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRole as useAdminRole, usePermissionList, useUpdateRole } from "@/hooks/useAdmin";
+import { useFeature } from "@/hooks/useFeatures";
 import { buildPermissionVocab, compressScopes } from "@/lib/scopes";
 import type { RoleDetail } from "@/types/roles.types";
 
@@ -66,6 +72,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
   const router = useRouter();
   const { mutate: updateRole, isPending } = useUpdateRole();
   const { data: allPermissions } = usePermissionList();
+  const roleSync = useFeature("roleSync");
 
   const [displayName, setDisplayName] = useState(role.displayName ?? "");
   const [description, setDescription] = useState(role.description ?? "");
@@ -83,7 +90,18 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
   );
   const [permissions, setPermissions] = useState<string[]>(role.permissions ?? []);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [errors, setErrors] = useState<{ displayName?: string; rank?: string; form?: string }>({});
+  const [discord, setDiscord] = useState<DiscordRoleValues>({
+    discordRoleId: role.discordRoleId ?? "",
+    color: role.color ?? "",
+    synced: role.synced ?? true,
+  });
+  const [errors, setErrors] = useState<{
+    displayName?: string;
+    rank?: string;
+    discordRoleId?: string;
+    color?: string;
+    form?: string;
+  }>({});
 
   const vocab = useMemo(() => buildPermissionVocab(allPermissions ?? []), [allPermissions]);
   const compressed = useMemo(() => compressScopes(permissions, vocab), [permissions, vocab]);
@@ -95,6 +113,7 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
     if (!rank.trim()) next.rank = "Rank is required.";
     else if (Number.isNaN(rankValue) || rankValue < 1 || rankValue > 99)
       next.rank = "Rank must be between 1 and 99.";
+    if (roleSync) Object.assign(next, discordRoleErrors(discord));
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -115,11 +134,20 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
           teamRoleRequirement,
           requiresContribution,
           permissions,
+          ...(roleSync && {
+            discordRoleId: discord.discordRoleId.trim(),
+            color: discord.color.toLowerCase(),
+            synced: discord.synced,
+          }),
         },
       },
       {
         onSuccess: (updatedRole) => {
-          toast.success("Role updated.");
+          if (roleSync && discord.synced && !updatedRole.discordRoleId) {
+            toast.warning("Role saved. Discord could not be reached; save again to retry.");
+          } else {
+            toast.success("Role updated.");
+          }
           router.push(`/admin/roles/${updatedRole.name}`);
         },
         onError: (error: Error) =>
@@ -301,6 +329,18 @@ function RoleEditFields({ slug, role }: { slug: string; role: RoleDetail }) {
           )}
         </div>
       </section>
+
+      {roleSync && (
+        <DiscordRoleFields
+          values={discord}
+          onChange={(next) => {
+            setDiscord(next);
+            setErrors((p) => ({ ...p, discordRoleId: undefined, color: undefined }));
+          }}
+          errors={errors}
+          isNew={false}
+        />
+      )}
 
       <section className="border border-grey-200 bg-white">
         <div className="flex items-center justify-between gap-4 border-b border-grey-200 bg-grey-50 px-5 py-3">

@@ -12,6 +12,8 @@ export interface Department {
   description: string;
   /** The Discord role that unlocks this department's channel. */
   discordRoleId: string;
+  /** Role sync: the id of the team's own role. Holding it puts someone on the team. */
+  role?: number | null;
   /** Display order on the public directory. Lower first. */
   order: number;
   teamCount: number;

@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  DiscordRoleFields,
+  type DiscordRoleValues,
+  discordRoleErrors,
+} from "@/components/admin/DiscordRoleFields";
 import { PermissionSelectSheet } from "@/components/admin/PermissionSelectSheet";
 import { ScopeChips } from "@/components/admin/ScopeChips";
 import { RouteGuard } from "@/components/auth/RouteGuard";
@@ -12,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateRole, usePermissionList } from "@/hooks/useAdmin";
+import { useFeature } from "@/hooks/useFeatures";
 import { buildPermissionVocab, compressScopes } from "@/lib/scopes";
 
 const SLUG_REGEX = /^[a-z0-9_]+$/;
@@ -20,6 +26,7 @@ function NewRoleForm() {
   const router = useRouter();
   const { mutate: createRole, isPending } = useCreateRole();
   const { data: allPermissions } = usePermissionList();
+  const roleSync = useFeature("roleSync");
 
   const [name, setName] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -32,10 +39,17 @@ function NewRoleForm() {
   const [requiresContribution, setRequiresContribution] = useState(false);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [discord, setDiscord] = useState<DiscordRoleValues>({
+    discordRoleId: "",
+    color: "",
+    synced: true,
+  });
   const [errors, setErrors] = useState<{
     name?: string;
     displayName?: string;
     rank?: string;
+    discordRoleId?: string;
+    color?: string;
     form?: string;
   }>({});
 
@@ -52,6 +66,7 @@ function NewRoleForm() {
     if (!rank.trim()) next.rank = "Rank is required.";
     else if (Number.isNaN(rankValue) || rankValue < 1 || rankValue > 99)
       next.rank = "Rank must be between 1 and 99.";
+    if (roleSync) Object.assign(next, discordRoleErrors(discord));
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -71,19 +86,33 @@ function NewRoleForm() {
         teamRoleRequirement,
         requiresContribution,
         permissions,
+        ...(roleSync && {
+          discordRoleId: discord.discordRoleId.trim(),
+          color: discord.color.toLowerCase(),
+          synced: discord.synced,
+        }),
       },
       {
-        onSuccess: () => {
-          toast.success("Role created.");
+        onSuccess: (created) => {
+          // Vector makes the Discord role on create; say so if it could not.
+          if (roleSync && discord.synced && !created.discordRoleId) {
+            toast.warning(
+              "Role created on the portal only. Discord could not be reached; save the role again to retry."
+            );
+          } else {
+            toast.success("Role created.");
+          }
           router.push("/admin/roles");
         },
         onError: (err: unknown) => {
-          const status = (err as { status?: number })?.status;
-          setErrors((prev) =>
-            status === 400
-              ? { ...prev, name: "A role with this identifier already exists." }
-              : { ...prev, form: "Failed to create the role. Please try again." }
-          );
+          const { status, message = "" } = err as { status?: number; message?: string };
+          setErrors((prev) => {
+            if (status !== 400)
+              return { ...prev, form: "Failed to create the role. Please try again." };
+            if (/discord/i.test(message)) return { ...prev, discordRoleId: message };
+            if (/colou?r/i.test(message)) return { ...prev, color: message };
+            return { ...prev, name: "A role with this identifier already exists." };
+          });
         },
       }
     );
@@ -272,6 +301,18 @@ function NewRoleForm() {
           )}
         </div>
       </section>
+
+      {roleSync && (
+        <DiscordRoleFields
+          values={discord}
+          onChange={(next) => {
+            setDiscord(next);
+            setErrors((p) => ({ ...p, discordRoleId: undefined, color: undefined }));
+          }}
+          errors={errors}
+          isNew
+        />
+      )}
 
       {/* Permissions */}
       <section className="border border-grey-200 bg-white">

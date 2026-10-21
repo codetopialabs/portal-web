@@ -8,6 +8,8 @@ import type { ApiResponse } from "@/types/api.types";
 export interface FeatureFlags {
   /** The five-team structure: team leads, member levels, team health. */
   teamsV2: boolean;
+  /** Roles shared with Discord through Vector. */
+  roleSync: boolean;
 }
 
 export interface PublicConfig {
@@ -18,6 +20,7 @@ export interface PublicConfig {
  * flag off, which is the current behaviour. */
 export const DEFAULT_FEATURES: FeatureFlags = {
   teamsV2: false,
+  roleSync: false,
 };
 
 export const ConfigService = {
