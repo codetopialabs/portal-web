@@ -1,99 +1,340 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  Award,
-  Bot,
-  BrainCircuit,
-  CalendarDays,
-  Cloud,
-  Code2,
-  Cpu,
-  FileText,
-  FlaskConical,
-  Globe,
-  HelpCircle,
-  Link2,
-  MapPin,
-  Paintbrush,
-  Pencil,
-  Shield,
-  Smartphone,
-  Sparkles,
-  TestTube2,
-  Trophy,
-  Users,
-} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ComponentType } from "react";
-import { FaDiscord, FaGithub, FaLinkedin, FaXTwitter } from "react-icons/fa6";
+import { Dialog, Tooltip } from "radix-ui";
+import { type ComponentType, type ReactNode, useEffect, useState } from "react";
+import {
+  PiBehanceLogo,
+  PiCheck,
+  PiCodepenLogo,
+  PiDiscordLogo,
+  PiDribbbleLogo,
+  PiFacebookLogo,
+  PiGithubLogo,
+  PiGitlabLogo,
+  PiGitMergeFill,
+  PiGlobeSimple,
+  PiIdentificationCardFill,
+  PiInstagramLogo,
+  PiLinkedinLogo,
+  PiLinkSimple,
+  PiLinkSimpleHorizontal,
+  PiMedalFill,
+  PiMediumLogo,
+  PiMoonFill,
+  PiPencilSimple,
+  PiStackOverflowLogo,
+  PiSunFill,
+  PiTelegramLogo,
+  PiTiktokLogo,
+  PiWhatsappLogo,
+  PiX,
+  PiXLogo,
+} from "react-icons/pi";
 import { PublicProfileBadges } from "@/components/badges/PublicProfileBadges";
 import { ContributionGraph } from "@/components/contributions/ContributionGraph";
-import { PublicProfileContributions } from "@/components/profile/PublicProfileContributions";
+import { ProfileCoverArt } from "@/components/profile/ProfileCoverArt";
+import { ProfileRow, ProfileSection } from "@/components/profile/ProfileSection";
 import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
 import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
-import { formatJoinedAt, roleBadgeColors } from "@/components/profile/utils";
+import { formatJoinedAt } from "@/components/profile/utils";
 import { useMemberBadges } from "@/hooks/useBadges";
 import { usePermission } from "@/hooks/usePermission";
 import { LINK_PLATFORMS } from "@/lib/social-platforms";
-import { getAvatarUrl, getCoverUrl, getWallOfImpactUrl, sanitizeHandle } from "@/lib/utils";
+import {
+  cn,
+  getAvatarUrl,
+  getCoverUrl,
+  getWallOfImpactUrl,
+  sanitizeHandle,
+  withCloudinaryTransform,
+} from "@/lib/utils";
 import { type CommunityMember, UserService } from "@/services/user.service";
 import { useUserStore } from "@/store/user.store";
-import type { SocialLink } from "@/types/profile";
 import { normalizeUrl } from "@/utils/url";
 
-interface DisciplineMeta {
-  label: string;
-  icon: ComponentType<{ className?: string }>;
-}
-
-const DISCIPLINE_MAP: Record<string, DisciplineMeta> = {
-  software_engineering: { label: "Software Engineering", icon: Code2 },
-  ux_ui_design: { label: "UX / UI Design", icon: Paintbrush },
-  data_science: { label: "Data Science", icon: FlaskConical },
-  ml_ai: { label: "Machine Learning / AI", icon: BrainCircuit },
-  cybersecurity: { label: "Cybersecurity", icon: Shield },
-  cloud_devops: { label: "Cloud / DevOps", icon: Cloud },
-  product_management: { label: "Product Management", icon: Sparkles },
-  hardware_embedded: { label: "Hardware / Embedded", icon: Cpu },
-  robotics_iot: { label: "Robotics / IoT", icon: Bot },
-  mobile_development: { label: "Mobile Development", icon: Smartphone },
-  qa_testing: { label: "QA / Testing", icon: TestTube2 },
-  technical_writing: { label: "Technical Writing", icon: FileText },
-  other: { label: "Other", icon: HelpCircle },
+const DISCIPLINE_LABELS: Record<string, string> = {
+  software_engineering: "Software Engineering",
+  ux_ui_design: "UX / UI Design",
+  data_science: "Data Science",
+  ml_ai: "Machine Learning / AI",
+  cybersecurity: "Cybersecurity",
+  cloud_devops: "Cloud / DevOps",
+  product_management: "Product Management",
+  hardware_embedded: "Hardware / Embedded",
+  robotics_iot: "Robotics / IoT",
+  mobile_development: "Mobile Development",
+  qa_testing: "QA / Testing",
+  technical_writing: "Technical Writing",
+  other: "Other",
 };
 
-function SectionHeader({
-  icon: Icon,
-  title,
-  meta,
-  size = "default",
-}: {
-  icon: ComponentType<{ className?: string }>;
-  title: string;
-  meta?: string;
-  size?: "default" | "compact";
-}) {
-  const isCompact = size === "compact";
+type IconType = ComponentType<{ className?: string }>;
+
+// One icon family (Phosphor, regular weight) for every link on the page, so the row
+// of links reads as a set. Platforms without a match fall back to a link.
+const PLATFORM_ICONS: Record<string, IconType> = {
+  gitlab: PiGitlabLogo,
+  stackoverflow: PiStackOverflowLogo,
+  codepen: PiCodepenLogo,
+  dribbble: PiDribbbleLogo,
+  behance: PiBehanceLogo,
+  instagram: PiInstagramLogo,
+  facebook: PiFacebookLogo,
+  tiktok: PiTiktokLogo,
+  telegram: PiTelegramLogo,
+  whatsapp: PiWhatsappLogo,
+  medium: PiMediumLogo,
+};
+
+interface ProfileLink {
+  label: string;
+  href: string;
+  icon: IconType;
+}
+
+function yearRange(start: string, end: string | null | undefined) {
+  const from = new Date(start).getFullYear();
+  if (!end) return `${from} – Now`;
+  const to = new Date(end).getFullYear();
+  return from === to ? `${from}` : `${from} – ${to}`;
+}
+
+// Copies the profile's address so members can paste it anywhere.
+function CopyLinkButton({ username }: { username: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <div
-      className={`flex items-center justify-between gap-3 border-b border-zinc-100 ${isCompact ? "px-5 py-3" : "px-6 py-4"}`}
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(`${window.location.origin}/${username}`);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch {
+          // Clipboard can be blocked (e.g. insecure context); nothing to undo.
+        }
+      }}
+      className="inline-flex items-center gap-1.5 font-mono text-sm text-zinc-600 dark:text-zinc-400 transition-colors hover:text-zinc-950 dark:hover:text-white"
     >
-      <div className="flex items-center gap-2.5">
-        {isCompact ? (
-          <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-        ) : (
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-zinc-950 text-white">
-            <Icon className="h-3.5 w-3.5" />
-          </div>
-        )}
-        <h2 className={`font-sans font-bold text-zinc-900 ${isCompact ? "text-base" : "text-lg"}`}>
-          {title}
-        </h2>
-      </div>
-      {meta && <span className="font-mono text-[10px] text-zinc-400">{meta}</span>}
-    </div>
+      {copied ? <PiCheck className="h-4 w-4" /> : <PiLinkSimpleHorizontal className="h-4 w-4" />}
+      {copied ? "Copied" : "Copy link"}
+    </button>
+  );
+}
+
+type Detail = { label: string; value: ReactNode };
+
+// Short labels, like skills, roles and teams, sit in grey pills.
+const PILL_CLASS =
+  "rounded-md bg-[#efefef] px-2.5 py-1 font-mono text-sm text-zinc-700 dark:bg-[#1f1f1f] dark:text-zinc-300";
+
+// The avatar sits a third over the cover's bottom edge. A member's own
+// photo opens full size on click; the generated fallback has nothing to show.
+function ProfileAvatar({ url, name }: { url: string; name: string }) {
+  const avatarClass =
+    "relative -mt-10 h-28 w-28 bg-[#f2f2f2] object-cover ring-1 ring-black/10 dark:bg-[#1c1c1c] dark:ring-white/10 sm:-mt-14 sm:h-40 sm:w-40";
+
+  const [open, setOpen] = useState(false);
+
+  if (!url?.trim()) {
+    // biome-ignore lint/performance/noImgElement: generated avatar
+    return <img src={getAvatarUrl(url, name)} alt={name} className={avatarClass} />;
+  }
+
+  return (
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger asChild>
+        <button
+          type="button"
+          aria-label={`View ${name}'s photo`}
+          className="block cursor-zoom-in outline-offset-4 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-zinc-950 dark:focus-visible:outline-white"
+        >
+          {/* 320px covers the 160px avatar on retina screens. */}
+          {/* biome-ignore lint/performance/noImgElement: user avatar */}
+          <img
+            src={withCloudinaryTransform(url, "c_fill,g_face,w_320,h_320,f_auto,q_auto")}
+            alt={name}
+            className={avatarClass}
+          />
+        </button>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/85 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        <Dialog.Content
+          aria-describedby={undefined}
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          // The content fills the screen, so a click around the photo lands
+          // on it rather than the overlay: treat that as a backdrop click.
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setOpen(false);
+          }}
+        >
+          <Dialog.Title className="sr-only">{name}</Dialog.Title>
+          {/* Shown no larger than it was uploaded, so small photos stay sharp. */}
+          {/* biome-ignore lint/performance/noImgElement: user avatar */}
+          <img
+            src={withCloudinaryTransform(url, "c_limit,w_1200,h_1200,f_auto,q_auto")}
+            alt={name}
+            className="max-h-[85vh] max-w-full object-contain"
+          />
+          <Dialog.Close
+            aria-label="Close"
+            className="absolute top-4 right-4 p-2 text-white/70 outline-offset-2 hover:text-white focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-white"
+          >
+            <PiX aria-hidden className="h-6 w-6" />
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+type Pill = { label: string; description?: string };
+
+// A pill with a description says what it means on hover or focus.
+function Pills({ items }: { items: (string | Pill)[] }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {items.map((item) => {
+        const { label, description } = typeof item === "string" ? { label: item } : item;
+        return (
+          <li key={label} className="flex">
+            {description ? (
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      PILL_CLASS,
+                      "cursor-help outline-offset-2 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-zinc-950 dark:hover:bg-[#2a2a2a] dark:focus-visible:outline-white"
+                    )}
+                  >
+                    {label}
+                  </button>
+                </Tooltip.Trigger>
+                {/* Not portalled, so it sits inside the profile's .dark
+                    wrapper and follows the page theme. */}
+                <Tooltip.Content
+                  side="top"
+                  sideOffset={6}
+                  className="z-50 max-w-xs bg-zinc-950 px-3 py-2 font-mono text-xs leading-snug text-white dark:bg-white dark:text-zinc-950"
+                >
+                  {description}
+                  <Tooltip.Arrow className="fill-zinc-950 dark:fill-white" />
+                </Tooltip.Content>
+              </Tooltip.Root>
+            ) : (
+              <span className={PILL_CLASS}>{label}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+// Facts about the member, under the header: a quiet label over each value,
+// in rows of three so they line up however many there are.
+function DetailsList({ details }: { details: Detail[] }) {
+  return (
+    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-3">
+      {details.map(({ label, value }) => (
+        <div key={label} className="flex min-w-0 flex-col gap-1">
+          <dt className="font-sans text-sm text-zinc-500">{label}</dt>
+          <dd className="font-mono text-base font-medium leading-snug text-zinc-950 dark:text-white [&_ul]:mt-1">
+            {value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+type View = "overview" | "contributions" | "badges";
+type Theme = "light" | "dark";
+
+const THEME_KEY = "profile-theme";
+
+interface RailItem {
+  view: View;
+  label: string;
+  icon: IconType;
+  count?: number;
+}
+
+// The left rail, like an editor's activity bar: one quiet icon per part of
+// the profile, a count where there is one, and a bar beside the open one.
+// It sits just left of the profile column; on smaller screens it moves to
+// the bottom of the screen.
+function ProfileRail({
+  items,
+  active,
+  onSelect,
+  theme,
+  onToggleTheme,
+}: {
+  items: RailItem[];
+  active: View;
+  onSelect: (view: View) => void;
+  theme: Theme;
+  onToggleTheme: () => void;
+}) {
+  const ThemeIcon = theme === "dark" ? PiSunFill : PiMoonFill;
+  return (
+    <nav
+      aria-label="Profile sections"
+      className="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-black/5 dark:border-white/5 bg-[#ebebeb] dark:bg-[#0b0b0b] py-1 lg:sticky lg:inset-x-auto lg:bottom-auto lg:top-24 lg:w-20 lg:flex-col lg:justify-start lg:gap-1 lg:border-t-0 lg:bg-transparent lg:dark:bg-transparent lg:py-0"
+    >
+      {items.map(({ view, label, icon: Icon, count }) => {
+        const isActive = view === active;
+        return (
+          <button
+            key={view}
+            type="button"
+            onClick={() => onSelect(view)}
+            aria-label={count ? `${label} (${count})` : label}
+            aria-current={isActive ? "page" : undefined}
+            className={cn(
+              "relative flex h-14 flex-1 lg:w-20 lg:flex-none flex-col items-center justify-center gap-1 transition-colors duration-200",
+              isActive
+                ? "text-zinc-950 dark:text-white"
+                : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200"
+            )}
+          >
+            <span
+              aria-hidden
+              className={cn(
+                "absolute bg-zinc-950 dark:bg-white transition-opacity duration-200",
+                "inset-x-3 top-0 h-0.5 lg:inset-x-auto lg:inset-y-2 lg:left-0 lg:h-auto lg:w-0.5",
+                isActive ? "opacity-100" : "opacity-0"
+              )}
+            />
+            <Icon className="h-6 w-6" />
+            <span className="font-sans text-[11px] font-medium leading-none">{label}</span>
+            {count ? (
+              <span className="absolute top-0.5 right-4 grid h-5 min-w-5 place-items-center rounded-full bg-zinc-950 dark:bg-white px-1 font-mono text-[11px] font-bold leading-none text-white dark:text-black">
+                {count > 99 ? "99+" : count}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
+      {/* Kept apart at the bottom, like the settings icons in an editor. */}
+      <button
+        type="button"
+        onClick={onToggleTheme}
+        aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+        className="flex h-14 flex-1 lg:w-20 lg:flex-none flex-col items-center justify-center gap-1 text-zinc-500 transition-colors duration-200 hover:text-zinc-900 lg:mt-4 dark:hover:text-zinc-200"
+      >
+        <ThemeIcon className="h-6 w-6" />
+        <span className="font-sans text-[11px] font-medium leading-none">
+          {theme === "dark" ? "Light" : "Dark"}
+        </span>
+      </button>
+    </nav>
   );
 }
 
@@ -110,480 +351,402 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
     initialData: initialProfile,
   });
 
+  // Badge count decides whether the Badges section renders at all.
+  const { data: badgeAwards = [] } = useMemberBadges(username);
+
+  // The open section follows the address (#badges etc.), so a link can
+  // point straight at one.
+  const [view, setView] = useState<View>("overview");
+  useEffect(() => {
+    const fromHash = window.location.hash.slice(1);
+    // #activity was its own section before it joined Contributions.
+    if (fromHash === "activity") setView("contributions");
+    else if (["overview", "contributions", "badges"].includes(fromHash)) {
+      setView(fromHash as View);
+    }
+  }, []);
+  // Dark by default; a visitor's own choice is remembered on their device.
+  const [theme, setTheme] = useState<Theme>("dark");
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(THEME_KEY) === "light") setTheme("light");
+    } catch {
+      // Storage can be blocked; the default theme is fine.
+    }
+  }, []);
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    try {
+      window.localStorage.setItem(THEME_KEY, next);
+    } catch {
+      // Storage can be blocked; the switch still works for this visit.
+    }
+  };
+
+  const selectView = (next: View) => {
+    setView(next);
+    window.history.replaceState(null, "", next === "overview" ? " " : `#${next}`);
+  };
+
   if (!profile || isError) {
     notFound();
   }
 
-  // The generated dicebear pattern (no coverImageUrl) is flat, low-contrast
-  // vector art — safe to show at high opacity. A real uploaded photo can be
-  // arbitrarily bright/busy, so it stays closer to the original muted look
-  // to keep the name/badges legible over it.
+  // Only a cover the member uploaded is shown. The generated pattern used
+  // elsewhere is decoration, and this page has none.
   const hasCustomCover = Boolean(profile.coverImageUrl?.trim());
-  const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
   const filteredRoles = profile.communityRoles?.filter((r: string) => r.trim() !== "") || [];
   const roleList = filteredRoles.length > 0 ? filteredRoles : ["Member"];
-  const jobTitle = profile.currentRole || null;
-  const displayLocation = profile.location || null;
   const discipline = profile.discipline
-    ? (DISCIPLINE_MAP[profile.discipline] ?? {
-        label: profile.discipline
-          .replace(/_/g, " ")
-          .replace(/\b\w/g, (l: string) => l.toUpperCase()),
-        icon: HelpCircle,
-      })
+    ? (DISCIPLINE_LABELS[profile.discipline] ??
+      profile.discipline.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()))
     : null;
   const skills = profile.skills ?? [];
+  const teams = profile.teams ?? [];
   const careerProgressions = profile.careerProgressions ?? [];
   const recognitions = profile.recognitions ?? [];
+  const bio = profile.bio?.trim();
   const firstName = profile.fullName?.split(" ")[0] || "This member";
+  const badgeCount = badgeAwards.filter((a) => !a.isRevoked).length;
+  // Empty sections are left out, so a profile with nothing filled in needs
+  // one line saying so instead of a bare page.
+  const hasDetails =
+    Boolean(bio) || careerProgressions.length > 0 || recognitions.length > 0 || skills.length > 0;
 
   const isOwnProfile = currentUser?.username === username;
   const showOwnProfileEdit = isOwnProfile && canEditOwnProfile;
+  // Only the owner sees what's missing, each linking to its place in
+  // settings. Visitors just see the sections that are filled in.
+  const missing = showOwnProfileEdit
+    ? [
+        ...(bio ? [] : [{ label: "Add a bio", href: "/settings/profile#bio" }]),
+        ...(skills.length > 0
+          ? []
+          : [{ label: "Add skills", href: "/settings/profile#settings-skills" }]),
+      ]
+    : [];
   const showAdminEdit = !isOwnProfile && canEditMembers;
 
-  // Badge count for hero stats bar
-  const { data: badgeAwards = [] } = useMemberBadges(username);
-  const badgeCount = badgeAwards.filter((a) => !a.isRevoked).length;
-
-  const socialLinks: SocialLink[] = [];
-  if (profile.discordId) {
-    socialLinks.push({
-      label: profile.discordUsername ? `@${profile.discordUsername}` : "Discord",
-      href: `https://discord.com/users/${profile.discordId}`,
-      icon: FaDiscord,
-    });
-  }
+  const links: ProfileLink[] = [];
   if (profile.githubHandle) {
-    socialLinks.push({
+    links.push({
       label: "GitHub",
       href: `https://github.com/${sanitizeHandle(profile.githubHandle)}`,
-      icon: FaGithub,
-    });
-  }
-  if (profile.twitterHandle) {
-    socialLinks.push({
-      label: "X / Twitter",
-      href: `https://x.com/${sanitizeHandle(profile.twitterHandle)}`,
-      icon: FaXTwitter,
+      icon: PiGithubLogo,
     });
   }
   if (profile.linkedinUrl) {
-    socialLinks.push({
+    links.push({
       label: "LinkedIn",
       href: normalizeUrl(profile.linkedinUrl),
-      icon: FaLinkedin,
+      icon: PiLinkedinLogo,
+    });
+  }
+  if (profile.twitterHandle) {
+    links.push({
+      label: "X",
+      href: `https://x.com/${sanitizeHandle(profile.twitterHandle)}`,
+      icon: PiXLogo,
+    });
+  }
+  if (profile.discordId) {
+    links.push({
+      label: profile.discordUsername ? `Discord: @${profile.discordUsername}` : "Discord",
+      href: `https://discord.com/users/${profile.discordId}`,
+      icon: PiDiscordLogo,
     });
   }
   if (profile.websiteUrl) {
-    socialLinks.push({ label: "Website", href: normalizeUrl(profile.websiteUrl), icon: Globe });
+    links.push({
+      label: "Website",
+      href: normalizeUrl(profile.websiteUrl),
+      icon: PiGlobeSimple,
+    });
   }
   for (const link of profile.socialLinks ?? []) {
     if (!link.url.trim()) continue;
     const platform = LINK_PLATFORMS.find((p) => p.value === link.platform);
-    socialLinks.push({
+    links.push({
       label: link.label || platform?.label || "Link",
       href: normalizeUrl(link.url),
-      icon: platform?.icon ?? Globe,
+      icon: PLATFORM_ICONS[link.platform] ?? PiLinkSimple,
     });
   }
 
+  // Roles are single words: the team level first, then community roles.
+  // "Member" only shows when there is nothing else.
+  const allRoles = [
+    ...new Set([
+      ...(teams.length > 0 && profile.teamLevel ? [profile.teamLevel] : []),
+      ...roleList,
+    ]),
+  ];
+  const roles = allRoles.length > 1 ? allRoles.filter((role) => role !== "Member") : allRoles;
+  const roleDescriptions = new Map(
+    (profile.communityRoleDetails ?? []).map((role) => [role.name, role.description])
+  );
+  if (teams.length > 0 && profile.teamLevel && profile.teamLevelDescription) {
+    roleDescriptions.set(profile.teamLevel, profile.teamLevelDescription);
+  }
+
+  const details: Detail[] = [
+    ...(discipline ? [{ label: "Field", value: discipline }] : []),
+    ...(profile.experienceLevel ? [{ label: "Level", value: profile.experienceLevel }] : []),
+    {
+      label: roles.length > 1 ? "Roles" : "Role",
+      value: (
+        <Pills
+          items={roles.map((role) => ({ label: role, description: roleDescriptions.get(role) }))}
+        />
+      ),
+    },
+    ...(teams.length > 0
+      ? [
+          {
+            label: teams.length > 1 ? "Teams" : "Team",
+            value: (
+              <Pills
+                items={teams.map((team) => ({ label: team.name, description: team.description }))}
+              />
+            ),
+          },
+        ]
+      : []),
+    { label: "Joined", value: formatJoinedAt(profile.joinedAt) },
+  ];
+
+  const railItems: RailItem[] = [
+    { view: "overview", label: "Overview", icon: PiIdentificationCardFill },
+    { view: "contributions", label: "Contributions", icon: PiGitMergeFill },
+    ...(badgeCount > 0
+      ? [{ view: "badges" as const, label: "Badges", icon: PiMedalFill, count: badgeCount }]
+      : []),
+  ];
+  // A section can disappear (e.g. a badge is revoked); fall back to overview.
+  const openView = railItems.some((item) => item.view === view) ? view : "overview";
+
   return (
-    <div className="min-h-screen flex flex-col bg-white text-zinc-950">
-      <PublicProfileHeader />
+    // Tailwind's dark styles apply inside a .dark element, so the switch
+    // sits on a wrapper around the page.
+    <div className={theme === "dark" ? "dark" : undefined}>
+      <div className="flex min-h-screen flex-col bg-[#ebebeb] text-zinc-900 dark:bg-[#0b0b0b] dark:text-zinc-100">
+        <PublicProfileHeader />
 
-      <main className="flex-grow">
-        {/* Hero */}
-        <section className="relative bg-zinc-950">
-          {/* Cover image */}
-          <div className="absolute inset-0 h-96">
-            {/* biome-ignore lint/performance/noImgElement: user cover image */}
-            <img
-              src={getCoverUrl(profile.coverImageUrl, profile.fullName)}
-              alt=""
-              className={`h-full w-full object-cover ${hasCustomCover ? "opacity-45" : "opacity-80"}`}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/10" />
-            <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/40 via-transparent to-transparent" />
-          </div>
-
-          {/* Hero content */}
-          <div className="relative mx-auto max-w-7xl animate-in fade-in slide-in-from-bottom-2 px-4 pb-0 pt-32 duration-500 sm:px-6">
-            {/* Badges */}
-            <div className="mb-5 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-sm transition-colors hover:bg-white/15">
-                <Sparkles className="h-3 w-3 text-white/70" />
-                {primaryRole}
-              </span>
-              {discipline && (
-                <span className="inline-flex items-center gap-1.5 border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white backdrop-blur-sm transition-colors hover:bg-white/15">
-                  <discipline.icon className="h-3 w-3 text-white/70" />
-                  {discipline.label}
-                </span>
-              )}
+        <div className="flex flex-grow pt-16">
+          {/* The panel sits one shade lighter than the frame around it, with a
+            soft corner, so it reads as lifted without any borders. */}
+          <main className="min-h-[calc(100vh-4rem)] min-w-0 flex-grow overflow-x-clip bg-white dark:bg-[#151515] pb-28 sm:rounded-tl-xl lg:pb-24">
+            <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 font-mono text-sm text-zinc-500 sm:px-8">
+              <p className="min-w-0 truncate">
+                community <span className="text-zinc-300 dark:text-zinc-700">›</span> members{" "}
+                <span className="text-zinc-300 dark:text-zinc-700">›</span>{" "}
+                <span className="text-zinc-700 dark:text-zinc-300">{profile.username}</span>
+              </p>
+              <div className="flex shrink-0 items-center gap-5">
+                <CopyLinkButton username={profile.username} />
+                {(showOwnProfileEdit || showAdminEdit) && (
+                  <Link
+                    href={
+                      showOwnProfileEdit
+                        ? "/settings/profile"
+                        : `/admin/members/${profile.username}/edit`
+                    }
+                    className="inline-flex items-center gap-1.5 font-mono text-sm text-zinc-600 dark:text-zinc-400 transition-colors hover:text-zinc-950 dark:hover:text-white"
+                  >
+                    <PiPencilSimple className="h-4 w-4" />
+                    {showOwnProfileEdit ? "Edit profile" : "Edit member"}
+                  </Link>
+                )}
+              </div>
             </div>
 
-            {/* Avatar + name block */}
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-              <div className="h-32 w-32 shrink-0 ring-4 ring-white/20 sm:h-40 sm:w-40">
-                {/* biome-ignore lint/performance/noImgElement: user avatar */}
+            <div className="h-32 w-full overflow-hidden bg-[#f2f2f2] dark:bg-[#1c1c1c] sm:h-56">
+              {hasCustomCover ? (
+                // biome-ignore lint/performance/noImgElement: user cover image
                 <img
-                  src={getAvatarUrl(profile.profilePictureUrl, profile.fullName)}
-                  alt={profile.fullName}
+                  src={getCoverUrl(profile.coverImageUrl, profile.fullName)}
+                  alt=""
                   className="h-full w-full object-cover"
                 />
-              </div>
-
-              <div className="min-w-0">
-                {jobTitle && (
-                  <p className="mb-2 font-mono text-sm font-medium text-white/50">{jobTitle}</p>
-                )}
-                <h1 className="font-sans text-5xl font-black leading-none tracking-tight text-white sm:text-7xl">
-                  {profile.fullName}
-                </h1>
-                <p className="mt-2 font-mono text-sm text-zinc-400">@{profile.username}</p>
-                <div className="mt-5 flex flex-wrap items-center gap-4 font-mono text-[11px] text-zinc-400">
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-zinc-500" />
-                    {displayLocation ?? "Remote"}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <CalendarDays className="h-3.5 w-3.5 text-zinc-500" />
-                    Joined {formatJoinedAt(profile.joinedAt)}
-                  </span>
-                  {socialLinks.slice(0, 3).map((link) => {
-                    const Icon = link.icon;
-                    return (
-                      <a
-                        key={`${link.label}-${link.href}`}
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        title={link.label}
-                        className="inline-flex items-center gap-1.5 text-zinc-400 transition-colors hover:text-white"
-                      >
-                        <Icon className="h-3.5 w-3.5" />
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stats bar */}
-            <div className="mt-0 flex flex-wrap items-stretch border-t border-white/10">
-              <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors first:pl-0 hover:bg-white/[0.03]">
-                <Code2 className="h-4 w-4 text-zinc-600" />
-                <span className="font-sans text-xl font-black text-white">{skills.length}</span>
-                <span className="font-mono text-xs font-medium text-zinc-500">Skills</span>
-              </div>
-              <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors hover:bg-white/[0.03]">
-                <Users className="h-4 w-4 text-zinc-600" />
-                <span className="font-sans text-xl font-black text-white">{roleList.length}</span>
-                <span className="font-mono text-xs font-medium text-zinc-500">
-                  {roleList.length === 1 ? "Role" : "Roles"}
-                </span>
-              </div>
-              {socialLinks.length > 0 && (
-                <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-4 transition-colors hover:bg-white/[0.03]">
-                  <Link2 className="h-4 w-4 text-zinc-600" />
-                  <span className="font-sans text-xl font-black text-white">
-                    {socialLinks.length}
-                  </span>
-                  <span className="font-mono text-xs font-medium text-zinc-500">Links</span>
-                </div>
-              )}
-              {badgeCount > 0 && (
-                <div className="flex items-center gap-2.5 px-5 py-4 transition-colors hover:bg-white/[0.03]">
-                  <Award className="h-4 w-4 text-zinc-600" />
-                  <span className="font-sans text-xl font-black text-white">{badgeCount}</span>
-                  <span className="font-mono text-xs font-medium text-zinc-500">
-                    {badgeCount === 1 ? "Badge" : "Badges"}
-                  </span>
-                </div>
+              ) : (
+                <ProfileCoverArt seed={profile.username} />
               )}
             </div>
-          </div>
-        </section>
 
-        {/* Main body */}
-        <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 pb-16 sm:px-6 lg:grid-cols-[1fr_320px]">
-          {/* Left â€” bio + skills */}
-          <div className="space-y-6">
-            {/* Bio */}
-            <div className="border border-zinc-200 bg-white">
-              <SectionHeader icon={FileText} title="Bio" />
-              <div className="p-6">
-                {profile.bio ? (
-                  <p className="whitespace-pre-wrap font-sans text-sm leading-7 text-zinc-600">
-                    {profile.bio}
-                  </p>
-                ) : (
-                  <p className="font-mono text-sm text-zinc-400 italic">
-                    {firstName} hasn't added a bio yet.
-                  </p>
-                )}
-              </div>
+            {/* Their handle, huge and faint behind the header. */}
+            <div aria-hidden="true" className="relative">
+              <p className="pointer-events-none absolute top-3 right-4 select-none sm:right-8 whitespace-nowrap font-mono text-[clamp(72px,15vw,240px)] font-semibold leading-none tracking-tighter text-[#f2f2f2] dark:text-[#1d1d1d]">
+                @{profile.username}
+              </p>
             </div>
 
-            {/* Career Progression */}
-            <div className="border border-zinc-200 bg-white">
-              <SectionHeader icon={CalendarDays} title="Career Progression" />
-              <div className="p-6">
-                {careerProgressions.length > 0 ? (
-                  <div className="relative space-y-0">
-                    {careerProgressions.map((item, index) => {
-                      const isLast = index === careerProgressions.length - 1;
-                      const isCurrent = !item.endDate;
-                      const totalMonths = (() => {
-                        const start = new Date(item.startDate);
-                        const end = item.endDate ? new Date(item.endDate) : new Date();
-                        return (
-                          (end.getFullYear() - start.getFullYear()) * 12 +
-                          (end.getMonth() - start.getMonth())
-                        );
-                      })();
-                      const years = Math.floor(totalMonths / 12);
-                      const months = totalMonths % 12;
-                      const durationParts: string[] = [];
-                      if (years > 0) durationParts.push(`${years} yr${years > 1 ? "s" : ""}`);
-                      if (months > 0) durationParts.push(`${months} mo${months > 1 ? "s" : ""}`);
-                      const duration = totalMonths < 1 ? "< 1 mo" : durationParts.join(" ");
-                      const fmt = (d: string) =>
-                        new Intl.DateTimeFormat("en", { month: "short", year: "numeric" }).format(
-                          new Date(d)
-                        );
+            <article className="relative mx-auto max-w-3xl px-4 sm:px-8">
+              {/* A strip as tall as the column, left of it, so the rail can
+                  stay in view while the profile scrolls. */}
+              <div className="lg:absolute lg:inset-y-0 lg:-left-24 lg:pt-24">
+                <ProfileRail
+                  items={railItems}
+                  active={openView}
+                  onSelect={selectView}
+                  theme={theme}
+                  onToggleTheme={toggleTheme}
+                />
+              </div>
 
-                      return (
-                        <article key={item.id} className={`relative pl-6 ${isLast ? "" : "pb-7"}`}>
-                          {/* Timeline dot */}
-                          <span
-                            className={`absolute left-0 top-[6px] h-[10px] w-[10px] border-2 ${isCurrent ? "border-zinc-950 bg-zinc-950 shadow-[0_0_0_3px_var(--grey-100)]" : "border-zinc-300 bg-white"}`}
-                          />
-                          {/* Connector line — only between entries, never below the last */}
-                          {!isLast && (
-                            <span className="absolute left-[4px] top-[16px] bottom-0 w-px bg-zinc-200" />
-                          )}
+              <header className="animate-in fade-in slide-in-from-bottom-1 duration-500 motion-reduce:animate-none">
+                <ProfileAvatar url={profile.profilePictureUrl} name={profile.fullName} />
 
-                          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0">
-                              <h3 className="font-sans text-base font-bold text-zinc-950 leading-snug">
+                <div className="mt-5 min-w-0 sm:mt-6">
+                  <h1 className="font-sans text-[32px] font-semibold leading-tight tracking-tighter text-zinc-950 dark:text-white sm:text-5xl">
+                    {/* Non-breaking hyphens keep "Mensah-Bonsu" on one line. */}
+                    {profile.fullName.replaceAll("-", "\u2011")}
+                  </h1>
+                  <p className="mt-1 font-mono text-base text-zinc-500 sm:text-lg">
+                    @{profile.username}
+                  </p>
+                  {(profile.currentRole || profile.location) && (
+                    <p className="mt-3 font-mono text-base text-zinc-600 dark:text-zinc-400 sm:text-lg">
+                      {[profile.currentRole, profile.location].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
+                  {links.length > 0 && (
+                    <ul className="mt-4 flex flex-wrap items-center gap-5 sm:mt-5">
+                      {links.map(({ label, href, icon: Icon }) => (
+                        <li key={`${label}-${href}`}>
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={label}
+                            aria-label={label}
+                            className="text-zinc-500 transition-colors duration-200 hover:text-zinc-950 dark:hover:text-white"
+                          >
+                            <Icon className="h-5 w-5" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </header>
+
+              {/* Who they are in the community sits with the header, so it
+                  shows on every section and never drops to the bottom. */}
+              <div className="mt-8 animate-in fade-in slide-in-from-bottom-1 duration-500 motion-reduce:animate-none sm:mt-10">
+                <DetailsList details={details} />
+              </div>
+
+              <div className="mt-12 sm:mt-20">
+                {openView === "overview" && (
+                  <>
+                    {missing.length > 0 ? (
+                      <p className="mb-12 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-sm text-zinc-600 dark:text-zinc-400">
+                        <span>Only you can see this:</span>
+                        {missing.map(({ label, href }) => (
+                          <Link
+                            key={href}
+                            href={href}
+                            className="text-zinc-950 dark:text-white underline decoration-zinc-400 dark:decoration-zinc-600 underline-offset-4 transition-colors hover:decoration-zinc-950 dark:hover:decoration-white"
+                          >
+                            {label}
+                          </Link>
+                        ))}
+                      </p>
+                    ) : (
+                      !hasDetails && (
+                        <p className="font-mono text-sm text-zinc-600 dark:text-zinc-400">
+                          {firstName} hasn't added profile details yet.
+                        </p>
+                      )
+                    )}
+
+                    {bio && (
+                      <ProfileSection title="About">
+                        <p className="whitespace-pre-wrap font-mono text-base leading-7 text-zinc-700 dark:text-zinc-300">
+                          {bio}
+                        </p>
+                      </ProfileSection>
+                    )}
+                    {skills.length > 0 && (
+                      <ProfileSection title="Skills">
+                        <Pills items={skills} />
+                      </ProfileSection>
+                    )}
+
+                    {recognitions.length > 0 && (
+                      <ProfileSection title="Recognition">
+                        <div className="space-y-9">
+                          {recognitions.map((item) => (
+                            <ProfileRow key={item.id} date={item.period}>
+                              <a
+                                href={getWallOfImpactUrl(item.slug)}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="group block"
+                              >
+                                <h3 className="font-sans text-base font-semibold text-zinc-950 dark:text-white group-hover:underline group-hover:underline-offset-4">
+                                  {item.awardName}
+                                </h3>
+                                <p className="mt-0.5 font-mono text-sm text-zinc-500">
+                                  {item.domain || item.roleLabel || "Codetopia Community"}
+                                </p>
+                                <p className="mt-2 font-mono text-[15px] leading-7 text-zinc-700 dark:text-zinc-300">
+                                  {item.impactSummary}
+                                </p>
+                              </a>
+                            </ProfileRow>
+                          ))}
+                        </div>
+                      </ProfileSection>
+                    )}
+
+                    {careerProgressions.length > 0 && (
+                      <ProfileSection title="Career">
+                        <div className="space-y-9">
+                          {careerProgressions.map((item) => (
+                            <ProfileRow
+                              key={item.id}
+                              date={yearRange(item.startDate, item.endDate)}
+                            >
+                              <h3 className="font-sans text-base font-semibold text-zinc-950 dark:text-white">
                                 {item.title}
                               </h3>
-                              <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
+                              <p className="mt-0.5 font-mono text-sm text-zinc-500">
                                 {item.teamName ?? "Codetopia Community"}
                               </p>
-                              <p className="mt-1 font-mono text-[11px] text-zinc-400">
-                                {fmt(item.startDate)} <span className="text-zinc-300">–</span>{" "}
-                                {isCurrent ? (
-                                  <span className="font-bold text-zinc-950">Present</span>
-                                ) : (
-                                  fmt(item.endDate as string)
-                                )}
-                                <span className="mx-1.5 text-zinc-200">·</span>
-                                {duration}
-                              </p>
-                            </div>
-                          </div>
-
-                          {item.description && (
-                            <p className="mt-2.5 whitespace-pre-wrap font-mono text-xs leading-5 text-zinc-500">
-                              {item.description}
-                            </p>
-                          )}
-                        </article>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="font-mono text-sm text-zinc-400 italic">
-                    {firstName} hasn't added any progression entries yet.
-                  </p>
-                )}
-              </div>
-            </div>
-            {/* Teams v2: approved contributions, with links. Renders nothing
-                while the flag is off or the member has none. */}
-            <PublicProfileContributions username={profile.username} />
-
-            {/* Wall of Impact — only rendered when there's something to show.
-                Unlike bio or skills, an empty "no awards yet" state on every
-                profile reads as an absence rather than an invitation. */}
-            {recognitions.length > 0 && (
-              <div className="border border-zinc-200 bg-white">
-                <SectionHeader
-                  icon={Trophy}
-                  title="Recognition"
-                  meta={`${recognitions.length} award${recognitions.length === 1 ? "" : "s"}`}
-                />
-                <div className="divide-y divide-zinc-100">
-                  {recognitions.map((item) => (
-                    <a
-                      key={item.id}
-                      href={getWallOfImpactUrl(item.slug)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group block p-6 transition-colors hover:bg-zinc-50"
-                    >
-                      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                        <h3 className="font-sans text-base font-bold leading-snug text-zinc-950 group-hover:underline">
-                          {item.awardName}
-                        </h3>
-                        <span className="font-mono text-[11px] text-zinc-400">{item.period}</span>
-                      </div>
-                      <p className="mt-0.5 font-mono text-xs font-bold text-zinc-600">
-                        {item.domain || item.roleLabel || "Codetopia Community"}
-                      </p>
-                      <p className="mt-2.5 font-sans text-sm leading-6 text-zinc-500">
-                        {item.impactSummary}
-                      </p>
-                      {item.achievements.length > 0 && (
-                        <ul className="mt-3 space-y-1.5">
-                          {item.achievements.map((achievement) => (
-                            <li
-                              key={achievement}
-                              className="flex gap-2.5 font-mono text-xs leading-5 text-zinc-500"
-                            >
-                              <span
-                                aria-hidden="true"
-                                className="mt-[7px] h-1 w-1 shrink-0 bg-zinc-300"
-                              />
-                              {achievement}
-                            </li>
+                              {item.description && (
+                                <p className="mt-2 whitespace-pre-wrap font-mono text-[15px] leading-7 text-zinc-700 dark:text-zinc-300">
+                                  {item.description}
+                                </p>
+                              )}
+                            </ProfileRow>
                           ))}
-                        </ul>
-                      )}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Skills */}
-            <div className="border border-zinc-200 bg-white">
-              <SectionHeader
-                icon={Code2}
-                title="Skills"
-                meta={skills.length > 0 ? `${skills.length} total` : undefined}
-              />
-              <div className="p-6">
-                {skills.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="border border-zinc-200 bg-white px-3 py-1.5 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:bg-zinc-900 hover:text-white"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="font-mono text-sm text-zinc-400 italic">No skills added yet.</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Right sidebar */}
-          <aside className="space-y-4">
-            {/* Edit / action buttons */}
-            {showOwnProfileEdit && (
-              <Link
-                href="/settings/profile"
-                className="flex h-11 w-full items-center justify-center gap-2 bg-zinc-900 font-mono text-sm font-medium text-white shadow-[4px_4px_0_0_var(--grey-300)] transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-zinc-800 hover:shadow-[5px_5px_0_0_var(--grey-300)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_0_var(--grey-300)]"
-              >
-                Edit Your Profile
-                <Link2 className="h-4 w-4" />
-              </Link>
-            )}
-            {showAdminEdit && (
-              <Link
-                href={`/admin/members/${profile.username}/edit`}
-                className="flex h-11 w-full items-center justify-center gap-2 border border-zinc-900 font-mono text-sm font-medium text-zinc-950 shadow-[4px_4px_0_0_var(--grey-200)] transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-zinc-900 hover:text-white hover:shadow-[5px_5px_0_0_var(--grey-200)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_0_var(--grey-200)]"
-              >
-                <Pencil className="h-4 w-4" />
-                Edit Member
-              </Link>
-            )}
-
-            {/* Discipline */}
-            {discipline && (
-              <div className="border border-zinc-200 bg-white">
-                <SectionHeader icon={discipline.icon} title="Discipline" size="compact" />
-                <div className="p-5">
-                  <div className="flex items-center gap-3 border border-zinc-900 bg-zinc-900 px-4 py-3">
-                    <discipline.icon className="h-4 w-4 shrink-0 text-white/70" />
-                    <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em] text-white">
-                      {discipline.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Community roles */}
-            <div className="border border-zinc-200 bg-white">
-              <SectionHeader icon={Users} title="Community Roles" size="compact" />
-              <div className="divide-y divide-zinc-100">
-                {roleList.map((role, i) => (
-                  <div
-                    key={role}
-                    className="flex items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-zinc-50"
-                  >
-                    <span
-                      className={`inline-flex items-center border px-2.5 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] ${roleBadgeColors[role] ?? roleBadgeColors.Member}`}
-                    >
-                      {role}
-                    </span>
-                    {i === 0 && (
-                      <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-400">
-                        Primary
-                      </span>
+                        </div>
+                      </ProfileSection>
                     )}
-                  </div>
-                ))}
+                  </>
+                )}
+
+                {/* All of their work, from GitHub and their teams, on one
+                    calendar; a day opens to what was done. */}
+                {openView === "contributions" && (
+                  <ContributionGraph
+                    username={profile.username}
+                    joinedAt={profile.joinedAt}
+                    isPublicView
+                    appearance={theme}
+                  />
+                )}
+
+                {openView === "badges" && <PublicProfileBadges username={profile.username} />}
               </div>
-            </div>
+            </article>
+          </main>
+        </div>
 
-            {/* Social links */}
-            {socialLinks.length > 0 && (
-              <div className="border border-zinc-200 bg-white">
-                <SectionHeader icon={Link2} title={`Find ${firstName} online`} size="compact" />
-                <div className="divide-y divide-zinc-100">
-                  {socialLinks.map((link) => {
-                    const Icon = link.icon;
-                    return (
-                      <a
-                        key={`${link.label}-${link.href}`}
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex h-11 items-center gap-3 px-5 font-mono text-[11px] font-bold text-zinc-600 transition-colors hover:bg-zinc-900 hover:text-white"
-                      >
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {link.label}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </aside>
-        </section>
-
-        {badgeCount > 0 && (
-          <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
-            <PublicProfileBadges username={profile.username} />
-          </section>
-        )}
-
-        {/* Contributions */}
-        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
-          <ContributionGraph username={profile.username} joinedAt={profile.joinedAt} isPublicView />
-        </section>
-      </main>
-
-      <PublicProfileFooter />
+        <PublicProfileFooter />
+      </div>
     </div>
   );
 }

@@ -96,6 +96,17 @@ export interface CommunityMember {
   // Detail endpoint only (/users/members/<username>/) — the member list
   // deliberately omits these, so list results won't carry the field.
   recognitions?: MemberRecognition[];
+  // Teams the member is available to help, primary first. Empty while
+  // teams v2 is off.
+  teams?: { id: string; slug: string; name: string; description: string }[];
+  // Level on their team, what that level means and what they do there.
+  // Blank while teams v2 is off.
+  teamLevel?: string;
+  teamLevelDescription?: string;
+  roleTitle?: string;
+  // Public community roles with what each one means, same order as
+  // communityRoles. Detail endpoint only.
+  communityRoleDetails?: { name: string; description: string }[];
 }
 
 export interface UpdateMeRequest {
