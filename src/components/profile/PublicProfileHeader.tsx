@@ -14,7 +14,7 @@ export function PublicProfileHeader() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-zinc-950/85 text-white backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-black/5 bg-white/85 text-zinc-950 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 dark:text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center">
           <Image
@@ -22,7 +22,7 @@ export function PublicProfileHeader() {
             alt="Codetopia Community"
             width={128}
             height={32}
-            className="h-8 w-auto object-contain brightness-0 invert"
+            className="h-8 w-auto object-contain brightness-0 dark:invert"
             priority
           />
         </Link>
@@ -30,14 +30,14 @@ export function PublicProfileHeader() {
           {mounted && session ? (
             <Link
               href="/community"
-              className="hidden h-9 items-center gap-2 border border-white/15 px-3 font-mono text-sm font-medium text-zinc-300 transition-colors hover:bg-white hover:text-zinc-950 sm:inline-flex"
+              className="hidden h-9 items-center gap-2 border border-black/15 px-3 font-mono text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-950 hover:text-white sm:inline-flex dark:border-white/15 dark:text-zinc-300 dark:hover:bg-white dark:hover:text-zinc-950"
             >
               Community
             </Link>
           ) : mounted && !session ? (
             <Link
               href="/login"
-              className="inline-flex h-9 items-center border border-white/15 bg-white px-3 font-mono text-sm font-medium text-zinc-950 transition-colors hover:bg-emerald-100"
+              className="inline-flex h-9 items-center bg-zinc-950 px-3 font-mono text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-emerald-100"
             >
               Sign in
             </Link>

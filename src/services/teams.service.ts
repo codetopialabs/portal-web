@@ -203,11 +203,14 @@ export interface ReviewComment {
 }
 
 export interface ContributionItem {
-  type: "review_approved" | "pull_request_merged";
+  type: "review_approved" | "pull_request_merged" | "contribution_approved";
   title: string;
   url: string;
   timestamp: string;
-  source: "internal" | "github";
+  // "link" is a team contribution's proof: any outside address.
+  source: "internal" | "github" | "link";
+  team?: string;
+  description?: string;
 }
 
 export interface ContributionDay {
