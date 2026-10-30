@@ -102,6 +102,11 @@ function yearRange(start: string, end: string | null | undefined) {
   return from === to ? `${from}` : `${from} – ${to}`;
 }
 
+// The same size and shape as the header's Sign in button, outlined so it
+// sits a step below it.
+const BAR_BUTTON_CLASS =
+  "inline-flex h-9 items-center gap-2 border border-black/15 px-3 font-mono text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-950 hover:text-white dark:border-white/15 dark:text-zinc-300 dark:hover:bg-white dark:hover:text-zinc-950";
+
 // Copies the profile's address so members can paste it anywhere.
 function CopyLinkButton({ username }: { username: string }) {
   const [copied, setCopied] = useState(false);
@@ -117,7 +122,7 @@ function CopyLinkButton({ username }: { username: string }) {
           // Clipboard can be blocked (e.g. insecure context); nothing to undo.
         }
       }}
-      className="inline-flex items-center gap-1.5 font-mono text-sm text-zinc-600 dark:text-zinc-400 transition-colors hover:text-zinc-950 dark:hover:text-white"
+      className={BAR_BUTTON_CLASS}
     >
       {copied ? <PiCheck className="h-4 w-4" /> : <PiLinkSimpleHorizontal className="h-4 w-4" />}
       {copied ? "Copied" : "Copy link"}
@@ -537,13 +542,30 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
           {/* The panel sits one shade lighter than the frame around it, with a
             soft corner, so it reads as lifted without any borders. */}
           <main className="min-h-[calc(100vh-4rem)] min-w-0 flex-grow overflow-x-clip bg-white dark:bg-[#151515] pb-28 sm:rounded-tl-xl lg:pb-24">
-            <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3 font-mono text-sm text-zinc-500 sm:px-8">
-              <p className="min-w-0 truncate">
-                community <span className="text-zinc-300 dark:text-zinc-700">›</span> members{" "}
-                <span className="text-zinc-300 dark:text-zinc-700">›</span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">{profile.username}</span>
-              </p>
-              <div className="flex shrink-0 items-center gap-5">
+            {/* Same container as the header, so the trail starts under the
+                logo and the buttons end under Sign in. */}
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+              <nav aria-label="Breadcrumb" className="min-w-0">
+                <ol className="flex items-center gap-2 font-mono text-sm">
+                  <li>
+                    <Link
+                      href="/community"
+                      className="text-zinc-500 transition-colors hover:text-zinc-950 dark:hover:text-white"
+                    >
+                      Members
+                    </Link>
+                  </li>
+                  <li aria-hidden="true" className="text-zinc-300 dark:text-zinc-700">
+                    /
+                  </li>
+                  <li className="min-w-0 truncate">
+                    <span aria-current="page" className="text-zinc-950 dark:text-white">
+                      @{profile.username}
+                    </span>
+                  </li>
+                </ol>
+              </nav>
+              <div className="flex shrink-0 items-center gap-2">
                 <CopyLinkButton username={profile.username} />
                 {(showOwnProfileEdit || showAdminEdit) && (
                   <Link
@@ -552,7 +574,7 @@ export function PublicProfileContent({ initialProfile }: { initialProfile: Commu
                         ? "/settings/profile"
                         : `/admin/members/${profile.username}/edit`
                     }
-                    className="inline-flex items-center gap-1.5 font-mono text-sm text-zinc-600 dark:text-zinc-400 transition-colors hover:text-zinc-950 dark:hover:text-white"
+                    className={BAR_BUTTON_CLASS}
                   >
                     <PiPencilSimple className="h-4 w-4" />
                     {showOwnProfileEdit ? "Edit profile" : "Edit member"}
