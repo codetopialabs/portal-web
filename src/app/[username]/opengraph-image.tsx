@@ -103,6 +103,11 @@ export default async function OpengraphImage({
 
   const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
   const roleColor = ROLE_COLORS[primaryRole] ?? ROLE_COLORS.Member;
+  // Same as the profile page: members on a team show level and team.
+  const primaryTeam = profile.teams?.[0];
+  const roleLabel = primaryTeam
+    ? `${profile.teamLevel || "Member"}, ${primaryTeam.name}`
+    : primaryRole;
   const avatarSrc = await loadAvatarDataUri(
     getOgAvatarUrl(profile.profilePictureUrl, profile.fullName)
   );
@@ -208,7 +213,7 @@ export default async function OpengraphImage({
                 border: `2px solid ${roleColor.border}`,
               }}
             >
-              {primaryRole}
+              {roleLabel}
             </div>
           </div>
 

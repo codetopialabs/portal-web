@@ -16,6 +16,12 @@ export function getAvatarUrl(url: string | null | undefined, name: string): stri
   return `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}&size=128`;
 }
 
+// Cloudinary resizes on the fly from the URL, so ask for the size a spot
+// needs instead of the full upload. Other hosts are left as they are.
+export function withCloudinaryTransform(url: string, transform: string): string {
+  return url.replace(/(res\.cloudinary\.com\/[^/]+\/image\/upload\/)/, `$1${transform}/`);
+}
+
 export function getCoverUrl(url: string | null | undefined, name: string): string {
   const imageUrl = resolveImageUrl(url);
   if (imageUrl) return imageUrl;
