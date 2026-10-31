@@ -1,30 +1,50 @@
-import { UserX } from "lucide-react";
+"use client";
+
 import Link from "next/link";
-import { PublicProfileFooter } from "@/components/profile/PublicProfileFooter";
-import { PublicProfileHeader } from "@/components/profile/PublicProfileHeader";
+import { useEffect, useState } from "react";
+import { PiArrowUpRight } from "react-icons/pi";
+import {
+  ProfileUnavailable,
+  UNAVAILABLE_ACTION_CLASS,
+} from "@/components/profile/ProfileUnavailable";
+import { getJoinCommunityUrl } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function ProfileNotFound() {
+  // The session lives in storage, so it's only known after mounting.
+  const session = useAuthStore((s) => s.session);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return (
-    <div className="min-h-screen flex flex-col bg-white text-zinc-950">
-      <PublicProfileHeader />
-      <main className="flex flex-1 items-center justify-center px-4 pt-16">
-        <div className="w-full max-w-sm border border-zinc-200 bg-white py-16 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-zinc-200 bg-zinc-50">
-            <UserX className="h-5 w-5 text-zinc-300" />
-          </div>
-          <p className="font-mono text-sm font-bold text-zinc-900">This profile isn't available</p>
-          <p className="mt-1 max-w-xs mx-auto font-mono text-sm text-zinc-500">
-            It may not exist, or the link may be incorrect.
-          </p>
-          <Link
-            href="/community"
-            className="mt-6 inline-flex items-center gap-2 border border-zinc-200 bg-white px-4 py-2 font-mono text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-950"
-          >
-            Back to Community
+    <ProfileUnavailable
+      title="No one here by that name."
+      message="The link might be off, or the profile isn't public."
+      action={
+        // Members can browse everyone; visitors can't, so they're pointed at
+        // joining instead.
+        mounted && session ? (
+          <Link href="/community" className={UNAVAILABLE_ACTION_CLASS}>
+            See all members
           </Link>
-        </div>
-      </main>
-      <PublicProfileFooter />
-    </div>
+        ) : mounted ? (
+          <a
+            href={getJoinCommunityUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={UNAVAILABLE_ACTION_CLASS}
+          >
+            Join the community
+            <span className="sr-only"> (opens in a new tab)</span>
+            <PiArrowUpRight
+              aria-hidden
+              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </a>
+        ) : (
+          <div className="h-9 w-48" />
+        )
+      }
+    />
   );
 }

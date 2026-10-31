@@ -442,17 +442,27 @@ export function ContributionGraph({
               : "min-h-56 [&_[class$=scroll-container]]:pb-4"
           }
         >
-          {isLoading ? (
-            <div
-              className={
-                isPublicView
-                  ? "flex h-40 w-full items-center justify-center rounded-lg bg-[#f2f2f2] dark:bg-[#1c1c1c]"
-                  : "flex h-56 w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50"
-              }
-            >
-              <p
-                className={`font-mono text-xs animate-pulse ${isPublicView ? "text-zinc-600 dark:text-zinc-400" : "text-zinc-600"}`}
+          {isLoading && isPublicView ? (
+            // Faint squares in the calendar's shape (a year of weeks, at its
+            // block size and gap), so nothing jumps when the data arrives.
+            <div role="status" className="overflow-hidden pt-6 pb-4">
+              <span className="sr-only">Loading contributions</span>
+              <div
+                aria-hidden="true"
+                className="grid w-max animate-pulse grid-flow-col grid-rows-7 gap-[3px] motion-reduce:animate-none"
               >
+                {Array.from({ length: 53 * 7 }, (_, index) => (
+                  <span
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed, static placeholder cells
+                    key={index}
+                    className="h-2.5 w-2.5 rounded-[2px] bg-[#efefef] dark:bg-[#1f1f1f]"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : isLoading ? (
+            <div className="flex h-56 w-full items-center justify-center border border-dashed border-zinc-200 bg-zinc-50">
+              <p className="font-mono text-xs animate-pulse text-zinc-600">
                 Loading contributions...
               </p>
             </div>
@@ -467,7 +477,10 @@ export function ContributionGraph({
               <p
                 className={`max-w-xs text-sm ${isPublicView ? "text-zinc-600 dark:text-zinc-400" : "text-zinc-700"}`}
               >
-                No contributions found for {selectedYear ? selectedYear : "the past 12 months"}.
+                {/* "Yet" only while the period is still running. */}
+                {selectedYear && selectedYear !== new Date().getFullYear()
+                  ? `No contributions in ${selectedYear}.`
+                  : `No contributions in ${selectedYear ?? "the past 12 months"} yet.`}
               </p>
             </div>
           ) : (

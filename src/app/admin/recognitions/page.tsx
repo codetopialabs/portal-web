@@ -122,7 +122,7 @@ function RecognitionCard({ item }: { item: Recognition }) {
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <Link
-              href={`/${item.username}`}
+              href={`/@${item.username}`}
               className="font-mono text-[11px] font-medium text-zinc-500 hover:text-zinc-900 hover:underline"
             >
               {item.fullName} · @{item.username}

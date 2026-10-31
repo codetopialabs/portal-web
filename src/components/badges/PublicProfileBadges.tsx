@@ -2,9 +2,11 @@
 
 import { Award, Crown, Trophy, Users, X } from "lucide-react";
 import Image from "next/image";
+import { Dialog } from "radix-ui";
 import { useState } from "react";
 import { ProfileSection } from "@/components/profile/ProfileSection";
 import { useMemberBadges } from "@/hooks/useBadges";
+import { withCloudinaryTransform } from "@/lib/utils";
 import type { BadgeAward } from "@/types/badges.types";
 
 function holderLabel(count: number): string {
@@ -13,82 +15,68 @@ function holderLabel(count: number): string {
   return `${count} holders`;
 }
 
-function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => void }) {
+// Badge art is mostly black line drawings, so it always sits on a light
+// plate, which keeps it visible in dark mode too.
+function BadgeArt({ award, size }: { award: BadgeAward; size: "sm" | "lg" }) {
+  const plate = size === "lg" ? "h-32 w-32 p-5" : "h-20 w-20 p-3.5";
+  return (
+    <div className={`flex shrink-0 items-center justify-center bg-white dark:bg-zinc-300 ${plate}`}>
+      {award.badge.imageUrl ? (
+        <div className="relative h-full w-full">
+          {/* Uploads come with different amounts of empty margin; trimming
+              it lets every badge fill the same box. */}
+          <Image
+            src={withCloudinaryTransform(award.badge.imageUrl, "e_trim")}
+            alt=""
+            fill
+            sizes={size === "lg" ? "88px" : "52px"}
+            className="object-contain"
+          />
+        </div>
+      ) : (
+        <Award aria-hidden className="h-1/2 w-1/2 text-zinc-500" />
+      )}
+    </div>
+  );
+}
+
+// One badge's details, over the page. Not portalled, so it sits inside the
+// profile's theme wrapper and follows light and dark.
+export function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => void }) {
   const count = award.badge.awardCount ?? 0;
+  const HolderIcon = count <= 1 ? Crown : count <= 5 ? Trophy : Users;
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay closes dialog on click — keyboard users use the Escape key handler on the inner dialog
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-zinc-950/60 backdrop-blur-[2px] p-4 animate-[fade-in_0.15s_ease-out]"
-      role="presentation"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm overflow-hidden border border-zinc-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#151515] animate-[fade-in_0.2s_ease-out]"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${award.badge.name} badge details`}
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={(e) => e.key === "Escape" && onClose()}
-      >
-        {/* Badge hero — dark background to make artwork pop */}
-        <div className="relative flex justify-center bg-zinc-950 px-6 py-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-3 top-3 grid h-7 w-7 place-items-center text-zinc-500 transition-colors hover:text-white"
-            aria-label="Close badge details"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-          <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/5">
-            {award.badge.imageUrl ? (
-              <div className="relative h-16 w-16 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
-                <Image
-                  src={award.badge.imageUrl}
-                  alt={award.badge.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <Award className="h-10 w-10 text-zinc-500" />
-            )}
-          </div>
+    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 animate-in fade-in-0" />
+      <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 bg-white text-zinc-900 ring-1 ring-black/10 outline-none animate-in fade-in-0 zoom-in-95 dark:bg-[#151515] dark:text-zinc-100 dark:ring-white/10">
+        <div className="flex justify-center bg-[#f2f2f2] py-8 dark:bg-[#1c1c1c]">
+          <BadgeArt award={award} size="lg" />
         </div>
 
-        {/* Info */}
-        <div className="px-5 py-4">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-            {award.featuredRank !== null ? "Featured badge" : "Badge earned"}
+        <div className="px-6 pt-5 pb-6">
+          <p className="font-mono text-xs text-zinc-500">
+            {award.featuredRank !== null ? "Featured badge" : "Badge"}
           </p>
-          <h3 className="mt-1 font-sans text-lg font-black uppercase tracking-wide text-zinc-950 dark:text-white">
+          <Dialog.Title className="mt-1 font-sans text-2xl font-semibold tracking-tight text-zinc-950 dark:text-white">
             {award.badge.name}
-          </h3>
-          <p className="mt-1.5 font-mono text-[11px] leading-5 text-zinc-500 dark:text-zinc-400">
+          </Dialog.Title>
+          <Dialog.Description className="mt-2 font-mono text-sm leading-6 text-zinc-600 dark:text-zinc-400">
             {award.badge.description}
-          </p>
+          </Dialog.Description>
 
           {award.reason && (
-            <p className="mt-3 border-l-2 border-zinc-950 pl-3 dark:border-white font-mono text-[10px] leading-5 text-zinc-500">
+            <p className="mt-4 border-l-2 border-zinc-300 pl-3 font-mono text-sm leading-6 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
               {award.reason}
             </p>
           )}
 
-          {/* Metrics */}
-          <div className="mt-4 flex items-center gap-3 border-t border-zinc-200 pt-3 font-mono dark:border-white/10 text-[10px]">
-            <span className="inline-flex items-center gap-1 text-zinc-500">
-              {count <= 1 ? (
-                <Crown className="h-3 w-3 text-zinc-500" />
-              ) : count <= 5 ? (
-                <Trophy className="h-3 w-3 text-zinc-500" />
-              ) : (
-                <Users className="h-3 w-3 text-zinc-400" />
-              )}
+          <div className="mt-5 flex items-center gap-4 border-t border-black/10 pt-4 font-mono text-xs text-zinc-500 dark:border-white/10">
+            <span className="inline-flex items-center gap-1.5">
+              <HolderIcon aria-hidden className="h-3.5 w-3.5" />
               {holderLabel(count)}
             </span>
-            <span className="text-zinc-300">|</span>
-            <span className="text-zinc-400">
+            <span>
               Earned{" "}
               {new Date(award.awardedAt).toLocaleDateString("en", {
                 month: "short",
@@ -97,8 +85,15 @@ function BadgeDetails({ award, onClose }: { award: BadgeAward; onClose: () => vo
             </span>
           </div>
         </div>
-      </div>
-    </div>
+
+        <Dialog.Close
+          aria-label="Close"
+          className="absolute top-3 right-3 p-1.5 text-zinc-500 outline-offset-2 transition-colors hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-zinc-950 dark:hover:text-white dark:focus-visible:outline-white"
+        >
+          <X aria-hidden className="h-4 w-4" />
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 }
 
@@ -124,19 +119,7 @@ export function PublicProfileBadges({ username }: { username: string }) {
             onClick={() => setSelected(award)}
             className="flex flex-col items-center gap-3 rounded-lg bg-[#f2f2f2] px-3 py-5 text-center transition-colors duration-200 hover:bg-[#e8e8e8] dark:bg-[#1c1c1c] dark:hover:bg-[#242424]"
           >
-            {award.badge.imageUrl ? (
-              <div className="relative h-14 w-14">
-                <Image
-                  src={award.badge.imageUrl}
-                  alt=""
-                  fill
-                  sizes="56px"
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <Award className="h-10 w-10 text-zinc-500" />
-            )}
+            <BadgeArt award={award} size="sm" />
             <span className="font-mono text-sm text-zinc-700 dark:text-zinc-300">
               {award.badge.name}
             </span>
