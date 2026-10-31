@@ -1,37 +1,17 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
+import { COVER_HEIGHT, COVER_WIDTH, coverShapes, initialsOf } from "@/lib/cover-art";
 import { fetchMemberProfile } from "@/lib/member";
 import { loadGoogleFontTtf } from "@/lib/og-fonts";
+import { withCloudinaryTransform } from "@/lib/utils";
 
 /**
- * Uploaded avatars are Cloudinary URLs and can come in at several MB
- * uncompressed — wasteful and slow to fetch for a 240px circle. Cloudinary's
- * URL-based transforms let us ask for a small, face-cropped, pre-optimized
- * version instead. No-op for any URL that isn't a Cloudinary "/upload/" path
- * (e.g. the dicebear fallback below).
+ * Fetches an image ourselves (rather than letting satori's internal image
+ * loader do it) so a slow/oversized user upload can't hang or 500 the route
+ * that social crawlers hit with short, non-retrying timeouts.
  */
-function toAvatarThumbnail(url: string): string {
-  const marker = "/upload/";
-  const insertAt = url.indexOf(marker);
-  if (insertAt === -1) return url;
-  const splitAt = insertAt + marker.length;
-  return `${url.slice(0, splitAt)}w_480,h_480,c_fill,g_face,q_auto,f_auto/${url.slice(splitAt)}`;
-}
-
-/** Dicebear's default svg endpoint can't be rasterized by satori — this card needs a raster fallback. */
-function getOgAvatarUrl(url: string | null | undefined, name: string): string {
-  const trimmed = url?.trim();
-  if (trimmed) return toAvatarThumbnail(trimmed);
-  return `https://api.dicebear.com/9.x/bottts-neutral/png?seed=${encodeURIComponent(name)}&size=440`;
-}
-
-/**
- * Fetches the avatar ourselves (rather than letting satori's internal image
- * loader do it) so a slow/oversized user-uploaded photo can't hang or 500 the
- * route that social crawlers hit with short, non-retrying timeouts.
- */
-async function loadAvatarDataUri(url: string): Promise<string | null> {
+async function loadImageDataUri(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
     if (!res.ok) return null;
@@ -43,6 +23,27 @@ async function loadAvatarDataUri(url: string): Promise<string | null> {
   }
 }
 
+// The profile's generated cover in its dark colours, as an svg the renderer
+// can rasterise: the same shapes and grain the page draws for this username.
+function coverArtDataUri(seed: string): string {
+  const tones = ["#000000", "#2c2c2c", "#3c3c3c", "#505050"];
+  const shapes = coverShapes(seed);
+  const gradients = shapes
+    .map(
+      (shape, index) =>
+        `<radialGradient id="s${index}"><stop offset="0" stop-color="${tones[shape.tone]}"/><stop offset="0.45" stop-color="${tones[shape.tone]}" stop-opacity="0.6"/><stop offset="1" stop-color="${tones[shape.tone]}" stop-opacity="0"/></radialGradient>`
+    )
+    .join("");
+  const ellipses = shapes
+    .map(
+      (shape, index) =>
+        `<ellipse cx="${shape.cx}" cy="${shape.cy}" rx="${shape.rx}" ry="${shape.ry}" transform="rotate(${shape.rotate} ${shape.cx} ${shape.cy})" fill="url(#s${index})"/>`
+    )
+    .join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${COVER_WIDTH} ${COVER_HEIGHT}" width="${COVER_WIDTH}" height="${COVER_HEIGHT}"><defs>${gradients}<filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="3 0 0 0 -1  3 0 0 0 -1  3 0 0 0 -1  0 0 0 0 1"/></filter></defs><rect width="${COVER_WIDTH}" height="${COVER_HEIGHT}" fill="#161616"/>${ellipses}<rect width="${COVER_WIDTH}" height="${COVER_HEIGHT}" filter="url(#g)" opacity="0.12"/></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
 export const runtime = "nodejs";
 // GET route handlers (which this file compiles to) are cached by default —
 // without this, a transient API failure gets baked in and served to every
@@ -51,14 +52,21 @@ export const dynamic = "force-dynamic";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Mentor: { bg: "rgba(255,247,237,0.9)", text: "#ea580c", border: "#fed7aa" },
-  Member: { bg: "rgba(244,244,245,0.9)", text: "#71717a", border: "#e4e4e7" },
-  Volunteer: { bg: "rgba(236,253,245,0.9)", text: "#059669", border: "#a7f3d0" },
-  "Core Team": { bg: "#18181b", text: "#ffffff", border: "#18181b" },
-  Admin: { bg: "#18181b", text: "#ffffff", border: "#18181b" },
-  "Super Admin": { bg: "#18181b", text: "#ffffff", border: "#18181b" },
-};
+// The card in the profile's dark colours: the panel, a cover band across the
+// top and the avatar a third over its edge.
+const PANEL = "#151515";
+const COVER = 220;
+const AVATAR = 210;
+const AVATAR_TOP = COVER - AVATAR / 3;
+const EDGE = 64;
+const TEXT_LEFT = EDGE + AVATAR + 44;
+const TEXT_WIDTH = size.width - TEXT_LEFT - EDGE;
+
+// Biggest size, up to 76px, at which the name fits on one line. Space
+// Grotesk's letters average a little under 0.6em wide.
+function nameSize(name: string): number {
+  return Math.round(Math.max(44, Math.min(76, TEXT_WIDTH / (name.length * 0.6))));
+}
 
 export default async function OpengraphImage({
   params,
@@ -68,17 +76,20 @@ export default async function OpengraphImage({
   const { username: rawUsername } = await params;
   const username = decodeURIComponent(rawUsername).replace(/^@/, "");
 
-  const [profile, logoBuffer, spaceGrotesk, inter] = await Promise.all([
-    fetchMemberProfile(username),
-    readFile(path.join(process.cwd(), "public/logos/codetopia-community.png")),
-    loadGoogleFontTtf("Space Grotesk", 700),
+  const [profile, logoBuffer, spaceGrotesk, inter, interSemibold] = await Promise.all([
+    // Crawlers don't retry, so a failed lookup still gets the plain card.
+    fetchMemberProfile(username).catch(() => null),
+    readFile(path.join(process.cwd(), "public/logos/community-logo-white.png")),
+    loadGoogleFontTtf("Space Grotesk", 600),
     loadGoogleFontTtf("Inter", 500),
+    loadGoogleFontTtf("Inter", 600),
   ]);
 
   const logoSrc = `data:image/png;base64,${logoBuffer.toString("base64")}`;
   const fonts = [
-    { name: "Space Grotesk", data: spaceGrotesk, weight: 700 as const },
+    { name: "Space Grotesk", data: spaceGrotesk, weight: 600 as const },
     { name: "Inter", data: inter, weight: 500 as const },
+    { name: "Inter", data: interSemibold, weight: 600 as const },
   ];
 
   if (!profile) {
@@ -86,168 +97,169 @@ export default async function OpengraphImage({
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           width: "100%",
           height: "100%",
-          background: "#09090b",
+          background: PANEL,
         }}
       >
         {/** biome-ignore lint/performance/noImgElement: satori render, not a browser img */}
-        <img src={logoSrc} width={280} height={158} style={{ objectFit: "contain" }} alt="" />
+        <img src={logoSrc} width={386} height={78} alt="" />
       </div>,
       { ...size, fonts }
     );
   }
 
-  const primaryRole = profile.primaryRole || profile.communityRoles?.[0] || "Member";
-  const roleColor = ROLE_COLORS[primaryRole] ?? ROLE_COLORS.Member;
-  // Same as the profile page: members on a team show level and team.
-  const primaryTeam = profile.teams?.[0];
-  const roleLabel = primaryTeam
-    ? `${profile.teamLevel || "Member"}, ${primaryTeam.name}`
-    : primaryRole;
-  const avatarSrc = await loadAvatarDataUri(
-    getOgAvatarUrl(profile.profilePictureUrl, profile.fullName)
-  );
+  const coverUrl = profile.coverImageUrl?.trim();
+  const photoUrl = profile.profilePictureUrl?.trim();
+  const [coverSrc, photoSrc] = await Promise.all([
+    coverUrl
+      ? loadImageDataUri(
+          withCloudinaryTransform(coverUrl, `c_fill,g_auto,w_1200,h_${COVER},q_auto,f_jpg`)
+        )
+      : null,
+    photoUrl
+      ? loadImageDataUri(
+          withCloudinaryTransform(photoUrl, "c_fill,g_face,w_420,h_420,q_auto,f_jpg")
+        )
+      : null,
+  ]);
+
+  const detail = [profile.currentRole, profile.location].filter(Boolean).join(" · ");
+  const handleSize = Math.min(220, (size.width - EDGE * 2) / (profile.username.length * 0.62));
 
   return new ImageResponse(
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
+        position: "relative",
         width: "100%",
         height: "100%",
-        padding: 64,
-        background: "#09090b",
-        backgroundImage:
-          "radial-gradient(circle at 85% 15%, rgba(255,255,255,0.08), transparent 55%)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: PANEL,
       }}
     >
+      {/* Their handle, huge and faint, on the right, fading towards the foot
+          as on the page. */}
       <div
         style={{
           display: "flex",
-          flex: 1,
+          position: "absolute",
+          right: EDGE,
+          bottom: 28,
+          fontFamily: "Inter",
+          fontWeight: 600,
+          fontSize: handleSize,
+          lineHeight: 0.8,
+          letterSpacing: "-0.05em",
+          color: "#1f1f1f",
+          maskImage: "linear-gradient(to bottom, black 40%, transparent)",
+        }}
+      >
+        {profile.username}
+      </div>
+
+      {/** biome-ignore lint/performance/noImgElement: satori render, not a browser img */}
+      <img
+        src={coverSrc ?? coverArtDataUri(profile.username)}
+        width={size.width}
+        height={COVER}
+        style={{ position: "absolute", top: 0, left: 0, objectFit: "cover" }}
+        alt=""
+      />
+
+      <div
+        style={{
+          display: "flex",
+          position: "absolute",
+          top: AVATAR_TOP,
+          left: EDGE,
+          width: AVATAR,
+          height: AVATAR,
           alignItems: "center",
-          gap: 56,
-          padding: "0 8px",
+          justifyContent: "center",
+          backgroundColor: "#1c1c1c",
+          border: "1px solid rgba(255,255,255,0.1)",
+          fontFamily: "Space Grotesk",
+          fontWeight: 600,
+          fontSize: 84,
+          letterSpacing: "-0.04em",
+          color: "#52525b",
+        }}
+      >
+        {photoSrc ? (
+          // biome-ignore lint/performance/noImgElement: satori render, not a browser img
+          <img
+            src={photoSrc}
+            width={AVATAR - 2}
+            height={AVATAR - 2}
+            style={{ objectFit: "cover" }}
+            alt=""
+          />
+        ) : (
+          initialsOf(profile.fullName)
+        )}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          position: "absolute",
+          top: COVER + 28,
+          left: TEXT_LEFT,
+          width: TEXT_WIDTH,
         }}
       >
         <div
           style={{
             display: "flex",
-            width: 320,
-            height: 320,
-            flexShrink: 0,
-            backgroundColor: "#27272a",
+            fontFamily: "Space Grotesk",
+            fontWeight: 600,
+            fontSize: nameSize(profile.fullName),
+            lineHeight: 1.05,
+            letterSpacing: "-0.04em",
+            color: "#ffffff",
           }}
         >
-          {avatarSrc && (
-            // biome-ignore lint/performance/noImgElement: satori render, not a browser img
-            <img
-              src={avatarSrc}
-              width={320}
-              height={320}
-              style={{
-                objectFit: "cover",
-                border: "4px solid rgba(255,255,255,0.2)",
-              }}
-              alt=""
-            />
-          )}
+          {profile.fullName}
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-          {profile.currentRole && (
-            <div
-              style={{
-                display: "flex",
-                marginBottom: 8,
-                fontFamily: "Inter",
-                fontWeight: 500,
-                fontSize: 26,
-                color: "#71717a",
-              }}
-            >
-              {profile.currentRole}
-            </div>
-          )}
+        <div
+          style={{
+            display: "flex",
+            marginTop: 10,
+            fontFamily: "Inter",
+            fontWeight: 500,
+            fontSize: 30,
+            color: "#71717a",
+          }}
+        >
+          @{profile.username}
+        </div>
+        {detail && (
           <div
             style={{
               display: "flex",
-              fontFamily: "Space Grotesk",
-              fontWeight: 700,
-              fontSize: 72,
-              lineHeight: 1.05,
-              color: "#ffffff",
-            }}
-          >
-            {profile.fullName}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              marginTop: 14,
+              marginTop: 18,
               fontFamily: "Inter",
-              fontSize: 32,
+              fontWeight: 500,
+              fontSize: 26,
               color: "#a1a1aa",
             }}
           >
-            @{profile.username}
+            {detail}
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 32 }}>
-            <div
-              style={{
-                display: "flex",
-                fontFamily: "Inter",
-                fontWeight: 500,
-                fontSize: 22,
-                padding: "10px 22px",
-                textTransform: "uppercase",
-                letterSpacing: 2,
-                backgroundColor: roleColor.bg,
-                color: roleColor.text,
-                border: `2px solid ${roleColor.border}`,
-              }}
-            >
-              {roleLabel}
-            </div>
-          </div>
-
-          {profile.location && (
-            <div
-              style={{
-                display: "flex",
-                marginTop: 20,
-                fontFamily: "Inter",
-                fontSize: 26,
-                color: "#71717a",
-              }}
-            >
-              {profile.location}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderTop: "1px solid rgba(255,255,255,0.1)",
-          paddingTop: 32,
-        }}
-      >
-        {/** biome-ignore lint/performance/noImgElement: satori render, not a browser img */}
-        <img src={logoSrc} width={140} height={79} style={{ objectFit: "contain" }} alt="" />
-        <div style={{ display: "flex", fontFamily: "Inter", fontSize: 24, color: "#52525b" }}>
-          Codetopia Community
-        </div>
-      </div>
+      {/** biome-ignore lint/performance/noImgElement: satori render, not a browser img */}
+      <img
+        src={logoSrc}
+        width={164}
+        height={33}
+        style={{ position: "absolute", left: EDGE, bottom: 48, objectFit: "contain" }}
+        alt=""
+      />
     </div>,
     { ...size, fonts }
   );
