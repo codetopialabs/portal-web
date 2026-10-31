@@ -51,6 +51,22 @@ export function getCertificateVerifyUrl(verificationCode: string): string {
   return `${base}/verify?code=${encodeURIComponent(verificationCode)}`;
 }
 
+/** The public community site's home page. */
+export function getCommunitySiteUrl(): string {
+  return (process.env.NEXT_PUBLIC_COMMUNITY_SITE_URL ?? "https://community.codetopia.org").replace(
+    /\/+$/,
+    ""
+  );
+}
+
+/**
+ * The Howtos on the public community site, where joining starts. Visitors are
+ * sent there rather than straight to sign-up, so they see how it works first.
+ */
+export function getJoinCommunityUrl(): string {
+  return `${getCommunitySiteUrl()}/howtos`;
+}
+
 /**
  * Converts a string to title case (e.g. "FRONTEND DEVELOPER" → "Frontend Developer").
  * Always applies — any casing the user types is normalised on blur/submit.

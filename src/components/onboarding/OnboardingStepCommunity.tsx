@@ -40,7 +40,7 @@ const SOCIALS = [
     icon: FaXTwitter,
     iconColor: "text-zinc-900",
     label: "X",
-    href: "https://x.com/codetopiacom",
+    href: "https://x.com/codetopiacomm",
   },
   {
     id: "facebook",

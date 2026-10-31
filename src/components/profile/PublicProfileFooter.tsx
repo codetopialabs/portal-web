@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import {
   FaGithub,
   FaInstagram,
@@ -22,13 +21,13 @@ const socialIcons = [
     href: "https://www.linkedin.com/company/codetopiacommunity",
     label: "LinkedIn",
   },
-  { icon: FaXTwitter, href: "https://x.com/codetopiacom", label: "X" },
+  { icon: FaXTwitter, href: "https://x.com/codetopiacomm", label: "X" },
   {
     icon: FaInstagram,
     href: "https://www.instagram.com/codetopiacommunity/",
     label: "Instagram",
   },
-  { icon: FaThreads, href: "http://www.threads.com/codetopiacommunity/", label: "Threads" },
+  { icon: FaThreads, href: "https://www.threads.com/@codetopiacommunity", label: "Threads" },
   { icon: FaTiktok, href: "https://www.tiktok.com/@codetopiacommunity", label: "TikTok" },
   {
     icon: SiBluesky,
@@ -53,33 +52,43 @@ const footerLinks = [
 
 // Slim on purpose: the profile is the page, the footer only says whose
 // community this is and where to go next.
-export function PublicProfileFooter() {
+// On a profile, phones and tablets have the section bar fixed along the
+// bottom, so the footer leaves room for it there.
+export function PublicProfileFooter({ aboveBottomBar = false }: { aboveBottomBar?: boolean }) {
   return (
-    <footer className="w-full bg-black text-white">
+    <footer className={`w-full bg-black text-white ${aboveBottomBar ? "pb-16 lg:pb-0" : ""}`}>
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex flex-col gap-4">
-          <Link href="/" className="inline-block">
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={COMMUNITY_SITE_URL}
+            className="inline-block"
+          >
             <Image
-              src="/logos/codetopia-community.png"
+              src="/logos/community-logo-white.png"
               alt="Codetopia Community"
-              width={128}
-              height={32}
-              className="h-7 w-auto object-contain brightness-0 invert"
+              width={773}
+              height={156}
+              unoptimized
+              className="h-7 w-auto"
             />
-          </Link>
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
           <p className="max-w-sm font-mono text-sm leading-relaxed text-zinc-400">
             An open community where people in tech do real work together. Based in Ghana, open to
             the world.
           </p>
         </div>
 
-        <nav className="flex flex-wrap gap-x-6 gap-y-3 font-mono text-sm">
+        <nav className="grid grid-cols-2 gap-x-6 gap-y-3 font-sans text-sm sm:flex sm:flex-wrap">
           {footerLinks.map(({ label, href }) => (
             <a
               key={label}
               href={href}
               {...(href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}
-              className="text-zinc-400 transition-colors hover:text-white"
+              // The email is the longest; on phones it takes a row of its own.
+              className={`text-zinc-400 transition-colors hover:text-white ${href.startsWith("mailto:") ? "col-span-2" : ""}`}
             >
               {label}
             </a>
@@ -87,8 +96,10 @@ export function PublicProfileFooter() {
         </nav>
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div className="flex flex-wrap gap-4">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+        {/* Each icon gets a finger-sized target; the row is pulled back so the
+            first icon still lines up with the text above. */}
+        <div className="-mx-2.5 flex flex-wrap">
           {socialIcons.map((social) => (
             <a
               key={social.label}
@@ -96,14 +107,14 @@ export function PublicProfileFooter() {
               target="_blank"
               rel="noreferrer"
               aria-label={social.label}
-              className="text-zinc-500 transition-colors hover:text-white"
+              className="p-2.5 text-zinc-500 transition-colors hover:text-white"
             >
               <social.icon className="h-4 w-4" />
             </a>
           ))}
         </div>
-        <p suppressHydrationWarning className="font-mono text-xs text-zinc-500">
-          &copy; {new Date().getFullYear()} Codetopia. A{" "}
+        <p suppressHydrationWarning className="font-sans text-xs text-zinc-500">
+          &copy; {new Date().getFullYear()} Codetopia Community. A{" "}
           <a
             href="https://codetopia.org"
             target="_blank"

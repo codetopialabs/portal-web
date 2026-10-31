@@ -361,7 +361,7 @@ function ActivityPageContent() {
                         <span>
                           on{" "}
                           <Link
-                            href={`/${subjectUsername}`}
+                            href={`/@${subjectUsername}`}
                             className="text-zinc-500 hover:text-zinc-900 hover:underline"
                           >
                             @{subjectUsername}
@@ -375,7 +375,7 @@ function ActivityPageContent() {
                         <span>
                           by{" "}
                           <Link
-                            href={`/${entry.actorUsername}`}
+                            href={`/@${entry.actorUsername}`}
                             className="text-zinc-500 hover:text-zinc-900 hover:underline"
                           >
                             @{entry.actorUsername}
